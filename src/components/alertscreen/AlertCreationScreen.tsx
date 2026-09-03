@@ -5,10 +5,11 @@ import { candles, SERIES, UP, DOWN, LEAD, TRAIL } from "./chart";
 import { pxHub, PX_BASE } from "./priceHub";
 import type { PriceState } from "./priceHub";
 import {
-  BackNavButton,
-  WatchlistNavButton,
-  AlertNavButton,
-} from "../glasslab/nav-buttons";
+  BackButton,
+  WatchlistButton,
+  AlertButton,
+} from "../glasslab/GlassButton";
+import "../glasslab/glass-button.css";
 
 /* Ported from "Create Alert Prototype.dc.html". A stock-detail screen in an
    iPhone frame: live rolling price, candlestick chart with a draw-in,
@@ -496,12 +497,14 @@ export function AlertCreationScreen({
               }}
             >
               {/* header bar — back left, watchlist + alert right */}
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <BackNavButton size={44} />
+              <div className="dark" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <BackButton variant="light" />
                 <span style={{ flex: 1 }} />
-                <WatchlistNavButton size={38} />
-                <AlertNavButton
-                  size={38}
+                <WatchlistButton variant="light" size="mobile" iconOnly />
+                <AlertButton
+                  variant="light"
+                  size="mobile"
+                  iconOnly
                   onClick={createAlert}
                   style={{ animation: bellShake }}
                 />
