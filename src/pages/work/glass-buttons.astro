@@ -38,11 +38,11 @@ const variants = ["light", "green"] as const;
     </section>
 
     <section>
-      <p class="sec-label">Mobile · iOS</p>
+      <p class="sec-label">Mobile · iOS · icon only</p>
       <p class="rule">
-        50 pt tall (44 pt is Apple's minimum touch target), capsule radius,
-        17 pt semibold system text, 16 pt screen-edge insets, 12 pt between
-        buttons. No hover lift on touch; a 3% scale-down on press.
+        Circular, 50 × 50 pt (44 pt is Apple's minimum touch target), 22 pt
+        glyph, 12 pt apart. Each carries an aria-label ("Add to watchlist",
+        "Set alert"). No hover lift on touch; a 3% scale-down on press.
       </p>
 
       <div class="phones">
@@ -50,15 +50,9 @@ const variants = ["light", "green"] as const;
           <div class="phone">
             <span class="phone-tag">{v}</span>
             <div class="screen">
-              <div class="stack">
-                <span class="ctx">Side by side</span>
-                <div class="row">
-                  <WatchlistButton variant={v} size="mobile" block />
-                  <AlertButton variant={v} size="mobile" block />
-                </div>
-                <span class="ctx">Full width</span>
-                <WatchlistButton variant={v} size="mobile" block />
-                <AlertButton variant={v} size="mobile" block />
+              <div class="toolbar">
+                <WatchlistButton variant={v} size="mobile" iconOnly />
+                <AlertButton variant={v} size="mobile" iconOnly />
               </div>
             </div>
           </div>
@@ -192,31 +186,14 @@ const variants = ["light", "green"] as const;
   }
 
   .screen {
-    width: 390px;
-    max-width: 100%;
-    border-radius: 30px;
+    display: inline-block;
+    border-radius: 24px;
     border: 1px solid #262626;
-    padding: 20px 16px; /* 16pt screen-edge insets */
+    padding: 20px;
   }
 
-  .stack {
+  .toolbar {
     display: flex;
-    flex-direction: column;
-    gap: 12px; /* 12pt between buttons */
-  }
-
-  .row {
-    display: flex;
-    gap: 12px;
-  }
-
-  .ctx {
-    font-size: 0.62rem;
-    color: #7a7a7a;
-    margin-top: 0.5rem;
-  }
-
-  .ctx:first-child {
-    margin-top: 0;
+    gap: 12px; /* 12pt between icon targets */
   }
 </style>

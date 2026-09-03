@@ -14,6 +14,8 @@ type GlassButtonProps = Omit<ComponentProps<"button">, "className"> & {
   size?: "web" | "mobile";
   /** Stretch to the container width (pair it with 16pt screen-edge insets on the parent). */
   block?: boolean;
+  /** Drop the label, render a circular icon-only button. Caller must pass an aria-label. */
+  iconOnly?: boolean;
   icon?: ReactNode;
   children: ReactNode;
 };
@@ -29,6 +31,7 @@ export function GlassButton({
   variant = "dark",
   size = "web",
   block = false,
+  iconOnly = false,
   icon,
   children,
   type = "button",
@@ -43,7 +46,8 @@ export function GlassButton({
     "btn",
     `btn--${variant}`,
     size === "mobile" && "btn--mobile",
-    block && "btn--block",
+    iconOnly && "btn--icon",
+    block && !iconOnly && "btn--block",
   ]
     .filter(Boolean)
     .join(" ");
@@ -52,7 +56,7 @@ export function GlassButton({
     <button type={type} className={cls} {...rest}>
       <span className={strokeClass} aria-hidden="true" />
       {icon}
-      <span className="label">{children}</span>
+      {!iconOnly && <span className="label">{children}</span>}
     </button>
   );
 }
@@ -97,17 +101,35 @@ type WrappedProps = Omit<GlassButtonProps, "icon" | "children"> & {
   label?: string;
 };
 
-export function WatchlistButton({ label = "Watchlist", ...rest }: WrappedProps) {
+export function WatchlistButton({
+  label = "Watchlist",
+  iconOnly = false,
+  ...rest
+}: WrappedProps) {
   return (
-    <GlassButton icon={<StarIcon />} {...rest}>
+    <GlassButton
+      icon={<StarIcon />}
+      iconOnly={iconOnly}
+      aria-label={iconOnly ? "Add to watchlist" : undefined}
+      {...rest}
+    >
       {label}
     </GlassButton>
   );
 }
 
-export function AlertButton({ label = "Alert", ...rest }: WrappedProps) {
+export function AlertButton({
+  label = "Alert",
+  iconOnly = false,
+  ...rest
+}: WrappedProps) {
   return (
-    <GlassButton icon={<BellIcon />} {...rest}>
+    <GlassButton
+      icon={<BellIcon />}
+      iconOnly={iconOnly}
+      aria-label={iconOnly ? "Set alert" : undefined}
+      {...rest}
+    >
       {label}
     </GlassButton>
   );
