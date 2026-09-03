@@ -10,6 +10,10 @@ export type GlassVariant =
 
 type GlassButtonProps = Omit<ComponentProps<"button">, "className"> & {
   variant?: GlassVariant;
+  /** "web" = 160×48 desktop pill; "mobile" = iOS sizing (≥44pt target, 50pt tall, 17pt semibold). */
+  size?: "web" | "mobile";
+  /** Stretch to the container width (pair it with 16pt screen-edge insets on the parent). */
+  block?: boolean;
   icon?: ReactNode;
   children: ReactNode;
 };
@@ -23,6 +27,8 @@ type GlassButtonProps = Omit<ComponentProps<"button">, "className"> & {
  */
 export function GlassButton({
   variant = "dark",
+  size = "web",
+  block = false,
   icon,
   children,
   type = "button",
@@ -33,8 +39,17 @@ export function GlassButton({
       ? "inner-stroke"
       : `inner-stroke inner-stroke--${variant}`;
 
+  const cls = [
+    "btn",
+    `btn--${variant}`,
+    size === "mobile" && "btn--mobile",
+    block && "btn--block",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <button type={type} className={`btn btn--${variant}`} {...rest}>
+    <button type={type} className={cls} {...rest}>
       <span className={strokeClass} aria-hidden="true" />
       {icon}
       <span className="label">{children}</span>

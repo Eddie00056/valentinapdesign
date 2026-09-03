@@ -157,8 +157,52 @@
   background: linear-gradient(273.75deg, #2A6B38 3.96%, #4A9B58 34.23%, #357941 98.29%);
 }
 
+/* ---- Mobile / iOS sizing ----
+   Apple HIG: 44pt minimum touch target; prominent action buttons sit at
+   ~50pt tall with a capsule radius and 17pt semibold system text. No hover
+   lift on touch; a small scale-down on press is the iOS feedback. */
+.btn--mobile {
+  height: 50px;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 20px;
+  gap: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro",
+    "Segoe UI", system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  transition: transform 0.14s ease, box-shadow 0.2s ease, opacity 0.14s ease;
+}
+
+.btn--mobile > svg {
+  width: 20px;
+  height: 20px;
+}
+
+.btn--mobile:hover {
+  transform: none;
+}
+
+.btn--mobile:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+/* Full-width action (screen-edge inset is the parent's job) */
+.btn--block {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn--mobile:active {
+    transform: none;
+  }
+}
+
 /* Dark mode overrides */
 .dark .btn { transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.4s ease, color 0.4s ease; }
+.dark .btn--mobile { transition: transform 0.14s ease, box-shadow 0.2s ease, opacity 0.14s ease, background 0.4s ease, color 0.4s ease; }
 
 .dark .inner-stroke {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.08) 102.08%);
