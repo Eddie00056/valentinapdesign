@@ -490,52 +490,16 @@ export function AlertCreationScreen({
                 flex: 1,
                 minHeight: 0,
                 overflowY: "auto",
-                padding: "14px 16px 28px",
+                padding: "14px 24px 28px",
               }}
             >
-              {/* search */}
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  height: 34,
-                  padding: "0 14px",
-                  borderRadius: 999,
-                  background: "#262d33",
-                }}
-              >
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  style={{ width: 17, height: 17, display: "block", flex: "none" }}
-                  stroke="#8e97ad"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                >
-                  <circle cx="8.6" cy="8.6" r="5.6" />
-                  <path d="M12.8 12.8L17 17" />
-                </svg>
-                <span data-type="body-muted" style={{ color: "#8e97ad", fontSize: 12, fontWeight: 400, lineHeight: 1 }}>
-                  Search symbol
-                </span>
-              </div>
-
               {/* ticker */}
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginTop: 20,
-                }}
-              >
-                <div>
-                  <div style={{ display: "flex", gap: 8, alignItems: "baseline", color: "#f2f2f8" }}>
-                    <span data-type="heading" style={{ fontSize: 14, fontWeight: 600 }}>DASH</span>
-                    <span data-type="heading-regular" style={{ fontSize: 14, fontWeight: 400 }}>DoorDash, Inc.</span>
-                  </div>
-                  <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginTop: 4 }}>
+              <div>
+                <div style={{ display: "flex", gap: 8, alignItems: "baseline", color: "#f2f2f8" }}>
+                  <span data-type="heading" style={{ fontSize: 14, fontWeight: 600 }}>DASH</span>
+                  <span data-type="heading-regular" style={{ fontSize: 14, fontWeight: 400 }}>DoorDash, Inc.</span>
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginTop: 4 }}>
                     <div
                       data-type="price"
                       style={{
@@ -584,19 +548,20 @@ export function AlertCreationScreen({
                       {changeText}
                     </span>
                   </div>
-                </div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center", paddingTop: 2, flex: "none" }}>
-                  <WatchlistNavButton size={36} />
-                  <AlertNavButton
-                    size={36}
-                    onClick={createAlert}
-                    style={{ animation: bellShake }}
-                  />
-                </div>
+              </div>
+
+              {/* watchlist / alert */}
+              <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 14 }}>
+                <WatchlistNavButton size={36} />
+                <AlertNavButton
+                  size={36}
+                  onClick={createAlert}
+                  style={{ animation: bellShake }}
+                />
               </div>
 
               {/* chart */}
-              <div style={{ position: "relative", width: "calc(100% + 32px)", margin: "24px -16px 0", height: 124 }}>
+              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "24px -24px 0", height: 124 }}>
                 <svg viewBox="0 0 393 124" preserveAspectRatio="none" style={{ display: "block", width: "100%", height: "100%" }}>
                   <defs>
                     <linearGradient id="areaUp" x1="0" y1="0" x2="0" y2="1">
