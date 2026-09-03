@@ -4,9 +4,8 @@ import { ArrowBackIcon, StarFilledIcon, BellIcon } from "./icons";
 
 export { StarFilledIcon } from "./icons";
 
-/* iOS-style nav chrome: soft circular icon buttons. Low-contrast
-   translucent fill, a whisper of an inset highlight, generous blur, no
-   mask ring — reads calm on a real screen. Not grouped. */
+/* Flat nav buttons: a separate, glass-free variation. Solid low-contrast
+   circular fill, no blur / no ring / no shadow. Never grouped. */
 
 type BtnProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children">;
 
