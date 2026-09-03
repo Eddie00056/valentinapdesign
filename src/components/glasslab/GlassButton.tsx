@@ -116,6 +116,21 @@ export function SearchIcon() {
   );
 }
 
+/* Material Symbols "arrow_back" (opsz24, wght400) as a currentColor SVG. */
+export function ArrowBackIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M19 12H5M12 19l-7-7 7-7"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /* ---- named buttons ---- */
 
 type WrappedProps = Omit<GlassButtonProps, "icon" | "children"> & {
@@ -180,6 +195,25 @@ export function SearchButton({
       size={size}
       iconOnly
       icon={<SearchIcon />}
+      aria-label={label}
+      {...rest}
+    >
+      {label}
+    </GlassButton>
+  );
+}
+
+/** Icon-only mobile back button. */
+export function BackButton({
+  label = "Back",
+  size = "mobile",
+  ...rest
+}: WrappedProps) {
+  return (
+    <GlassButton
+      size={size}
+      iconOnly
+      icon={<ArrowBackIcon />}
       aria-label={label}
       {...rest}
     >

@@ -1,0 +1,46 @@
+---
+import Base from "../../layouts/Base.astro";
+import { BackButton } from "../../components/glasslab/GlassButton";
+import "../../components/glasslab/glass-button.css";
+
+const variants = ["light", "green"] as const;
+---
+
+<Base title="Buttons lab">
+  <main class="wrap dark">
+    <div class="group">
+      {variants.map((v) => (
+        <div class="pair">
+          <BackButton variant={v} />
+          <BackButton variant={v} style={{ width: 44, height: 44 }} />
+        </div>
+      ))}
+    </div>
+  </main>
+</Base>
+
+<style>
+  .wrap {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4rem;
+    padding: 3rem 1.5rem;
+    background: #0d0d0d;
+  }
+
+  .group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .pair {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+</style>
