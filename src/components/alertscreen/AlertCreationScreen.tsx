@@ -486,6 +486,7 @@ export function AlertCreationScreen({
             }}
           >
             <div
+              className="acs-scroll"
               style={{
                 flex: 1,
                 minHeight: 0,
@@ -494,12 +495,13 @@ export function AlertCreationScreen({
               }}
             >
               {/* ticker */}
-              <div>
-                <div style={{ display: "flex", gap: 8, alignItems: "baseline", color: "#f2f2f8" }}>
-                  <span data-type="heading" style={{ fontSize: 14, fontWeight: 600 }}>DASH</span>
-                  <span data-type="heading-regular" style={{ fontSize: 14, fontWeight: 400 }}>DoorDash, Inc.</span>
-                </div>
-                <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginTop: 4 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <div style={{ display: "flex", gap: 8, alignItems: "baseline", color: "#f2f2f8" }}>
+                    <span data-type="heading" style={{ fontSize: 14, fontWeight: 600 }}>DASH</span>
+                    <span data-type="heading-regular" style={{ fontSize: 14, fontWeight: 400 }}>DoorDash, Inc.</span>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginTop: 4 }}>
                     <div
                       data-type="price"
                       style={{
@@ -548,16 +550,15 @@ export function AlertCreationScreen({
                       {changeText}
                     </span>
                   </div>
-              </div>
-
-              {/* watchlist / alert */}
-              <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 14 }}>
-                <WatchlistNavButton size={36} />
-                <AlertNavButton
-                  size={36}
-                  onClick={createAlert}
-                  style={{ animation: bellShake }}
-                />
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", paddingTop: 2, flex: "none" }}>
+                  <WatchlistNavButton size={36} />
+                  <AlertNavButton
+                    size={36}
+                    onClick={createAlert}
+                    style={{ animation: bellShake }}
+                  />
+                </div>
               </div>
 
               {/* chart */}

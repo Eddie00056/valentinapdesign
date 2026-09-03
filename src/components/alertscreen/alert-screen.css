@@ -33,6 +33,13 @@
 @keyframes badgeNumB { 0%,45%{opacity:0;transform:scale(.4)} 70%{opacity:1;transform:scale(1.12)} 100%{opacity:1;transform:scale(1)} }
 @keyframes ringPulse { 0% { box-shadow: 0 0 0 0 rgba(72,213,151,0.45); } 100% { box-shadow: 0 0 0 14px rgba(72,213,151,0); } }
 
+/* Hide the scroll container's scrollbar so the 24px left / right padding
+   reads as symmetric (a classic scrollbar otherwise eats into the right
+   inset and shifts the negative-margin chart / rail bleeds). Matches iOS,
+   where the scrollbar is an overlay. */
+.acs-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.acs-scroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
 /* single hover state carried over from `style-hover` on the bell */
 .acs-bell:hover { transform: scale(1.06); }
 
