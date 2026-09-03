@@ -1,5 +1,4 @@
 ---
-import "../styles/global.css";
 import { site } from "../data/site";
 
 interface Props {
@@ -8,12 +7,7 @@ interface Props {
 }
 
 const { title, description } = Astro.props;
-
 const pageTitle = title ? `${title} — ${site.name}` : site.name;
-const canonical = new URL(
-  Astro.url.pathname,
-  Astro.site ?? "https://valentinapdesign.com",
-);
 ---
 
 <!doctype html>
@@ -25,19 +19,24 @@ const canonical = new URL(
     <link rel="icon" href="/favicon.ico" />
     <title>{pageTitle}</title>
     {description && <meta name="description" content={description} />}
-    <link rel="canonical" href={canonical.href} />
-
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={pageTitle} />
-    <meta property="og:url" content={canonical.href} />
     <meta name="generator" content={Astro.generator} />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Inter:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap"
       rel="stylesheet"
     />
+
+    <style is:global>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #0d0d0d;
+        overflow: hidden;
+      }
+    </style>
   </head>
   <body>
     <slot />

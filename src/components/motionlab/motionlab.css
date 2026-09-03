@@ -1,0 +1,191 @@
+/* Stock / Option toggle + focused-demo shell.
+   Ported from the motion-toggle-lab source; only the component classes are
+   kept (no global body/reset — the site owns those). */
+
+/* ---- the toggle itself ---- */
+
+.track {
+  position: relative;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.track:focus-visible {
+  box-shadow: 0 0 0 2px rgba(72, 213, 151, 0.55);
+}
+
+.labels {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  z-index: 1;
+}
+
+.lbl {
+  appearance: none;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: 0.24px;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+/* ---- Demo shell — after the tcosta.com/wspoc snippet-page chrome ---- */
+
+.shell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  transition: background 0.4s ease;
+}
+
+.shell--light {
+  background: #ffffff;
+}
+
+.shell--dark {
+  background: #0d0d0d;
+}
+
+.shell-nav {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  right: 24px;
+  height: 48px;
+  z-index: 100;
+  pointer-events: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shell-glass {
+  pointer-events: auto;
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.shell--dark .shell-glass {
+  background: rgba(38, 38, 38, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.shell-btn {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.75);
+  background: transparent;
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shell-btn:hover {
+  color: #000;
+}
+
+.shell--dark .shell-btn {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.shell--dark .shell-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.shell-btn svg {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.shell-btn--back:hover svg {
+  transform: translateX(-2px);
+}
+
+.shell-pill {
+  height: 48px;
+  padding: 0 8px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shell-pill-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #0d0d0d;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.shell-pill-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.shell-pill-btn[data-on="true"] {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.shell--dark .shell-pill-btn {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.shell--dark .shell-pill-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.shell--dark .shell-pill-btn[data-on="true"] {
+  color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.shell-stage {
+  z-index: 1;
+}
+
+.shell-foot {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+@media (max-width: 600px) {
+  .shell-nav {
+    top: 12px;
+    left: 12px;
+    right: 12px;
+  }
+}

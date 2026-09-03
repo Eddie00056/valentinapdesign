@@ -1,10 +1,12 @@
 # valentinapdesign.com
 
-Personal site for **Valentina P.** — a grid-gallery landing page. One index
-page of project cards; each card links to its own case-study page. Add a
-project and it shows up on the site.
+Personal site for **Valentina P.** — a name and a grid of pieces. Each piece is
+a thumbnail that opens a full-screen interactive demo; the demo's back button
+returns to this home page.
 
-Built with [Astro](https://astro.build) (static output, no framework runtime).
+Built with [Astro](https://astro.build) (static output) + React islands
+([`@astrojs/react`](https://docs.astro.build/en/guides/integrations-guide/react/))
+for the interactive pieces, animated with [`motion`](https://motion.dev).
 
 ## Run it locally
 
@@ -12,52 +14,43 @@ Built with [Astro](https://astro.build) (static output, no framework runtime).
 npm install
 npm run dev        # http://localhost:4321
 npm run build      # static site into dist/
-npm run preview    # serve the built dist/ locally
+npm run preview
 ```
 
-Requires Node 22.12+.
+Node 22+.
 
-## Where things live
+## Layout
 
 | Path | What |
 | --- | --- |
-| `src/data/site.ts` | **Edit this.** Site name/links + the `pieces` array (the gallery). Order = display order. |
-| `src/pages/index.astro` | The gallery grid. |
-| `src/pages/work/[slug].astro` | Case-study page template, one per piece. |
-| `src/layouts/Base.astro` | HTML shell, `<head>`, fonts, footer. |
-| `src/styles/global.css` | Design tokens (colour, type) + base styles. |
-| `public/` | Static files served as-is (favicon, images). |
+| `src/pages/index.astro` | Home — name + the gallery grid. |
+| `src/data/site.ts` | Site name + the `pieces` list (one entry per thumbnail). |
+| `src/pages/work/*.astro` | One page per piece — full-screen, its own `Bare` layout. |
+| `src/components/motionlab/` | The Stock / Option toggle: component, sound, demo shell, thumbnail preview. |
+| `src/layouts/Base.astro` | Head + fonts for normal pages. |
+| `src/layouts/Bare.astro` | Chrome-free shell for the full-screen demos. |
+| `src/styles/global.css` | Design tokens + base styles for the site (not the demos). |
 
-## Adding a project
+## Adding a piece
 
-1. Add an entry to `pieces` in `src/data/site.ts`:
+1. Build the interactive component under `src/components/<name>/`, with an
+   island wrapper that renders it (see `motionlab/ToggleDemo.tsx`). Give the
+   demo shell an `onBack` that does `window.location.href = "/"`.
+2. Add a page `src/pages/work/<slug>.astro` that renders the island inside
+   `Bare` with `client:load`.
+3. Add a thumbnail preview component (see `motionlab/TogglePreview.tsx`) —
+   non-interactive, `pointer-events: none` so clicks reach the card link.
+4. Add an entry to `pieces` in `src/data/site.ts`:
 
    ```ts
-   {
-     slug: "my-project",           // becomes /work/my-project
-     title: "My Project",
-     year: "2026",
-     kind: "Identity",             // short tag shown on the card
-     summary: "One line about it.",
-     cover: "/work/my-project/cover.jpg", // optional; omit for a coloured tile
-     accent: "#c8624a",            // tile colour when there's no cover
-   }
+   { slug: "my-piece", href: "/work/my-piece", title: "My Piece" }
    ```
 
-2. Put images in `public/work/my-project/`.
-3. Flesh out the case study in `src/pages/work/[slug].astro` (currently a
-   shared placeholder for every piece — split it out when the content differs).
+5. Render its preview in the grid in `src/pages/index.astro`.
 
 ## Deploying
 
-Static site — any static host works. Recommended: **Cloudflare Pages** (build
-command `npm run build`, output directory `dist`). Custom domain
-`valentinapdesign.com` is configured at the registrar (Porkbun). See the repo's
-deployment notes / issues for the current DNS setup.
-
-## TODO
-
-- Replace placeholder projects and copy in `src/data/site.ts` (search `TODO`).
-- Real case-study content per project.
-- Real social links + email address.
-- Add `public/og.png` for link previews.
+Auto-deploys to Cloudflare (Workers static assets) on every push to `main`.
+Build: `npm run build`; deploy: `npx wrangler deploy` (config in
+`wrangler.jsonc`, serves `./dist`). Custom domain `valentinapdesign.com` is
+attached to the Worker; DNS + SSL handled by Cloudflare.
