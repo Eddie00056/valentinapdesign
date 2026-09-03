@@ -210,27 +210,19 @@
   height: 14px;
 }
 /* 24px control keeps a 44pt invisible hit area (Apple HIG). */
-.btn--mobile.btn--icon:not(.btn--44)::after {
+.btn--mobile.btn--icon::after {
   content: "";
   position: absolute;
   inset: -10px;
   border-radius: 50%;
 }
 
-/* 44 x 44pt mobile action — label-only square (Trade) or icon-only (Search).
-   Already at the minimum touch target, so no hit-area expansion. */
-.btn--mobile.btn--44 {
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
-  min-height: 44px;
+/* Trade — web-style pill (16px DM Sans, hover lift) at a fixed 71 x 32. */
+.btn--trade {
+  width: 71px;
+  height: 32px;
   padding: 0;
-  font-size: 13px;
-  letter-spacing: -0.02em;
-}
-.btn--mobile.btn--44.btn--icon > svg {
-  width: 20px;
-  height: 20px;
+  white-space: nowrap;
 }
 
 @media (prefers-reduced-motion: reduce) {

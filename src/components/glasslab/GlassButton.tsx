@@ -13,9 +13,9 @@ type GlassButtonProps = Omit<ComponentProps<"button">, "className"> & {
   /**
    * "web" = 160×48 desktop pill;
    * "mobile" = iOS sizing (50pt tall labelled, or 24px with iconOnly);
-   * "mobile-44" = a 44×44pt square (label-only) / circle (iconOnly).
+   * "trade" = web-style pill at a fixed 71×32.
    */
-  size?: "web" | "mobile" | "mobile-44";
+  size?: "web" | "mobile" | "trade";
   /** Stretch to the container width (pair it with 16pt screen-edge insets on the parent). */
   block?: boolean;
   /** Drop the label, render a circular icon-only button. Caller must pass an aria-label. */
@@ -46,12 +46,11 @@ export function GlassButton({
       ? "inner-stroke"
       : `inner-stroke inner-stroke--${variant}`;
 
-  const isMobile = size === "mobile" || size === "mobile-44";
   const cls = [
     "btn",
     `btn--${variant}`,
-    isMobile && "btn--mobile",
-    size === "mobile-44" && "btn--44",
+    size === "mobile" && "btn--mobile",
+    size === "trade" && "btn--trade",
     iconOnly && "btn--icon",
     block && !iconOnly && "btn--block",
   ]
@@ -157,10 +156,10 @@ export function AlertButton({
   );
 }
 
-/** Label-only 44×44pt square action. */
+/** Label-only web-style pill, fixed 71×32. */
 export function TradeButton({
   label = "Trade",
-  size = "mobile-44",
+  size = "trade",
   ...rest
 }: WrappedProps) {
   return (
@@ -170,10 +169,10 @@ export function TradeButton({
   );
 }
 
-/** Icon-only 44×44pt search action. */
+/** Icon-only search action — same sizing as Watchlist / Alert. */
 export function SearchButton({
   label = "Search",
-  size = "mobile-44",
+  size = "mobile",
   ...rest
 }: WrappedProps) {
   return (
