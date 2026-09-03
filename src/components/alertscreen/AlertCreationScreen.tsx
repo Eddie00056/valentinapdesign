@@ -5,6 +5,7 @@ import { candles, SERIES, UP, DOWN, LEAD, TRAIL } from "./chart";
 import { pxHub, PX_BASE } from "./priceHub";
 import type { PriceState } from "./priceHub";
 import {
+  BackNavButton,
   WatchlistNavButton,
   AlertNavButton,
 } from "../glasslab/nav-buttons";
@@ -494,14 +495,25 @@ export function AlertCreationScreen({
                 padding: "14px 24px 28px",
               }}
             >
+              {/* header bar — back left, watchlist + alert right */}
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <BackNavButton size={44} />
+                <span style={{ flex: 1 }} />
+                <WatchlistNavButton size={38} />
+                <AlertNavButton
+                  size={38}
+                  onClick={createAlert}
+                  style={{ animation: bellShake }}
+                />
+              </div>
+
               {/* ticker */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <div style={{ display: "flex", gap: 8, alignItems: "baseline", color: "#f2f2f8" }}>
-                    <span data-type="heading" style={{ fontSize: 14, fontWeight: 600 }}>DASH</span>
-                    <span data-type="heading-regular" style={{ fontSize: 14, fontWeight: 400 }}>DoorDash, Inc.</span>
-                  </div>
-                  <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginTop: 4 }}>
+              <div style={{ marginTop: 32 }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "baseline", color: "#f2f2f8" }}>
+                  <span data-type="heading" style={{ fontSize: 14, fontWeight: 600 }}>DASH</span>
+                  <span data-type="heading-regular" style={{ fontSize: 14, fontWeight: 400 }}>DoorDash, Inc.</span>
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginTop: 4 }}>
                     <div
                       data-type="price"
                       style={{
@@ -551,15 +563,6 @@ export function AlertCreationScreen({
                     </span>
                   </div>
                 </div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center", paddingTop: 2, flex: "none" }}>
-                  <WatchlistNavButton size={36} />
-                  <AlertNavButton
-                    size={36}
-                    onClick={createAlert}
-                    style={{ animation: bellShake }}
-                  />
-                </div>
-              </div>
 
               {/* chart */}
               <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "24px -24px 0", height: 124 }}>
