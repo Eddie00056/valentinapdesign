@@ -1,0 +1,237 @@
+/* Glass button — surface + 1px gradient ring (::before) + 1px inset highlight
+   (.inner-stroke), six colour variants, with .dark ancestor overrides.
+   Ported verbatim from the handoff; only additions: `gap` on .btn for the
+   icon, and a focus-visible ring. */
+
+.btn {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 160px;
+  height: 48px;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-radius: 1000px;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0.5px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.btn > svg {
+  position: relative;
+  z-index: 4;
+  flex: none;
+}
+
+.btn > .label {
+  position: relative;
+  z-index: 4;
+}
+
+.btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.inner-stroke {
+  box-sizing: border-box;
+  position: absolute;
+  left: 1px;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  border-radius: 1000px;
+  z-index: 3;
+  padding: 1px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.2) 102.08%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.inner-stroke--light {
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.7) 102.08%);
+}
+
+.inner-stroke--cream {
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.7) 102.08%);
+}
+
+.inner-stroke--blue {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.6) 102.08%);
+}
+
+.inner-stroke--red {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.5) 102.08%);
+}
+
+.inner-stroke--green {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.5) 102.08%);
+}
+
+.btn--dark {
+  background: rgba(0, 0, 0, 0.96);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.16);
+  color: #FFFFFF;
+}
+.btn--dark::before {
+  background: linear-gradient(146.26deg, #000000 8.55%, #000000 57.49%, #000000 86.93%);
+}
+
+.btn--light {
+  background: rgba(255, 255, 255, 0.50);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.06);
+  color: #1A1A1A;
+}
+.btn--light::before {
+  background: linear-gradient(270deg, rgba(0, 0, 0, 0.07) 0%, rgba(0, 0, 0, 0) 24.61%, rgba(0, 0, 0, 0.05) 100%);
+}
+
+.btn--cream {
+  background: rgba(228, 222, 158, 0.50);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.06);
+  color: #8B7D4A;
+}
+.btn--cream::before {
+  background: linear-gradient(273.75deg, #BCB676 3.96%, #EAE4A4 34.23%, #BCB676 98.29%);
+}
+
+.btn--blue {
+  background: rgba(193, 202, 237, 0.50);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.04);
+  color: #4A6FA5;
+}
+.btn--blue::before {
+  background: linear-gradient(273.75deg, #6C9BE6 3.96%, #B2E1F5 34.23%, #6291DC 98.29%);
+}
+
+.btn--red {
+  background: rgba(226, 43, 24, 0.70);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.08);
+  color: #FFFFFF;
+}
+.btn--red::before {
+  background: linear-gradient(273.75deg, #DE3221 3.96%, #FF9D8C 34.23%, #C42828 98.29%);
+}
+
+.btn--green {
+  background: rgba(53, 121, 65, 0.55);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.08);
+  color: #FFFFFF;
+}
+.btn--green::before {
+  background: linear-gradient(273.75deg, #2A6B38 3.96%, #4A9B58 34.23%, #357941 98.29%);
+}
+
+/* Dark mode overrides */
+.dark .btn { transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.4s ease, color 0.4s ease; }
+
+.dark .inner-stroke {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.08) 102.08%);
+}
+
+.dark .btn--dark {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0px 8px 20px rgba(255, 255, 255, 0.06);
+  color: #0A0A0A;
+}
+.dark .btn--dark::before {
+  background: linear-gradient(170.89deg, rgba(255, 255, 255, 0.9) 3.02%, rgba(255, 255, 255, 0.15) 28.94%, rgba(255, 255, 255, 0.5) 108.33%);
+}
+.dark .btn--dark .inner-stroke {
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.7) 102.08%);
+}
+
+.dark .btn--light {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+}
+.dark .btn--light::before {
+  background: linear-gradient(170.89deg, rgba(255, 255, 255, 0.45) 3.02%, rgba(255, 255, 255, 0.08) 28.94%, rgba(255, 255, 255, 0.25) 108.33%);
+}
+.dark .inner-stroke--light {
+  background: linear-gradient(320.64deg, #0D0D0D 11.97%, rgba(30, 30, 30, 0.3) 48.91%, #1A1A1A 91.55%);
+}
+
+.dark .btn--cream {
+  background: rgba(200, 180, 80, 0.18);
+  box-shadow: 0px 8px 20px rgba(180, 160, 60, 0.08);
+  color: #D4C46A;
+}
+.dark .btn--cream::before {
+  background: linear-gradient(170.89deg, rgba(234, 228, 164, 0.8) 3.02%, rgba(188, 182, 118, 0.19) 28.94%, rgba(188, 182, 118, 0.54) 108.33%);
+}
+.dark .inner-stroke--cream {
+  background: linear-gradient(320.64deg, #0D0D0D 11.97%, rgba(35, 32, 20, 0.3) 48.91%, #1A1A1A 91.55%);
+}
+
+.dark .btn--blue {
+  background: rgba(69, 78, 113, 0.5);
+  box-shadow: 0px 8px 20px rgba(80, 120, 200, 0.08);
+  color: #9CB7ED;
+}
+.dark .btn--blue::before {
+  background: linear-gradient(170.89deg, rgba(156, 183, 237, 0.8) 3.02%, rgba(116, 143, 197, 0.19) 28.94%, rgba(116, 143, 197, 0.54) 108.33%);
+}
+.dark .inner-stroke--blue {
+  background: linear-gradient(320.64deg, #0D0D0D 11.97%, rgba(28, 31, 44, 0.3) 48.91%, #1A1A1A 91.55%);
+}
+
+.dark .btn--red {
+  background: rgba(180, 35, 22, 0.4);
+  box-shadow: 0px 8px 20px rgba(200, 40, 30, 0.12);
+  color: #E22B18;
+}
+.dark .btn--red::before {
+  background: linear-gradient(170.89deg, rgba(255, 120, 100, 0.8) 3.02%, rgba(200, 40, 30, 0.19) 28.94%, rgba(220, 50, 35, 0.54) 108.33%);
+}
+.dark .inner-stroke--red {
+  background: linear-gradient(320.64deg, #0D0D0D 11.97%, rgba(40, 20, 18, 0.3) 48.91%, #1A1A1A 91.55%);
+}
+
+.dark .btn--green {
+  background: rgba(43, 100, 55, 0.45);
+  box-shadow: 0px 8px 20px rgba(64, 150, 82, 0.12);
+  color: #7ED68C;
+}
+.dark .btn--green::before {
+  background: linear-gradient(170.89deg, rgba(100, 180, 110, 0.8) 3.02%, rgba(64, 150, 82, 0.19) 28.94%, rgba(64, 150, 82, 0.54) 108.33%);
+}
+.dark .inner-stroke--green {
+  background: linear-gradient(320.64deg, #0D0D0D 11.97%, rgba(18, 38, 22, 0.3) 48.91%, #1A1A1A 91.55%);
+}

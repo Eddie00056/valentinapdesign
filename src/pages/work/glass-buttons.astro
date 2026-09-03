@@ -1,0 +1,169 @@
+---
+import Base from "../../layouts/Base.astro";
+import {
+  WatchlistButton,
+  AlertButton,
+} from "../../components/glasslab/GlassButton";
+import "../../components/glasslab/glass-button.css";
+
+const variants = ["dark", "light", "cream", "blue", "green", "red"] as const;
+---
+
+<Base title="Glass buttons" description="Watchlist and alert glass buttons — resting state, six colour variants.">
+  <main class="wrap">
+    <header>
+      <p class="eyebrow">Component · work in progress</p>
+      <h1>Glass buttons</h1>
+      <p class="note">
+        Watchlist and alert buttons. Resting state only, all six colour
+        variants, shown on a light and a dark surface. Hover / press are the
+        CSS defaults (a 1px lift).
+      </p>
+    </header>
+
+    <section class="panel panel--light" aria-label="On a light surface">
+      <p class="panel-label">On a light surface</p>
+      <div class="grid">
+        {variants.map((v) => (
+          <div class="cell">
+            <p class="v-name">{v}</p>
+            <div class="pair">
+              <WatchlistButton variant={v} />
+              <AlertButton variant={v} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="panel panel--dark dark" aria-label="On a dark surface">
+      <p class="panel-label">On a dark surface</p>
+      <div class="grid">
+        {variants.map((v) => (
+          <div class="cell">
+            <p class="v-name">{v}</p>
+            <div class="pair">
+              <WatchlistButton variant={v} />
+              <AlertButton variant={v} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .wrap {
+    max-width: 1100px;
+    margin-inline: auto;
+    padding: clamp(2rem, 1.4rem + 3vw, 4rem) clamp(1.15rem, 0.7rem + 2vw, 2.5rem)
+      6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    font-family: var(--font-body);
+    color: var(--ink);
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 0 0 0.9rem;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(1.8rem, 1.4rem + 2vw, 2.6rem);
+    letter-spacing: -0.015em;
+    margin: 0 0 0.75rem;
+  }
+
+  .note {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+  }
+
+  .panel {
+    border-radius: 16px;
+    padding: clamp(1.5rem, 1rem + 3vw, 3rem);
+    border: 1px solid var(--line);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel-label {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 1.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* backdrops so the glass blur has something to work on */
+  .panel--light {
+    background:
+      radial-gradient(38% 55% at 18% 20%, rgba(120, 160, 255, 0.28), transparent 70%),
+      radial-gradient(42% 60% at 85% 30%, rgba(255, 170, 120, 0.25), transparent 70%),
+      radial-gradient(50% 70% at 60% 100%, rgba(150, 230, 190, 0.22), transparent 70%),
+      #f4f4f2;
+  }
+  .panel--light .panel-label {
+    color: #6a6a68;
+  }
+
+  .panel--dark {
+    background:
+      radial-gradient(38% 55% at 20% 15%, rgba(90, 130, 255, 0.30), transparent 70%),
+      radial-gradient(44% 60% at 88% 35%, rgba(255, 110, 90, 0.24), transparent 70%),
+      radial-gradient(52% 72% at 55% 105%, rgba(70, 200, 140, 0.22), transparent 70%),
+      #0d0d0d;
+    border-color: #262626;
+  }
+  .panel--dark .panel-label {
+    color: #9a9a9a;
+  }
+
+  .grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 2rem 1.5rem;
+  }
+
+  .cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .v-name {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .panel--light .v-name {
+    color: #7a7a78;
+  }
+  .panel--dark .v-name {
+    color: #8a8a8a;
+  }
+
+  .pair {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+</style>
