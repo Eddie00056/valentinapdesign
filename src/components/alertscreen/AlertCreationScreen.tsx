@@ -8,6 +8,7 @@ import {
   BackButton,
   WatchlistButton,
   AlertButton,
+  FractionalButton,
 } from "../glasslab/GlassButton";
 import "../glasslab/glass-button.css";
 
@@ -508,6 +509,7 @@ export function AlertCreationScreen({
                   onClick={createAlert}
                   style={{ animation: bellShake }}
                 />
+                <FractionalButton variant="light" size="mobile" iconOnly />
               </div>
 
               {/* ticker */}
