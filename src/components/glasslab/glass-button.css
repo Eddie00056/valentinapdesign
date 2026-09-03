@@ -312,25 +312,20 @@
 }
 
 /* ---- Mobile glass — blend the reflected light ----
-   The small circles were catching a hard 1px glint instead of a soft
-   reflection. Widen the blur, ease the rim gradient, add a diffuse sheen
-   + faint opposite-edge shade. Light comes from the LEFT (~95deg):
-   bright at the left edge, fading across, a soft pickup on the right.
-   Scoped to .btn--mobile so the web pills are untouched. Placed last so
-   it wins source-order ties with the .dark .btn--<variant> rules. */
+   The small circles were catching a hard 1px glint. Widen the blur and
+   ease the rim / inner-stroke gradients so the top light fades in softly.
+   No inset shadows — those read as a drawn edge, not a reflection.
+   Scoped to .btn--mobile so the web pills are untouched; last in the file
+   so it wins source-order ties with the .dark .btn--<variant> rules. */
 
 .btn--mobile.btn--icon {
   backdrop-filter: blur(24px) saturate(1.6);
   -webkit-backdrop-filter: blur(24px) saturate(1.6);
-  box-shadow:
-    inset 2px 0 3px rgba(255, 255, 255, 0.2),
-    inset -8px 0 10px rgba(0, 0, 0, 0.05),
-    0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
 .btn--mobile.btn--icon::before {
   background: linear-gradient(
-    95deg,
+    165deg,
     rgba(255, 255, 255, 0.5) 0%,
     rgba(255, 255, 255, 0.12) 34%,
     rgba(255, 255, 255, 0) 64%,
@@ -340,7 +335,7 @@
 
 .btn--mobile .inner-stroke {
   background: linear-gradient(
-    92deg,
+    158deg,
     rgba(255, 255, 255, 0.55) 0%,
     rgba(255, 255, 255, 0.08) 26%,
     rgba(255, 255, 255, 0) 56%,
@@ -349,16 +344,9 @@
   );
 }
 
-.dark .btn--mobile.btn--icon {
-  box-shadow:
-    inset 2px 0 3px rgba(255, 255, 255, 0.15),
-    inset -9px 0 11px rgba(0, 0, 0, 0.16),
-    0 8px 22px rgba(0, 0, 0, 0.22);
-}
-
 .dark .btn--mobile.btn--icon::before {
   background: linear-gradient(
-    95deg,
+    165deg,
     rgba(255, 255, 255, 0.3) 0%,
     rgba(255, 255, 255, 0.05) 36%,
     rgba(255, 255, 255, 0) 66%,
@@ -368,7 +356,7 @@
 
 .dark .btn--mobile .inner-stroke {
   background: linear-gradient(
-    92deg,
+    158deg,
     rgba(255, 255, 255, 0.24) 0%,
     rgba(255, 255, 255, 0.04) 24%,
     rgba(255, 255, 255, 0) 56%,
