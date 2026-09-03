@@ -513,7 +513,7 @@ export function AlertCreationScreen({
               {/* ticker */}
               <div style={{ marginTop: 16 }}>
                 <div style={{ display: "flex", gap: 8, alignItems: "baseline", color: "#f2f2f8" }}>
-                  <span data-type="heading" style={{ fontSize: 14, fontWeight: 600 }}>DASH</span>
+                  <span data-type="heading" style={{ fontSize: 18, fontWeight: 600 }}>DASH</span>
                   <span data-type="heading-regular" style={{ fontSize: 14, fontWeight: 400 }}>DoorDash, Inc.</span>
                 </div>
                 <div style={{ display: "flex", gap: 8, alignItems: "flex-end", marginTop: 4 }}>
