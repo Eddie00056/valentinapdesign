@@ -497,7 +497,7 @@ export function AlertCreationScreen({
               }}
             >
               {/* header bar — back left, watchlist + alert right */}
-              <div className="dark" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div className="dark" style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <BackButton variant="light" />
                 <span style={{ flex: 1 }} />
                 <WatchlistButton variant="light" size="mobile" iconOnly />
