@@ -1,7 +1,20 @@
 import type { ComponentProps, ReactNode } from "react";
-import { StarIcon, BellIcon, SearchIcon, ArrowBackIcon } from "./icons";
+import {
+  StarIcon,
+  BellIcon,
+  SearchIcon,
+  ArrowBackIcon,
+  FractionalIcon,
+} from "./icons";
 
-export { StarIcon, StarFilledIcon, BellIcon, SearchIcon, ArrowBackIcon } from "./icons";
+export {
+  StarIcon,
+  StarFilledIcon,
+  BellIcon,
+  SearchIcon,
+  ArrowBackIcon,
+  FractionalIcon,
+} from "./icons";
 
 export type GlassVariant =
   | "dark"
@@ -133,6 +146,25 @@ export function SearchButton({
       size={size}
       iconOnly
       icon={<SearchIcon />}
+      aria-label={label}
+      {...rest}
+    >
+      {label}
+    </GlassButton>
+  );
+}
+
+/** Icon-only fractional-shares action — same sizing as Watchlist / Alert. */
+export function FractionalButton({
+  label = "Fractional shares",
+  size = "mobile",
+  ...rest
+}: WrappedProps) {
+  return (
+    <GlassButton
+      size={size}
+      iconOnly
+      icon={<FractionalIcon />}
       aria-label={label}
       {...rest}
     >

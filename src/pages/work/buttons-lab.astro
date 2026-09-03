@@ -6,6 +6,7 @@ import {
   TradeButton,
   SearchButton,
   BackButton,
+  FractionalButton,
 } from "../../components/glasslab/GlassButton";
 import {
   BackNavButton,
@@ -49,13 +50,14 @@ const variants = ["light", "green"] as const;
       ))}
     </div>
 
-    {/* mobile icon-only, 24 */}
+    {/* mobile icon-only glass */}
     <div class="group">
       {variants.map((v) => (
         <div class="pair">
           <WatchlistButton variant={v} size="mobile" iconOnly />
           <AlertButton variant={v} size="mobile" iconOnly />
           <SearchButton variant={v} />
+          <FractionalButton variant={v} />
           <BackButton variant={v} />
         </div>
       ))}

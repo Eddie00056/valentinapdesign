@@ -1,0 +1,14 @@
+/* Mask-image icons (icons supplied as PNG rather than inline SVG).
+   `background: currentColor` + the alpha mask = a recolourable glyph.
+   Size is controlled by the consuming button's CSS, same as the > svg
+   rules — never set width/height inline or those overrides can't win. */
+
+.icon-mask {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex: none;
+  background: currentColor;
+  -webkit-mask: var(--icon-src) center / contain no-repeat;
+  mask: var(--icon-src) center / contain no-repeat;
+}

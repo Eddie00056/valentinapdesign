@@ -39,10 +39,17 @@
   outline-offset: 3px;
 }
 
-.btn > svg {
+.btn > svg,
+.btn > .icon-mask {
   position: relative;
   z-index: 4;
   flex: none;
+}
+
+/* mask-image icons scale via width/height on the span, not the > svg rule */
+.btn--mobile.btn--icon > .icon-mask {
+  width: 16px;
+  height: 16px;
 }
 
 .btn > .label {
