@@ -1,0 +1,41 @@
+/* Keyframes from "Create Alert Prototype.dc.html" <helmet>. */
+
+@keyframes toastIn { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes toastDrop { 0% { opacity:0; transform: translateY(-56px); } 100% { opacity:1; transform: translateY(0); } }
+@keyframes toastMorph { 0% { opacity:0; clip-path: inset(14px 20px 14px calc(100% - 52px) round 999px); transform: translateY(-40px); } 18% { opacity:1; clip-path: inset(14px 20px 14px calc(100% - 52px) round 999px); transform: translateY(-4px); } 62% { clip-path: inset(0 0 0 0 round 12px); transform: translateY(3px); } 100% { opacity:1; clip-path: inset(0 0 0 0 round 10px); transform: translateY(0); } }
+@keyframes toastMorphText { 0%,42% { opacity:0; transform: translateY(6px); } 100% { opacity:1; transform: translateY(0); } }
+@keyframes toastWipe { 0% { clip-path: inset(0 0 100% 0); opacity:.6; } 100% { clip-path: inset(0 0 0 0); opacity:1; } }
+@keyframes toastStackIn { 0% { opacity:0; transform: translateY(-80px); } 30% { opacity:1; } 100% { opacity:1; transform: translateY(0); } }
+@keyframes toastStackOut { 0% { opacity:1; transform: scale(1); } 100% { opacity:0; transform: scale(.97); } }
+@keyframes toastWipeText { 0%,25% { opacity:0; transform: translateY(8px); } 100% { opacity:1; transform: translateY(0); } }
+@keyframes rollUpA { from{transform:translateY(0)} to{transform:translateY(-50%)} }
+@keyframes rollUpB { from{transform:translateY(0)} to{transform:translateY(-50%)} }
+@keyframes rollDownA { from{transform:translateY(-50%)} to{transform:translateY(0)} }
+@keyframes rollDownB { from{transform:translateY(-50%)} to{transform:translateY(0)} }
+@keyframes sonar { 0% { transform: scale(.5); opacity: .7; } 100% { transform: scale(2.8); opacity: 0; } }
+@keyframes op-spin { to { transform: rotate(360deg); } }
+@keyframes op-spinOut { to { opacity: 0; } }
+@keyframes op-drawCircle { from { stroke-dashoffset: 301.6; } to { stroke-dashoffset: 0; } }
+@keyframes op-drawCheck { from { stroke-dashoffset: 48; } to { stroke-dashoffset: 0; } }
+@keyframes op-fillIn { 0% { opacity:0; transform: scale(0.85);} 60% { opacity:.14; transform: scale(1.04);} 100% { opacity:.1; transform: scale(1);} }
+@keyframes op-checkPop { 0% { transform: translate(-50%,-50%) scale(.5); opacity:0;} 100% { transform: translate(-50%,-50%) scale(1); opacity:1;} }
+@keyframes op-pop3d { 0% { transform: scale(1) rotateX(0) rotateY(0);} 22% { transform: scale(1.15) rotateX(-8deg) rotateY(5deg);} 48% { transform: scale(.95) rotateX(3deg) rotateY(-2deg);} 72% { transform: scale(1.03) rotateX(-1deg) rotateY(.5deg);} 100% { transform: scale(1) rotateX(0) rotateY(0);} }
+@keyframes op-glowIn { 0% { transform: translate(-50%,-50%) scale(.5); opacity:0;} 50% { opacity:.28;} 100% { transform: translate(-50%,-50%) scale(1.6); opacity:.16;} }
+@keyframes op-rippleOut { 0% { transform: translate(-50%,-50%) scale(1); opacity:.5;} 100% { transform: translate(-50%,-50%) scale(2); opacity:0; filter: blur(2px);} }
+@keyframes op-textOut { to { filter: blur(8px); opacity:0; transform: translateY(6px) scale(.96);} }
+@keyframes op-textIn { from { filter: blur(8px); opacity:0; transform: translateY(-6px) scale(.96);} to { filter: blur(0); opacity:1; transform: translateY(0) scale(1);} }
+@keyframes op-scrimIn { from { opacity:0 } to { opacity:1 } }
+@keyframes bellShakeA { 0%{transform:translateX(0) rotate(0)} 12%{transform:translateX(-1.2px) rotate(-9deg)} 26%{transform:translateX(1.2px) rotate(9deg)} 40%{transform:translateX(-.9px) rotate(-6deg)} 54%{transform:translateX(.9px) rotate(4.5deg)} 70%{transform:translateX(-.5px) rotate(-2.4deg)} 84%{transform:translateX(.5px) rotate(1.2deg)} 100%{transform:translateX(0) rotate(0)} }
+@keyframes bellShakeB { 0%{transform:translateX(0) rotate(0)} 12%{transform:translateX(-1.2px) rotate(-9deg)} 26%{transform:translateX(1.2px) rotate(9deg)} 40%{transform:translateX(-.9px) rotate(-6deg)} 54%{transform:translateX(.9px) rotate(4.5deg)} 70%{transform:translateX(-.5px) rotate(-2.4deg)} 84%{transform:translateX(.5px) rotate(1.2deg)} 100%{transform:translateX(0) rotate(0)} }
+@keyframes badgeMorphA { 0%{opacity:0;width:4px;height:4px;transform:translate(-5px,4px)} 25%{opacity:1;width:4px;height:4px;transform:translate(-5px,4px)} 60%{width:16px;height:16px;transform:translate(1px,-1px)} 78%{width:13px;height:13px;transform:translate(0,0)} 100%{opacity:1;width:14px;height:14px;transform:translate(0,0)} }
+@keyframes badgeMorphB { 0%{opacity:0;width:4px;height:4px;transform:translate(-5px,4px)} 25%{opacity:1;width:4px;height:4px;transform:translate(-5px,4px)} 60%{width:16px;height:16px;transform:translate(1px,-1px)} 78%{width:13px;height:13px;transform:translate(0,0)} 100%{opacity:1;width:14px;height:14px;transform:translate(0,0)} }
+@keyframes badgeNumA { 0%,45%{opacity:0;transform:scale(.4)} 70%{opacity:1;transform:scale(1.12)} 100%{opacity:1;transform:scale(1)} }
+@keyframes badgeNumB { 0%,45%{opacity:0;transform:scale(.4)} 70%{opacity:1;transform:scale(1.12)} 100%{opacity:1;transform:scale(1)} }
+@keyframes ringPulse { 0% { box-shadow: 0 0 0 0 rgba(72,213,151,0.45); } 100% { box-shadow: 0 0 0 14px rgba(72,213,151,0); } }
+
+/* single hover state carried over from `style-hover` on the bell */
+.acs-bell:hover { transform: scale(1.06); }
+
+@media (prefers-reduced-motion: reduce) {
+  .acs-root * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}

@@ -33,4 +33,9 @@ export const pieces: Piece[] = [
     href: "/work/alert-prototype",
     title: "Alert creation prototype",
   },
+  {
+    slug: "alert-creation",
+    href: "/work/alert-creation",
+    title: "Alert creation",
+  },
 ];

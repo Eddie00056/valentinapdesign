@@ -4,6 +4,7 @@ import { site, pieces } from "../data/site";
 import { TogglePreview } from "../components/motionlab/TogglePreview";
 import { LimitOrderErrorPreview } from "../components/glasslab/LimitOrderErrorPreview";
 import { FractionalSharesBannerPreview } from "../components/glasslab/FractionalSharesBannerPreview";
+import { AlertCreationPreview } from "../components/alertscreen/AlertCreationPreview";
 import "../components/motionlab/motionlab.css";
 import "../components/glasslab/glasslab.css";
 ---
@@ -44,6 +45,9 @@ import "../components/glasslab/glasslab.css";
                     <path d="M52 76a8 8 0 0 0 16 0"></path>
                   </g>
                 </svg>
+              )}
+              {p.slug === "alert-creation" && (
+                <AlertCreationPreview client:visible />
               )}
             </span>
           </a>
