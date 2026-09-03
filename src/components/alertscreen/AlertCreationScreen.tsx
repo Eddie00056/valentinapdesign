@@ -4,7 +4,8 @@ import "./alert-screen.css";
 import { candles, SERIES, UP, DOWN, LEAD, TRAIL } from "./chart";
 import { pxHub, PX_BASE } from "./priceHub";
 import type { PriceState } from "./priceHub";
-import { StarIcon, BellIcon } from "../glasslab/GlassButton";
+import { WatchlistButton, AlertButton } from "../glasslab/GlassButton";
+import "../glasslab/glass-button.css";
 
 /* Ported from "Create Alert Prototype.dc.html". A stock-detail screen in an
    iPhone frame: live rolling price, candlestick chart with a draw-in,
@@ -582,46 +583,25 @@ export function AlertCreationScreen({
                     </span>
                   </div>
                 </div>
-                <div style={{ display: "flex", gap: 8, alignItems: "center", paddingTop: 2, flex: "none" }}>
-                  <div
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: "50%",
-                      border: "1px solid #3d444c",
-                      boxSizing: "border-box",
-                      flex: "none",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#fff",
-                    }}
-                  >
-                    <StarIcon />
-                  </div>
-                  <div
-                    role="button"
+                <div
+                  className="dark"
+                  style={{ display: "flex", gap: 8, alignItems: "center", paddingTop: 2, flex: "none" }}
+                >
+                  <WatchlistButton
+                    variant="light"
+                    size="mobile"
+                    iconOnly
+                    aria-label="Add to watchlist"
+                    style={{ width: 32, height: 32, flex: "none" }}
+                  />
+                  <AlertButton
+                    variant="light"
+                    size="mobile"
+                    iconOnly
                     aria-label="Create alert"
                     onClick={createAlert}
-                    className="acs-bell"
-                    style={css(
-                      "width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 180ms,border-color 180ms,transform 120ms;border:1px solid #3d444c;background:transparent",
-                    )}
-                  >
-                    <span
-                      style={{
-                        position: "relative",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: s.active ? "#48d597" : "#fff",
-                        transition: "color 200ms ease",
-                        animation: bellShake,
-                      }}
-                    >
-                      <BellIcon />
-                    </span>
-                  </div>
+                    style={{ width: 32, height: 32, flex: "none", animation: bellShake }}
+                  />
                 </div>
               </div>
 
