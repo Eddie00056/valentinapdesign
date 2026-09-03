@@ -23,6 +23,11 @@
   transition: transform 0.16s ease, background 0.16s ease;
 }
 
+.navbtn svg {
+  width: 22px;
+  height: 22px;
+}
+
 .navbtn:hover {
   background: rgba(255, 255, 255, 0.14);
 }

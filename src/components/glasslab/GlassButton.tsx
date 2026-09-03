@@ -1,4 +1,7 @@
 import type { ComponentProps, ReactNode } from "react";
+import { StarIcon, BellIcon, SearchIcon, ArrowBackIcon } from "./icons";
+
+export { StarIcon, StarFilledIcon, BellIcon, SearchIcon, ArrowBackIcon } from "./icons";
 
 export type GlassVariant =
   | "dark"
@@ -63,71 +66,6 @@ export function GlassButton({
       {icon}
       {!iconOnly && <span className="label">{children}</span>}
     </button>
-  );
-}
-
-/* ---- icons ---- */
-
-export function StarIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 3.6l2.6 5.27 5.82.85-4.21 4.1.99 5.8L12 17.9l-5.2 2.72.99-5.8-4.21-4.1 5.82-.85z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-export function BellIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M18 8.5a6 6 0 1 0-12 0c0 6.5-2.6 8.5-2.6 8.5h17.2S18 15 18 8.5Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M10 20.5a2 2 0 0 0 4 0"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-/* Material Symbols "search" (opsz24, wght400) as an SVG so it takes the
-   button's currentColor across variants. */
-export function SearchIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M20 20l-4.85-4.85"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-/* Material Symbols "arrow_back" (opsz24, wght400) as a currentColor SVG. */
-export function ArrowBackIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M19 12H5M12 19l-7-7 7-7"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
 
