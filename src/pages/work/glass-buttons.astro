@@ -6,38 +6,22 @@ import {
 } from "../../components/glasslab/GlassButton";
 import "../../components/glasslab/glass-button.css";
 
-const variants = ["dark", "light", "cream", "blue", "green", "red"] as const;
+const variants = ["light", "green"] as const;
 ---
 
-<Base title="Glass buttons" description="Watchlist and alert glass buttons — resting state, six colour variants.">
-  <main class="wrap">
+<Base title="Glass buttons" description="Watchlist and alert glass buttons — light and green variants on a dark surface.">
+  <main class="wrap dark">
     <header>
       <p class="eyebrow">Component · work in progress</p>
       <h1>Glass buttons</h1>
       <p class="note">
-        Watchlist and alert buttons. Resting state only, all six colour
-        variants, shown on a light and a dark surface. Hover / press are the
-        CSS defaults (a 1px lift).
+        Watchlist and alert buttons — light and green variants, on a dark
+        surface. Resting state only; hover / press are the CSS defaults (a 1px
+        lift).
       </p>
     </header>
 
-    <section class="panel panel--light" aria-label="On a light surface">
-      <p class="panel-label">On a light surface</p>
-      <div class="grid">
-        {variants.map((v) => (
-          <div class="cell">
-            <p class="v-name">{v}</p>
-            <div class="pair">
-              <WatchlistButton variant={v} />
-              <AlertButton variant={v} />
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-
-    <section class="panel panel--dark dark" aria-label="On a dark surface">
-      <p class="panel-label">On a dark surface</p>
+    <section class="panel">
       <div class="grid">
         {variants.map((v) => (
           <div class="cell">
@@ -92,44 +76,16 @@ const variants = ["dark", "light", "cream", "blue", "green", "red"] as const;
 
   .panel {
     border-radius: 16px;
-    padding: clamp(1.5rem, 1rem + 3vw, 3rem);
-    border: 1px solid var(--line);
+    padding: clamp(2rem, 1.4rem + 4vw, 3.5rem);
+    border: 1px solid #262626;
     position: relative;
     overflow: hidden;
-  }
-
-  .panel-label {
-    position: relative;
-    z-index: 1;
-    margin: 0 0 1.75rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  /* backdrops so the glass blur has something to work on */
-  .panel--light {
-    background:
-      radial-gradient(38% 55% at 18% 20%, rgba(120, 160, 255, 0.28), transparent 70%),
-      radial-gradient(42% 60% at 85% 30%, rgba(255, 170, 120, 0.25), transparent 70%),
-      radial-gradient(50% 70% at 60% 100%, rgba(150, 230, 190, 0.22), transparent 70%),
-      #f4f4f2;
-  }
-  .panel--light .panel-label {
-    color: #6a6a68;
-  }
-
-  .panel--dark {
+    /* backdrop so the glass blur has something to work on */
     background:
       radial-gradient(38% 55% at 20% 15%, rgba(90, 130, 255, 0.30), transparent 70%),
       radial-gradient(44% 60% at 88% 35%, rgba(255, 110, 90, 0.24), transparent 70%),
       radial-gradient(52% 72% at 55% 105%, rgba(70, 200, 140, 0.22), transparent 70%),
       #0d0d0d;
-    border-color: #262626;
-  }
-  .panel--dark .panel-label {
-    color: #9a9a9a;
   }
 
   .grid {
@@ -137,7 +93,7 @@ const variants = ["dark", "light", "cream", "blue", "green", "red"] as const;
     z-index: 1;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 2rem 1.5rem;
+    gap: 2.25rem 1.5rem;
   }
 
   .cell {
@@ -152,12 +108,6 @@ const variants = ["dark", "light", "cream", "blue", "green", "red"] as const;
     font-size: 0.7rem;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-  }
-
-  .panel--light .v-name {
-    color: #7a7a78;
-  }
-  .panel--dark .v-name {
     color: #8a8a8a;
   }
 
