@@ -322,10 +322,12 @@
 }
 
 /* ---- Mobile glass icons ----
-   The Mint library doesn't special-case small icon buttons — same 1px
-   ring gradients, geometry just scales. So no per-mobile gradient
-   overrides; just the icon-button box (Mint `default` icon size = 32px,
-   16px glyph). The 44pt invisible hit area stays. */
+   Mint `default` icon-button box: 32px, 16px glyph, 44pt hit area.
+   The rim treatment here is deliberately NOT the Mint two-ring spec —
+   the small circles read cleaner as a single soft masked rim with the
+   light coming from the lower-left (66deg). Scoped to .btn--mobile.btn--icon
+   so the web pills keep the full Mint spec. The .dark-prefixed copies are
+   only there to out-specify `.dark .btn--<variant>`. */
 .btn--mobile.btn--icon {
   width: 32px;
   height: 32px;
@@ -336,4 +338,25 @@
 }
 .btn--mobile.btn--icon::after {
   inset: -6px;
+}
+
+.btn--mobile.btn--icon,
+.dark .btn--mobile.btn--icon {
+  background: linear-gradient(66deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045));
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn--mobile.btn--icon::before,
+.dark .btn--mobile.btn--icon::before {
+  background: linear-gradient(
+    66deg,
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.03) 42%,
+    rgba(255, 255, 255, 0.09) 100%
+  );
+}
+
+/* single rim only — drop the inner highlight ring on the small circles */
+.btn--mobile.btn--icon .inner-stroke {
+  display: none;
 }
