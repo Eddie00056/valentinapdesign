@@ -10,8 +10,12 @@ export type GlassVariant =
 
 type GlassButtonProps = Omit<ComponentProps<"button">, "className"> & {
   variant?: GlassVariant;
-  /** "web" = 160×48 desktop pill; "mobile" = iOS sizing (≥44pt target, 50pt tall, 17pt semibold). */
-  size?: "web" | "mobile";
+  /**
+   * "web" = 160×48 desktop pill;
+   * "mobile" = iOS sizing (50pt tall labelled, or 24px with iconOnly);
+   * "mobile-44" = a 44×44pt square (label-only) / circle (iconOnly).
+   */
+  size?: "web" | "mobile" | "mobile-44";
   /** Stretch to the container width (pair it with 16pt screen-edge insets on the parent). */
   block?: boolean;
   /** Drop the label, render a circular icon-only button. Caller must pass an aria-label. */
@@ -42,10 +46,12 @@ export function GlassButton({
       ? "inner-stroke"
       : `inner-stroke inner-stroke--${variant}`;
 
+  const isMobile = size === "mobile" || size === "mobile-44";
   const cls = [
     "btn",
     `btn--${variant}`,
-    size === "mobile" && "btn--mobile",
+    isMobile && "btn--mobile",
+    size === "mobile-44" && "btn--44",
     iconOnly && "btn--icon",
     block && !iconOnly && "btn--block",
   ]
@@ -95,6 +101,22 @@ function BellIcon() {
   );
 }
 
+/* Material Symbols "search" (opsz24, wght400) as an SVG so it takes the
+   button's currentColor across variants. */
+function SearchIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
+      <path
+        d="M20 20l-4.85-4.85"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 /* ---- named buttons ---- */
 
 type WrappedProps = Omit<GlassButtonProps, "icon" | "children"> & {
@@ -128,6 +150,38 @@ export function AlertButton({
       icon={<BellIcon />}
       iconOnly={iconOnly}
       aria-label={iconOnly ? "Set alert" : undefined}
+      {...rest}
+    >
+      {label}
+    </GlassButton>
+  );
+}
+
+/** Label-only 44×44pt square action. */
+export function TradeButton({
+  label = "Trade",
+  size = "mobile-44",
+  ...rest
+}: WrappedProps) {
+  return (
+    <GlassButton size={size} {...rest}>
+      {label}
+    </GlassButton>
+  );
+}
+
+/** Icon-only 44×44pt search action. */
+export function SearchButton({
+  label = "Search",
+  size = "mobile-44",
+  ...rest
+}: WrappedProps) {
+  return (
+    <GlassButton
+      size={size}
+      iconOnly
+      icon={<SearchIcon />}
+      aria-label={label}
       {...rest}
     >
       {label}

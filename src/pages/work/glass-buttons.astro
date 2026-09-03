@@ -3,6 +3,8 @@ import Base from "../../layouts/Base.astro";
 import {
   WatchlistButton,
   AlertButton,
+  TradeButton,
+  SearchButton,
 } from "../../components/glasslab/GlassButton";
 import "../../components/glasslab/glass-button.css";
 
@@ -25,6 +27,8 @@ const variants = ["light", "green"] as const;
         <div class="pair">
           <WatchlistButton variant={v} size="mobile" iconOnly />
           <AlertButton variant={v} size="mobile" iconOnly />
+          <TradeButton variant={v} />
+          <SearchButton variant={v} />
         </div>
       ))}
     </div>

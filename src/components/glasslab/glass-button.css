@@ -209,12 +209,28 @@
   width: 14px;
   height: 14px;
 }
-/* The visible control is 24px; keep a 44pt invisible hit area (Apple HIG). */
-.btn--mobile.btn--icon::after {
+/* 24px control keeps a 44pt invisible hit area (Apple HIG). */
+.btn--mobile.btn--icon:not(.btn--44)::after {
   content: "";
   position: absolute;
   inset: -10px;
   border-radius: 50%;
+}
+
+/* 44 x 44pt mobile action — label-only square (Trade) or icon-only (Search).
+   Already at the minimum touch target, so no hit-area expansion. */
+.btn--mobile.btn--44 {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  font-size: 13px;
+  letter-spacing: -0.02em;
+}
+.btn--mobile.btn--44.btn--icon > svg {
+  width: 20px;
+  height: 20px;
 }
 
 @media (prefers-reduced-motion: reduce) {
