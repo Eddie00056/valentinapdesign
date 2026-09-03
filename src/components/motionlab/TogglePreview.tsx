@@ -23,7 +23,14 @@ export function TogglePreview() {
   }, [reduce]);
 
   return (
-    <div style={{ pointerEvents: "none" }} aria-hidden="true">
+    <div
+      style={{
+        pointerEvents: "none",
+        transform: "scale(1.8)",
+        transformOrigin: "center",
+      }}
+      aria-hidden="true"
+    >
       <TrackFrame value={value} onPick={() => {}} theme="light">
         <motion.div
           style={pillStyle}

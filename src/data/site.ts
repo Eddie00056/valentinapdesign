@@ -11,11 +11,21 @@ export type Piece = {
   title: string;
 };
 
-// The gallery. One piece for now.
+// The gallery, in display order.
 export const pieces: Piece[] = [
   {
     slug: "stock-option-toggle",
     href: "/work/stock-option-toggle",
     title: "Stock / Option toggle",
+  },
+  {
+    slug: "limit-order-error",
+    href: "/work/limit-order-error",
+    title: "Limit order error",
+  },
+  {
+    slug: "fractional-shares-banner",
+    href: "/work/fractional-shares-banner",
+    title: "Fractional shares banner",
   },
 ];

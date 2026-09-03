@@ -1,0 +1,9 @@
+---
+import Bare from "../../layouts/Bare.astro";
+import { LimitOrderErrorPage } from "../../components/glasslab/LimitOrderErrorPage";
+import "../../components/glasslab/glasslab.css";
+---
+
+<Bare title="Limit order error" bg="#ffffff">
+  <LimitOrderErrorPage client:load />
+</Bare>

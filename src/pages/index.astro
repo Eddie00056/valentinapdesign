@@ -2,7 +2,10 @@
 import Base from "../layouts/Base.astro";
 import { site, pieces } from "../data/site";
 import { TogglePreview } from "../components/motionlab/TogglePreview";
+import { LimitOrderErrorPreview } from "../components/glasslab/LimitOrderErrorPreview";
+import { FractionalSharesBannerPreview } from "../components/glasslab/FractionalSharesBannerPreview";
 import "../components/motionlab/motionlab.css";
+import "../components/glasslab/glasslab.css";
 ---
 
 <Base>
@@ -14,7 +17,13 @@ import "../components/motionlab/motionlab.css";
         <li>
           <a href={p.href} aria-label={p.title}>
             <span class="thumb">
-              <TogglePreview client:load />
+              {p.slug === "stock-option-toggle" && <TogglePreview client:visible />}
+              {p.slug === "limit-order-error" && (
+                <LimitOrderErrorPreview client:visible />
+              )}
+              {p.slug === "fractional-shares-banner" && (
+                <FractionalSharesBannerPreview client:visible />
+              )}
             </span>
           </a>
         </li>
@@ -53,6 +62,7 @@ import "../components/motionlab/motionlab.css";
     display: grid;
     place-items: center;
     aspect-ratio: 4 / 3;
+    overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 10px;
     background: var(--paper-raised);

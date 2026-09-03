@@ -1,0 +1,74 @@
+/* Focused-canvas chrome for the glass pieces. Component visuals live inline
+   in the .tsx files; this is just the white stage + back button. */
+
+.pshell {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #ffffff;
+  font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.pshell-nav {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 100;
+}
+
+.pshell-glass {
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+}
+
+.pshell-back {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.75);
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pshell-back:hover {
+  color: #000;
+}
+
+.pshell-back:focus-visible {
+  outline: 2px solid #1682ff;
+  outline-offset: 2px;
+}
+
+.pshell-back svg {
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.pshell-back:hover svg {
+  transform: translateX(-2px);
+}
+
+.pshell-stage {
+  z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .pshell-nav {
+    top: 12px;
+    left: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pshell-back svg {
+    transition: none;
+  }
+}
