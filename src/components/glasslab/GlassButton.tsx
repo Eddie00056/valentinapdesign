@@ -68,7 +68,7 @@ export function GlassButton({
 
 /* ---- icons ---- */
 
-function StarIcon() {
+export function StarIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
@@ -81,7 +81,7 @@ function StarIcon() {
   );
 }
 
-function BellIcon() {
+export function BellIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
@@ -102,7 +102,7 @@ function BellIcon() {
 
 /* Material Symbols "search" (opsz24, wght400) as an SVG so it takes the
    button's currentColor across variants. */
-function SearchIcon() {
+export function SearchIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />

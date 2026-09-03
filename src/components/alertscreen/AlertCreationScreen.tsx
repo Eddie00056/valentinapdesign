@@ -4,6 +4,7 @@ import "./alert-screen.css";
 import { candles, SERIES, UP, DOWN, LEAD, TRAIL } from "./chart";
 import { pxHub, PX_BASE } from "./priceHub";
 import type { PriceState } from "./priceHub";
+import { StarIcon, BellIcon } from "../glasslab/GlassButton";
 
 /* Ported from "Create Alert Prototype.dc.html". A stock-detail screen in an
    iPhone frame: live rolling price, candlestick chart with a draw-in,
@@ -11,7 +12,6 @@ import type { PriceState } from "./priceHub";
 
 const ASSETS = "/prototypes/uploads";
 const PHONE = `${ASSETS}/PHONE.png`;
-const BELL = `${ASSETS}/notification.png`;
 const BG = `${ASSETS}/sindy-sussengut-ZUEcf_Ng2gw-unsplash-4569b038.jpg`;
 
 const TFS = ["1D", "1W", "1M", "3M", "6M", "YTD", "1Y"];
@@ -594,33 +594,32 @@ export function AlertCreationScreen({
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      color: "#fff",
                     }}
                   >
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      style={{ width: 18.6, height: 18.6 }}
-                      stroke="#fff"
-                      strokeWidth="1.47"
-                      strokeLinejoin="round"
-                      strokeLinecap="round"
-                    >
-                      <path
-                        transform="translate(12 12) scale(0.885) translate(-12 -12)"
-                        d="M12 2.6l2.85 5.85 6.4.94-4.63 4.53 1.1 6.38L12 17.29l-5.72 3.01 1.1-6.38L2.75 9.39l6.4-.94z"
-                      />
-                    </svg>
+                    <StarIcon />
                   </div>
                   <div
                     role="button"
+                    aria-label="Create alert"
                     onClick={createAlert}
                     className="acs-bell"
                     style={css(
                       "width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 180ms,border-color 180ms,transform 120ms;border:1px solid #3d444c;background:transparent",
                     )}
                   >
-                    <span style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", animation: bellShake }}>
-                      <img src={BELL} alt="Create alert" style={{ width: 18.6, height: 18.6, display: "block", filter: "invert(1)" }} />
+                    <span
+                      style={{
+                        position: "relative",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: s.active ? "#48d597" : "#fff",
+                        transition: "color 200ms ease",
+                        animation: bellShake,
+                      }}
+                    >
+                      <BellIcon />
                     </span>
                   </div>
                 </div>
