@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent } from "react";
+import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import "./alert-screen.css";
 import { candles, SERIES, UP, DOWN, LEAD, TRAIL } from "./chart";
 import { pxHub, PX_BASE } from "./priceHub";
@@ -8,7 +9,7 @@ import {
   BackButton,
   WatchlistButton,
   AlertButton,
-  FractionalButton,
+  FractionalIcon,
 } from "../glasslab/GlassButton";
 import "../glasslab/glass-button.css";
 
@@ -22,6 +23,7 @@ const BG = `${ASSETS}/sindy-sussengut-ZUEcf_Ng2gw-unsplash-4569b038.jpg`;
 
 const TFS = ["1D", "1W", "1M", "3M", "6M", "YTD", "1Y"];
 const PREV_CLOSE = 192.91;
+const SYMBOL = "DASH";
 
 type ToastAnim = "drop" | "morph" | "wipe" | "stack";
 
@@ -109,12 +111,16 @@ export function AlertCreationScreen({
   autoDismiss = true,
   toastDuration = 3200,
   frame = "full",
+  fractionalBanner = true,
 }: {
   toastAnimation?: ToastAnim;
   autoDismiss?: boolean;
   toastDuration?: number;
   /** "full" = centred on the photo backdrop; "bare" = just the phone. */
   frame?: "full" | "bare";
+  /** On landing, show a full-width "fractional shares is available" banner
+      that morphs into the header's fractional icon when dismissed. */
+  fractionalBanner?: boolean;
 }) {
   const [s, setS] = useState<St>(INIT);
   const merge = (p: Partial<St>) => setS((v) => ({ ...v, ...p }));
@@ -124,6 +130,24 @@ export function AlertCreationScreen({
   const flashRef = useRef<number | undefined>(undefined);
   const idRef = useRef(0);
   const dirRef = useRef(1);
+
+  /* Fractional-shares "expandable card" (Motion example): shared layoutId
+     "frac-card" morphs between the full-width strip and the compact glass
+     icon in the header. Soft, near-bounceless spring for the size delta;
+     the glass icon fades in late so it never renders at strip size. */
+  const [fracOpen, setFracOpen] = useState(fractionalBanner);
+  const fracSpring = { type: "spring", visualDuration: 0.28, bounce: 0 } as const;
+  /* inline approximation of the glass `light` icon button (glass-button.css
+     .dark .btn--light) so the morphing card can *be* the resting icon. */
+  const fracGlass: CSSProperties = {
+    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    boxShadow:
+      "inset 0 1px 0 rgba(255,255,255,0.22), 0 8px 16px rgba(0,0,0,0.35)",
+    backdropFilter: "blur(18px)",
+    WebkitBackdropFilter: "blur(18px)",
+    color: "rgba(255,255,255,0.85)",
+  };
 
   const measure = () => {
     const rail = railElRef.current;
@@ -497,25 +521,168 @@ export function AlertCreationScreen({
                 padding: "14px 24px 28px",
               }}
             >
-              {/* header bar — back left, watchlist + alert right */}
-              <div className="dark" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <BackButton variant="light" />
-                <span style={{ flex: 1 }} />
-                <WatchlistButton variant="light" size="mobile" iconOnly />
-                <AlertButton
-                  variant="light"
-                  size="mobile"
-                  iconOnly
-                  onClick={createAlert}
-                  style={{ animation: bellShake }}
-                />
-                <FractionalButton variant="light" size="mobile" iconOnly />
-              </div>
+              <LayoutGroup>
+                {/* header bar — back left; then fractional (compact state of
+                    the card, revealed once the banner is dismissed), watchlist,
+                    alert on the right */}
+                <div className="dark" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <BackButton variant="light" />
+                  <span style={{ flex: 1 }} />
+                  <div style={{ width: 32, height: 32, flex: "none", position: "relative" }}>
+                    {!fracOpen && (
+                      <motion.div
+                        layoutId="frac-card"
+                        transition={fracSpring}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1, transition: { duration: 0.2 } }}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Fractional shares"
+                        onClick={() => setFracOpen(true)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setFracOpen(true);
+                          }
+                        }}
+                        style={{
+                          position: "absolute",
+                          inset: 0,
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          borderRadius: 999,
+                          overflow: "hidden",
+                          cursor: "pointer",
+                          ...fracGlass,
+                        }}
+                      >
+                        <motion.span
+                          layoutId="frac-glyph"
+                          className="acs-frac-glyph"
+                          style={{ lineHeight: 0, color: "rgba(255,255,255,0.9)" }}
+                        >
+                          <FractionalIcon />
+                        </motion.span>
+                      </motion.div>
+                    )}
+                  </div>
+                  <WatchlistButton variant="light" size="mobile" iconOnly />
+                  <AlertButton
+                    variant="light"
+                    size="mobile"
+                    iconOnly
+                    onClick={createAlert}
+                    style={{ animation: bellShake }}
+                  />
+                </div>
+
+                {/* Motion shared-layout ("expandable card"). Outer slot owns
+                    the layout height (collapses fast, so the content below
+                    follows immediately); the inner layoutId box floats on top
+                    and morphs to / from the header icon. */}
+                <AnimatePresence initial={false}>
+                  {fracOpen && (
+                      <motion.div
+                        key="frac-slot"
+                        initial={{ height: 0, marginTop: 0 }}
+                        animate={{ height: 40, marginTop: 12 }}
+                        exit={{ height: 0, marginTop: 0 }}
+                        transition={{ duration: 0.17, ease: [0.4, 0, 0.2, 1] }}
+                        style={{
+                          position: "relative",
+                          marginLeft: -24,
+                          marginRight: -24,
+                        }}
+                      >
+                        <motion.div
+                          layoutId="frac-card"
+                          transition={fracSpring}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1, transition: { duration: 0.16 } }}
+                          exit={{ opacity: 0, transition: { duration: 0.1 } }}
+                          role="button"
+                          tabIndex={0}
+                          aria-label="Dismiss fractional shares notice"
+                          onClick={() => setFracOpen(false)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              setFracOpen(false);
+                            }
+                          }}
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            height: 40,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: "0 24px",
+                            boxSizing: "border-box",
+                            background: "#111317",
+                            borderTop: "1px solid #31383f",
+                            borderBottom: "1px solid #31383f",
+                            borderRadius: 0,
+                            color: "#f2f2f8",
+                            cursor: "pointer",
+                            overflow: "hidden",
+                          }}
+                        >
+                          <motion.span
+                            layoutId="frac-glyph"
+                            className="acs-frac-glyph"
+                            transition={{ layout: { duration: 0.2, ease: [0.22, 1, 0.36, 1] } }}
+                            style={{ flex: "none", lineHeight: 0, color: "#f2f2f8" }}
+                          >
+                            <FractionalIcon />
+                          </motion.span>
+                          <motion.span
+                            data-type="body"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1, transition: { duration: 0.16, delay: 0.06 } }}
+                            exit={{ opacity: 0, transition: { duration: 0.06 } }}
+                            style={{
+                              flex: 1,
+                              minWidth: 0,
+                              fontSize: 12,
+                              fontWeight: 500,
+                              lineHeight: 1,
+                              whiteSpace: "nowrap",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            Fractional shares available for {SYMBOL} market orders
+                          </motion.span>
+                          <motion.span
+                            aria-hidden="true"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 0.6, transition: { duration: 0.16, delay: 0.06 } }}
+                            exit={{ opacity: 0, transition: { duration: 0.06 } }}
+                            style={{ flex: "none", lineHeight: 0 }}
+                          >
+                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                              <path
+                                d="M1.6 1.6l10.8 10.8M12.4 1.6L1.6 12.4"
+                                stroke="currentColor"
+                                strokeWidth="1.8"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </motion.span>
+                        </motion.div>
+                      </motion.div>
+                  )}
+                </AnimatePresence>
+              </LayoutGroup>
 
               {/* ticker */}
               <div style={{ marginTop: 16 }}>
                 <div style={{ display: "flex", gap: 4, alignItems: "baseline", color: "#f2f2f8" }}>
-                  <span data-type="heading" style={{ fontSize: 18, fontWeight: 600 }}>DASH</span>
+                  <span data-type="heading" style={{ fontSize: 18, fontWeight: 600 }}>{SYMBOL}</span>
                   <span data-type="heading-regular" style={{ fontSize: 14, fontWeight: 400 }}>DoorDash, Inc.</span>
                 </div>
                 <div style={{ display: "flex", gap: 4, alignItems: "flex-end", marginTop: 4 }}>
@@ -682,7 +849,7 @@ export function AlertCreationScreen({
                 <div>
                   <div data-type="body-muted" style={muted}>Day range</div>
                   <div style={rangeBar}>
-                    <span style={{ position: "absolute", left: "56%", top: -2, width: 3, height: 6, background: "#48d597", borderRadius: 1 }} />
+                    <span style={{ position: "absolute", left: "56%", top: -2, width: 3, height: 6, background: "#31383f", borderRadius: 1 }} />
                   </div>
                   <div data-type="body" style={{ display: "flex", justifyContent: "space-between", ...val }}>
                     <span>$191.11</span>
@@ -692,7 +859,7 @@ export function AlertCreationScreen({
                 <div>
                   <div data-type="body-muted" style={muted}>52 week range</div>
                   <div style={rangeBar}>
-                    <span style={{ position: "absolute", left: "24%", top: -2, width: 3, height: 6, background: "#48d597", borderRadius: 1 }} />
+                    <span style={{ position: "absolute", left: "24%", top: -2, width: 3, height: 6, background: "#31383f", borderRadius: 1 }} />
                   </div>
                   <div data-type="body" style={{ display: "flex", justifyContent: "space-between", ...val }}>
                     <span>$166.19</span>

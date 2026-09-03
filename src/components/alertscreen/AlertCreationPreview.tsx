@@ -20,7 +20,7 @@ export function AlertCreationPreview() {
           transformOrigin: "top left",
         }}
       >
-        <AlertCreationScreen frame="bare" />
+        <AlertCreationScreen frame="bare" fractionalBanner={false} />
       </div>
     </div>
   );
