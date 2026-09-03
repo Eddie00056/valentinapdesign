@@ -4,8 +4,10 @@ import "./alert-screen.css";
 import { candles, SERIES, UP, DOWN, LEAD, TRAIL } from "./chart";
 import { pxHub, PX_BASE } from "./priceHub";
 import type { PriceState } from "./priceHub";
-import { WatchlistButton, AlertButton } from "../glasslab/GlassButton";
-import "../glasslab/glass-button.css";
+import {
+  WatchlistNavButton,
+  AlertNavButton,
+} from "../glasslab/nav-buttons";
 
 /* Ported from "Create Alert Prototype.dc.html". A stock-detail screen in an
    iPhone frame: live rolling price, candlestick chart with a draw-in,
@@ -583,24 +585,12 @@ export function AlertCreationScreen({
                     </span>
                   </div>
                 </div>
-                <div
-                  className="dark"
-                  style={{ display: "flex", gap: 8, alignItems: "center", paddingTop: 2, flex: "none" }}
-                >
-                  <WatchlistButton
-                    variant="light"
-                    size="mobile"
-                    iconOnly
-                    aria-label="Add to watchlist"
-                    style={{ width: 32, height: 32, flex: "none" }}
-                  />
-                  <AlertButton
-                    variant="light"
-                    size="mobile"
-                    iconOnly
-                    aria-label="Create alert"
+                <div style={{ display: "flex", gap: 8, alignItems: "center", paddingTop: 2, flex: "none" }}>
+                  <WatchlistNavButton size={36} />
+                  <AlertNavButton
+                    size={36}
                     onClick={createAlert}
-                    style={{ width: 32, height: 32, flex: "none", animation: bellShake }}
+                    style={{ animation: bellShake }}
                   />
                 </div>
               </div>

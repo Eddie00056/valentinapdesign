@@ -7,13 +7,29 @@ import {
   SearchButton,
   BackButton,
 } from "../../components/glasslab/GlassButton";
+import {
+  BackNavButton,
+  WatchlistNavButton,
+  AlertNavButton,
+} from "../../components/glasslab/nav-buttons";
 import "../../components/glasslab/glass-button.css";
+import "../../components/glasslab/nav-buttons.css";
 
 const variants = ["light", "green"] as const;
 ---
 
 <Base title="Buttons lab">
   <main class="wrap dark">
+    {/* nav buttons — soft circular, ungrouped, shown in a screen-edge bar */}
+    <div class="group">
+      <div class="bar">
+        <BackNavButton />
+        <span class="spacer"></span>
+        <WatchlistNavButton />
+        <AlertNavButton />
+      </div>
+    </div>
+
     {/* web pills */}
     <div class="group">
       {variants.map((v) => (
@@ -79,5 +95,16 @@ const variants = ["light", "green"] as const;
     display: flex;
     align-items: center;
     gap: 12px;
+  }
+
+  .bar {
+    width: min(420px, 100%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .spacer {
+    flex: 1;
   }
 </style>
