@@ -1,11 +1,13 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
-/* Prototype v2 — same concept as LiveLineChart but candlesticks:
+/* Prototype v2 — candlesticks, Robinhood "advanced" style:
    - candles for the elapsed session, up to "now" (PROGRESS across)
-   - the last few candles pop; the pulse dot sits at "now"
-   - dashed prev-close baseline, bolder past "now", with faint future ticks
-   - baseline ~1/4 up from the bottom
+   - the last few candles pop; the rest are the cool green/red
+   - "now" = a green DOTTED price line across the full width + a price pill
+     on the right axis. It moves only when the price ticks: every TICK_MS a
+     small delta comes in, the line snaps to the new level, then holds.
+   - dashed prev-close baseline, ~1/4 up from the bottom
    Standalone; nothing here touches AlertCreationScreen. */
 
 const W = 360;
@@ -15,7 +17,12 @@ const N = 96;
 const CANDLES = 22;
 const START_FROM_BOTTOM = 0.25;
 const PROGRESS = 0.56;
-const TAIL_CANDLES = 4; // trailing candles at full strength
+const TAIL_CANDLES = 8; // trailing candles at full strength
+const BASE_PRICE = 772.76;
+const TICK_MS = 1500;
+const TICK_UNIT = 0.01; // price per tick
+const TICK_PX = 9; // pixels the dotted line moves per tick
+const SEQ = [1, -1, 2, -2]; // fixed price-move sequence, looped
 
 const UP = "#00C805";
 const DOWN = "#FF5A00";
@@ -38,13 +45,28 @@ type K = { o: number; c: number; hi: number; lo: number; up: boolean };
 
 export function LiveCandleChart() {
   const reduce = useReducedMotion();
+  const [ticks, setTicks] = useState(0); // cumulative ticks from BASE_PRICE
+  const idxRef = useRef(0);
 
-  const model = useMemo(() => {
+  useEffect(() => {
+    if (reduce) return;
+    const id = window.setInterval(() => {
+      const delta = SEQ[idxRef.current % SEQ.length];
+      idxRef.current += 1;
+      setTicks((t) => t + delta);
+    }, TICK_MS);
+    return () => window.clearInterval(id);
+  }, [reduce]);
+
+  const { candles, baselineY, baseY } = useMemo(() => {
     const raw = walk(7, N, 0.22, 3.0);
     const per = Math.floor(raw.length / CANDLES);
     const ks: K[] = [];
     for (let i = 0; i < CANDLES; i++) {
-      const seg = raw.slice(i * per, i === CANDLES - 1 ? raw.length : (i + 1) * per);
+      const seg = raw.slice(
+        i * per,
+        i === CANDLES - 1 ? raw.length : (i + 1) * per,
+      );
       const o = seg[0];
       const c = seg[seg.length - 1];
       ks.push({ o, c, hi: Math.max(...seg), lo: Math.min(...seg), up: c >= o });
@@ -83,59 +105,29 @@ export function LiveCandleChart() {
       };
     });
 
-    const last = ks[ks.length - 1];
-    return { candles, baselineY, endX, slot, dotY: yy(last.c), dotX: endX };
+    return { candles, baselineY, baseY: yy(ks[ks.length - 1].c) };
   }, []);
 
-  const { candles, baselineY, endX, dotY, dotX } = model;
-
-  // faint "future" ticks past now
-  const future = Array.from({ length: 5 }, (_, i) => {
-    const x = endX + ((W - endX) / 6) * (i + 1);
-    return { x, y: baselineY + 8 + i * 4 };
-  });
+  const price = BASE_PRICE + ticks * TICK_UNIT;
+  const priceY = baseY - ticks * TICK_PX;
 
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
       width="100%"
-      style={{ display: "block", overflow: "hidden" }}
+      style={{ display: "block", overflow: "visible" }}
       aria-hidden="true"
     >
       <line
         x1="0"
-        x2={endX}
+        x2={W}
         y1={baselineY}
         y2={baselineY}
-        stroke="rgba(0,0,0,0.14)"
+        stroke="rgba(0,0,0,0.16)"
         strokeWidth="1"
         strokeDasharray="0.75 4"
         strokeLinecap="round"
       />
-      <line
-        x1={endX}
-        x2={W}
-        y1={baselineY}
-        y2={baselineY}
-        stroke="rgba(0,0,0,0.34)"
-        strokeWidth="1.4"
-        strokeDasharray="1.4 4"
-        strokeLinecap="round"
-      />
-
-      {future.map((f, i) => (
-        <line
-          key={i}
-          x1={f.x - 4}
-          x2={f.x + 4}
-          y1={f.y}
-          y2={f.y}
-          stroke={UP}
-          strokeOpacity="0.35"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-        />
-      ))}
 
       <motion.g
         initial={reduce ? false : { opacity: 0 }}
@@ -158,24 +150,35 @@ export function LiveCandleChart() {
         ))}
       </motion.g>
 
-      {!reduce && (
-        <motion.circle
-          cx={dotX}
-          cy={dotY}
-          r={3.6}
-          fill={UP}
-          style={{ transformBox: "fill-box", transformOrigin: "center" }}
-          initial={{ scale: 0.5, opacity: 0.45 }}
-          animate={{ scale: 4.4, opacity: 0 }}
-          transition={{
-            duration: 1.7,
-            ease: "easeOut",
-            repeat: Infinity,
-            repeatType: "loop",
-          }}
+      {/* "now" — dotted price line + axis pill. Moves only on a tick. */}
+      <motion.g
+        initial={false}
+        animate={{ y: priceY }}
+        transition={{ duration: reduce ? 0 : 0.45, ease: [0.33, 1, 0.68, 1] }}
+      >
+        <line
+          x1="0"
+          x2={W - 44}
+          y1="0"
+          y2="0"
+          stroke={UP}
+          strokeWidth="1.2"
+          strokeDasharray="1 3"
+          strokeLinecap="round"
         />
-      )}
-      <circle cx={dotX} cy={dotY} r="3.6" fill={UP} />
+        <rect x={W - 44} y={-9} width="46" height="18" rx="9" fill={UP} />
+        <text
+          x={W - 21}
+          y="4"
+          textAnchor="middle"
+          fontSize="10"
+          fontWeight="700"
+          fill="#fff"
+          fontFamily="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+        >
+          {price.toFixed(2)}
+        </text>
+      </motion.g>
     </svg>
   );
 }

@@ -61,18 +61,24 @@ export function SearchIcon() {
   );
 }
 
-/* "Fractional shares" — a circle with a wedge sliced out (a fraction of a
-   whole). Thin-stroke SVG to match the rest of the set; replaces the bold
-   PNG (Frame 1000006345) that sat heavy next to the others. */
+/* "Fractional shares" — a pie chart with one wedge. Same viewBox, stroke
+   weight and round caps as StarIcon / BellIcon so it sits with the set. */
 export function FractionalIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <circle cx="12" cy="12" r="8.25" stroke="currentColor" strokeWidth="1.8" />
       <path
-        d="M12 12V3.75M12 12l7.15 4.13"
+        d="M21.21 15.89A10 10 0 1 1 8 2.83"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M22 12A10 10 0 0 0 12 2v10z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
