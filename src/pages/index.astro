@@ -1,0 +1,176 @@
+---
+import Base from "../layouts/Base.astro";
+import { site, pieces } from "../data/site";
+---
+
+<Base>
+  <header class="masthead">
+    <div class="wrap masthead-inner">
+      <div class="id">
+        <h1>{site.name}</h1>
+        <p class="sub">{site.role} — {site.tagline}</p>
+      </div>
+      <nav class="meta-nav" aria-label="Elsewhere">
+        {site.social.map((s) => (
+          <a class="link-underline" href={s.href} target="_blank" rel="noopener">
+            {s.label}
+          </a>
+        ))}
+        <a class="link-underline" href={`mailto:${site.email}`}>Email</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="gallery">
+    <div class="wrap">
+      <ol class="grid">
+        {pieces.map((p, i) => (
+          <li class="card">
+            <a href={`/work/${p.slug}`}>
+              <div
+                class="thumb"
+                style={`--tile:${p.accent ?? "var(--paper-raised)"}`}
+              >
+                {p.cover ? (
+                  <img src={p.cover} alt="" loading="lazy" />
+                ) : (
+                  <span class="thumb-label" aria-hidden="true">{p.title}</span>
+                )}
+              </div>
+              <div class="card-meta">
+                <span class="card-title">{p.title}</span>
+                <span class="mono">{p.kind} · {p.year}</span>
+              </div>
+              <p class="card-summary">{p.summary}</p>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .masthead {
+    border-bottom: 1px solid var(--line);
+    padding-block: clamp(2.5rem, 1.5rem + 5vw, 5rem);
+  }
+
+  .masthead-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .id h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.9rem, 1.4rem + 2.5vw, 3rem);
+  }
+
+  .sub {
+    margin-top: 0.75rem;
+    color: var(--ink-soft);
+    max-width: 46ch;
+  }
+
+  .meta-nav {
+    display: flex;
+    gap: 1.25rem;
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .gallery {
+    padding-block: clamp(2rem, 1rem + 4vw, 4rem) 6rem;
+  }
+
+  .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: clamp(1.5rem, 1rem + 2vw, 3rem) clamp(1.25rem, 1rem + 1.5vw, 2.25rem);
+  }
+
+  .card a {
+    display: block;
+  }
+
+  .thumb {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--tile);
+    display: grid;
+    place-items: center;
+    isolation: isolate;
+  }
+
+  .thumb::after {
+    /* subtle vignette so light accents still read */
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.06),
+      rgba(0, 0, 0, 0.14)
+    );
+    z-index: 1;
+  }
+
+  .thumb img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  .thumb-label {
+    position: relative;
+    z-index: 2;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: rgba(255, 255, 255, 0.92);
+    padding: 0 1rem;
+    text-align: center;
+    text-wrap: balance;
+    mix-blend-mode: overlay;
+  }
+
+  .card a:hover .thumb {
+    filter: brightness(1.04);
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.9rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+
+  .card-summary {
+    margin-top: 0.35rem;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    max-width: 42ch;
+  }
+
+  @media (max-width: 520px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

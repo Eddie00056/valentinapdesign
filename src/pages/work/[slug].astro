@@ -1,0 +1,109 @@
+---
+import Base from "../../layouts/Base.astro";
+import { pieces } from "../../data/site";
+
+export function getStaticPaths() {
+  return pieces.map((p) => ({ params: { slug: p.slug }, props: { piece: p } }));
+}
+
+const { piece } = Astro.props;
+const idx = pieces.findIndex((p) => p.slug === piece.slug);
+const next = pieces[(idx + 1) % pieces.length];
+---
+
+<Base title={piece.title} description={piece.summary}>
+  <article class="case">
+    <div class="wrap">
+      <p class="mono back"><a class="link-underline" href="/">← Index</a></p>
+
+      <header class="case-head">
+        <h1>{piece.title}</h1>
+        <p class="mono">{piece.kind} · {piece.year}</p>
+        <p class="case-summary">{piece.summary}</p>
+      </header>
+
+      <div
+        class="hero-tile"
+        style={`--tile:${piece.accent ?? "var(--paper-raised)"}`}
+      >
+        {piece.cover ? <img src={piece.cover} alt="" /> : null}
+      </div>
+
+      <div class="placeholder">
+        <p>
+          {/* TODO: real case study — images in public/work/{piece.slug}/,
+              brief, approach, outcome. */}
+          Case study content goes here. Drop images into
+          <code>public/work/{piece.slug}/</code> and write up the brief,
+          approach, and result.
+        </p>
+      </div>
+
+      <p class="mono next">
+        <a class="link-underline" href={`/work/${next.slug}`}>
+          Next → {next.title}
+        </a>
+      </p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .case {
+    padding-block: clamp(2rem, 1rem + 4vw, 4rem) 6rem;
+  }
+
+  .back {
+    margin-bottom: 3rem;
+  }
+
+  .case-head h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 1.5rem + 3vw, 3.5rem);
+  }
+
+  .case-head .mono {
+    margin-top: 0.75rem;
+  }
+
+  .case-summary {
+    margin-top: 1.25rem;
+    color: var(--ink-soft);
+    max-width: 52ch;
+    font-size: 1.1rem;
+  }
+
+  .hero-tile {
+    margin-top: 2.5rem;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius);
+    background: var(--tile);
+    overflow: hidden;
+  }
+
+  .hero-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder {
+    border: 1px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 2.5rem;
+    color: var(--ink-soft);
+    margin-top: 2.5rem;
+  }
+
+  .placeholder code {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: var(--paper-raised);
+    padding: 0.1em 0.4em;
+    border-radius: 6px;
+  }
+
+  .next {
+    margin-top: 3rem;
+  }
+</style>
