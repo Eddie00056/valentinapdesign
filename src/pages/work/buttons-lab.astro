@@ -1,6 +1,12 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { BackButton } from "../../components/glasslab/GlassButton";
+import {
+  WatchlistButton,
+  AlertButton,
+  TradeButton,
+  SearchButton,
+  BackButton,
+} from "../../components/glasslab/GlassButton";
 import "../../components/glasslab/glass-button.css";
 
 const variants = ["light", "green"] as const;
@@ -8,10 +14,41 @@ const variants = ["light", "green"] as const;
 
 <Base title="Buttons lab">
   <main class="wrap dark">
+    {/* web pills */}
     <div class="group">
       {variants.map((v) => (
         <div class="pair">
+          <WatchlistButton variant={v} />
+          <AlertButton variant={v} />
+        </div>
+      ))}
+    </div>
+
+    {/* trade */}
+    <div class="group">
+      {variants.map((v) => (
+        <div class="pair">
+          <TradeButton variant={v} />
+        </div>
+      ))}
+    </div>
+
+    {/* mobile icon-only, 24 */}
+    <div class="group">
+      {variants.map((v) => (
+        <div class="pair">
+          <WatchlistButton variant={v} size="mobile" iconOnly />
+          <AlertButton variant={v} size="mobile" iconOnly />
+          <SearchButton variant={v} />
           <BackButton variant={v} />
+        </div>
+      ))}
+    </div>
+
+    {/* back, 44 */}
+    <div class="group">
+      {variants.map((v) => (
+        <div class="pair">
           <BackButton variant={v} style={{ width: 44, height: 44 }} />
         </div>
       ))}
