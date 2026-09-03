@@ -2,7 +2,6 @@
    Edit an icon here and every page that renders it — glass-buttons,
    buttons-lab, the alert-creation screen — picks up the change on the
    next build. All icons: 20×20 default, viewBox 0 0 24 24, currentColor. */
-import "./icons.css";
 
 export function StarIcon() {
   return (
@@ -62,16 +61,20 @@ export function SearchIcon() {
   );
 }
 
-/* "Fractional shares" — supplied as a PNG (Frame 1000006345). Rendered
-   as a currentColor mask so it recolours per variant like the SVGs.
-   Size comes from the button's CSS (.icon-mask overrides), not inline. */
+/* "Fractional shares" — a circle with a wedge sliced out (a fraction of a
+   whole). Thin-stroke SVG to match the rest of the set; replaces the bold
+   PNG (Frame 1000006345) that sat heavy next to the others. */
 export function FractionalIcon() {
   return (
-    <span
-      className="icon-mask"
-      aria-hidden="true"
-      style={{ ["--icon-src" as string]: "url(/icons/fractional.png)" }}
-    />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="8.25" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M12 12V3.75M12 12l7.15 4.13"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 
