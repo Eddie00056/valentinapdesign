@@ -19,7 +19,6 @@ import "../glasslab/glass-button.css";
 
 const ASSETS = "/prototypes/uploads";
 const PHONE = `${ASSETS}/PHONE.png`;
-const BG = `${ASSETS}/sindy-sussengut-ZUEcf_Ng2gw-unsplash-4569b038.jpg`;
 
 const TFS = ["1D", "1W", "1M", "3M", "6M", "YTD", "1Y"];
 const PREV_CLOSE = 192.91;
@@ -955,7 +954,7 @@ export function AlertCreationScreen({
         alignItems: "center",
         justifyContent: "center",
         padding: "48px 28px",
-        background: `#0F0F0F url('${BG}') center/cover no-repeat`,
+        background: "#0F0F0F",
       }}
     >
       {phone}
