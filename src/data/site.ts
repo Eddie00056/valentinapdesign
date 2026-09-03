@@ -28,4 +28,9 @@ export const pieces: Piece[] = [
     href: "/work/fractional-shares-banner",
     title: "Fractional shares banner",
   },
+  {
+    slug: "alert-prototype",
+    href: "/work/alert-prototype",
+    title: "Alert creation prototype",
+  },
 ];

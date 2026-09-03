@@ -24,6 +24,27 @@ import "../components/glasslab/glasslab.css";
               {p.slug === "fractional-shares-banner" && (
                 <FractionalSharesBannerPreview client:visible />
               )}
+              {p.slug === "alert-prototype" && (
+                <svg
+                  class="mark"
+                  viewBox="0 0 120 120"
+                  role="img"
+                  aria-label="Alert creation prototype"
+                >
+                  <rect width="120" height="120" rx="18" fill="#111317"></rect>
+                  <g
+                    stroke="#48d597"
+                    stroke-width="4"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    fill="none"
+                  >
+                    <path d="M78 52a18 18 0 1 0-36 0c0 13-5 17-5 17h46s-5-4-5-17Z"
+                    ></path>
+                    <path d="M52 76a8 8 0 0 0 16 0"></path>
+                  </g>
+                </svg>
+              )}
             </span>
           </a>
         </li>
@@ -71,5 +92,10 @@ import "../components/glasslab/glasslab.css";
 
   a:hover .thumb {
     border-color: var(--ink-faint);
+  }
+
+  .thumb .mark {
+    width: 84px;
+    height: 84px;
   }
 </style>
