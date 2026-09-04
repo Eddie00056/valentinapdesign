@@ -325,24 +325,30 @@ export function AlertCreationScreen({
       " 700ms cubic-bezier(.36,.07,.19,.97)"
     : "none";
 
+  // Clip PHONE.png (a tall 678x1400 render) to roughly a real-phone height,
+  // then fade the last ~75px to nothing so the bottom edge dissolves into the
+  // page instead of ending on a hard line.
+  const phoneMask =
+    "linear-gradient(to bottom, #000 0%, #000 90%, transparent 100%)";
+
   const phone = (
     <div
       style={{
         flex: "none",
-        filter: "drop-shadow(0 24px 55px rgba(0,0,0,0.55))",
+        filter: "drop-shadow(0 24px 55px rgba(0,0,0,0.5))",
+        WebkitMaskImage: phoneMask,
+        maskImage: phoneMask,
         fontFamily: "'Open Sans', Helvetica, Arial, sans-serif",
         letterSpacing: 0,
       }}
     >
-      {/* PHONE.png is a tall 678x1400 render; clip it to a real-phone height so
-          the content isn't sitting above a long empty chin. */}
       <div
         style={{
           position: "relative",
           width: 406,
-          height: 712,
+          height: 736,
           overflow: "hidden",
-          borderRadius: "54px 54px 46px 46px",
+          borderRadius: "54px 54px 0 0",
         }}
       >
         <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
