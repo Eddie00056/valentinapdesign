@@ -66,6 +66,8 @@ type Props = {
   /** draw the forming candle past the series. Off for the alert screen, where
       "now" is just the dotted line + pill and a trailing candle reads as junk. */
   forming?: boolean;
+  /** opacity of the non-hot (older) candles — lower = more faded */
+  coolFade?: number;
 };
 
 export function LiveCandleChart({
@@ -80,6 +82,7 @@ export function LiveCandleChart({
   upColor = UP,
   downColor = DOWN,
   forming = true,
+  coolFade = 1,
 }: Props = {}) {
   const W = w;
   const H = h;
@@ -158,6 +161,7 @@ export function LiveCandleChart({
         wx: cx,
         wy1: yy(c.hi),
         wy2: yy(c.lo),
+        hot,
         color: c.up ? (hot ? upColor : UP_COOL) : hot ? downColor : DOWN_COOL,
       };
     });
@@ -222,7 +226,7 @@ export function LiveCandleChart({
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         {candles.map((c, i) => (
-          <g key={i}>
+          <g key={i} opacity={c.hot ? 1 : coolFade}>
             <line
               x1={c.wx}
               x2={c.wx}

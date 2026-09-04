@@ -738,6 +738,7 @@ export function AlertCreationScreen({
                   upColor={UP}
                   downColor={DOWN}
                   forming={false}
+                  coolFade={0.38}
                 />
               </div>
 
