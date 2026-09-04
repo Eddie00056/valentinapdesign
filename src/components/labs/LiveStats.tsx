@@ -116,12 +116,9 @@ export function LiveStats({
         />
       </div>
 
-      {/* stat rows — no divider; sit tight under the depth bar */}
+      {/* stat rows — no divider; sit tight under the depth bar. Bid/ask size
+          live in the header row above, so they're not repeated here. */}
       <div style={{ marginTop: 2 }}>
-        <Row>
-          <Cell k="Bid size" v={String(bid)} />
-          <Cell k="Ask size" v={String(ask)} />
-        </Row>
         {rows.map(([a, b, c, d], ri) => (
           <Row key={ri}>
             <Cell k={a} v={b} />
