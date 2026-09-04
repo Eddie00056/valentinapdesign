@@ -73,6 +73,17 @@ type Props = {
   forming?: boolean;
   /** opacity of the non-hot (older) candles — lower = more faded */
   coolFade?: number;
+  /** draw the prev-close baseline dash. Off for the alert screen. */
+  baseline?: boolean;
+  /** live mode: the "now" line + pill + tick sim. Off for historical
+      timeframes — the series just fills the width, static, no price element. */
+  live?: boolean;
+  /** pull the "now" pill + line-end in from the right edge (px). Use when the
+      host clips the chart's right bleed and the pill would be cut off. */
+  pillInset?: number;
+  /** where the baseline / series sits: fraction of the plot height up from the
+      bottom. Lower = candles sit lower, less dead space beneath them. */
+  startFromBottom?: number;
 };
 
 export function LiveCandleChart({
@@ -88,6 +99,10 @@ export function LiveCandleChart({
   downColor = DOWN,
   forming = true,
   coolFade = 1,
+  baseline = true,
+  startFromBottom = START_FROM_BOTTOM,
+  live = true,
+  pillInset = 0,
 }: Props = {}) {
   const W = w;
   const H = h;
@@ -111,7 +126,7 @@ export function LiveCandleChart({
   }, [external, extPrice]);
 
   useEffect(() => {
-    if (external || reduce) return;
+    if (external || reduce || !live) return;
     const id = window.setInterval(() => {
       const delta = SEQ[idxRef.current % SEQ.length];
       idxRef.current += 1;
@@ -121,7 +136,7 @@ export function LiveCandleChart({
       });
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [external, reduce]);
+  }, [external, reduce, live]);
 
   const model = useMemo(() => {
     const raw = walk(7, N, 0.22, 3.0);
@@ -140,7 +155,7 @@ export function LiveCandleChart({
     const lo = Math.min(...ks.map((k) => k.lo), v0);
     const hi = Math.max(...ks.map((k) => k.hi), v0);
 
-    const baselineY = PAD + (H - 2 * PAD) * (1 - START_FROM_BOTTOM);
+    const baselineY = PAD + (H - 2 * PAD) * (1 - startFromBottom);
     const spaceUp = baselineY - PAD;
     const spaceDown = H - PAD - baselineY;
     const k = Math.min(
@@ -149,7 +164,8 @@ export function LiveCandleChart({
     );
     const yy = (v: number) => baselineY - (v - v0) * k;
 
-    const endX = W * PROGRESS;
+    // live: series stops at "now" (~56% across). static: fill the width.
+    const endX = W * (live ? PROGRESS : 0.96);
     const slot = endX / CANDLES;
     const bw = Math.min(slot * 0.62, 9);
 
@@ -178,7 +194,7 @@ export function LiveCandleChart({
       liveX: endX + slot * 0.5,
       bw,
     };
-  }, [W, H, PAD, upColor, downColor]);
+  }, [W, H, PAD, upColor, downColor, startFromBottom, live]);
 
   const { candles, baselineY, baseY, liveX, bw } = model;
 
@@ -219,16 +235,18 @@ export function LiveCandleChart({
       style={{ display: "block", overflow: "visible" }}
       aria-hidden="true"
     >
-      <line
-        x1="0"
-        x2={W}
-        y1={baselineY}
-        y2={baselineY}
-        stroke={baselineStroke}
-        strokeWidth="1"
-        strokeDasharray="0.75 4"
-        strokeLinecap="round"
-      />
+      {baseline && (
+        <line
+          x1="0"
+          x2={W}
+          y1={baselineY}
+          y2={baselineY}
+          stroke={baselineStroke}
+          strokeWidth="1"
+          strokeDasharray="0.75 4"
+          strokeLinecap="round"
+        />
+      )}
 
       <motion.g
         initial={reduce ? false : { opacity: 0 }}
@@ -277,35 +295,37 @@ export function LiveCandleChart({
         </>
       )}
 
-      {/* "now" — dotted price line + axis pill. Moves only on a tick. */}
-      <motion.g
-        initial={false}
-        animate={{ y: priceY }}
-        transition={reduce ? { duration: 0 } : SYNC}
-      >
-        <line
-          x1="0"
-          x2={W - 44}
-          y1="0"
-          y2="0"
-          stroke={nowColor}
-          strokeWidth="1.2"
-          strokeDasharray="1 3"
-          strokeLinecap="round"
-        />
-        <rect x={W - 44} y={-9} width="46" height="18" rx="9" fill={nowColor} />
-        <text
-          x={W - 21}
-          y="4"
-          textAnchor="middle"
-          fontSize="10"
-          fontWeight="700"
-          fill="#fff"
-          fontFamily="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+      {/* "now" — dotted price line + axis pill. Live timeframes only. */}
+      {live && (
+        <motion.g
+          initial={false}
+          animate={{ y: priceY }}
+          transition={reduce ? { duration: 0 } : SYNC}
         >
-          {dispPrice.toFixed(2)}
-        </text>
-      </motion.g>
+          <line
+            x1="0"
+            x2={W - 44 - pillInset}
+            y1="0"
+            y2="0"
+            stroke={nowColor}
+            strokeWidth="1.2"
+            strokeDasharray="1 3"
+            strokeLinecap="round"
+          />
+          <rect x={W - 44 - pillInset} y={-9} width="46" height="18" rx="9" fill={nowColor} />
+          <text
+            x={W - 21 - pillInset}
+            y="4"
+            textAnchor="middle"
+            fontSize="10"
+            fontWeight="700"
+            fill="#fff"
+            fontFamily="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
+          >
+            {dispPrice.toFixed(2)}
+          </text>
+        </motion.g>
+      )}
     </svg>
   );
 }

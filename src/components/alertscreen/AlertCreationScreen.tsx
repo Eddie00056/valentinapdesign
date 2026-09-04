@@ -686,14 +686,17 @@ export function AlertCreationScreen({
               {/* chart — tick-driven candlesticks (Robinhood "advanced" style):
                   static session candles, a forming candle that builds on each
                   tick, and a dotted "now" price line + axis pill. */}
-              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "16px -24px 0", minHeight: 212 }}>
+              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "16px -24px 0", minHeight: 188 }}>
                 <LiveCandleChart
                   w={393}
-                  h={212}
-                  pad={20}
-                  baselineStroke="rgba(255,255,255,0.14)"
+                  h={188}
+                  pad={14}
+                  baseline={false}
+                  startFromBottom={0.12}
+                  pillInset={34}
                   drawIn={drawn}
-                  price={s.price}
+                  live={tf === 0}
+                  price={tf === 0 ? s.price : undefined}
                   prevClose={PREV_CLOSE}
                   upColor={UP}
                   downColor={DOWN}
@@ -706,7 +709,7 @@ export function AlertCreationScreen({
               <div
                 ref={railElRef}
                 role="tablist"
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", margin: "16px -10px 0" }}
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", margin: "10px -10px 0" }}
               >
                 <div
                   aria-hidden="true"
@@ -719,7 +722,7 @@ export function AlertCreationScreen({
                     left: indLeft,
                     right: indRight,
                     opacity: indOpacity,
-                    transition: `${indTransition},opacity 200ms ease`,
+                    transition: `${indTransition},opacity 150ms ease`,
                   }}
                 />
                 {items.map((item, i) => (
@@ -747,12 +750,12 @@ export function AlertCreationScreen({
                       borderRadius: 8,
                       background: "transparent",
                       fontFamily: "'Open Sans', Helvetica, Arial, sans-serif",
-                      fontSize: 13,
+                      fontSize: 12,
                       fontWeight: 700,
                       lineHeight: 1,
                       cursor: "pointer",
                       color: item.color,
-                      transition: "color 200ms ease",
+                      transition: "color 150ms ease",
                     }}
                   >
                     {item.label}

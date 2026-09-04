@@ -12,8 +12,8 @@ import { motion, useReducedMotion } from "motion/react";
 const TICK_MS = 2200; // matches priceHub PX_STEP for the standalone lab
 const MUTED = "#8e97ad";
 const VAL = "#f2f2f8";
-const FS = 13; // one type size for the whole readout (label + value)
-const ROW_PAD = 7; // vertical padding per stat row -> 14px between rows
+const FS = 12; // one type size for the whole readout (label + value)
+const ROW_PAD = 9; // vertical padding per stat row
 
 // bid/ask size sequences — deterministic, small moves
 const BID_SEQ = [3, 4, 3, 5, 4, 6, 4, 3];
@@ -86,7 +86,7 @@ export function LiveStats({
   return (
     <div style={{ fontFamily: "'Open Sans', Helvetica, Arial, sans-serif" }}>
       {/* Bid / Ask + depth bar */}
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: FS, lineHeight: 1 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: FS }}>
         <div>
           <span style={{ color: MUTED }}>Bid </span>
           <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{bidPrice}</span>
@@ -102,26 +102,26 @@ export function LiveStats({
         style={{
           display: "flex",
           gap: 3,
-          height: 7,
-          marginTop: 10,
-          borderRadius: 4,
+          height: 6,
+          marginTop: 8,
+          borderRadius: 3,
           overflow: "hidden",
         }}
       >
         <motion.div
-          style={{ background: up, borderRadius: 3 }}
+          style={{ background: up, borderRadius: 2 }}
           animate={{ width: `${bidPct}%` }}
           transition={reduce ? { duration: 0 } : spring}
         />
         <motion.div
-          style={{ background: down, borderRadius: 3, flex: 1 }}
+          style={{ background: down, borderRadius: 2, flex: 1 }}
           transition={reduce ? { duration: 0 } : spring}
         />
       </div>
 
       {/* stat rows — no divider; sit tight under the depth bar. Bid/ask size
           live in the header row above, so they're not repeated here. */}
-      <div style={{ marginTop: 4 }}>
+      <div style={{ marginTop: 2 }}>
         {rows.map(([a, b, c, d], ri) => (
           <Row key={ri}>
             <Cell k={a} v={b} />
@@ -150,7 +150,7 @@ function Row({ children }: { children: ReactNode }) {
 
 function Cell({ k, v }: { k: string; v: string }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: FS, lineHeight: 1 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: FS }}>
       <span style={{ color: MUTED }}>{k}</span>
       <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{v}</span>
     </div>
