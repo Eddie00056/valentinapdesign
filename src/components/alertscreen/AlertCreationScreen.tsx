@@ -367,33 +367,24 @@ export function AlertCreationScreen({
         />
         <div
           style={{
+            // measured off iphone17pro.png @406: screen inset L/R ~10.6px,
+            // top ~7.5px, corner radius ~58px. Content bg is pure #000 to
+            // match the PNG's black screen, so any sub-px corner mismatch is
+            // invisible and only the metal rail frames it.
             position: "absolute",
-            left: 4,
-            right: 4,
-            top: 0,
+            left: 10,
+            right: 10,
+            top: 8,
             bottom: 0,
-            borderRadius: "62px 62px 0 0",
+            borderRadius: "58px 58px 0 0",
             overflow: "hidden",
-            background: "#111317",
+            background: "transparent",
             paddingTop: 50,
             boxSizing: "border-box",
             display: "flex",
             flexDirection: "column",
           }}
         >
-          <div
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              left: 0,
-              right: 0,
-              top: 0,
-              height: 57,
-              background: "#111317",
-              zIndex: 1,
-              borderRadius: "62px 62px 0 0",
-            }}
-          />
           <div
             style={{
               position: "absolute",
@@ -481,7 +472,7 @@ export function AlertCreationScreen({
             style={{
               flex: 1,
               minHeight: 0,
-              background: "#111317",
+              background: "#000",
               display: "flex",
               flexDirection: "column",
               position: "relative",
@@ -598,7 +589,7 @@ export function AlertCreationScreen({
                             gap: 8,
                             padding: "0 24px",
                             boxSizing: "border-box",
-                            background: "#111317",
+                            background: "#000",
                             borderTop: "1px solid #31383f",
                             borderBottom: "1px solid #31383f",
                             borderRadius: 0,
