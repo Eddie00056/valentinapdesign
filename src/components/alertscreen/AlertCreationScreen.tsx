@@ -325,36 +325,26 @@ export function AlertCreationScreen({
       " 700ms cubic-bezier(.36,.07,.19,.97)"
     : "none";
 
+  // Fade the phone's lower quarter to nothing so the bezel, home indicator and
+  // the empty slab under the stats dissolve into the page — a mask (vs a
+  // gradient overlay) means no colour to match and no seam / rail glint.
+  const phoneFade =
+    "linear-gradient(to bottom, #000 0%, #000 80%, transparent 98%)";
+
   const phone = (
     <div
       style={{
         position: "relative",
         width: 406,
         flex: "none",
-        filter: "drop-shadow(0 40px 60px rgba(0,0,0,0.35))",
+        filter: "drop-shadow(0 22px 50px rgba(0,0,0,0.5))",
+        WebkitMaskImage: phoneFade,
+        maskImage: phoneFade,
         fontFamily: "'Open Sans', Helvetica, Arial, sans-serif",
         letterSpacing: 0,
       }}
     >
         <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
-
-        {/* Rather than crop the phone (which clips awkwardly), dissolve its
-            lower third — bezel, home indicator and the empty slab below the
-            stats — into the page background so it just fades out. */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            left: -2,
-            right: -2,
-            bottom: -2,
-            height: "30%",
-            zIndex: 6,
-            pointerEvents: "none",
-            background:
-              "linear-gradient(to bottom, rgba(15,15,15,0) 0%, rgba(15,15,15,0.6) 45%, #0F0F0F 72%)",
-          }}
-        />
         <div
           style={{
             position: "absolute",
@@ -861,7 +851,10 @@ export function AlertCreationScreen({
         alignItems: "center",
         justifyContent: "center",
         padding: "48px 28px",
-        background: "#0F0F0F",
+        // soft ambient light behind the phone so the backdrop reads considered,
+        // not a flat void; keeps the masked phone edge from looking abrupt
+        background:
+          "radial-gradient(115% 80% at 50% 30%, #17191e 0%, #101114 48%, #0b0b0d 100%)",
       }}
     >
       {phone}
