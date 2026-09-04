@@ -173,7 +173,8 @@ export function LiveCandleChart({
       const cx = i * slot + slot / 2;
       const top = yy(Math.max(c.o, c.c));
       const bot = yy(Math.min(c.o, c.c));
-      const hot = i >= CANDLES - TAIL_CANDLES;
+      // static (historical) view: every candle full-strength, no fade / tail
+      const hot = !live || i >= CANDLES - TAIL_CANDLES;
       return {
         x: cx - bw / 2,
         y: top,
