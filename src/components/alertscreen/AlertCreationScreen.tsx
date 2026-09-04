@@ -20,7 +20,7 @@ import "../glasslab/glass-button.css";
    timeframe rail with a sliding indicator, and a toast system. */
 
 const ASSETS = "/prototypes/uploads";
-const PHONE = `${ASSETS}/PHONE.png`;
+const PHONE = `${ASSETS}/iphone17pro.png`;
 
 const TFS = ["1D", "1W", "1M", "3M", "6M", "YTD", "1Y"];
 const PREV_CLOSE = 192.91;
@@ -325,11 +325,13 @@ export function AlertCreationScreen({
       " 700ms cubic-bezier(.36,.07,.19,.97)"
     : "none";
 
-  // Measured from PHONE.png (678x1400) at this 406px render: outer corner
-  // r≈55, rail≈6px, so the screen is inset 6px with a ~49px corner. The mask
-  // fades the phone's bottom into the page. IMPORTANT: no `filter` on the
-  // masked element — filter + mask on one box hard-clips the drop-shadow to a
-  // rectangle and that clip line is the "triangle edge".
+  // iphone17pro.png (5200x10568) renders ~858px tall at 406 wide; the screen
+  // sits a few px inside the rail. Overlay inset/radius below over-hug the
+  // screen edge so the black content covers the rail highlight rather than
+  // leaving a sliver. The mask fades the phone's bottom into the page.
+  // IMPORTANT: no `filter` on the masked element — filter + mask on one box
+  // hard-clips the drop-shadow to a rectangle, and that clip line is the
+  // "triangle edge".
   const phoneMask =
     "linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%)";
 
@@ -366,11 +368,11 @@ export function AlertCreationScreen({
         <div
           style={{
             position: "absolute",
-            left: 6,
-            right: 6,
-            top: 6,
+            left: 5,
+            right: 5,
+            top: 5,
             bottom: 0,
-            borderRadius: "49px 49px 0 0",
+            borderRadius: "52px 52px 0 0",
             overflow: "hidden",
             background: "transparent",
             paddingTop: 50,
@@ -389,7 +391,7 @@ export function AlertCreationScreen({
               height: 57,
               background: "#111317",
               zIndex: 1,
-              borderRadius: "49px 49px 0 0",
+              borderRadius: "52px 52px 0 0",
             }}
           />
           <div
