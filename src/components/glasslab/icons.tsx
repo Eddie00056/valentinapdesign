@@ -4,10 +4,12 @@
    next build. All icons: 20×20 default, viewBox 0 0 24 24, currentColor. */
 
 export function StarIcon() {
+  // Enlarged ~1.1x about centre so the star fills the 24-box like the bell /
+  // fractional glyphs — the old outline read visibly smaller next to them.
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
-        d="M12 3.6l2.6 5.27 5.82.85-4.21 4.1.99 5.8L12 17.9l-5.2 2.72.99-5.8-4.21-4.1 5.82-.85z"
+        d="M12 2.76 L14.86 8.56 L21.26 9.49 L16.63 14 L17.72 20.38 L12 18.49 L6.28 21.48 L7.37 15.1 L2.74 10.59 L9.14 9.66 Z"
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinejoin="round"

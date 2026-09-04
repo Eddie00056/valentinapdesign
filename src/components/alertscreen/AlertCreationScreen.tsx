@@ -325,37 +325,38 @@ export function AlertCreationScreen({
       " 700ms cubic-bezier(.36,.07,.19,.97)"
     : "none";
 
-  // Fade the phone's lower quarter to nothing so the bezel, home indicator and
-  // the empty slab under the stats dissolve into the page — a mask (vs a
-  // gradient overlay) means no colour to match and no seam / rail glint.
-  const phoneFade =
-    "linear-gradient(to bottom, #000 0%, #000 80%, transparent 98%)";
-
   const phone = (
     <div
       style={{
-        position: "relative",
-        width: 406,
         flex: "none",
-        filter: "drop-shadow(0 22px 50px rgba(0,0,0,0.5))",
-        WebkitMaskImage: phoneFade,
-        maskImage: phoneFade,
+        filter: "drop-shadow(0 24px 55px rgba(0,0,0,0.55))",
         fontFamily: "'Open Sans', Helvetica, Arial, sans-serif",
         letterSpacing: 0,
       }}
     >
+      {/* PHONE.png is a tall 678x1400 render; clip it to a real-phone height so
+          the content isn't sitting above a long empty chin. */}
+      <div
+        style={{
+          position: "relative",
+          width: 406,
+          height: 712,
+          overflow: "hidden",
+          borderRadius: "54px 54px 46px 46px",
+        }}
+      >
         <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
         <div
           style={{
             position: "absolute",
             left: "1.8%",
             right: "1.8%",
-            top: "0.9%",
-            bottom: "0.9%",
-            borderRadius: 56,
+            top: 6,
+            bottom: 6,
+            borderRadius: 48,
             overflow: "hidden",
             background: "transparent",
-            paddingTop: 52,
+            paddingTop: 50,
             boxSizing: "border-box",
             display: "flex",
             flexDirection: "column",
@@ -702,6 +703,7 @@ export function AlertCreationScreen({
                   baseline={false}
                   startFromBottom={0.12}
                   pillInset={34}
+                  pillTextColor="#04150c"
                   drawIn={drawn}
                   live={tf === 0}
                   price={tf === 0 ? s.price : undefined}
@@ -838,6 +840,7 @@ export function AlertCreationScreen({
           />
         </div>
       </div>
+    </div>
   );
 
   if (frame === "bare") return phone;
@@ -851,10 +854,7 @@ export function AlertCreationScreen({
         alignItems: "center",
         justifyContent: "center",
         padding: "48px 28px",
-        // soft ambient light behind the phone so the backdrop reads considered,
-        // not a flat void; keeps the masked phone edge from looking abrupt
-        background:
-          "radial-gradient(115% 80% at 50% 30%, #17191e 0%, #101114 48%, #0b0b0d 100%)",
+        background: "linear-gradient(180deg, #131417 0%, #0b0b0d 100%)",
       }}
     >
       {phone}

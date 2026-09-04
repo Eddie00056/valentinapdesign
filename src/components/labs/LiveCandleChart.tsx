@@ -81,6 +81,8 @@ type Props = {
   /** pull the "now" pill + line-end in from the right edge (px). Use when the
       host clips the chart's right bleed and the pill would be cut off. */
   pillInset?: number;
+  /** price-pill text colour (default white) */
+  pillTextColor?: string;
   /** where the baseline / series sits: fraction of the plot height up from the
       bottom. Lower = candles sit lower, less dead space beneath them. */
   startFromBottom?: number;
@@ -103,6 +105,7 @@ export function LiveCandleChart({
   startFromBottom = START_FROM_BOTTOM,
   live = true,
   pillInset = 0,
+  pillTextColor = "#fff",
 }: Props = {}) {
   const W = w;
   const H = h;
@@ -320,7 +323,7 @@ export function LiveCandleChart({
             textAnchor="middle"
             fontSize="10"
             fontWeight="700"
-            fill="#fff"
+            fill={pillTextColor}
             fontFamily="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
           >
             {dispPrice.toFixed(2)}
