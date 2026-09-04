@@ -138,11 +138,13 @@ export function AlertCreationScreen({
   const fracSpring = { type: "spring", visualDuration: 0.28, bounce: 0 } as const;
   /* inline approximation of the glass `light` icon button (glass-button.css
      .dark .btn--light) so the morphing card can *be* the resting icon. */
+  // Match the mobile GlassButton (watchlist / alert): 66deg fill, a
+  // whisper-thin uniform rim (no border, no bright top highlight), soft shadow.
   const fracGlass: CSSProperties = {
-    background: "rgba(255,255,255,0.08)",
-    border: "1px solid rgba(255,255,255,0.12)",
+    background:
+      "linear-gradient(66deg, rgba(255,255,255,0.1), rgba(255,255,255,0.045))",
     boxShadow:
-      "inset 0 1px 0 rgba(255,255,255,0.22), 0 8px 16px rgba(0,0,0,0.35)",
+      "inset 0 0 0 1px rgba(255,255,255,0.08), 0 8px 20px rgba(0,0,0,0.4)",
     backdropFilter: "blur(18px)",
     WebkitBackdropFilter: "blur(18px)",
     color: "rgba(255,255,255,0.85)",
