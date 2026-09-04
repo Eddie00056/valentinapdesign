@@ -21,7 +21,7 @@ const TAIL_CANDLES = 8; // trailing candles at full strength
 const BASE_PRICE = 772.76;
 const TICK_MS = 1500;
 const TICK_UNIT = 0.01; // price per tick
-const TICK_PX = 9; // pixels the dotted line moves per tick
+const TICK_PX = 2; // pixels the line / candle moves per tick (small)
 const SEQ = [1, -1, 2, -2]; // fixed price-move sequence, looped
 
 const UP = "#00C805";
@@ -45,7 +45,8 @@ type K = { o: number; c: number; hi: number; lo: number; up: boolean };
 
 export function LiveCandleChart() {
   const reduce = useReducedMotion();
-  const [ticks, setTicks] = useState(0); // cumulative ticks from BASE_PRICE
+  // ticks = current level; hi/lo = running extremes of the forming candle
+  const [tk, setTk] = useState({ now: 0, hi: 0, lo: 0 });
   const idxRef = useRef(0);
 
   useEffect(() => {
@@ -53,12 +54,15 @@ export function LiveCandleChart() {
     const id = window.setInterval(() => {
       const delta = SEQ[idxRef.current % SEQ.length];
       idxRef.current += 1;
-      setTicks((t) => t + delta);
+      setTk((t) => {
+        const now = t.now + delta;
+        return { now, hi: Math.max(t.hi, now), lo: Math.min(t.lo, now) };
+      });
     }, TICK_MS);
     return () => window.clearInterval(id);
   }, [reduce]);
 
-  const { candles, baselineY, baseY } = useMemo(() => {
+  const model = useMemo(() => {
     const raw = walk(7, N, 0.22, 3.0);
     const per = Math.floor(raw.length / CANDLES);
     const ks: K[] = [];
@@ -105,11 +109,26 @@ export function LiveCandleChart() {
       };
     });
 
-    return { candles, baselineY, baseY: yy(ks[ks.length - 1].c) };
+    return {
+      candles,
+      baselineY,
+      baseY: yy(ks[ks.length - 1].c),
+      liveX: endX + slot * 0.5,
+      bw,
+    };
   }, []);
 
-  const price = BASE_PRICE + ticks * TICK_UNIT;
-  const priceY = baseY - ticks * TICK_PX;
+  const { candles, baselineY, baseY, liveX, bw } = model;
+
+  const price = BASE_PRICE + tk.now * TICK_UNIT;
+  const priceY = baseY - tk.now * TICK_PX; // = forming candle's close
+  const openY = baseY; // candle opened at the base level
+  const hiY = baseY - tk.hi * TICK_PX; // running high (lowest y)
+  const loY = baseY - tk.lo * TICK_PX; // running low
+  const bodyTop = Math.min(openY, priceY);
+  const bodyH = Math.max(1.4, Math.abs(priceY - openY));
+  const liveUp = priceY <= openY;
+  const liveColor = liveUp ? UP : DOWN;
 
   return (
     <svg
@@ -149,6 +168,28 @@ export function LiveCandleChart() {
           </g>
         ))}
       </motion.g>
+
+      {/* the forming candle — builds as the price ticks; wick extends if it
+          makes a new high/low */}
+      <motion.line
+        x1={liveX}
+        x2={liveX}
+        initial={false}
+        animate={{ y1: hiY, y2: loY }}
+        transition={{ duration: reduce ? 0 : 0.4, ease: [0.33, 1, 0.68, 1] }}
+        stroke={liveColor}
+        strokeWidth="1.4"
+        strokeLinecap="round"
+      />
+      <motion.rect
+        x={liveX - bw / 2}
+        width={bw}
+        rx="1"
+        initial={false}
+        animate={{ y: bodyTop, height: bodyH }}
+        transition={{ duration: reduce ? 0 : 0.4, ease: [0.33, 1, 0.68, 1] }}
+        fill={liveColor}
+      />
 
       {/* "now" — dotted price line + axis pill. Moves only on a tick. */}
       <motion.g
