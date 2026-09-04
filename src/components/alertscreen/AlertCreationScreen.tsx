@@ -334,7 +334,7 @@ export function AlertCreationScreen({
   // hard-clips the drop-shadow to a rectangle, and that clip line is the
   // "triangle edge".
   const phoneMask =
-    "linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%)";
+    "linear-gradient(to bottom, #000 0%, #000 73%, transparent 100%)";
 
   const phone = (
     <div
