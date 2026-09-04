@@ -1,0 +1,72 @@
+---
+import Bare from "../../layouts/Bare.astro";
+import { OrderPlacementScreenBoxed } from "../../components/alertscreen/OrderPlacementScreenBoxed";
+---
+
+<Bare title="Order placement — boxed fields" bg="#0b0b0d">
+  <OrderPlacementScreenBoxed client:load />
+
+  <a class="back" href="/" aria-label="Back to home">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M12.0833 15L7.08325 10L12.0833 5"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </a>
+
+  <style is:global>
+    html,
+    body {
+      overflow-y: auto !important;
+    }
+  </style>
+
+  <style>
+    .back {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 30;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #f2f2f8;
+      background: rgba(17, 19, 23, 0.72);
+      border: 1px solid #1d2328;
+      -webkit-backdrop-filter: blur(18px);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: color 0.15s ease;
+    }
+    .back:hover {
+      color: #fff;
+    }
+    .back:focus-visible {
+      outline: 2px solid #48d597;
+      outline-offset: 2px;
+    }
+    .back svg {
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .back:hover svg {
+      transform: translateX(-2px);
+    }
+    @media (max-width: 600px) {
+      .back {
+        top: 12px;
+        left: 12px;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .back svg {
+        transition: none;
+      }
+    }
+  </style>
+</Bare>

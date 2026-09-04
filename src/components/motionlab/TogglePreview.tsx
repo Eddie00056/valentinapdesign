@@ -33,7 +33,7 @@ export function TogglePreview() {
     >
       <TrackFrame value={value} onPick={() => {}} theme="light">
         <motion.div
-          style={pillStyle}
+          style={pillStyle()}
           animate={{ x: xFor(value) }}
           transition={
             reduce

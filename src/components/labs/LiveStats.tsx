@@ -38,6 +38,9 @@ type Props = {
   /** up / down accent — pass the host palette so the bar matches everything else */
   up?: string;
   down?: string;
+  /** false = just Bid/Ask + the depth bar, no stat rows (order placement doesn't
+      have room/use for Open, Volume, etc. below its own form fields). */
+  showRows?: boolean;
 };
 
 export function LiveStats({
@@ -46,6 +49,7 @@ export function LiveStats({
   askPrice = "$194.30",
   up = "#48d597",
   down = "#ff557d",
+  showRows = true,
 }: Props = {}) {
   const reduce = useReducedMotion();
   const [i, setI] = useState(0);
@@ -117,14 +121,16 @@ export function LiveStats({
 
       {/* stat rows — no divider; sit tight under the depth bar. Bid/ask size
           live in the header row above, so they're not repeated here. */}
-      <div style={{ marginTop: 2 }}>
-        {rows.map(([a, b, c, d], ri) => (
-          <Row key={ri}>
-            <Cell k={a} v={b} />
-            <Cell k={c} v={d} />
-          </Row>
-        ))}
-      </div>
+      {showRows && (
+        <div style={{ marginTop: 2 }}>
+          {rows.map(([a, b, c, d], ri) => (
+            <Row key={ri}>
+              <Cell k={a} v={b} />
+              <Cell k={c} v={d} />
+            </Row>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

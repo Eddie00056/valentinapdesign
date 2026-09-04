@@ -1,24 +1,24 @@
 import type { ReactNode } from "react";
 import type { MotionStyle } from "motion/react";
-import { c, geo, themed } from "./tokens";
-import type { Side, Theme } from "./tokens";
+import { c, geo as defaultGeo, themed } from "./tokens";
+import type { Geo, Side, Theme } from "./tokens";
 
 // Figma places the pill at (-1, -1) so its 1px border sits exactly on top of
 // the track's 1px border on the selected side (see node 88:5243).
-export const pillStyle: MotionStyle = {
+export const pillStyle = (g: Geo = defaultGeo): MotionStyle => ({
   position: "absolute",
   top: -1,
   left: -1,
-  width: geo.seg,
-  height: geo.H,
-  borderRadius: geo.R,
+  width: g.seg,
+  height: g.H,
+  borderRadius: g.R,
   background: c.pillBg,
   border: `1px solid ${c.pillBorder}`,
   boxSizing: "border-box",
   zIndex: 0,
-};
+});
 
-export const xFor = (v: Side) => (v === "stock" ? 0 : geo.travel);
+export const xFor = (v: Side, g: Geo = defaultGeo) => (v === "stock" ? 0 : g.travel);
 
 export function FxSpan({
   children,
@@ -42,6 +42,11 @@ export type FrameProps = {
   labelFx?: boolean;
   onPressSide?: (s: Side | null) => void;
   theme?: Theme;
+  /** override the Figma-accurate 104x20 default (e.g. to stretch the toggle
+      full-width elsewhere). */
+  geo?: Geo;
+  /** override the label font-size (px) independent of the track's own size. */
+  labelFontSize?: number;
 };
 
 export function TrackFrame({
@@ -51,6 +56,8 @@ export function TrackFrame({
   labelFx,
   onPressSide,
   theme = "dark",
+  geo: g = defaultGeo,
+  labelFontSize,
 }: FrameProps) {
   const t = themed(theme);
   return (
@@ -69,9 +76,9 @@ export function TrackFrame({
         }
       }}
       style={{
-        width: geo.W,
-        height: geo.H,
-        borderRadius: geo.R,
+        width: g.W,
+        height: g.H,
+        borderRadius: g.R,
         border: `1px solid ${t.trackBorder}`,
       }}
     >
@@ -88,7 +95,10 @@ export function TrackFrame({
             onPointerDown={() => onPressSide?.(side)}
             onPointerUp={() => onPressSide?.(null)}
             onPointerLeave={() => onPressSide?.(null)}
-            style={{ color: value === side ? c.labelOn : t.labelOff }}
+            style={{
+              color: value === side ? c.labelOn : t.labelOff,
+              ...(labelFontSize != null ? { fontSize: labelFontSize } : null),
+            }}
           >
             <FxSpan active={value === side} fx={labelFx}>
               {side === "stock" ? "Stock" : "Option"}

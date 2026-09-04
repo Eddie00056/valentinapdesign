@@ -2,13 +2,24 @@
 
 export type Side = "stock" | "option";
 
-export const geo = {
-  W: 104, // track width
-  H: 20, // track height
-  R: 6, // corner radius
-  seg: 52, // pill / segment width
-  travel: 52, // px the pill moves between the two states
-} as const;
+/** Shape of the track geometry — lets a consumer pass a differently-sized
+    track (e.g. a full-width instance elsewhere) while the default below
+    stays Figma-accurate. */
+export type Geo = {
+  W: number; // track width
+  H: number; // track height
+  R: number; // corner radius
+  seg: number; // pill / segment width
+  travel: number; // px the pill moves between the two states
+};
+
+export const geo: Geo = {
+  W: 104,
+  H: 20,
+  R: 6,
+  seg: 52,
+  travel: 52,
+};
 
 export const c = {
   trackBorder: "rgba(254,255,253,0.2)", // opacity/neutral-140a

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { motion, useReducedMotion } from "motion/react";
-import { c, geo } from "./tokens";
-import type { Side, Theme } from "./tokens";
+import { c, geo as defaultGeo } from "./tokens";
+import type { Geo, Side, Theme } from "./tokens";
 import type { TickApi } from "./useTickSound";
 import { TrackFrame, pillStyle, xFor } from "./toggleParts";
 
@@ -18,11 +18,16 @@ export function ReactiveToggle({
   onChange,
   sound,
   theme = "dark",
+  geo: g = defaultGeo,
+  labelFontSize,
 }: {
   value: Side;
   onChange: (s: Side) => void;
   sound?: TickApi;
   theme?: Theme;
+  /** override the Figma-accurate 104x20 default (e.g. a full-width instance). */
+  geo?: Geo;
+  labelFontSize?: number;
 }) {
   const reduce = useReducedMotion();
   const prev = useRef<Side>(value);
@@ -41,10 +46,10 @@ export function ReactiveToggle({
   };
 
   return (
-    <TrackFrame value={value} onPick={pick} labelFx theme={theme}>
+    <TrackFrame value={value} onPick={pick} labelFx theme={theme} geo={g} labelFontSize={labelFontSize}>
       <motion.div
-        style={pillStyle}
-        animate={{ x: xFor(value) }}
+        style={pillStyle(g)}
+        animate={{ x: xFor(value, g) }}
         transition={
           reduce
             ? { duration: 0 }
@@ -60,7 +65,7 @@ export function ReactiveToggle({
             style={{
               position: "absolute",
               inset: -1,
-              borderRadius: geo.R,
+              borderRadius: g.R,
               boxShadow: `0 0 10px 1px ${c.pillBorder}`,
               pointerEvents: "none",
             }}

@@ -1,0 +1,6 @@
+/* Hide the scroll container's scrollbar so the horizontal padding reads as
+   symmetric (a classic scrollbar otherwise eats into the right inset).
+   Matches iOS, where the scrollbar is an overlay. Shared by every screen
+   mounted in PhoneFrame. */
+.pf-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.pf-scroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
