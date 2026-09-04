@@ -336,12 +336,25 @@ export function AlertCreationScreen({
         letterSpacing: 0,
       }}
     >
-        {/* PHONE.png is 678x1400 -> ~838px tall at 406 wide. Crop ~140px off
-            the bottom chin so the content isn't sitting above a big empty
-            slab; the wrapper re-rounds the bottom corners. */}
-        <div style={{ height: 700, overflow: "hidden", borderRadius: 52 }}>
-          <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
-        </div>
+        <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
+
+        {/* Rather than crop the phone (which clips awkwardly), dissolve its
+            lower third — bezel, home indicator and the empty slab below the
+            stats — into the page background so it just fades out. */}
+        <div
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            left: -2,
+            right: -2,
+            bottom: -2,
+            height: "30%",
+            zIndex: 6,
+            pointerEvents: "none",
+            background:
+              "linear-gradient(to bottom, rgba(15,15,15,0) 0%, rgba(15,15,15,0.6) 45%, #0F0F0F 72%)",
+          }}
+        />
         <div
           style={{
             position: "absolute",
