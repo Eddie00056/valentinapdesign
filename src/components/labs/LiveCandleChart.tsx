@@ -29,6 +29,11 @@ const DOWN = "#FF5A00";
 const UP_COOL = "#7ED37B";
 const DOWN_COOL = "#FF9E7E";
 
+// one transition for every "now" element so the line, pill and forming candle
+// settle together — and matched by LiveStats' depth bar so the whole readout
+// moves as a unit on each price tick. Critically damped, ~0.4s, no bounce.
+const SYNC = { type: "spring" as const, stiffness: 140, damping: 24, mass: 1 };
+
 function walk(seed: number, n: number, drift: number, vol: number) {
   let s = seed;
   let v = 50;
@@ -97,12 +102,12 @@ export function LiveCandleChart({
   // see, then track how far above/below it we've traded (in $).
   const anchorRef = useRef<number | null>(null);
   if (external && anchorRef.current == null) anchorRef.current = extPrice!;
-  const [ext, setExt] = useState({ d: 0, hi: 0, lo: 0 });
+  const [ext, setExt] = useState({ hi: 0, lo: 0 });
 
   useEffect(() => {
     if (!external) return;
     const d = extPrice! - (anchorRef.current ?? extPrice!);
-    setExt((e) => ({ d, hi: Math.max(e.hi, d), lo: Math.min(e.lo, d) }));
+    setExt((e) => ({ hi: Math.max(e.hi, d), lo: Math.min(e.lo, d) }));
   }, [external, extPrice]);
 
   useEffect(() => {
@@ -179,19 +184,24 @@ export function LiveCandleChart({
 
   const clampY = (y: number) => Math.max(8, Math.min(H - 8, y));
 
+  // external $ offset from the anchor — computed inline (not via useEffect) so
+  // the "now" line + pill land in the SAME render as the host price, keeping
+  // them in lockstep with the bid/ask readout and depth bar.
+  const dNow = external ? extPrice! - (anchorRef.current ?? extPrice!) : 0;
+
   // "now" always continues from the last static candle's close (`baseY`) — in
   // external mode it just wiggles from there as the host price moves. `unitPx`
   // is deliberately small so the forming candle stays put, like the sim did.
   const dispPrice = external ? extPrice! : BASE_PRICE + tk.now * TICK_UNIT;
   const openY = baseY; // candle opened at the base level
   const priceY = external
-    ? clampY(baseY - ext.d * unitPx)
+    ? clampY(baseY - dNow * unitPx)
     : baseY - tk.now * TICK_PX; // = forming candle's close
   const hiY = external
-    ? clampY(baseY - ext.hi * unitPx)
+    ? clampY(baseY - Math.max(ext.hi, dNow) * unitPx)
     : baseY - tk.hi * TICK_PX; // running high (lowest y)
   const loY = external
-    ? clampY(baseY - ext.lo * unitPx)
+    ? clampY(baseY - Math.min(ext.lo, dNow) * unitPx)
     : baseY - tk.lo * TICK_PX; // running low
   const bodyTop = Math.min(openY, priceY);
   const bodyH = Math.max(1.4, Math.abs(priceY - openY));
@@ -250,7 +260,7 @@ export function LiveCandleChart({
             x2={liveX}
             initial={false}
             animate={{ y1: hiY, y2: loY }}
-            transition={{ duration: reduce ? 0 : 0.4, ease: [0.33, 1, 0.68, 1] }}
+            transition={reduce ? { duration: 0 } : SYNC}
             stroke={liveColor}
             strokeWidth="1.4"
             strokeLinecap="round"
@@ -261,7 +271,7 @@ export function LiveCandleChart({
             rx="1"
             initial={false}
             animate={{ y: bodyTop, height: bodyH }}
-            transition={{ duration: reduce ? 0 : 0.4, ease: [0.33, 1, 0.68, 1] }}
+            transition={reduce ? { duration: 0 } : SYNC}
             fill={liveColor}
           />
         </>
@@ -271,7 +281,7 @@ export function LiveCandleChart({
       <motion.g
         initial={false}
         animate={{ y: priceY }}
-        transition={{ duration: reduce ? 0 : 0.45, ease: [0.33, 1, 0.68, 1] }}
+        transition={reduce ? { duration: 0 } : SYNC}
       >
         <line
           x1="0"

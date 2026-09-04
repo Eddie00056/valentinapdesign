@@ -72,11 +72,12 @@ export function LiveStats({
     Math.min(50 + BAND, 50 + (rawPct - 50) * COMPRESS),
   );
 
-  // gentle, slightly overdamped spring — glides to the new width, no snap/bounce
+  // matches LiveCandleChart's SYNC spring so the bar, the chart's "now" line
+  // and the pill all settle together on each price tick. ~0.4s, no bounce.
   const spring = {
     type: "spring" as const,
-    stiffness: 90,
-    damping: 22,
+    stiffness: 140,
+    damping: 24,
     mass: 1,
   };
 
