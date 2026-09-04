@@ -343,7 +343,9 @@
 .btn--mobile.btn--icon,
 .dark .btn--mobile.btn--icon {
   background: linear-gradient(66deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.045));
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  /* small 32px chips — a heavy 20px shadow smears into a dark halo on a
+     near-black bar; keep it a tight, faint contact shadow */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .btn--mobile.btn--icon::before,

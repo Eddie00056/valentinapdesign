@@ -308,7 +308,7 @@ export function LiveCandleChart({
         >
           <line
             x1="0"
-            x2={W - 44 - pillInset}
+            x2={W - 46 - pillInset}
             y1="0"
             y2="0"
             stroke={nowColor}
@@ -316,9 +316,9 @@ export function LiveCandleChart({
             strokeDasharray="1 3"
             strokeLinecap="round"
           />
-          <rect x={W - 44 - pillInset} y={-9} width="46" height="18" rx="9" fill={nowColor} />
+          <rect x={W - 46 - pillInset} y={-9} width="46" height="18" rx="9" fill={nowColor} />
           <text
-            x={W - 21 - pillInset}
+            x={W - 23 - pillInset}
             y="4"
             textAnchor="middle"
             fontSize="10"

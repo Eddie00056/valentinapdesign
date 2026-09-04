@@ -136,7 +136,7 @@ export function AlertCreationScreen({
   const fracGlass: CSSProperties = {
     background:
       "linear-gradient(66deg, rgba(255,255,255,0.1), rgba(255,255,255,0.045))",
-    boxShadow: "0 8px 20px rgba(0,0,0,0.4)",
+    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
     backdropFilter: "blur(18px)",
     WebkitBackdropFilter: "blur(18px)",
     color: "rgba(255,255,255,0.85)",
@@ -347,19 +347,30 @@ export function AlertCreationScreen({
           position: "relative",
           width: 406,
           height: 736,
-          overflow: "hidden",
-          borderRadius: "54px 54px 0 0",
         }}
       >
-        <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
+        {/* object-fit crops the tall render's bottom while keeping its own
+            baked-in rounded top corners — no extra clip element, so no
+            mismatched nested corner arcs. */}
+        <img
+          src={PHONE}
+          alt="iPhone"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: "top center",
+            display: "block",
+          }}
+        />
         <div
           style={{
             position: "absolute",
             left: "1.8%",
             right: "1.8%",
             top: 6,
-            bottom: 6,
-            borderRadius: 48,
+            bottom: 0,
+            borderRadius: "46px 46px 0 0",
             overflow: "hidden",
             background: "transparent",
             paddingTop: 50,
@@ -701,14 +712,14 @@ export function AlertCreationScreen({
               {/* chart — tick-driven candlesticks (Robinhood "advanced" style):
                   static session candles, a forming candle that builds on each
                   tick, and a dotted "now" price line + axis pill. */}
-              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "16px -24px 0", minHeight: 188 }}>
+              <div style={{ position: "relative", width: "calc(100% + 24px)", margin: "16px 0 0 -24px", minHeight: 188 }}>
                 <LiveCandleChart
                   w={393}
                   h={188}
                   pad={14}
                   baseline={false}
                   startFromBottom={0.12}
-                  pillInset={34}
+                  pillInset={2}
                   pillTextColor="#04150c"
                   drawIn={drawn}
                   live={tf === 0}
@@ -831,19 +842,6 @@ export function AlertCreationScreen({
             </div>
           </div>
 
-          <div
-            style={{
-              position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-              bottom: 8,
-              width: 134,
-              height: 5,
-              borderRadius: 3,
-              background: "#fff",
-              opacity: 0.85,
-            }}
-          />
         </div>
       </div>
     </div>
