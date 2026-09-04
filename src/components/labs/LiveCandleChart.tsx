@@ -10,9 +10,9 @@ import { motion, useReducedMotion } from "motion/react";
    - dashed prev-close baseline, ~1/4 up from the bottom
    Standalone; nothing here touches AlertCreationScreen. */
 
-const W = 360;
-const H = 190;
-const PAD = 22;
+const W_DEF = 360;
+const H_DEF = 190;
+const PAD_DEF = 22;
 const N = 96;
 const CANDLES = 22;
 const START_FROM_BOTTOM = 0.25;
@@ -43,7 +43,27 @@ function walk(seed: number, n: number, drift: number, vol: number) {
 
 type K = { o: number; c: number; hi: number; lo: number; up: boolean };
 
-export function LiveCandleChart() {
+type Props = {
+  /** svg viewBox width / height — lets the alert screen mount it in a short, wide box */
+  w?: number;
+  h?: number;
+  pad?: number;
+  /** baseline (prev-close) dash colour — dark surfaces need a light stroke */
+  baselineStroke?: string;
+  /** gate the static-candle fade-in on the host's draw phase */
+  drawIn?: boolean;
+};
+
+export function LiveCandleChart({
+  w = W_DEF,
+  h = H_DEF,
+  pad = PAD_DEF,
+  baselineStroke = "rgba(0,0,0,0.16)",
+  drawIn = true,
+}: Props = {}) {
+  const W = w;
+  const H = h;
+  const PAD = pad;
   const reduce = useReducedMotion();
   // ticks = current level; hi/lo = running extremes of the forming candle
   const [tk, setTk] = useState({ now: 0, hi: 0, lo: 0 });
@@ -116,7 +136,7 @@ export function LiveCandleChart() {
       liveX: endX + slot * 0.5,
       bw,
     };
-  }, []);
+  }, [W, H, PAD]);
 
   const { candles, baselineY, baseY, liveX, bw } = model;
 
@@ -142,7 +162,7 @@ export function LiveCandleChart() {
         x2={W}
         y1={baselineY}
         y2={baselineY}
-        stroke="rgba(0,0,0,0.16)"
+        stroke={baselineStroke}
         strokeWidth="1"
         strokeDasharray="0.75 4"
         strokeLinecap="round"
@@ -150,7 +170,7 @@ export function LiveCandleChart() {
 
       <motion.g
         initial={reduce ? false : { opacity: 0 }}
-        animate={reduce ? undefined : { opacity: 1 }}
+        animate={reduce || drawIn ? { opacity: 1 } : { opacity: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
         {candles.map((c, i) => (

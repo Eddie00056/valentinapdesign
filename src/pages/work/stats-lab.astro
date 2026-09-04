@@ -1,0 +1,32 @@
+---
+/* LOCAL PROTOTYPE — not linked, not shipped. Revised alert-screen stats:
+   Robinhood-style bid/ask depth + range markers (tick-driven), and stat
+   rows with no group dividers / one even spacing. */
+import Bare from "../../layouts/Bare.astro";
+import { LiveStats } from "../../components/labs/LiveStats";
+---
+
+<Bare title="Stats lab" bg="#0b0d0f">
+  <main class="stage">
+    <div class="phone">
+      <LiveStats client:load />
+    </div>
+  </main>
+</Bare>
+
+<style>
+  .stage {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 3rem 1rem;
+  }
+  .phone {
+    width: 390px;
+    max-width: 100%;
+    background: #111317;
+    border-radius: 22px;
+    padding: 22px 24px 28px;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+  }
+</style>

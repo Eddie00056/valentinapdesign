@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent } from "react";
 import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import "./alert-screen.css";
-import { candles, SERIES, UP, DOWN, LEAD, TRAIL } from "./chart";
+import { UP, DOWN, LEAD, TRAIL } from "./chart";
+import { LiveCandleChart } from "../labs/LiveCandleChart";
 import { pxHub, PX_BASE } from "./priceHub";
 import type { PriceState } from "./priceHub";
 import {
@@ -271,21 +272,6 @@ export function AlertCreationScreen({
     Math.abs((delta / PREV_CLOSE) * 100).toFixed(2) +
     "%)";
   const changeColor = delta >= 0 ? UP : DOWN;
-
-  const chartCandles = candles(SERIES[TFS[tf]], 30).map((k, i) => ({
-    ...k,
-    color: k.up ? "#48d597" : "#ff557d",
-    style:
-      "opacity:" +
-      (drawn ? 1 : 0) +
-      ";transform-box:fill-box;transform-origin:center;transform:scaleY(" +
-      (drawn ? 1 : 0.2) +
-      ");transition:opacity 220ms ease " +
-      (drawn ? i * 12 : 0) +
-      "ms,transform 320ms cubic-bezier(.22,.9,.28,1) " +
-      (drawn ? i * 12 : 0) +
-      "ms",
-  }));
 
   const target = s.pos[tf];
   const indLeft = target ? target.left.toFixed(2) + "px" : "0px";
@@ -736,42 +722,17 @@ export function AlertCreationScreen({
                   </div>
                 </div>
 
-              {/* chart */}
-              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "24px -24px 0", height: 124 }}>
-                <svg viewBox="0 0 393 124" preserveAspectRatio="none" style={{ display: "block", width: "100%", height: "100%" }}>
-                  <defs>
-                    <linearGradient id="areaUp" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#48d597" stopOpacity="0.30" />
-                      <stop offset="62%" stopColor="#48d597" stopOpacity="0.06" />
-                      <stop offset="100%" stopColor="#48d597" stopOpacity="0" />
-                    </linearGradient>
-                    <linearGradient id="areaDown" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="#ff557d" stopOpacity="0.24" />
-                      <stop offset="62%" stopColor="#ff557d" stopOpacity="0.05" />
-                      <stop offset="100%" stopColor="#ff557d" stopOpacity="0" />
-                    </linearGradient>
-                  </defs>
-                  <line
-                    x1="0"
-                    x2="393"
-                    y1="80.68"
-                    y2="80.68"
-                    style={{
-                      stroke: "rgba(255,255,255,0.14)",
-                      strokeWidth: 1,
-                      strokeDasharray: "1 4",
-                      strokeLinecap: "round",
-                      opacity: drawn ? 1 : 0,
-                      transition: "opacity 500ms ease 200ms",
-                    }}
-                  />
-                  {chartCandles.map((k, i) => (
-                    <g key={i} style={css(k.style)}>
-                      <line x1={k.cx} x2={k.cx} y1={k.hi} y2={k.lo} stroke={k.color} strokeWidth={1.6} strokeLinecap="round" />
-                      <rect x={k.x} y={k.y} width={k.w} height={k.h} rx={1} fill={k.color} />
-                    </g>
-                  ))}
-                </svg>
+              {/* chart — tick-driven candlesticks (Robinhood "advanced" style):
+                  static session candles, a forming candle that builds on each
+                  tick, and a dotted "now" price line + axis pill. */}
+              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "24px -24px 0", minHeight: 124 }}>
+                <LiveCandleChart
+                  w={393}
+                  h={124}
+                  pad={16}
+                  baselineStroke="rgba(255,255,255,0.14)"
+                  drawIn={drawn}
+                />
               </div>
 
               {/* timeframe rail */}
