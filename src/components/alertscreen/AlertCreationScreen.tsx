@@ -385,88 +385,9 @@ export function AlertCreationScreen({
             flexDirection: "column",
           }}
         >
-          <div
-            style={{
-              position: "absolute",
-              zIndex: 2,
-              left: 22,
-              top: 22,
-              height: 34,
-              display: "flex",
-              alignItems: "center",
-              color: "#fff",
-              fontFamily: "'Open Sans', Helvetica, Arial, sans-serif",
-              fontSize: 16,
-              fontWeight: 600,
-              letterSpacing: "0.2px",
-            }}
-          >
-            9:41
-          </div>
-
-          <div
-            style={{
-              position: "absolute",
-              zIndex: 2,
-              right: 22,
-              top: 22,
-              height: 34,
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
-            <svg viewBox="0 0 18 12" style={{ width: 17, height: 11, display: "block" }} fill="#fff">
-              <rect x="0" y="8.5" width="3" height="3.5" rx="1" />
-              <rect x="4.8" y="6" width="3" height="6" rx="1" />
-              <rect x="9.6" y="3.2" width="3" height="8.8" rx="1" />
-              <rect x="14.4" y="0" width="3" height="12" rx="1" />
-            </svg>
-            <svg
-              viewBox="0 0 16 12"
-              style={{ width: 16, height: 12, display: "block" }}
-              fill="none"
-              stroke="#fff"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-            >
-              <path d="M1.4 4.4a10 10 0 0 1 13.2 0" />
-              <path d="M3.9 7.2a6.3 6.3 0 0 1 8.2 0" />
-              <path d="M6.5 9.9a2.5 2.5 0 0 1 3 0" />
-            </svg>
-            <span style={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-              <span
-                style={{
-                  display: "block",
-                  width: 25,
-                  height: 12.5,
-                  border: "1.2px solid rgba(255,255,255,0.45)",
-                  borderRadius: 3.5,
-                  padding: 1.5,
-                  boxSizing: "border-box",
-                }}
-              >
-                <span
-                  style={{
-                    display: "block",
-                    width: "100%",
-                    height: "100%",
-                    background: "#fff",
-                    borderRadius: 1.5,
-                  }}
-                />
-              </span>
-              <span
-                style={{
-                  display: "block",
-                  width: 1.5,
-                  height: 4,
-                  borderRadius: "0 1px 1px 0",
-                  background: "rgba(255,255,255,0.45)",
-                }}
-              />
-            </span>
-          </div>
+          {/* status bar (9:41 + signal/wifi/battery) and the Dynamic Island
+              are baked into iphone17pro.png — no rendered status bar here, or
+              it doubles up. `paddingTop` keeps content clear of it. */}
 
           <div
             style={{
