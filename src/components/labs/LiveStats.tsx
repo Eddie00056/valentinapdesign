@@ -118,8 +118,9 @@ export function LiveStats({
         />
       </div>
 
-      {/* divider — bid/ask + its visual sit above; everything else below */}
-      <div style={{ height: 1, background: DIVIDER, margin: "18px 0" }} />
+      {/* divider — bid/ask + its visual sit above; everything else below.
+          bottom margin + the first row's 9px top padding == the 18px gap above */}
+      <div style={{ height: 1, background: DIVIDER, margin: "18px 0 9px" }} />
 
       {/* stat rows — no further dividers, even spacing */}
       <div>

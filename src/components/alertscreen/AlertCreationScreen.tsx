@@ -102,7 +102,7 @@ export function AlertCreationScreen({
   autoDismiss = true,
   toastDuration = 3200,
   frame = "full",
-  fractionalBanner = true,
+  fractionalBanner = false,
 }: {
   toastAnimation?: ToastAnim;
   autoDismiss?: boolean;
@@ -214,14 +214,8 @@ export function AlertCreationScreen({
   };
 
   const createAlert = () => {
-    const id = ++idRef.current;
-    setS((st) => ({
-      ...st,
-      active: true,
-      n: st.n + 1,
-      toasts: [{ id, born: Date.now() }, ...st.toasts].slice(0, 3),
-    }));
-    if (autoDismiss) window.setTimeout(() => dismiss(id), toastDuration);
+    // no toast — just arm the alert + trigger the bell reaction
+    setS((st) => ({ ...st, active: true, n: st.n + 1 }));
   };
 
   /* ---- derived (renderVals) ---- */
@@ -342,7 +336,15 @@ export function AlertCreationScreen({
         letterSpacing: 0,
       }}
     >
-        <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
+        {/* clip a little off the phone's bottom so the content isn't swimming
+            in dead space below the stats; the wrapper re-rounds the corners */}
+        <div style={{ borderRadius: 56, overflow: "hidden" }}>
+          <img
+            src={PHONE}
+            alt="iPhone"
+            style={{ width: "100%", display: "block", marginBottom: -64 }}
+          />
+        </div>
         <div
           style={{
             position: "absolute",
@@ -471,7 +473,7 @@ export function AlertCreationScreen({
                 flex: 1,
                 minHeight: 0,
                 overflowY: "auto",
-                padding: "14px 24px 28px",
+                padding: "14px 24px 16px",
               }}
             >
               <LayoutGroup>
@@ -692,11 +694,11 @@ export function AlertCreationScreen({
               {/* chart — tick-driven candlesticks (Robinhood "advanced" style):
                   static session candles, a forming candle that builds on each
                   tick, and a dotted "now" price line + axis pill. */}
-              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "24px -24px 0", minHeight: 124 }}>
+              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "20px -24px 0", minHeight: 168 }}>
                 <LiveCandleChart
                   w={393}
-                  h={124}
-                  pad={16}
+                  h={168}
+                  pad={18}
                   baselineStroke="rgba(255,255,255,0.14)"
                   drawIn={drawn}
                   price={s.price}
