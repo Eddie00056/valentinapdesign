@@ -732,6 +732,8 @@ export function AlertCreationScreen({
                   pad={16}
                   baselineStroke="rgba(255,255,255,0.14)"
                   drawIn={drawn}
+                  price={s.price}
+                  prevClose={PREV_CLOSE}
                 />
               </div>
 

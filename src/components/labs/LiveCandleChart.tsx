@@ -52,6 +52,14 @@ type Props = {
   baselineStroke?: string;
   /** gate the static-candle fade-in on the host's draw phase */
   drawIn?: boolean;
+  /** live price from the host. When set, the chart drops its own tick sim and
+      the "now" line / forming candle follow this instead — keeps it in sync
+      with a price readout rendered elsewhere. */
+  price?: number;
+  /** day's previous close — colours the "now" line / pill to match a header change */
+  prevClose?: number;
+  /** pixels per $1 of move when driven by `price` */
+  unitPx?: number;
 };
 
 export function LiveCandleChart({
@@ -60,17 +68,33 @@ export function LiveCandleChart({
   pad = PAD_DEF,
   baselineStroke = "rgba(0,0,0,0.16)",
   drawIn = true,
+  price: extPrice,
+  prevClose,
+  unitPx = 26,
 }: Props = {}) {
   const W = w;
   const H = h;
   const PAD = pad;
   const reduce = useReducedMotion();
+  const external = extPrice != null;
   // ticks = current level; hi/lo = running extremes of the forming candle
   const [tk, setTk] = useState({ now: 0, hi: 0, lo: 0 });
   const idxRef = useRef(0);
 
+  // external-price mode: anchor the forming candle's open at the first price we
+  // see, then track how far above/below it we've traded (in $).
+  const anchorRef = useRef<number | null>(null);
+  if (external && anchorRef.current == null) anchorRef.current = extPrice!;
+  const [ext, setExt] = useState({ d: 0, hi: 0, lo: 0 });
+
   useEffect(() => {
-    if (reduce) return;
+    if (!external) return;
+    const d = extPrice! - (anchorRef.current ?? extPrice!);
+    setExt((e) => ({ d, hi: Math.max(e.hi, d), lo: Math.min(e.lo, d) }));
+  }, [external, extPrice]);
+
+  useEffect(() => {
+    if (external || reduce) return;
     const id = window.setInterval(() => {
       const delta = SEQ[idxRef.current % SEQ.length];
       idxRef.current += 1;
@@ -80,7 +104,7 @@ export function LiveCandleChart({
       });
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [reduce]);
+  }, [external, reduce]);
 
   const model = useMemo(() => {
     const raw = walk(7, N, 0.22, 3.0);
@@ -140,15 +164,32 @@ export function LiveCandleChart({
 
   const { candles, baselineY, baseY, liveX, bw } = model;
 
-  const price = BASE_PRICE + tk.now * TICK_UNIT;
-  const priceY = baseY - tk.now * TICK_PX; // = forming candle's close
-  const openY = baseY; // candle opened at the base level
-  const hiY = baseY - tk.hi * TICK_PX; // running high (lowest y)
-  const loY = baseY - tk.lo * TICK_PX; // running low
+  const clampY = (y: number) => Math.max(8, Math.min(H - 8, y));
+
+  // In external mode "now" is driven by a real (mean-reverting) price that can
+  // swing a dollar or two, so anchor it just above the prev-close baseline —
+  // that leaves headroom both ways — instead of the last static candle's close.
+  const anchorY = external ? baselineY - 22 : baseY;
+
+  const dispPrice = external ? extPrice! : BASE_PRICE + tk.now * TICK_UNIT;
+  const openY = anchorY; // candle opened at the anchor level
+  const priceY = external
+    ? clampY(anchorY - ext.d * unitPx)
+    : baseY - tk.now * TICK_PX; // = forming candle's close
+  const hiY = external
+    ? clampY(anchorY - ext.hi * unitPx)
+    : baseY - tk.hi * TICK_PX; // running high (lowest y)
+  const loY = external
+    ? clampY(anchorY - ext.lo * unitPx)
+    : baseY - tk.lo * TICK_PX; // running low
   const bodyTop = Math.min(openY, priceY);
   const bodyH = Math.max(1.4, Math.abs(priceY - openY));
   const liveUp = priceY <= openY;
   const liveColor = liveUp ? UP : DOWN;
+  // the "now" line + pill: in external mode colour by the day's change so it
+  // tracks the header; otherwise it's always the hot green of the prototype.
+  const nowColor =
+    external && prevClose != null && extPrice! < prevClose ? DOWN : UP;
 
   return (
     <svg
@@ -222,12 +263,12 @@ export function LiveCandleChart({
           x2={W - 44}
           y1="0"
           y2="0"
-          stroke={UP}
+          stroke={nowColor}
           strokeWidth="1.2"
           strokeDasharray="1 3"
           strokeLinecap="round"
         />
-        <rect x={W - 44} y={-9} width="46" height="18" rx="9" fill={UP} />
+        <rect x={W - 44} y={-9} width="46" height="18" rx="9" fill={nowColor} />
         <text
           x={W - 21}
           y="4"
@@ -237,7 +278,7 @@ export function LiveCandleChart({
           fill="#fff"
           fontFamily="-apple-system, BlinkMacSystemFont, system-ui, sans-serif"
         >
-          {price.toFixed(2)}
+          {dispPrice.toFixed(2)}
         </text>
       </motion.g>
     </svg>
