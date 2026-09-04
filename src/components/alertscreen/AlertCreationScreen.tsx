@@ -127,7 +127,11 @@ export function AlertCreationScreen({
      icon in the header. Soft, near-bounceless spring for the size delta;
      the glass icon fades in late so it never renders at strip size. */
   const [fracOpen, setFracOpen] = useState(fractionalBanner);
+  // Opening (strip -> compact icon's target is the expanded motion.div) and
+  // dismissing (compact icon's own transition) are two separate elements, so
+  // they can run at different speeds — dismiss is snappier.
   const fracSpring = { type: "spring", visualDuration: 0.4, bounce: 0 } as const;
+  const fracSpringClose = { type: "spring", visualDuration: 0.26, bounce: 0 } as const;
   /* inline approximation of the glass `light` icon button (glass-button.css
      .dark .btn--light) so the morphing card can *be* the resting icon. */
   // Match the mobile GlassButton (watchlist / alert) exactly: 66deg fill +
@@ -428,14 +432,14 @@ export function AlertCreationScreen({
                     the card, revealed once the banner is dismissed), watchlist,
                     alert on the right */}
                 <div className="dark" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <BackButton variant="light" />
+                  <BackButton variant="light" style={{ position: "relative", zIndex: 2 }} />
                   <span style={{ flex: 1 }} />
                   <div style={{ width: 32, height: 32, flex: "none", position: "relative" }}>
                     {!fracOpen && (
                       <motion.div
                         layoutId="frac-card"
                         className="acs-frac-card"
-                        transition={fracSpring}
+                        transition={fracSpringClose}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1, transition: { duration: 0.2 } }}
                         role="button"
@@ -451,6 +455,11 @@ export function AlertCreationScreen({
                         style={{
                           position: "absolute",
                           inset: 0,
+                          // pinned below the header icons (zIndex 2) so the
+                          // shared-layout morph — which spans the full header
+                          // width mid-transition — tucks behind the star/bell
+                          // instead of drawing over them on dismiss.
+                          zIndex: 1,
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
@@ -470,13 +479,18 @@ export function AlertCreationScreen({
                       </motion.div>
                     )}
                   </div>
-                  <WatchlistButton variant="light" size="mobile" iconOnly />
+                  <WatchlistButton
+                    variant="light"
+                    size="mobile"
+                    iconOnly
+                    style={{ position: "relative", zIndex: 2 }}
+                  />
                   <AlertButton
                     variant="light"
                     size="mobile"
                     iconOnly
                     onClick={createAlert}
-                    style={{ animation: bellShake }}
+                    style={{ position: "relative", zIndex: 2, animation: bellShake }}
                   />
                 </div>
 
@@ -490,7 +504,11 @@ export function AlertCreationScreen({
                         key="frac-slot"
                         initial={{ height: 0, marginTop: 0 }}
                         animate={{ height: 40, marginTop: 12 }}
-                        exit={{ height: 0, marginTop: 0 }}
+                        exit={{
+                          height: 0,
+                          marginTop: 0,
+                          transition: { duration: 0.12, ease: [0.4, 0, 0.2, 1] },
+                        }}
                         transition={{ duration: 0.17, ease: [0.4, 0, 0.2, 1] }}
                         style={{
                           position: "relative",
@@ -520,6 +538,9 @@ export function AlertCreationScreen({
                             right: 0,
                             top: 0,
                             height: 40,
+                            // same reasoning as the compact card: stay below
+                            // the header icons (zIndex 2) during the morph.
+                            zIndex: 1,
                             display: "flex",
                             alignItems: "center",
                             gap: 8,

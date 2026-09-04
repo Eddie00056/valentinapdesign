@@ -86,25 +86,20 @@ export function LiveStats({
 
   return (
     <div style={{ fontFamily: "'Open Sans', Helvetica, Arial, sans-serif" }}>
-      {/* Bid / Ask + depth bar */}
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: FS }}>
-        <div>
-          <span style={{ color: MUTED }}>Bid </span>
-          <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{bidPrice}</span>
-          <span style={{ color: MUTED }}>{" × "}{bid}</span>
-        </div>
-        <div>
-          <span style={{ color: MUTED }}>Ask </span>
-          <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{askPrice}</span>
-          <span style={{ color: MUTED }}>{" × "}{ask}</span>
-        </div>
-      </div>
+      {/* Bid / Ask — same Row/Cell grid as the stat rows below, so the bid
+          value sits on the value column and the ask label sits on the
+          label column, both flush with every row underneath. */}
+      <Row>
+        <Cell k="Bid" v={`${bidPrice} × ${bid}`} />
+        <Cell k="Ask" v={`${askPrice} × ${ask}`} />
+      </Row>
       <div
         style={{
           display: "flex",
           gap: 3,
           height: 6,
-          marginTop: 8,
+          // Row's own bottom padding is 9px; pull up so text -> bar is 4px total.
+          marginTop: -5,
           borderRadius: 3,
           overflow: "hidden",
         }}
@@ -140,7 +135,7 @@ function Row({ children }: { children: ReactNode }) {
       style={{
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        gap: 16,
+        gap: 18,
         padding: `${ROW_PAD}px 0`,
       }}
     >
@@ -149,7 +144,7 @@ function Row({ children }: { children: ReactNode }) {
   );
 }
 
-function Cell({ k, v }: { k: string; v: string }) {
+function Cell({ k, v }: { k: string; v: ReactNode }) {
   return (
     <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: FS }}>
       <span style={{ color: MUTED }}>{k}</span>
