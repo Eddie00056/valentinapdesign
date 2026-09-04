@@ -389,6 +389,21 @@ export function AlertCreationScreen({
               are baked into iphone17pro.png — no rendered status bar here, or
               it doubles up. `paddingTop` keeps content clear of it. */}
 
+          {/* the render has a stray bright bar baked in just under the
+              signal/wifi/battery cluster — mask it with #000. */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              top: 44,
+              right: 40,
+              width: 78,
+              height: 15,
+              background: "#000",
+              zIndex: 5,
+            }}
+          />
+
           <div
             style={{
               flex: 1,
