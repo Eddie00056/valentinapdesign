@@ -60,6 +60,12 @@ type Props = {
   prevClose?: number;
   /** pixels per $1 of move when driven by `price` — small, so "now" holds its spot */
   unitPx?: number;
+  /** up / down accent — override so the "now" line + hot candles match a host palette */
+  upColor?: string;
+  downColor?: string;
+  /** draw the forming candle past the series. Off for the alert screen, where
+      "now" is just the dotted line + pill and a trailing candle reads as junk. */
+  forming?: boolean;
 };
 
 export function LiveCandleChart({
@@ -71,6 +77,9 @@ export function LiveCandleChart({
   price: extPrice,
   prevClose,
   unitPx = 6,
+  upColor = UP,
+  downColor = DOWN,
+  forming = true,
 }: Props = {}) {
   const W = w;
   const H = h;
@@ -149,7 +158,7 @@ export function LiveCandleChart({
         wx: cx,
         wy1: yy(c.hi),
         wy2: yy(c.lo),
-        color: c.up ? (hot ? UP : UP_COOL) : hot ? DOWN : DOWN_COOL,
+        color: c.up ? (hot ? upColor : UP_COOL) : hot ? downColor : DOWN_COOL,
       };
     });
 
@@ -160,7 +169,7 @@ export function LiveCandleChart({
       liveX: endX + slot * 0.5,
       bw,
     };
-  }, [W, H, PAD]);
+  }, [W, H, PAD, upColor, downColor]);
 
   const { candles, baselineY, baseY, liveX, bw } = model;
 
@@ -183,11 +192,11 @@ export function LiveCandleChart({
   const bodyTop = Math.min(openY, priceY);
   const bodyH = Math.max(1.4, Math.abs(priceY - openY));
   const liveUp = priceY <= openY;
-  const liveColor = liveUp ? UP : DOWN;
+  const liveColor = liveUp ? upColor : downColor;
   // the "now" line + pill: in external mode colour by the day's change so it
   // tracks the header; otherwise it's always the hot green of the prototype.
   const nowColor =
-    external && prevClose != null && extPrice! < prevClose ? DOWN : UP;
+    external && prevClose != null && extPrice! < prevClose ? downColor : upColor;
 
   return (
     <svg
@@ -230,25 +239,29 @@ export function LiveCandleChart({
 
       {/* the forming candle — builds as the price ticks; wick extends if it
           makes a new high/low */}
-      <motion.line
-        x1={liveX}
-        x2={liveX}
-        initial={false}
-        animate={{ y1: hiY, y2: loY }}
-        transition={{ duration: reduce ? 0 : 0.4, ease: [0.33, 1, 0.68, 1] }}
-        stroke={liveColor}
-        strokeWidth="1.4"
-        strokeLinecap="round"
-      />
-      <motion.rect
-        x={liveX - bw / 2}
-        width={bw}
-        rx="1"
-        initial={false}
-        animate={{ y: bodyTop, height: bodyH }}
-        transition={{ duration: reduce ? 0 : 0.4, ease: [0.33, 1, 0.68, 1] }}
-        fill={liveColor}
-      />
+      {forming && (
+        <>
+          <motion.line
+            x1={liveX}
+            x2={liveX}
+            initial={false}
+            animate={{ y1: hiY, y2: loY }}
+            transition={{ duration: reduce ? 0 : 0.4, ease: [0.33, 1, 0.68, 1] }}
+            stroke={liveColor}
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+          <motion.rect
+            x={liveX - bw / 2}
+            width={bw}
+            rx="1"
+            initial={false}
+            animate={{ y: bodyTop, height: bodyH }}
+            transition={{ duration: reduce ? 0 : 0.4, ease: [0.33, 1, 0.68, 1] }}
+            fill={liveColor}
+          />
+        </>
+      )}
 
       {/* "now" — dotted price line + axis pill. Moves only on a tick. */}
       <motion.g

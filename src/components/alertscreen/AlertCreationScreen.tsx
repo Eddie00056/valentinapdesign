@@ -139,13 +139,13 @@ export function AlertCreationScreen({
   const fracSpring = { type: "spring", visualDuration: 0.28, bounce: 0 } as const;
   /* inline approximation of the glass `light` icon button (glass-button.css
      .dark .btn--light) so the morphing card can *be* the resting icon. */
-  // Match the mobile GlassButton (watchlist / alert): 66deg fill, a
-  // whisper-thin uniform rim (no border, no bright top highlight), soft shadow.
+  // Match the mobile GlassButton (watchlist / alert) exactly: 66deg fill +
+  // soft shadow here, and the same 66deg masked 1px rim via `.acs-frac-card`
+  // (a plain inset ring reads flat / faded next to the real glass buttons).
   const fracGlass: CSSProperties = {
     background:
       "linear-gradient(66deg, rgba(255,255,255,0.1), rgba(255,255,255,0.045))",
-    boxShadow:
-      "inset 0 0 0 1px rgba(255,255,255,0.08), 0 8px 20px rgba(0,0,0,0.4)",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.4)",
     backdropFilter: "blur(18px)",
     WebkitBackdropFilter: "blur(18px)",
     color: "rgba(255,255,255,0.85)",
@@ -519,6 +519,7 @@ export function AlertCreationScreen({
                     {!fracOpen && (
                       <motion.div
                         layoutId="frac-card"
+                        className="acs-frac-card"
                         transition={fracSpring}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1, transition: { duration: 0.2 } }}
@@ -734,6 +735,9 @@ export function AlertCreationScreen({
                   drawIn={drawn}
                   price={s.price}
                   prevClose={PREV_CLOSE}
+                  upColor={UP}
+                  downColor={DOWN}
+                  forming={false}
                 />
               </div>
 
