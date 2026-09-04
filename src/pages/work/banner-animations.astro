@@ -1,0 +1,20 @@
+---
+/* LOCAL PROTOTYPE — not linked, not shipped. Four motion treatments for
+   AlertCreationScreen's fractional-shares banner, each borrowing its
+   language from a different reference (iOS App Folder, Family's dialog,
+   Clerk's UserButton dropdown, Clerk's Create-button expand). Doesn't touch
+   the real banner — whichever wins gets ported back by hand. */
+import Bare from "../../layouts/Bare.astro";
+import { BannerAnimationLab } from "../../components/alertscreen/BannerAnimationLab";
+---
+
+<Bare title="Banner animation lab" bg="#0b0b0d">
+  <BannerAnimationLab client:load />
+
+  <style is:global>
+    html,
+    body {
+      overflow-y: auto !important;
+    }
+  </style>
+</Bare>

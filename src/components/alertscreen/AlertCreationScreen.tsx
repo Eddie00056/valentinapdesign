@@ -124,14 +124,16 @@ export function AlertCreationScreen({
 
   /* Fractional-shares "expandable card" (Motion example): shared layoutId
      "frac-card" morphs between the full-width strip and the compact glass
-     icon in the header. Soft, near-bounceless spring for the size delta;
-     the glass icon fades in late so it never renders at strip size. */
+     icon in the header. "iOS App Folder" treatment (ported from the
+     /work/banner-animations lab), tuned per feedback: opening keeps a
+     bouncy, slightly overshooting spring (the glyph "pops" in on top of
+     it); dismissing (banner -> icon) keeps the same shape-morph but lands
+     without any overshoot — the bounce read wrong specifically at the end
+     of that direction. */
   const [fracOpen, setFracOpen] = useState(fractionalBanner);
-  // Opening (strip -> compact icon's target is the expanded motion.div) and
-  // dismissing (compact icon's own transition) are two separate elements, so
-  // they can run at different speeds — dismiss is snappier.
-  const fracSpring = { type: "spring", visualDuration: 0.4, bounce: 0 } as const;
+  const fracSpring = { type: "spring", stiffness: 380, damping: 20, mass: 0.9 } as const;
   const fracSpringClose = { type: "spring", visualDuration: 0.26, bounce: 0 } as const;
+  const fracGlyphPop = { type: "spring", stiffness: 500, damping: 16, delay: 0.05 } as const;
   /* inline approximation of the glass `light` icon button (glass-button.css
      .dark .btn--light) so the morphing card can *be* the resting icon. */
   // Match the mobile GlassButton (watchlist / alert) exactly: 66deg fill +
@@ -558,15 +560,21 @@ export function AlertCreationScreen({
                           <motion.span
                             layoutId="frac-glyph"
                             className="acs-frac-glyph"
-                            transition={{ layout: { duration: 0.2, ease: [0.22, 1, 0.36, 1] } }}
+                            transition={{ layout: fracGlyphPop }}
                             style={{ flex: "none", lineHeight: 0, color: "#f2f2f8" }}
                           >
-                            <FractionalIcon />
+                            <motion.span
+                              initial={{ scale: 0.6, opacity: 0.4 }}
+                              animate={{ scale: 1, opacity: 1, transition: fracGlyphPop }}
+                              style={{ display: "block" }}
+                            >
+                              <FractionalIcon />
+                            </motion.span>
                           </motion.span>
                           <motion.span
                             data-type="body"
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: 1, transition: { duration: 0.16, delay: 0.06 } }}
+                            animate={{ opacity: 1, transition: { duration: 0.2, delay: 0.14 } }}
                             exit={{ opacity: 0, transition: { duration: 0.06 } }}
                             style={{
                               flex: 1,
@@ -584,7 +592,7 @@ export function AlertCreationScreen({
                           <motion.span
                             aria-hidden="true"
                             initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.6, transition: { duration: 0.16, delay: 0.06 } }}
+                            animate={{ opacity: 0.6, transition: { duration: 0.2, delay: 0.14 } }}
                             exit={{ opacity: 0, transition: { duration: 0.06 } }}
                             style={{ flex: "none", lineHeight: 0 }}
                           >
