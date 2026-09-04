@@ -31,8 +31,8 @@ const DOWN_COOL = "#FF9E7E";
 
 // one transition for every "now" element so the line, pill and forming candle
 // settle together — and matched by LiveStats' depth bar so the whole readout
-// moves as a unit on each price tick. Critically damped, ~0.4s, no bounce.
-const SYNC = { type: "spring" as const, stiffness: 140, damping: 24, mass: 1 };
+// moves as a unit on each price tick. Slightly overdamped, ~0.65s, no bounce.
+const SYNC = { type: "spring" as const, stiffness: 80, damping: 20, mass: 1 };
 
 function walk(seed: number, n: number, drift: number, vol: number) {
   let s = seed;

@@ -127,7 +127,7 @@ export function AlertCreationScreen({
      icon in the header. Soft, near-bounceless spring for the size delta;
      the glass icon fades in late so it never renders at strip size. */
   const [fracOpen, setFracOpen] = useState(fractionalBanner);
-  const fracSpring = { type: "spring", visualDuration: 0.28, bounce: 0 } as const;
+  const fracSpring = { type: "spring", visualDuration: 0.4, bounce: 0 } as const;
   /* inline approximation of the glass `light` icon button (glass-button.css
      .dark .btn--light) so the morphing card can *be* the resting icon. */
   // Match the mobile GlassButton (watchlist / alert) exactly: 66deg fill +
@@ -242,7 +242,7 @@ export function AlertCreationScreen({
       bottom: rising ? ch : changed ? p : ch,
       color: flash ? (s.dir === 1 ? UP : DOWN) : "#ffffff",
       anim: changed
-        ? rollName + " 420ms cubic-bezier(.2,.8,.25,1) both"
+        ? rollName + " 560ms cubic-bezier(.2,.8,.25,1) both"
         : "none",
     };
   });
@@ -465,7 +465,7 @@ export function AlertCreationScreen({
                 flex: 1,
                 minHeight: 0,
                 overflowY: "auto",
-                padding: "14px 24px 16px",
+                padding: "16px 24px 20px",
               }}
             >
               <LayoutGroup>
@@ -651,7 +651,7 @@ export function AlertCreationScreen({
                             overflow: "hidden",
                             height: 22,
                             color: ch.color,
-                            transition: "color 600ms cubic-bezier(.4,0,.2,1)",
+                            transition: "color 760ms cubic-bezier(.4,0,.2,1)",
                           }}
                         >
                           <div style={{ display: "block", animation: ch.anim }}>
@@ -675,7 +675,7 @@ export function AlertCreationScreen({
                         alignItems: "flex-end",
                         lineHeight: 1,
                         color: changeColor,
-                        transition: "color 400ms ease",
+                        transition: "color 520ms ease",
                       }}
                     >
                       {changeText}
@@ -686,7 +686,7 @@ export function AlertCreationScreen({
               {/* chart — tick-driven candlesticks (Robinhood "advanced" style):
                   static session candles, a forming candle that builds on each
                   tick, and a dotted "now" price line + axis pill. */}
-              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "20px -24px 0", minHeight: 212 }}>
+              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "16px -24px 0", minHeight: 212 }}>
                 <LiveCandleChart
                   w={393}
                   h={212}
@@ -706,7 +706,7 @@ export function AlertCreationScreen({
               <div
                 ref={railElRef}
                 role="tablist"
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", margin: "14px -10px 0" }}
+                style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", margin: "16px -10px 0" }}
               >
                 <div
                   aria-hidden="true"
@@ -719,7 +719,7 @@ export function AlertCreationScreen({
                     left: indLeft,
                     right: indRight,
                     opacity: indOpacity,
-                    transition: `${indTransition},opacity 150ms ease`,
+                    transition: `${indTransition},opacity 200ms ease`,
                   }}
                 />
                 {items.map((item, i) => (
@@ -747,12 +747,12 @@ export function AlertCreationScreen({
                       borderRadius: 8,
                       background: "transparent",
                       fontFamily: "'Open Sans', Helvetica, Arial, sans-serif",
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: 700,
                       lineHeight: 1,
                       cursor: "pointer",
                       color: item.color,
-                      transition: "color 150ms ease",
+                      transition: "color 200ms ease",
                     }}
                   >
                     {item.label}
@@ -763,7 +763,7 @@ export function AlertCreationScreen({
               {/* stats — Robinhood-style bid/ask depth + stat rows, driven by
                   the shared price clock so the sizes / bar move on the same
                   tick as the price and chart, and on the same UP/DOWN palette */}
-              <div style={{ marginTop: 26 }}>
+              <div style={{ marginTop: 20 }}>
                 <LiveStats
                   tick={s.pn}
                   bidPrice={"$" + (s.price - 0.01).toFixed(2)}

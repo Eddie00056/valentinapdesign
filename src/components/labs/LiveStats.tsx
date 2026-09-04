@@ -9,9 +9,11 @@ import { motion, useReducedMotion } from "motion/react";
    the shared price clock (pass `tick` / `bidPrice` / `askPrice` / `up` / `down`
    so it stays in sync and on-palette). */
 
-const TICK_MS = 1500;
+const TICK_MS = 2200; // matches priceHub PX_STEP for the standalone lab
 const MUTED = "#8e97ad";
 const VAL = "#f2f2f8";
+const FS = 13; // one type size for the whole readout (label + value)
+const ROW_PAD = 7; // vertical padding per stat row -> 14px between rows
 
 // bid/ask size sequences — deterministic, small moves
 const BID_SEQ = [3, 4, 3, 5, 4, 6, 4, 3];
@@ -73,18 +75,18 @@ export function LiveStats({
   );
 
   // matches LiveCandleChart's SYNC spring so the bar, the chart's "now" line
-  // and the pill all settle together on each price tick. ~0.4s, no bounce.
+  // and the pill all settle together on each price tick. ~0.65s, no bounce.
   const spring = {
     type: "spring" as const,
-    stiffness: 140,
-    damping: 24,
+    stiffness: 80,
+    damping: 20,
     mass: 1,
   };
 
   return (
     <div style={{ fontFamily: "'Open Sans', Helvetica, Arial, sans-serif" }}>
       {/* Bid / Ask + depth bar */}
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: FS, lineHeight: 1 }}>
         <div>
           <span style={{ color: MUTED }}>Bid </span>
           <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{bidPrice}</span>
@@ -100,26 +102,26 @@ export function LiveStats({
         style={{
           display: "flex",
           gap: 3,
-          height: 6,
-          marginTop: 8,
-          borderRadius: 3,
+          height: 7,
+          marginTop: 10,
+          borderRadius: 4,
           overflow: "hidden",
         }}
       >
         <motion.div
-          style={{ background: up, borderRadius: 2 }}
+          style={{ background: up, borderRadius: 3 }}
           animate={{ width: `${bidPct}%` }}
           transition={reduce ? { duration: 0 } : spring}
         />
         <motion.div
-          style={{ background: down, borderRadius: 2, flex: 1 }}
+          style={{ background: down, borderRadius: 3, flex: 1 }}
           transition={reduce ? { duration: 0 } : spring}
         />
       </div>
 
       {/* stat rows — no divider; sit tight under the depth bar. Bid/ask size
           live in the header row above, so they're not repeated here. */}
-      <div style={{ marginTop: 2 }}>
+      <div style={{ marginTop: 4 }}>
         {rows.map(([a, b, c, d], ri) => (
           <Row key={ri}>
             <Cell k={a} v={b} />
@@ -138,7 +140,7 @@ function Row({ children }: { children: ReactNode }) {
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
         gap: 16,
-        padding: "9px 0",
+        padding: `${ROW_PAD}px 0`,
       }}
     >
       {children}
@@ -148,7 +150,7 @@ function Row({ children }: { children: ReactNode }) {
 
 function Cell({ k, v }: { k: string; v: string }) {
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 12 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: FS, lineHeight: 1 }}>
       <span style={{ color: MUTED }}>{k}</span>
       <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{v}</span>
     </div>

@@ -2,7 +2,7 @@
 // One timer advances a mean-reverting walk and pushes {price, prev, dir, n}
 // to every subscriber.
 
-const PX_STEP = 1600;
+const PX_STEP = 2200;
 export const PX_BASE = 194.29;
 
 export type PriceState = {

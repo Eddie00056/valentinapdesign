@@ -9,8 +9,8 @@ export const W = 393,
 export const UP = "#48d597",
   DOWN = "#ff557d";
 export const BASE_Y = PAD_T + (H - PAD_T - PAD_B) * 0.62;
-export const LEAD = "260ms cubic-bezier(.2,.9,.25,1)",
-  TRAIL = "400ms cubic-bezier(.32,.78,.22,1)";
+export const LEAD = "360ms cubic-bezier(.2,.9,.25,1)",
+  TRAIL = "560ms cubic-bezier(.32,.78,.22,1)";
 
 function walk(seed: number, n: number, drift: number, vol: number) {
   let s = seed,
