@@ -325,10 +325,11 @@ export function AlertCreationScreen({
       " 700ms cubic-bezier(.36,.07,.19,.97)"
     : "none";
 
-  // iphone17pro.png (5200x10568) renders ~858px tall at 406 wide; the screen
-  // sits a few px inside the rail. Overlay inset/radius below over-hug the
-  // screen edge so the black content covers the rail highlight rather than
-  // leaving a sliver. The mask fades the phone's bottom into the page.
+  // Geometry measured off iphone17pro.png (5200x10568). object-fit:cover at
+  // 406 wide scales it 0.0781x, so the PNG carries ~8px of transparent margin
+  // each side, then a ~1px rail, then the screen. Screen corner radius ≈ 53px.
+  // The overlay below is inset 8px with a 54px radius so the black content
+  // lands exactly on the screen curve (a hair proud, to hide any seam).
   // IMPORTANT: no `filter` on the masked element — filter + mask on one box
   // hard-clips the drop-shadow to a rectangle, and that clip line is the
   // "triangle edge".
@@ -368,11 +369,11 @@ export function AlertCreationScreen({
         <div
           style={{
             position: "absolute",
-            left: 5,
-            right: 5,
-            top: 5,
+            left: 8,
+            right: 8,
+            top: 1,
             bottom: 0,
-            borderRadius: "52px 52px 0 0",
+            borderRadius: "54px 54px 0 0",
             overflow: "hidden",
             background: "transparent",
             paddingTop: 50,
@@ -391,7 +392,7 @@ export function AlertCreationScreen({
               height: 57,
               background: "#111317",
               zIndex: 1,
-              borderRadius: "52px 52px 0 0",
+              borderRadius: "54px 54px 0 0",
             }}
           />
           <div
