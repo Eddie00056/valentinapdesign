@@ -325,17 +325,18 @@ export function AlertCreationScreen({
       " 700ms cubic-bezier(.36,.07,.19,.97)"
     : "none";
 
-  // Clip PHONE.png (a tall 678x1400 render) to roughly a real-phone height,
-  // then fade the last ~75px to nothing so the bottom edge dissolves into the
-  // page instead of ending on a hard line.
+  // Measured from PHONE.png (678x1400) at this 406px render: outer corner
+  // r≈55, rail≈6px, so the screen is inset 6px with a ~49px corner. The mask
+  // fades the phone's bottom into the page. IMPORTANT: no `filter` on the
+  // masked element — filter + mask on one box hard-clips the drop-shadow to a
+  // rectangle and that clip line is the "triangle edge".
   const phoneMask =
-    "linear-gradient(to bottom, #000 0%, #000 90%, transparent 100%)";
+    "linear-gradient(to bottom, #000 0%, #000 88%, transparent 100%)";
 
   const phone = (
     <div
       style={{
         flex: "none",
-        filter: "drop-shadow(0 24px 55px rgba(0,0,0,0.5))",
         WebkitMaskImage: phoneMask,
         maskImage: phoneMask,
         fontFamily: "'Open Sans', Helvetica, Arial, sans-serif",
@@ -346,12 +347,11 @@ export function AlertCreationScreen({
         style={{
           position: "relative",
           width: 406,
-          height: 736,
+          height: 748,
         }}
       >
         {/* object-fit crops the tall render's bottom while keeping its own
-            baked-in rounded top corners — no extra clip element, so no
-            mismatched nested corner arcs. */}
+            baked-in rounded top corners. */}
         <img
           src={PHONE}
           alt="iPhone"
@@ -366,11 +366,11 @@ export function AlertCreationScreen({
         <div
           style={{
             position: "absolute",
-            left: "1.8%",
-            right: "1.8%",
+            left: 6,
+            right: 6,
             top: 6,
             bottom: 0,
-            borderRadius: "46px 46px 0 0",
+            borderRadius: "49px 49px 0 0",
             overflow: "hidden",
             background: "transparent",
             paddingTop: 50,
@@ -389,7 +389,7 @@ export function AlertCreationScreen({
               height: 57,
               background: "#111317",
               zIndex: 1,
-              borderRadius: "52px 52px 0 0",
+              borderRadius: "49px 49px 0 0",
             }}
           />
           <div
@@ -712,14 +712,14 @@ export function AlertCreationScreen({
               {/* chart — tick-driven candlesticks (Robinhood "advanced" style):
                   static session candles, a forming candle that builds on each
                   tick, and a dotted "now" price line + axis pill. */}
-              <div style={{ position: "relative", width: "calc(100% + 24px)", margin: "16px 0 0 -24px", minHeight: 188 }}>
+              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "16px -24px 0", minHeight: 188 }}>
                 <LiveCandleChart
                   w={393}
                   h={188}
                   pad={14}
                   baseline={false}
                   startFromBottom={0.12}
-                  pillInset={2}
+                  pillInset={0}
                   pillTextColor="#04150c"
                   drawIn={drawn}
                   live={tf === 0}
