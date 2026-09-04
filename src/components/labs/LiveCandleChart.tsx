@@ -58,7 +58,7 @@ type Props = {
   price?: number;
   /** day's previous close — colours the "now" line / pill to match a header change */
   prevClose?: number;
-  /** pixels per $1 of move when driven by `price` */
+  /** pixels per $1 of move when driven by `price` — small, so "now" holds its spot */
   unitPx?: number;
 };
 
@@ -70,7 +70,7 @@ export function LiveCandleChart({
   drawIn = true,
   price: extPrice,
   prevClose,
-  unitPx = 26,
+  unitPx = 6,
 }: Props = {}) {
   const W = w;
   const H = h;
@@ -166,21 +166,19 @@ export function LiveCandleChart({
 
   const clampY = (y: number) => Math.max(8, Math.min(H - 8, y));
 
-  // In external mode "now" is driven by a real (mean-reverting) price that can
-  // swing a dollar or two, so anchor it just above the prev-close baseline —
-  // that leaves headroom both ways — instead of the last static candle's close.
-  const anchorY = external ? baselineY - 22 : baseY;
-
+  // "now" always continues from the last static candle's close (`baseY`) — in
+  // external mode it just wiggles from there as the host price moves. `unitPx`
+  // is deliberately small so the forming candle stays put, like the sim did.
   const dispPrice = external ? extPrice! : BASE_PRICE + tk.now * TICK_UNIT;
-  const openY = anchorY; // candle opened at the anchor level
+  const openY = baseY; // candle opened at the base level
   const priceY = external
-    ? clampY(anchorY - ext.d * unitPx)
+    ? clampY(baseY - ext.d * unitPx)
     : baseY - tk.now * TICK_PX; // = forming candle's close
   const hiY = external
-    ? clampY(anchorY - ext.hi * unitPx)
+    ? clampY(baseY - ext.hi * unitPx)
     : baseY - tk.hi * TICK_PX; // running high (lowest y)
   const loY = external
-    ? clampY(anchorY - ext.lo * unitPx)
+    ? clampY(baseY - ext.lo * unitPx)
     : baseY - tk.lo * TICK_PX; // running low
   const bodyTop = Math.min(openY, priceY);
   const bodyH = Math.max(1.4, Math.abs(priceY - openY));
