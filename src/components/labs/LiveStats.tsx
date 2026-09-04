@@ -4,8 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 
 /* Robinhood-style stats block for the alert screen:
    - Bid / Ask with a live depth bar (bid vs ask size), tick-driven, up top
-   - a single divider
-   - every other stat below it, one even spacing, no further dividers
+   - every other stat directly below, one even spacing, no dividers
    Standalone on /work/stats-lab; embedded in AlertCreationScreen driven by
    the shared price clock (pass `tick` / `bidPrice` / `askPrice` / `up` / `down`
    so it stays in sync and on-palette). */
@@ -13,7 +12,6 @@ import { motion, useReducedMotion } from "motion/react";
 const TICK_MS = 1500;
 const MUTED = "#8e97ad";
 const VAL = "#f2f2f8";
-const DIVIDER = "rgba(255,255,255,0.09)";
 
 // bid/ask size sequences — deterministic, small moves
 const BID_SEQ = [3, 4, 3, 5, 4, 6, 4, 3];
@@ -118,12 +116,8 @@ export function LiveStats({
         />
       </div>
 
-      {/* divider — bid/ask + its visual sit above; everything else below.
-          bottom margin + the first row's 9px top padding == the 18px gap above */}
-      <div style={{ height: 1, background: DIVIDER, margin: "18px 0 9px" }} />
-
-      {/* stat rows — no further dividers, even spacing */}
-      <div>
+      {/* stat rows — no divider; sit tight under the depth bar */}
+      <div style={{ marginTop: 2 }}>
         <Row>
           <Cell k="Bid size" v={String(bid)} />
           <Cell k="Ask size" v={String(ask)} />

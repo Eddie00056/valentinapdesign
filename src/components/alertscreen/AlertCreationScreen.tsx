@@ -336,15 +336,7 @@ export function AlertCreationScreen({
         letterSpacing: 0,
       }}
     >
-        {/* clip a little off the phone's bottom so the content isn't swimming
-            in dead space below the stats; the wrapper re-rounds the corners */}
-        <div style={{ borderRadius: 56, overflow: "hidden" }}>
-          <img
-            src={PHONE}
-            alt="iPhone"
-            style={{ width: "100%", display: "block", marginBottom: -64 }}
-          />
-        </div>
+        <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
         <div
           style={{
             position: "absolute",
@@ -694,11 +686,11 @@ export function AlertCreationScreen({
               {/* chart — tick-driven candlesticks (Robinhood "advanced" style):
                   static session candles, a forming candle that builds on each
                   tick, and a dotted "now" price line + axis pill. */}
-              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "20px -24px 0", minHeight: 168 }}>
+              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "20px -24px 0", minHeight: 212 }}>
                 <LiveCandleChart
                   w={393}
-                  h={168}
-                  pad={18}
+                  h={212}
+                  pad={20}
                   baselineStroke="rgba(255,255,255,0.14)"
                   drawIn={drawn}
                   price={s.price}
@@ -773,7 +765,7 @@ export function AlertCreationScreen({
                   tick as the price and chart, and on the same UP/DOWN palette */}
               <div style={{ marginTop: 26 }}>
                 <LiveStats
-                  tick={s.n}
+                  tick={s.pn}
                   bidPrice={"$" + (s.price - 0.01).toFixed(2)}
                   askPrice={"$" + (s.price + 0.01).toFixed(2)}
                   up={UP}
