@@ -15,9 +15,10 @@ const VAL = "#f2f2f8";
 const FS = 12; // one type size for the whole readout (label + value)
 const ROW_PAD = 9; // vertical padding per stat row
 
-// bid/ask size sequences — deterministic, small moves
-const BID_SEQ = [3, 4, 3, 5, 4, 6, 4, 3];
-const ASK_SEQ = [1, 2, 1, 1, 3, 2, 4, 2];
+// bid/ask size sequences — deterministic, small moves. Start even (3/3) so the
+// depth bar sits dead centre at rest, then nudge ±1 either way.
+const BID_SEQ = [3, 4, 3, 4, 5, 4, 3, 4];
+const ASK_SEQ = [3, 3, 4, 4, 3, 4, 4, 3];
 
 // rows under the divider; the live bid/ask sizes are prepended as the first row
 const rows: [string, string, string, string][] = [
@@ -64,11 +65,11 @@ export function LiveStats({
   const bid = BID_SEQ[step % BID_SEQ.length];
   const ask = ASK_SEQ[step % ASK_SEQ.length];
 
-  // Raw split can swing ~43->83%. Pull it toward 50/50 (COMPRESS) and cap the
-  // travel (BAND) so a big size move nudges the bar rather than throwing it.
-  const COMPRESS = 0.4;
-  const BAND = 14; // max % either side of centre
-  const rawPct = (bid / (bid + ask)) * 100;
+  // Balanced around 50: pull the raw split toward centre (COMPRESS) and cap the
+  // travel (BAND) so it nudges rather than swings. bid == ask -> exactly 50.
+  const COMPRESS = 0.5;
+  const BAND = 10; // max % either side of centre
+  const rawPct = bid + ask > 0 ? (bid / (bid + ask)) * 100 : 50;
   const bidPct = Math.max(
     50 - BAND,
     Math.min(50 + BAND, 50 + (rawPct - 50) * COMPRESS),
@@ -90,12 +91,12 @@ export function LiveStats({
         <div>
           <span style={{ color: MUTED }}>Bid </span>
           <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{bidPrice}</span>
-          <span style={{ color: MUTED }}> &times;{bid}</span>
+          <span style={{ color: MUTED }}>{" × "}{bid}</span>
         </div>
         <div>
           <span style={{ color: MUTED }}>Ask </span>
           <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{askPrice}</span>
-          <span style={{ color: MUTED }}> &times;{ask}</span>
+          <span style={{ color: MUTED }}>{" × "}{ask}</span>
         </div>
       </div>
       <div

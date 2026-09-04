@@ -336,7 +336,12 @@ export function AlertCreationScreen({
         letterSpacing: 0,
       }}
     >
-        <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
+        {/* PHONE.png is 678x1400 -> ~838px tall at 406 wide. Crop ~140px off
+            the bottom chin so the content isn't sitting above a big empty
+            slab; the wrapper re-rounds the bottom corners. */}
+        <div style={{ height: 700, overflow: "hidden", borderRadius: 52 }}>
+          <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
+        </div>
         <div
           style={{
             position: "absolute",
