@@ -342,6 +342,10 @@ export function AlertCreationScreen({
         flex: "none",
         WebkitMaskImage: phoneMask,
         maskImage: phoneMask,
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+        WebkitMaskSize: "100% 100%",
+        maskSize: "100% 100%",
         fontFamily: "'Open Sans', Helvetica, Arial, sans-serif",
         letterSpacing: 0,
       }}
@@ -351,31 +355,26 @@ export function AlertCreationScreen({
           position: "relative",
           width: 406,
           height: 748,
+          overflow: "hidden",
         }}
       >
-        {/* object-fit crops the tall render's bottom while keeping its own
-            baked-in rounded top corners. */}
+        {/* natural scale (406 wide -> ~825 tall); frame overflow crops the
+            bottom, the PNG's own rounded top corners show. */}
         <img
           src={PHONE}
           alt="iPhone"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            objectPosition: "top center",
-            display: "block",
-          }}
+          style={{ width: "100%", display: "block" }}
         />
         <div
           style={{
             position: "absolute",
-            left: 8,
-            right: 8,
-            top: 1,
+            left: 4,
+            right: 4,
+            top: 0,
             bottom: 0,
-            borderRadius: "54px 54px 0 0",
+            borderRadius: "62px 62px 0 0",
             overflow: "hidden",
-            background: "transparent",
+            background: "#111317",
             paddingTop: 50,
             boxSizing: "border-box",
             display: "flex",
@@ -392,7 +391,7 @@ export function AlertCreationScreen({
               height: 57,
               background: "#111317",
               zIndex: 1,
-              borderRadius: "54px 54px 0 0",
+              borderRadius: "62px 62px 0 0",
             }}
           />
           <div
