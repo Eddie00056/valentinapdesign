@@ -63,9 +63,24 @@ export function LiveStats({
   const step = external ? tick! : i;
   const bid = BID_SEQ[step % BID_SEQ.length];
   const ask = ASK_SEQ[step % ASK_SEQ.length];
-  const bidPct = (bid / (bid + ask)) * 100;
 
-  const spring = { type: "spring" as const, stiffness: 260, damping: 30 };
+  // Raw split can swing ~43->83%. Pull it toward 50/50 (COMPRESS) and cap the
+  // travel (BAND) so a big size move nudges the bar rather than throwing it.
+  const COMPRESS = 0.4;
+  const BAND = 14; // max % either side of centre
+  const rawPct = (bid / (bid + ask)) * 100;
+  const bidPct = Math.max(
+    50 - BAND,
+    Math.min(50 + BAND, 50 + (rawPct - 50) * COMPRESS),
+  );
+
+  // gentle, slightly overdamped spring — glides to the new width, no snap/bounce
+  const spring = {
+    type: "spring" as const,
+    stiffness: 90,
+    damping: 22,
+    mass: 1,
+  };
 
   return (
     <div style={{ fontFamily: "'Open Sans', Helvetica, Arial, sans-serif" }}>

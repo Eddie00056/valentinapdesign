@@ -1,0 +1,121 @@
+---
+/* LOCAL PROTOTYPE — not linked, not shipped. A calmer "happy" tap reaction
+   for the header icon buttons, to replace the off-frame bellShake.
+   Tap the icons. Three variants — pick one. */
+import Bare from "../../layouts/Bare.astro";
+import { TapPop } from "../../components/labs/TapPop";
+import { StarIcon, BellIcon } from "../../components/glasslab/icons";
+
+const variants = [
+  {
+    id: "pop",
+    name: "pop",
+    note: "squish → overshoot → settle. Pure scale on the glyph's centre. Nothing moves.",
+  },
+  {
+    id: "wiggle",
+    name: "wiggle",
+    note: "tiny scale bump + a ±10° shimmy that damps out. Playful, still planted.",
+  },
+  {
+    id: "halo",
+    name: "halo",
+    note: "pop + the glyph blips to the accent colour + a ring radiates out and fades.",
+  },
+] as const;
+---
+
+<Bare title="Tap lab" bg="#0b0d0f">
+  <main class="stage">
+    <div class="phone">
+      <p class="eyebrow">Header icon tap — prototype</p>
+      <p class="hint">Tap a star or bell.</p>
+
+      {variants.map((v) => (
+        <div class="row">
+          <div class="meta">
+            <span class="tag">{v.name}</span>
+            <span class="desc">{v.note}</span>
+          </div>
+          <div class="dark btns">
+            <TapPop client:load anim={v.id} accent="#48d597" ariaLabel="Add to watchlist">
+              <StarIcon />
+            </TapPop>
+            <TapPop client:load anim={v.id} accent="#f2b23c" ariaLabel="Create alert">
+              <BellIcon />
+            </TapPop>
+          </div>
+        </div>
+      ))}
+    </div>
+  </main>
+</Bare>
+
+<style>
+  .stage {
+    min-height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 3rem 1rem;
+    font-family:
+      -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui,
+      sans-serif;
+  }
+  .phone {
+    width: 390px;
+    max-width: 100%;
+    background: #111317;
+    border-radius: 22px;
+    padding: 24px 24px 12px;
+    box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+  }
+  .eyebrow {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #6b7280;
+  }
+  .hint {
+    margin: 4px 0 20px;
+    font-size: 13px;
+    color: #8e97ad;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  .tag {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f2f2f8;
+  }
+  .desc {
+    font-size: 12px;
+    line-height: 1.35;
+    color: #8e97ad;
+  }
+  .btns {
+    display: flex;
+    gap: 10px;
+    flex: none;
+  }
+  /* the icon glyphs render at 20px; the real mobile buttons use 16.
+     island markup -> needs a fully global selector */
+  :global(.tap-glyph svg) {
+    width: 16px;
+    height: 16px;
+    display: block;
+  }
+</style>
