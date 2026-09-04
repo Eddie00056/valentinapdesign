@@ -4,6 +4,7 @@ import { AnimatePresence, LayoutGroup, motion } from "motion/react";
 import "./alert-screen.css";
 import { UP, DOWN, LEAD, TRAIL } from "./chart";
 import { LiveCandleChart } from "../labs/LiveCandleChart";
+import { LiveStats } from "../labs/LiveStats";
 import { pxHub, PX_BASE } from "./priceHub";
 import type { PriceState } from "./priceHub";
 import {
@@ -95,16 +96,6 @@ function modeTextAnim(mode: string) {
     )[mode] || "none"
   );
 }
-
-const muted: CSSProperties = { color: "#8e97ad", fontSize: 12, fontWeight: 400 };
-const val: CSSProperties = { color: "#f2f2f8", fontSize: 12, fontWeight: 400 };
-const rangeBar: CSSProperties = {
-  height: 2,
-  background: "#31383f",
-  borderRadius: 1,
-  position: "relative",
-  margin: "14px 0 12px",
-};
 
 export function AlertCreationScreen({
   toastAnimation = "stack",
@@ -334,31 +325,6 @@ export function AlertCreationScreen({
       };
     });
   })();
-
-  const groups = [
-    {
-      rows: [
-        { a: "Bid size", b: "3", c: "Ask size", d: "1" },
-        { a: "Open", b: "$191.78", c: "Prev close", d: "$194.70" },
-      ],
-    },
-    {
-      rows: [
-        { a: "Volume", b: "68M", c: "Avg volume", d: "79M" },
-        { a: "Market cap", b: "1.62T", c: "Shares", d: "506.44M" },
-        { a: "Dividends", b: "$5.34", c: "Yield", d: "1.24%" },
-        { a: "EPS", b: "24.00", c: "P/E", d: "78.00" },
-      ],
-    },
-    {
-      rows: [
-        { a: "Ex-date", b: "06 Nov 2020", c: "Earnings date", d: "26 May 2021" },
-      ],
-    },
-  ].map((g, i, arr) => ({
-    ...g,
-    style: "padding:6px 0" + (i < arr.length - 1 ? ";border-bottom:1px solid #1d2328" : ""),
-  }));
 
   const bellShake = s.n
     ? (s.n % 2 ? "bellShakeA" : "bellShakeB") +
@@ -800,60 +766,17 @@ export function AlertCreationScreen({
                 ))}
               </div>
 
-              {/* bid / ask */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 26 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#22282e", borderRadius: 8, height: 35, padding: "0 14px" }}>
-                  <span data-type="body-muted" style={muted}>Bid</span>
-                  <span data-type="body" style={val}>$194.28</span>
-                </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "#22282e", borderRadius: 8, height: 35, padding: "0 14px" }}>
-                  <span data-type="body-muted" style={muted}>Ask</span>
-                  <span data-type="body" style={val}>$194.30</span>
-                </div>
-              </div>
-
-              {/* ranges */}
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 14 }}>
-                <div>
-                  <div data-type="body-muted" style={muted}>Day range</div>
-                  <div style={rangeBar}>
-                    <span style={{ position: "absolute", left: "56%", top: -2, width: 3, height: 6, background: "#31383f", borderRadius: 1 }} />
-                  </div>
-                  <div data-type="body" style={{ display: "flex", justifyContent: "space-between", ...val }}>
-                    <span>$191.11</span>
-                    <span>$196.25</span>
-                  </div>
-                </div>
-                <div>
-                  <div data-type="body-muted" style={muted}>52 week range</div>
-                  <div style={rangeBar}>
-                    <span style={{ position: "absolute", left: "24%", top: -2, width: 3, height: 6, background: "#31383f", borderRadius: 1 }} />
-                  </div>
-                  <div data-type="body" style={{ display: "flex", justifyContent: "space-between", ...val }}>
-                    <span>$166.19</span>
-                    <span>$402.67</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* stat groups */}
-              <div style={{ marginTop: 16, borderTop: "1px solid #1d2328" }}>
-                {groups.map((g, gi) => (
-                  <div key={gi} style={css(g.style)}>
-                    {g.rows.map((row, ri) => (
-                      <div key={ri} style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, padding: "8px 0" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                          <span data-type="body-muted" style={muted}>{row.a}</span>
-                          <span data-type="body" style={val}>{row.b}</span>
-                        </div>
-                        <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
-                          <span data-type="body-muted" style={muted}>{row.c}</span>
-                          <span data-type="body" style={val}>{row.d}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ))}
+              {/* stats — Robinhood-style bid/ask depth + stat rows, driven by
+                  the shared price clock so the sizes / bar move on the same
+                  tick as the price and chart, and on the same UP/DOWN palette */}
+              <div style={{ marginTop: 26 }}>
+                <LiveStats
+                  tick={s.n}
+                  bidPrice={"$" + (s.price - 0.01).toFixed(2)}
+                  askPrice={"$" + (s.price + 0.01).toFixed(2)}
+                  up={UP}
+                  down={DOWN}
+                />
               </div>
             </div>
 

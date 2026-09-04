@@ -1,24 +1,26 @@
 import { useEffect, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 
-/* Prototype — Robinhood-style stats block for the alert screen:
-   - Bid / Ask with a live depth bar (bid vs ask size), tick-driven
-   - stat rows below, no group dividers, one even spacing throughout
-   - stat rows below with NO group dividers, one even spacing throughout
-   Same tick logic as the candlestick prototype. Standalone. */
+/* Robinhood-style stats block for the alert screen:
+   - Bid / Ask with a live depth bar (bid vs ask size), tick-driven, up top
+   - a single divider
+   - every other stat below it, one even spacing, no further dividers
+   Standalone on /work/stats-lab; embedded in AlertCreationScreen driven by
+   the shared price clock (pass `tick` / `bidPrice` / `askPrice` / `up` / `down`
+   so it stays in sync and on-palette). */
 
 const TICK_MS = 1500;
-const GREEN = "#48d597";
-const RED = "#ff557d";
 const MUTED = "#8e97ad";
 const VAL = "#f2f2f8";
+const DIVIDER = "rgba(255,255,255,0.09)";
 
 // bid/ask size sequences — deterministic, small moves
 const BID_SEQ = [3, 4, 3, 5, 4, 6, 4, 3];
 const ASK_SEQ = [1, 2, 1, 1, 3, 2, 4, 2];
 
+// rows under the divider; the live bid/ask sizes are prepended as the first row
 const rows: [string, string, string, string][] = [
-  ["Bid size", "3", "Ask size", "1"],
   ["Open", "$191.78", "Prev close", "$194.70"],
   ["Volume", "68M", "Avg volume", "79M"],
   ["Market cap", "1.62T", "Shares", "506.44M"],
@@ -27,22 +29,40 @@ const rows: [string, string, string, string][] = [
   ["Ex-date", "06 Nov 2020", "Earnings date", "26 May 2021"],
 ];
 
-export function LiveStats() {
+type Props = {
+  /** external tick index — when set, no internal interval; sizes follow this */
+  tick?: number;
+  bidPrice?: string;
+  askPrice?: string;
+  /** up / down accent — pass the host palette so the bar matches everything else */
+  up?: string;
+  down?: string;
+};
+
+export function LiveStats({
+  tick,
+  bidPrice = "$194.28",
+  askPrice = "$194.30",
+  up = "#48d597",
+  down = "#ff557d",
+}: Props = {}) {
   const reduce = useReducedMotion();
   const [i, setI] = useState(0);
   const idx = useRef(0);
+  const external = tick != null;
 
   useEffect(() => {
-    if (reduce) return;
+    if (external || reduce) return;
     const id = window.setInterval(() => {
       idx.current += 1;
       setI(idx.current);
     }, TICK_MS);
     return () => window.clearInterval(id);
-  }, [reduce]);
+  }, [external, reduce]);
 
-  const bid = BID_SEQ[i % BID_SEQ.length];
-  const ask = ASK_SEQ[i % ASK_SEQ.length];
+  const step = external ? tick! : i;
+  const bid = BID_SEQ[step % BID_SEQ.length];
+  const ask = ASK_SEQ[step % ASK_SEQ.length];
   const bidPct = (bid / (bid + ask)) * 100;
 
   const spring = { type: "spring" as const, stiffness: 260, damping: 30 };
@@ -53,12 +73,12 @@ export function LiveStats() {
       <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
         <div>
           <span style={{ color: MUTED }}>Bid </span>
-          <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>$194.28</span>
+          <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{bidPrice}</span>
           <span style={{ color: MUTED }}> &times;{bid}</span>
         </div>
         <div>
           <span style={{ color: MUTED }}>Ask </span>
-          <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>$194.30</span>
+          <span style={{ color: VAL, fontVariantNumeric: "tabular-nums" }}>{askPrice}</span>
           <span style={{ color: MUTED }}> &times;{ask}</span>
         </div>
       </div>
@@ -73,33 +93,47 @@ export function LiveStats() {
         }}
       >
         <motion.div
-          style={{ background: GREEN, borderRadius: 2 }}
+          style={{ background: up, borderRadius: 2 }}
           animate={{ width: `${bidPct}%` }}
           transition={reduce ? { duration: 0 } : spring}
         />
         <motion.div
-          style={{ background: RED, borderRadius: 2, flex: 1 }}
+          style={{ background: down, borderRadius: 2, flex: 1 }}
           transition={reduce ? { duration: 0 } : spring}
         />
       </div>
 
-      {/* stat rows — no dividers, even spacing */}
-      <div style={{ marginTop: 24 }}>
+      {/* divider — bid/ask + its visual sit above; everything else below */}
+      <div style={{ height: 1, background: DIVIDER, margin: "18px 0" }} />
+
+      {/* stat rows — no further dividers, even spacing */}
+      <div>
+        <Row>
+          <Cell k="Bid size" v={String(bid)} />
+          <Cell k="Ask size" v={String(ask)} />
+        </Row>
         {rows.map(([a, b, c, d], ri) => (
-          <div
-            key={ri}
-            style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
-              gap: 16,
-              padding: "9px 0",
-            }}
-          >
+          <Row key={ri}>
             <Cell k={a} v={b} />
             <Cell k={c} v={d} />
-          </div>
+          </Row>
         ))}
       </div>
+    </div>
+  );
+}
+
+function Row({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        gap: 16,
+        padding: "9px 0",
+      }}
+    >
+      {children}
     </div>
   );
 }
