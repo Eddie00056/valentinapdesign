@@ -129,11 +129,37 @@ export function AlertCreationScreen({
      bouncy, slightly overshooting spring (the glyph "pops" in on top of
      it); dismissing (banner -> icon) keeps the same shape-morph but lands
      without any overshoot — the bounce read wrong specifically at the end
-     of that direction. */
+     of that direction.
+
+     `fracSettled` guards against a real edge case: `fracSpringClose`'s
+     bounce:0 only holds starting from rest — if dismiss is tapped while
+     the bouncy open spring above is still mid-flight, its carried-over
+     velocity can make the close spring overshoot anyway ("sometimes
+     bounces" on a fast tap). Dismiss is ignored until
+     onLayoutAnimationComplete below confirms the open animation has
+     actually settled, so the close always starts from rest. */
   const [fracOpen, setFracOpen] = useState(fractionalBanner);
-  const fracSpring = { type: "spring", stiffness: 380, damping: 20, mass: 0.9 } as const;
-  const fracSpringClose = { type: "spring", visualDuration: 0.26, bounce: 0 } as const;
-  const fracGlyphPop = { type: "spring", stiffness: 500, damping: 16, delay: 0.05 } as const;
+  const [fracSettled, setFracSettled] = useState(true);
+  // Both directions bounce-free now (the open overshoot read as "weird"
+  // once the corner-radius delay above was fixed and it became the only
+  // thing left standing out). borderRadius keeps its own zero-duration
+  // override — without it, Motion's shared-layout crossfades border-radius
+  // continuously alongside width/height/position (same as it would
+  // backgroundColor), which reads as a slow, mushy round -> square instead
+  // of an immediate change. Single shared-layout element throughout — no
+  // DOM restructuring, which previously threw off the dismiss animation.
+  const fracSpring = { type: "spring", visualDuration: 0.3, bounce: 0, borderRadius: { duration: 0 } } as const;
+  const fracSpringClose = { type: "spring", visualDuration: 0.26, bounce: 0, borderRadius: { duration: 0 } } as const;
+  const fracGlyphPop = { type: "spring", visualDuration: 0.22, bounce: 0, delay: 0.05 } as const;
+
+  const openFrac = () => {
+    setFracOpen(true);
+    setFracSettled(false);
+  };
+  const dismissFrac = () => {
+    if (!fracSettled) return;
+    setFracOpen(false);
+  };
   /* inline approximation of the glass `light` icon button (glass-button.css
      .dark .btn--light) so the morphing card can *be* the resting icon. */
   // Match the mobile GlassButton (watchlist / alert) exactly: 66deg fill +
@@ -443,15 +469,21 @@ export function AlertCreationScreen({
                         className="acs-frac-card"
                         transition={fracSpringClose}
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: 1, transition: { duration: 0.2 } }}
+                        // borderRadius is an explicit animate target (not just
+                        // a static style) so Motion treats it as a normal
+                        // animated value governed by transition.borderRadius,
+                        // instead of picking it up only via shared-layout's
+                        // own automatic style crossfade — which ignored that
+                        // override and kept visibly interpolating the corner.
+                        animate={{ opacity: 1, borderRadius: 999, transition: { duration: 0.2 } }}
                         role="button"
                         tabIndex={0}
                         aria-label="Fractional shares"
-                        onClick={() => setFracOpen(true)}
+                        onClick={openFrac}
                         onKeyDown={(e) => {
                           if (e.key === "Enter" || e.key === " ") {
                             e.preventDefault();
-                            setFracOpen(true);
+                            openFrac();
                           }
                         }}
                         style={{
@@ -465,7 +497,6 @@ export function AlertCreationScreen({
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "center",
-                          borderRadius: 999,
                           overflow: "hidden",
                           cursor: "pointer",
                           ...fracGlass,
@@ -521,17 +552,21 @@ export function AlertCreationScreen({
                         <motion.div
                           layoutId="frac-card"
                           transition={fracSpring}
+                          onLayoutAnimationComplete={() => setFracSettled(true)}
                           initial={{ opacity: 0 }}
-                          animate={{ opacity: 1, transition: { duration: 0.16 } }}
+                          // borderRadius is an explicit animate target here
+                          // too — see the matching comment on the compact
+                          // icon above.
+                          animate={{ opacity: 1, borderRadius: 0, transition: { duration: 0.16 } }}
                           exit={{ opacity: 0, transition: { duration: 0.1 } }}
                           role="button"
                           tabIndex={0}
                           aria-label="Dismiss fractional shares notice"
-                          onClick={() => setFracOpen(false)}
+                          onClick={dismissFrac}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
                               e.preventDefault();
-                              setFracOpen(false);
+                              dismissFrac();
                             }
                           }}
                           style={{
@@ -551,7 +586,6 @@ export function AlertCreationScreen({
                             background: "#000",
                             borderTop: "1px solid #31383f",
                             borderBottom: "1px solid #31383f",
-                            borderRadius: 0,
                             color: "#f2f2f8",
                             cursor: "pointer",
                             overflow: "hidden",
