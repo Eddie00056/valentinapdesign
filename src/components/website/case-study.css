@@ -245,47 +245,74 @@
    contain + matching card bg reads as one continuous dark surface with
    the UI floating in it. Nothing is cropped. */
 .cs-bento .dark {
+  position: relative;
   background: #0c0c0c;
-  aspect-ratio: 13 / 10;
+  aspect-ratio: 8 / 5;
   overflow: hidden;
 }
 
+/* clip absolutely positioned + centred so it can never stretch the
+   card; capped well inside the edges so it floats as content-in-a-frame
+   rather than a zoomed-in fill. */
 .cs-bento .dark > video {
-  display: block;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: auto;
+  height: auto;
+  max-width: 88%;
+  max-height: 82%;
   object-fit: contain;
-  object-position: center;
 }
 
-/* order ticket — tall enough for all three rows (content ≈ 2.5:1) */
+/* order ticket — room for all three rows (content ≈ 2.5:1) */
 .cs-bento .fit-wide {
-  aspect-ratio: 2 / 1;
+  aspect-ratio: 19 / 10;
 }
 
-/* single price line — roomy card, line floats centred */
+/* single price ticker — wide, short, text floats centred */
 .cs-bento .fit-price {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 26 / 10;
+}
+/* clip has oversized baked-in text — hold it down to the card type scale */
+.cs-bento .dark.fit-price > video {
+  max-width: 70%;
 }
 
 /* chart — the one near-filled card */
 .cs-bento .fit-fill {
-  aspect-ratio: 13 / 10;
+  aspect-ratio: 8 / 5;
+}
+.cs-bento .dark.fit-fill > video {
+  max-width: 92%;
+  max-height: 92%;
 }
 
 /* wide data panel (options chain) */
 .cs-bento .fit-panel {
   aspect-ratio: 16 / 9;
 }
+.cs-bento .dark.fit-panel > video {
+  max-width: 94%;
+  max-height: 94%;
+}
 
 /* dual phone / spinner */
 .cs-bento .fit-square {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
+}
+.cs-bento .dark.fit-square > video {
+  max-width: 92%;
+  max-height: 92%;
 }
 
 /* the bell — small, centred, lots of air; no zoom */
 .cs-bento .fit-bell {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 8 / 5;
+}
+.cs-bento .dark.fit-bell > video {
+  max-width: 52%;
+  max-height: 56%;
 }
 
 /* light cards: white ground, content centred with real breathing room */
@@ -309,14 +336,19 @@
 /* phone-mockup cards (light or dark): a fixed aspect stage, clip
    centred and fully visible */
 .cs-bento .phone {
-  aspect-ratio: 5 / 4;
+  aspect-ratio: 16 / 10;
   display: grid;
   place-items: center;
 }
 
 .cs-bento .phone > video {
+  position: static;
+  inset: auto;
+  margin: 0;
   width: 100%;
   height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
 }
 

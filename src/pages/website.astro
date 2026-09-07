@@ -418,34 +418,55 @@ const quotes = [
      baked-in #0c0c0c margin, so contain + matching card bg reads as one
      continuous dark surface with the UI floating in it. No cropping. */
   .media--edge .col > div {
+    position: relative;
     background: #0c0c0c;
     border-radius: 20px;
     overflow: hidden;
   }
 
+  /* clip is absolutely positioned + centred so it can NEVER stretch the
+     card — the card's aspect-ratio alone sets its size. The clip floats
+     at its natural size, capped well below the card edges, so it reads
+     as content-in-a-frame, not a zoomed-in fill. */
   .media--edge .col > div > video {
-    display: block;
-    width: 100%;
-    height: 100%;
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: auto;
+    height: auto;
+    max-width: 86%;
+    max-height: 82%;
     object-fit: contain;
-    object-position: center;
   }
 
-  /* order ticket — tall enough for all three rows (content ≈ 2.5:1) */
+  /* order ticket — room for all three rows (content ≈ 2.5:1) */
   .media--edge .fit-wide {
-    aspect-ratio: 2 / 1;
+    aspect-ratio: 19 / 10;
   }
-  /* single price line — roomy card, line floats centred (Framer look) */
+  /* single price ticker — wide, short, text floats centred */
   .media--edge .fit-price {
-    aspect-ratio: 21 / 9;
+    aspect-ratio: 26 / 10;
   }
-  /* chart — the one near-filled card in the group */
+  /* clip has oversized baked-in text — hold it down to match the
+     other cards' type scale */
+  .media--edge .col > div.fit-price > video {
+    max-width: 70%;
+  }
+  /* chart — the one near-filled card; aspect matched to the clip */
   .media--edge .fit-fill {
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 8 / 5;
+  }
+  .media--edge .col > div.fit-fill > video {
+    max-width: 92%;
+    max-height: 92%;
   }
   /* the bell — small, centred, lots of air; no zoom */
   .media--edge .fit-bell {
-    aspect-ratio: 3 / 2;
+    aspect-ratio: 8 / 5;
+  }
+  .media--edge .col > div.fit-bell > video {
+    max-width: 62%;
+    max-height: 66%;
   }
 
   /* ---- testimonials ------------------------------------------- */
