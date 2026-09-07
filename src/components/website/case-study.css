@@ -52,11 +52,17 @@
 
 /* ---- overview / meta --------------------------------------- */
 .cs-overview {
-  max-width: 44rem;
   margin-block: clamp(2.5rem, 6vw, 5rem);
   padding-block: clamp(2rem, 4vw, 3rem);
   border-top: 1px solid var(--w-line);
   border-bottom: 1px solid var(--w-line);
+}
+
+/* the copy blocks inside sit at a readable measure, flush left
+   (the .cs-overview box itself stays full width for the rules) */
+.cs-overview .cs-block,
+.cs-overview .cs-meta {
+  max-width: 44rem;
 }
 
 .cs-block + .cs-block {
@@ -75,7 +81,7 @@
 
 .cs-body {
   margin: 0;
-  max-width: 42ch;
+  max-width: 42ch !important;
   font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
   line-height: 1.55;
   color: var(--w-ink-soft);
@@ -239,85 +245,82 @@
   overflow: hidden;
 }
 
-/* dark cards (Framer's method): a short/wide near-black box; the clip
-   sits centred with object-fit:contain and dark padding around it —
-   never stretched to fill. Clips carry baked-in #0c0c0c margin, so
-   contain + matching card bg reads as one continuous dark surface with
-   the UI floating in it. Nothing is cropped. */
+/* dark cards: a near-black band; the clip FLOATS centred at a fraction
+   of the card, dark margin all around — like Framer. Caps are pure %
+   (case-study cards are ~648px wide at a normal viewport, so 60% ≈ the
+   ~390px "natural" scale the homepage cards show the same UI at).
+   Absolute-positioned so the clip can never stretch the card. */
 .cs-bento .dark {
   position: relative;
   background: #0c0c0c;
-  aspect-ratio: 8 / 5;
+  aspect-ratio: 5 / 2;
   overflow: hidden;
 }
 
-/* clip absolutely positioned + centred so it can never stretch the
-   card; capped in ABSOLUTE px (not just %) so the baked-in UI floats at
-   a consistent modest size no matter how wide the case-study card is
-   (~650px here vs ~340px on the homepage — a % cap alone renders these
-   clips 2x bigger and reads as "zoomed in"). */
 .cs-bento .dark > video {
   position: absolute;
   inset: 0;
   margin: auto;
   width: auto;
   height: auto;
-  max-width: min(78%, 400px);
-  max-height: min(80%, 290px);
+  max-width: 60%;
+  max-height: 74%;
   object-fit: contain;
+  object-position: center;
 }
 
-/* order ticket — room for all three rows (content ≈ 2.5:1) */
+/* order ticket — 3 rows */
 .cs-bento .fit-wide {
-  aspect-ratio: 24 / 10;
+  aspect-ratio: 5 / 2;
 }
 .cs-bento .dark.fit-wide > video {
-  max-width: min(62%, 380px);
+  max-width: 56%;
+  max-height: 66%;
 }
 
-/* single price ticker — wide, short, text floats centred */
+/* single price ticker — baked-in text runs large, hold it down hard */
 .cs-bento .fit-price {
-  aspect-ratio: 30 / 10;
+  aspect-ratio: 16 / 5;
 }
-/* clip has oversized baked-in text — hold it down hard */
 .cs-bento .dark.fit-price > video {
-  max-width: min(52%, 300px);
+  max-width: 38%;
+  max-height: 62%;
 }
 
-/* chart — the one near-filled card */
+/* chart */
 .cs-bento .fit-fill {
-  aspect-ratio: 8 / 5;
+  aspect-ratio: 3 / 2;
 }
 .cs-bento .dark.fit-fill > video {
-  max-width: min(80%, 420px);
-  max-height: min(88%, 330px);
+  max-width: 66%;
+  max-height: 78%;
 }
 
-/* wide data panel (options chain) — needs a little more width to read */
+/* options chain table — wide, needs the most width to read */
 .cs-bento .fit-panel {
-  aspect-ratio: 18 / 8;
+  aspect-ratio: 2 / 1;
 }
 .cs-bento .dark.fit-panel > video {
-  max-width: min(86%, 520px);
-  max-height: min(88%, 300px);
+  max-width: 82%;
+  max-height: 76%;
 }
 
-/* dual phone / spinner */
+/* dual-phone card — the hero of the right column */
 .cs-bento .fit-square {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
 }
 .cs-bento .dark.fit-square > video {
-  max-width: min(66%, 400px);
-  max-height: min(92%, 400px);
+  max-width: 74%;
+  max-height: 82%;
 }
 
-/* the bell — small, centred, lots of air; no zoom */
+/* the bell — portrait clip, floated small in a landscape band */
 .cs-bento .fit-bell {
-  aspect-ratio: 8 / 5;
+  aspect-ratio: 2 / 1;
 }
 .cs-bento .dark.fit-bell > video {
-  max-width: min(40%, 220px);
-  max-height: min(52%, 220px);
+  max-width: 24%;
+  max-height: 60%;
 }
 
 /* light cards: white ground, content centred with real breathing room */
@@ -343,7 +346,7 @@
    video can't stretch the card. */
 .cs-bento .phone {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 6 / 5;
   overflow: hidden;
   display: block;
 }
@@ -354,8 +357,8 @@
   margin: auto;
   width: auto;
   height: auto;
-  max-width: min(50%, 240px);
-  max-height: 94%;
+  max-width: min(58%, 320px);
+  max-height: 88%;
   object-fit: contain;
 }
 
