@@ -199,13 +199,14 @@ const quotes = [
   #team,
   #contact {
     scroll-snap-align: start;
-    min-height: 100svh;
   }
 
-  /* the creed is one short line — don't make it a full empty screen
-     you can get stranded on */
-  .creed {
-    min-height: 62svh;
+  /* only the hero + the media-heavy project rows fill the viewport;
+     the text-only sections stay their natural height so there's no
+     empty screen to get stuck on */
+  .hero,
+  .project {
+    min-height: 100svh;
   }
 
   .hero,
@@ -215,6 +216,12 @@ const quotes = [
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  .creed,
+  #team,
+  #contact {
+    padding-block: clamp(4rem, 8vw, 9rem);
   }
 
   /* .project keeps its own two-column grid; just centre it vertically */
@@ -389,7 +396,10 @@ const quotes = [
   }
 
   .media--edge > div {
-    background: #000;
+    /* #0f0f0f matches the clips' own background, so they stop reading
+       as a hard rectangle; the border gives the card an edge on #000 */
+    background: #0f0f0f;
+    border: 1px solid #1c1c1c;
     border-radius: 24px;
     display: grid;
     place-items: center;
@@ -398,7 +408,7 @@ const quotes = [
   }
 
   .edge-chart video {
-    width: 94%;
+    width: 90%;
     height: auto;
   }
 

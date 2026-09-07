@@ -107,9 +107,11 @@ const canonical = new URL(
     scroll-padding-top: 4.75rem;
   }
 
-  /* glide, then lock each section to the top of the view — homepage only */
+  /* gently tidy sections to the top of the view as you rest near them —
+     homepage only. `proximity` (not `mandatory`) so you can never get
+     stranded on a short section between snaps. */
   html.snap {
-    scroll-snap-type: y mandatory;
+    scroll-snap-type: y proximity;
   }
 
   @media (prefers-reduced-motion: reduce) {

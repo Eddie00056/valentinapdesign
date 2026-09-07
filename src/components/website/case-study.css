@@ -176,7 +176,8 @@
 }
 
 .cs-panels .panel-dark {
-  background: #000;
+  background: #0f0f0f;
+  border: 1px solid #1c1c1c;
 }
 
 .cs-panels .panel-dark figcaption {
@@ -212,7 +213,8 @@
 }
 
 .cs-bento .dark {
-  background: #000;
+  background: #0f0f0f;
+  border: 1px solid #1c1c1c;
 }
 
 .cs-bento video {
