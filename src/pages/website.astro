@@ -70,7 +70,7 @@ const quotes = [
     <section id="projects" class="w-wrap projects">
       <!-- Questrade Pro -->
       <Reveal client:load amount={0.25}>
-        <article class="project">
+        <a class="project" href={`/website/${qp.slug}`}>
           <div class="project-copy">
             <p class="kicker">{qp.title}</p>
             <h2 class="project-title">{qp.summary}</h2>
@@ -85,12 +85,12 @@ const quotes = [
               playsinline
               preload="metadata"></video>
           </div>
-        </article>
+        </a>
       </Reveal>
 
       <!-- Fractional Shares -->
       <Reveal client:load amount={0.25}>
-        <article class="project">
+        <a class="project" href={`/website/${fs.slug}`}>
           <div class="project-copy">
             <p class="kicker">{fs.title}</p>
             <h2 class="project-title">{fs.summary}</h2>
@@ -107,12 +107,12 @@ const quotes = [
               <video src="/website/video/fractional-icon.mp4" autoplay loop muted playsinline></video>
             </div>
           </div>
-        </article>
+        </a>
       </Reveal>
 
       <!-- EdgeMobile -->
       <Reveal client:load amount={0.25}>
-        <article class="project">
+        <a class="project" href={`/website/${em.slug}`}>
           <div class="project-copy">
             <p class="kicker">{em.title}</p>
             <h2 class="project-title">{em.summary}</h2>
@@ -132,7 +132,7 @@ const quotes = [
               <video src="/website/video/edge-order.mp4" autoplay loop muted playsinline></video>
             </div>
           </div>
-        </article>
+        </a>
       </Reveal>
     </section>
 
@@ -288,6 +288,8 @@ const quotes = [
     grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
     gap: clamp(1.5rem, 1rem + 6vw, 7rem);
     align-items: center;
+    color: inherit;
+    text-decoration: none;
   }
 
   .project-copy {
@@ -318,6 +320,11 @@ const quotes = [
     font-size: 1.25rem;
     line-height: 1.2;
     color: var(--w-ink);
+    transition: opacity 0.18s ease;
+  }
+
+  .project:hover .see {
+    opacity: 0.62;
   }
 
   /* media wrappers */
@@ -347,6 +354,7 @@ const quotes = [
     overflow: hidden;
     display: grid;
     place-items: center;
+    padding: clamp(0.75rem, 2vw, 1.25rem);
   }
 
   .frac-phone {
@@ -362,10 +370,9 @@ const quotes = [
 
   .frac-a video,
   .frac-b video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transform: scale(1.02);
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
   }
 
   /* EdgeMobile: 2×2 grid of dark rounded cards */
@@ -482,16 +489,21 @@ const quotes = [
   }
 
   /* ---- responsive ---------------------------------------------- */
-  @media (max-width: 820px) {
+  /* stack the project rows before the two columns get cramped */
+  @media (max-width: 1080px) {
     .project {
       grid-template-columns: 1fr;
-      gap: 1.75rem;
+      gap: clamp(1.5rem, 4vw, 2.5rem);
+      max-width: 640px;
+      margin-inline: auto;
     }
 
     .project-copy {
       order: 2;
     }
+  }
 
+  @media (max-width: 820px) {
     .quotes {
       grid-template-columns: 1fr;
     }
