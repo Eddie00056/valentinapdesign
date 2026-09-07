@@ -91,23 +91,27 @@ const P = "/website/video"; // shared prototype clips from the homepage
 
     <Reveal client:load>
       <section class="cs-bento w-wrap">
-        <div class="light phone">
-          <video src={`${P}/fractional-phone.mp4`} autoplay loop muted playsinline></video>
+        <div class="col">
+          <div class="light phone">
+            <video src={`${P}/fractional-phone.mp4`} autoplay loop muted playsinline></video>
+          </div>
+          <div class="dark">
+            <video src={`${V}/chart.mp4`} autoplay loop muted playsinline></video>
+          </div>
+          <div class="dark">
+            <video src={`${V}/stepper.mp4`} autoplay loop muted playsinline></video>
+          </div>
         </div>
-        <div class="light">
-          <video src={`${P}/fractional-icon.mp4`} autoplay loop muted playsinline></video>
-        </div>
-        <div class="dark">
-          <video src={`${V}/chart.mp4`} autoplay loop muted playsinline></video>
-        </div>
-        <div class="light">
-          <video src={`${P}/fractional-limit.mp4`} autoplay loop muted playsinline></video>
-        </div>
-        <div class="dark">
-          <video src={`${V}/stepper.mp4`} autoplay loop muted playsinline></video>
-        </div>
-        <div class="dark phone">
-          <video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video>
+        <div class="col">
+          <div class="light">
+            <video src={`${P}/fractional-icon.mp4`} autoplay loop muted playsinline></video>
+          </div>
+          <div class="light">
+            <video src={`${P}/fractional-limit.mp4`} autoplay loop muted playsinline></video>
+          </div>
+          <div class="dark phone">
+            <video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video>
+          </div>
         </div>
       </section>
     </Reveal>
