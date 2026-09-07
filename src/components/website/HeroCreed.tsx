@@ -6,35 +6,56 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 /**
  * The tail of the hero sentence: " I get shit work done".
  *
- * It phases in as you start scrolling down from the hero, then — a little
- * further down — a line strikes through "shit". Driven by raw scroll
- * distance from the top (the hero is the first screen, so scrollY 0 == hero
- * at rest), which stays predictable through the page's scroll-snap.
+ * The hero is pinned (`.hero-pin` spacer + `.hero-sticky`) so the view holds
+ * still while a stretch of scroll drives this reveal. Progress is how far the
+ * pin container has scrolled through its own travel:
+ *   - 0 → 0.4  : "I get shit work done" fades in
+ *   - 0.5 → 0.9: a line strikes through "shit"
+ *   - then the pin releases and normal scrolling continues to the projects.
  *
- * Reduced motion / no-JS: the finished joke ("I get ~~shit~~ work done") is
- * shown outright (see the <noscript> override in website.astro).
+ * Reduced motion / no-JS: the finished joke is shown outright (see the
+ * <noscript> override + reduced-motion CSS in website.astro).
  */
 export function HeroCreed() {
   const reduce = useReducedMotion();
-  const [y, setY] = useState(0);
+  const [p, setP] = useState(0);
 
   useEffect(() => {
     if (reduce) return;
+    const pin = document.querySelector<HTMLElement>(".hero-pin");
+    if (!pin) return;
+
     let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => setY(window.scrollY));
+    const measure = () => {
+      raf = 0;
+      const r = pin.getBoundingClientRect();
+      const travel = r.height - window.innerHeight;
+      setP(travel > 0 ? clamp(-r.top / travel, 0, 1) : 0);
     };
-    onScroll();
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(measure);
+    };
+
+    measure();
     window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
       window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
       cancelAnimationFrame(raf);
     };
   }, [reduce]);
 
-  const inT = clamp((y - 20) / (320 - 20), 0, 1);
-  const strikeT = clamp((y - 360) / (700 - 360), 0, 1);
+  // hold scroll-snap off while the pin is mid-reveal so a nearby snap
+  // target can't yank the page before the strike finishes
+  useEffect(() => {
+    const active = !reduce && p > 0.002 && p < 0.995;
+    document.documentElement.classList.toggle("snap-hold", active);
+    return () => document.documentElement.classList.remove("snap-hold");
+  }, [p, reduce]);
+
+  const inT = clamp(p / 0.4, 0, 1);
+  const strikeT = clamp((p - 0.5) / 0.4, 0, 1);
 
   if (reduce) {
     return (

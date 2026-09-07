@@ -56,13 +56,17 @@ const quotes = [
   </noscript>
 
   <main>
-    <section class="w-wrap bay hero">
-      <p class="statement">
-        Product Designer with 5+ years experience shaping fintech products
-        while focusing on fostering collaboration, pushing limits, and
-        delivering high-impact work{" "}<HeroCreed client:load />
-      </p>
-    </section>
+    <div class="hero-pin">
+      <div class="hero-sticky">
+        <section class="w-wrap bay hero">
+          <p class="statement">
+            Product Designer with 5+ years experience shaping fintech products
+            while focusing on fostering collaboration, pushing limits, and
+            delivering high-impact work{" "}<HeroCreed client:load />
+          </p>
+        </section>
+      </div>
+    </div>
 
     <section id="projects" class="w-wrap projects">
       <!-- Questrade Pro -->
@@ -192,33 +196,46 @@ const quotes = [
     scroll-margin-top: 5rem;
   }
 
-  /* scroll-snap targets — glide, then lock each section to the view.
-     Each is a screenful so one snap == one "page". */
-  .hero,
+  /* scroll-snap targets — glide, then lock each section to the view. */
   .project,
   #team,
   #contact {
     scroll-snap-align: start;
   }
 
-  /* only the hero + the media-heavy project rows fill the viewport;
-     the text-only sections stay their natural height so there's no
-     empty screen to get stuck on */
-  .hero,
-  .project {
-    min-height: 100svh;
+  /* ---- hero pin: the hero holds still while a stretch of scroll drives
+     the "I get shit work done" reveal, then releases to the projects.
+     .hero-pin is a tall spacer; .hero-sticky pins inside it. */
+  .hero-pin {
+    position: relative;
+    height: 200vh;
   }
 
-  .hero,
-  #team,
-  #contact {
+  /* HeroCreed toggles .snap-hold while the pin is mid-reveal */
+  :global(html.snap.snap-hold) {
+    scroll-snap-type: none;
+  }
+
+  .hero-sticky {
+    position: sticky;
+    top: 0;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
   }
 
+  /* only the media-heavy project rows fill the viewport; the text-only
+     sections stay their natural height so there's no empty screen */
+  .project {
+    min-height: 100svh;
+  }
+
   #team,
   #contact {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding-block: clamp(4rem, 8vw, 9rem);
   }
 
@@ -237,7 +254,13 @@ const quotes = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .hero,
+    .hero-pin {
+      height: auto;
+    }
+    .hero-sticky {
+      position: static;
+      min-height: 0;
+    }
     .project,
     #team,
     #contact {
