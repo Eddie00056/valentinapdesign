@@ -234,17 +234,32 @@
   overflow: hidden;
 }
 
-/* dark cards: the clip carries its own wide #0e0e0e margin — let it run
-   to the card edge (card == clip, no seam, no crop) */
+/* dark cards: a fixed aspect box per clip shape, clip fitted inside
+   with contain. The clips' own #0e0e0e margin === the card ground, so
+   the letterbox is invisible — deterministic sizing, no crop, no
+   giant text, no clipped phones. */
 .cs-bento .dark {
   background: #0e0e0e;
-  display: block;
+  aspect-ratio: 16 / 10;
+}
+
+.cs-bento .dark.ar-wide {
+  aspect-ratio: 16 / 9;
+}
+
+.cs-bento .dark.ar-strip {
+  aspect-ratio: 20 / 7;
+}
+
+.cs-bento .dark.ar-chart {
+  aspect-ratio: 4 / 3;
 }
 
 .cs-bento .dark > video {
   display: block;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
 }
 
 /* light cards: white ground, content centred with real breathing room */
@@ -265,14 +280,20 @@
   object-fit: contain;
 }
 
-/* a light phone-mockup card: fixed comfortable stage height */
-.cs-bento .light.phone {
+/* phone-mockup cards (light or dark): a fixed comfortable stage,
+   clip centred */
+.cs-bento .phone {
+  aspect-ratio: auto;
+  display: grid;
+  place-items: center;
   min-height: clamp(320px, 42vw, 440px);
 }
 
-.cs-bento .light.phone > video {
-  max-height: 100%;
+.cs-bento .phone > video {
+  width: auto;
   height: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* ---- before / after --------------------------------------- */

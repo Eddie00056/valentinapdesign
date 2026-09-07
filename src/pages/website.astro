@@ -407,28 +407,36 @@ const quotes = [
     gap: 12px;
   }
 
+  /* fixed aspect box per clip shape, clip fitted inside with contain —
+     the clips' own #0e0e0e margin === the card ground so the letterbox
+     is invisible. Deterministic, no crop, no giant text. */
   .media--edge .col > div {
-    /* card ground = the clips' own #0e0e0e; wide clips run to the card
-       edge (the card IS the clip — no seam, no crop) */
     background: #0e0e0e;
     border-radius: 20px;
     overflow: hidden;
-    display: block;
+    display: grid;
+    place-items: center;
   }
 
   .media--edge .col > div > video {
     display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: contain;
   }
 
-  /* the bell is a tall portrait clip — centre it small instead */
+  .media--edge .edge-chart {
+    aspect-ratio: 4 / 3;
+  }
+  .media--edge .edge-hood {
+    aspect-ratio: 20 / 7;
+  }
+  .media--edge .edge-order {
+    aspect-ratio: 16 / 9;
+  }
   .media--edge .edge-bell {
-    display: grid;
-    place-items: center;
     aspect-ratio: 1.5 / 1;
   }
-
   .media--edge .edge-bell > video {
     width: auto;
     height: 58%;
