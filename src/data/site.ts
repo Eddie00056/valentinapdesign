@@ -11,45 +11,34 @@ export type Piece = {
   title: string;
 };
 
-export type WebsitePage = {
-  name: string;
-  blurb: string;
-  status: "todo" | "wip" | "live";
-  href?: string;
+// Case studies ported from the Framer site. One dynamic route renders
+// all of them: src/pages/website/[slug].astro
+export type CaseStudy = {
+  slug: string;
+  title: string;
+  summary: string;
+  impact: string;
 };
 
-// Content from the Framer site (valentinapadure.framer.website), being
-// ported over one page at a time. Set `href` + status "live" as each lands.
-export const websitePages: WebsitePage[] = [
+export const caseStudies: CaseStudy[] = [
   {
-    name: "Home / intro",
-    blurb: "Name, role, tagline — “I get shit work done”",
-    status: "todo",
+    slug: "questrade-pro",
+    title: "Questrade Pro",
+    summary: "Redesigned the highest-impact feature, and reduced time to trade by 60%.",
+    impact: "−60% time to trade",
   },
   {
-    name: "Questrade Pro",
-    blurb: "Case study — redesigned the highest-impact feature; cut trade time 60%",
-    status: "todo",
+    slug: "fractional-shares",
+    title: "Fractional Shares",
+    summary: "Led the end-to-end design of fractional trading, driving $33M in revenue.",
+    impact: "$33M in revenue",
   },
   {
-    name: "Fractional Shares",
-    blurb: "Case study — end-to-end fractional trading; $33M revenue",
-    status: "todo",
-  },
-  {
-    name: "EdgeMobile",
-    blurb: "Case study — Questrade’s top income-generating mobile platform",
-    status: "todo",
-  },
-  {
-    name: "Testimonials",
-    blurb: "Four endorsements — Questrade, Wealthsimple, Microsoft",
-    status: "todo",
-  },
-  {
-    name: "Contact",
-    blurb: "Email, phone, LinkedIn, availability",
-    status: "todo",
+    slug: "edgemobile",
+    title: "EdgeMobile",
+    summary:
+      "Led the design, launch and early growth of Questrade’s top income-generating mobile platform.",
+    impact: "Top income-generating platform",
   },
 ];
 

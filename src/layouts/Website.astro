@@ -1,0 +1,151 @@
+---
+import { site } from "../data/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — Product Designer`;
+const canonical = new URL(
+  Astro.url.pathname,
+  Astro.site ?? "https://valentinapdesign.com",
+);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <title>{pageTitle}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={canonical.href} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:url" content={canonical.href} />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  /* Elza Text — self-hosted, matched to the Framer source ------------- */
+  @font-face {
+    font-family: "Elza Text";
+    src: url("/website/fonts/elza-400.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Elza Text";
+    src: url("/website/fonts/elza-500.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Elza Text";
+    src: url("/website/fonts/elza-600.woff2") format("woff2");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Elza Text";
+    src: url("/website/fonts/elza-700.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  :root {
+    /* palette measured off valentinapadure.framer.website */
+    --w-bg: #030205;
+    --w-surface: #0c0c0c;
+    --w-ink: #ffffff;
+    --w-ink-soft: #969696;
+    --w-ink-mute: rgba(255, 255, 255, 0.5);
+    --w-ink-faint: #565656;
+    --w-line: #1e1e1e;
+    --w-accent: #00ff9d;
+    --w-cream: #fffced;
+
+    --w-font: "Elza Text", "Fraunces", Georgia, serif;
+    --w-font-alt: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, Helvetica, Arial, sans-serif;
+
+    --w-gutter: clamp(1.25rem, 4.5vw, 2.5rem);
+    --w-maxw: 1400px;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* glide, then lock each section to the top of the view */
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 4.75rem;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-snap-type: none;
+      scroll-behavior: auto;
+    }
+  }
+
+  body {
+    margin: 0;
+    background: var(--w-bg);
+    color: var(--w-ink);
+    font-family: var(--w-font);
+    font-size: 1rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .w-wrap {
+    width: 100%;
+    max-width: var(--w-maxw);
+    margin-inline: auto;
+    padding-inline: var(--w-gutter);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: var(--w-accent);
+    color: #000;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
