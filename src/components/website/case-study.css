@@ -39,6 +39,17 @@
   border-radius: 12px;
 }
 
+/* for clips whose source resolution is modest — don't upscale past 1:1 */
+.cs-media--cap {
+  display: flex;
+  justify-content: center;
+}
+
+.cs-media--cap video {
+  width: auto;
+  max-width: min(100%, 960px);
+}
+
 /* ---- overview / meta --------------------------------------- */
 .cs-overview {
   max-width: 44rem;
@@ -176,8 +187,7 @@
 }
 
 .cs-panels .panel-dark {
-  background: #0f0f0f;
-  border: 1px solid #1c1c1c;
+  background: #0e0e0e;
 }
 
 .cs-panels .panel-dark figcaption {
@@ -202,31 +212,48 @@
 .cs-bento > div {
   border-radius: 16px;
   display: grid;
-  place-items: center;
+  place-items: stretch;
   overflow: hidden;
-  min-height: 240px;
-  padding: clamp(1.5rem, 4vw, 2.5rem);
 }
 
 .cs-bento .light {
   background: #f4f4f2;
+  place-items: center;
+  min-height: 220px;
+  padding: clamp(1.25rem, 3vw, 2rem);
 }
 
+/* dark cards carry the clip's own #0e0e0e ground; let the clip fill the
+   card edge-to-edge so there's no card-vs-clip seam (matches Framer) */
 .cs-bento .dark {
-  background: #0f0f0f;
-  border: 1px solid #1c1c1c;
+  background: #0e0e0e;
 }
 
-.cs-bento video {
+.cs-bento .dark > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cs-bento .light > video {
   display: block;
   max-width: 100%;
   height: auto;
-  border-radius: 8px;
 }
 
-.cs-bento .phone video {
+/* phone-mockup clips sit centred with breathing room, not stretched */
+.cs-bento .phone {
+  place-items: center;
+  padding: clamp(1rem, 3vw, 2rem);
+  min-height: 260px;
+}
+
+.cs-bento .phone > video {
   width: auto;
-  max-height: 300px;
+  max-height: 320px;
+  height: auto;
+  object-fit: contain;
 }
 
 /* column variant: two independent stacks (masonry-ish) */
