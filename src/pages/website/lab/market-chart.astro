@@ -1,0 +1,53 @@
+---
+import Website from "../../../layouts/Website.astro";
+import SiteHeader from "../../../components/website/SiteHeader.astro";
+import { MarketChart } from "../../../components/website/lab/MarketChart";
+---
+
+<Website title="Lab — Market chart">
+  <SiteHeader />
+  <main class="lab">
+    <p class="tag">Prototype · not linked from the site</p>
+    <h1>Market chart</h1>
+    <p class="note">
+      Candidate replacement for the baked chart clip in the EdgeMobile bento —
+      real gradient fill, and switching the timeframe morphs the line with a
+      spring (Motion). Trend flips crossfade green↔red.
+    </p>
+
+    <div class="stage">
+      <MarketChart client:load />
+    </div>
+  </main>
+</Website>
+
+<style>
+  .lab {
+    max-width: 620px;
+    margin-inline: auto;
+    padding: clamp(3rem, 8vw, 6rem) var(--w-gutter) 6rem;
+  }
+  .tag {
+    margin: 0 0 0.75rem;
+    font-family: var(--w-font-alt);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--w-accent);
+  }
+  h1 {
+    margin: 0;
+    font-weight: 400;
+    font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
+    letter-spacing: -0.02em;
+  }
+  .note {
+    margin: 1rem 0 2.5rem;
+    color: var(--w-ink-soft);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+  .stage {
+    max-width: 440px;
+  }
+</style>
