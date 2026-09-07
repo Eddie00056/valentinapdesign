@@ -188,6 +188,92 @@ const quotes = [
       });
     }
   </script>
+
+  <script>
+    /* Section settling — replaces CSS scroll-snap.
+       Nothing touches the scroll position while the user is scrolling
+       (slow or fast). Only once scrolling has fully stopped does the
+       nearest section ease to the top. So free-scrolling is never
+       fought, and a stop clicks cleanly into place. */
+    (() => {
+      const html = document.documentElement;
+      const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+      if (reduce.matches) return;
+
+      const anchor = () =>
+        parseFloat(getComputedStyle(html).scrollPaddingTop) || 0;
+      const targets = () => [
+        ...document.querySelectorAll(".projects .project, #team, #contact"),
+      ];
+
+      let tweening = false;
+      let raf = 0;
+      const easeOutCubic = (t) => 1 - (1 - t) ** 3;
+
+      const stopTween = () => {
+        if (!tweening) return;
+        cancelAnimationFrame(raf);
+        tweening = false;
+        html.style.scrollBehavior = "";
+      };
+
+      function tweenTo(y) {
+        const from = window.scrollY;
+        const delta = y - from;
+        if (Math.abs(delta) < 2) return;
+        const dur = Math.min(480, 240 + Math.abs(delta) * 0.34);
+        const t0 = performance.now();
+        html.style.scrollBehavior = "auto";
+        tweening = true;
+        const step = (now) => {
+          const t = Math.min(1, (now - t0) / dur);
+          window.scrollTo(0, Math.round(from + delta * easeOutCubic(t)));
+          if (t < 1) raf = requestAnimationFrame(step);
+          else stopTween();
+        };
+        raf = requestAnimationFrame(step);
+      }
+
+      function settle() {
+        if (tweening) return;
+        if (html.classList.contains("snap-hold")) return; // hero pin busy
+        const off = anchor();
+        const maxPull = window.innerHeight * 0.55;
+        let best = null;
+        let bestDist = Infinity;
+        for (const el of targets()) {
+          const top = el.getBoundingClientRect().top - off;
+          const d = Math.abs(top);
+          if (d < bestDist) {
+            bestDist = d;
+            best = top;
+          }
+        }
+        if (best == null || bestDist < 3 || bestDist > maxPull) return;
+        tweenTo(window.scrollY + best);
+      }
+
+      if ("onscrollend" in window) {
+        window.addEventListener("scrollend", settle);
+      } else {
+        let d = 0;
+        window.addEventListener(
+          "scroll",
+          () => {
+            if (tweening) return;
+            clearTimeout(d);
+            d = setTimeout(settle, 170);
+          },
+          { passive: true }
+        );
+      }
+
+      // hand scroll back to the user the instant they act
+      ["wheel", "touchstart", "pointerdown", "keydown"].forEach((ev) =>
+        window.addEventListener(ev, stopTween, { passive: true })
+      );
+    })();
+  </script>
 </Website>
 
 <style>
@@ -196,24 +282,16 @@ const quotes = [
     scroll-margin-top: 5rem;
   }
 
-  /* scroll-snap targets — glide, then lock each section to the view. */
-  .project,
-  #team,
-  #contact {
-    scroll-snap-align: start;
-  }
+  /* Section settling is done in JS (see the scroll-settle <script>), not
+     CSS scroll-snap — so slow free-scrolling is never pulled. Each
+     settle target is marked data-snap. */
 
   /* ---- hero pin: the hero holds still while a stretch of scroll drives
      the "I get shit work done" reveal, then releases to the projects.
      .hero-pin is a tall spacer; .hero-sticky pins inside it. */
   .hero-pin {
     position: relative;
-    height: 200vh;
-  }
-
-  /* HeroCreed toggles .snap-hold while the pin is mid-reveal */
-  :global(html.snap.snap-hold) {
-    scroll-snap-type: none;
+    height: 160vh;
   }
 
   .hero-sticky {
@@ -261,11 +339,7 @@ const quotes = [
       position: static;
       min-height: 0;
     }
-    .project,
-    #team,
-    #contact {
-      scroll-snap-align: none;
-      scroll-snap-stop: normal;
+    .project {
       min-height: 0;
     }
   }

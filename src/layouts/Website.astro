@@ -106,19 +106,14 @@ const canonical = new URL(
     scroll-padding-top: 4.75rem;
   }
 
-  /* gently tidy sections to the top of the view as you rest near them —
-     homepage only. `proximity` (not `mandatory`) so you can never get
-     stranded on a short section between snaps. */
-  html.snap {
-    scroll-snap-type: y proximity;
-  }
+  /* The homepage (html.snap) does NOT use CSS scroll-snap — a small
+     script settles the nearest section to the top only once scrolling
+     has fully stopped, so free-scrolling (slow or fast) is never
+     fought. See the scroll-settle <script> in website.astro. */
 
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
-    }
-    html.snap {
-      scroll-snap-type: none;
     }
   }
 

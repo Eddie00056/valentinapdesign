@@ -25,12 +25,20 @@ export function HeroCreed() {
     const pin = document.querySelector<HTMLElement>(".hero-pin");
     if (!pin) return;
 
+    const sticky = pin.querySelector<HTMLElement>(".hero-sticky");
     let raf = 0;
     const measure = () => {
       raf = 0;
       const r = pin.getBoundingClientRect();
       const travel = r.height - window.innerHeight;
-      setP(travel > 0 ? clamp(-r.top / travel, 0, 1) : 0);
+      const next = travel > 0 ? clamp(-r.top / travel, 0, 1) : 0;
+      setP(next);
+      // hand the view off: once the strike is done, ease the hero out so
+      // it isn't a full-opacity block that then scrolls away
+      if (sticky) {
+        const exit = clamp((next - 0.9) / 0.1, 0, 1);
+        sticky.style.opacity = exit ? String(1 - exit) : "";
+      }
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(measure);
@@ -43,6 +51,7 @@ export function HeroCreed() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
       cancelAnimationFrame(raf);
+      if (sticky) sticky.style.opacity = "";
     };
   }, [reduce]);
 
