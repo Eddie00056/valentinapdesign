@@ -199,8 +199,13 @@ const quotes = [
   #team,
   #contact {
     scroll-snap-align: start;
-    scroll-snap-stop: always;
     min-height: 100svh;
+  }
+
+  /* the creed is one short line — don't make it a full empty screen
+     you can get stranded on */
+  .creed {
+    min-height: 62svh;
   }
 
   .hero,
@@ -384,8 +389,7 @@ const quotes = [
   }
 
   .media--edge > div {
-    background: #0b0b0b;
-    border: 1px solid var(--w-line);
+    background: #000;
     border-radius: 24px;
     display: grid;
     place-items: center;
@@ -394,7 +398,7 @@ const quotes = [
   }
 
   .edge-chart video {
-    width: 82%;
+    width: 94%;
     height: auto;
   }
 

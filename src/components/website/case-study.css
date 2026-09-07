@@ -212,8 +212,7 @@
 }
 
 .cs-bento .dark {
-  background: #0b0b0b;
-  border: 1px solid var(--w-line);
+  background: #000;
 }
 
 .cs-bento video {
