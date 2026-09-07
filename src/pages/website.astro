@@ -120,18 +120,18 @@ const quotes = [
           </div>
           <div class="media media--edge">
             <div class="col">
-              <div class="edge-chart">
+              <div class="fit-fill">
                 <video src="/website/video/edge-chart.mp4" autoplay loop muted playsinline></video>
               </div>
-              <div class="edge-hood">
+              <div class="fit-price">
                 <video src="/website/video/edge-hood.mp4" autoplay loop muted playsinline></video>
               </div>
             </div>
             <div class="col">
-              <div class="edge-bell">
+              <div class="fit-bell">
                 <video src="/website/video/edge-bell.mp4" autoplay loop muted playsinline></video>
               </div>
-              <div class="edge-order">
+              <div class="fit-wide">
                 <video src="/website/video/edge-order.mp4" autoplay loop muted playsinline></video>
               </div>
             </div>
@@ -412,39 +412,45 @@ const quotes = [
     width: 100%;
   }
 
-  /* fixed aspect box per clip shape, clip fitted inside with contain —
-     the clips' own #0e0e0e margin === the card ground so the letterbox
-     is invisible. Deterministic, no crop, no giant text. */
+  /* each card's aspect-ratio is tuned to its clip's content region, so
+     the clip fills the card and the baked #0e0e0e margin either
+     letterboxes invisibly or is cropped. Deterministic. */
   .media--edge .col > div {
     background: #0e0e0e;
     border-radius: 20px;
     overflow: hidden;
-    display: grid;
-    place-items: center;
   }
 
   .media--edge .col > div > video {
     display: block;
     width: 100%;
     height: 100%;
-    object-fit: contain;
   }
 
-  .media--edge .edge-chart {
-    aspect-ratio: 4 / 3;
+  .media--edge .fit-wide {
+    aspect-ratio: 34 / 10;
   }
-  .media--edge .edge-hood {
-    aspect-ratio: 20 / 7;
+  .media--edge .fit-wide > video {
+    object-fit: contain;
   }
-  .media--edge .edge-order {
-    aspect-ratio: 16 / 9;
+  .media--edge .fit-price {
+    aspect-ratio: 5 / 1;
   }
-  .media--edge .edge-bell {
-    aspect-ratio: 1.5 / 1;
+  .media--edge .fit-price > video {
+    object-fit: contain;
   }
-  .media--edge .edge-bell > video {
-    width: auto;
-    height: 58%;
+  .media--edge .fit-fill {
+    aspect-ratio: 16 / 10;
+  }
+  .media--edge .fit-fill > video {
+    object-fit: cover;
+  }
+  .media--edge .fit-bell {
+    aspect-ratio: 1 / 1;
+  }
+  .media--edge .fit-bell > video {
+    object-fit: cover;
+    transform: scale(1.7);
   }
 
   /* ---- testimonials ------------------------------------------- */

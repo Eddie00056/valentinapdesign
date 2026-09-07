@@ -239,32 +239,61 @@
   overflow: hidden;
 }
 
-/* dark cards: a fixed aspect box per clip shape, clip fitted inside
-   with contain. The clips' own #0e0e0e margin === the card ground, so
-   the letterbox is invisible — deterministic sizing, no crop, no
-   giant text, no clipped phones. */
+/* dark cards: each card's aspect-ratio is tuned to the *content* region
+   of its clip (measured), so the clip fills the card and the baked
+   #0e0e0e frame margin either letterboxes invisibly (fit-*  contain)
+   or is cropped away (fit-* cover). Deterministic, no giant text, no
+   clipped content. */
 .cs-bento .dark {
   background: #0e0e0e;
   aspect-ratio: 16 / 10;
-}
-
-.cs-bento .dark.ar-wide {
-  aspect-ratio: 16 / 9;
-}
-
-.cs-bento .dark.ar-strip {
-  aspect-ratio: 20 / 7;
-}
-
-.cs-bento .dark.ar-chart {
-  aspect-ratio: 4 / 3;
 }
 
 .cs-bento .dark > video {
   display: block;
   width: 100%;
   height: 100%;
+}
+
+/* wide stacked content (order ticket) — show it all, letterbox sides */
+.cs-bento .fit-wide {
+  aspect-ratio: 34 / 10;
+}
+.cs-bento .fit-wide > video {
   object-fit: contain;
+}
+
+/* one price line */
+.cs-bento .fit-price {
+  aspect-ratio: 5 / 1;
+}
+.cs-bento .fit-price > video {
+  object-fit: contain;
+}
+
+/* content ~fills its frame (chart, options table, dual phone) — crop
+   the small dead margin */
+.cs-bento .fit-fill {
+  aspect-ratio: 16 / 10;
+}
+.cs-bento .fit-fill > video {
+  object-fit: cover;
+}
+
+.cs-bento .fit-square {
+  aspect-ratio: 1 / 1;
+}
+.cs-bento .fit-square > video {
+  object-fit: cover;
+}
+
+/* the bell floats small in a big frame — zoom it up */
+.cs-bento .fit-bell {
+  aspect-ratio: 1 / 1;
+}
+.cs-bento .fit-bell > video {
+  object-fit: cover;
+  transform: scale(1.7);
 }
 
 /* light cards: white ground, content centred with real breathing room */
