@@ -396,15 +396,20 @@ const quotes = [
      stretching that balloons the small cards */
   .media--edge {
     display: grid;
-    grid-template-columns: 1.25fr 1fr;
+    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
     align-items: start;
     gap: 12px;
   }
 
   .media--edge .col {
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
+  }
+
+  .media--edge .col > * {
+    width: 100%;
   }
 
   /* fixed aspect box per clip shape, clip fitted inside with contain —
