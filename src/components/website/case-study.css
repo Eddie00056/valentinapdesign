@@ -285,19 +285,17 @@
   object-fit: contain;
 }
 
-/* phone-mockup cards (light or dark): a fixed comfortable stage,
-   clip centred */
+/* phone-mockup cards (light or dark): a fixed aspect stage, clip
+   centred and fully visible */
 .cs-bento .phone {
-  aspect-ratio: auto;
+  aspect-ratio: 5 / 4;
   display: grid;
   place-items: center;
-  min-height: clamp(320px, 42vw, 440px);
 }
 
 .cs-bento .phone > video {
-  width: auto;
+  width: 100%;
   height: 100%;
-  max-height: 100%;
   object-fit: contain;
 }
 
