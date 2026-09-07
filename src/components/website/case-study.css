@@ -444,46 +444,6 @@
   max-height: 460px;
 }
 
-/* ---- footer / contact ------------------------------------ */
-.cs-footer {
-  padding-block: clamp(4rem, 10vw, 8rem);
-  border-top: 1px solid var(--w-line);
-}
-
-.cs-footer h2 {
-  margin: 0 0 clamp(1.25rem, 3vw, 2rem);
-  font-weight: 400;
-  font-size: clamp(1.75rem, 1.1rem + 2.6vw, 2.5rem);
-  letter-spacing: -0.018em;
-}
-
-.cs-contact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin: 0;
-  font-size: 1rem;
-  color: var(--w-ink-soft);
-}
-
-.cs-contact a {
-  color: var(--w-ink-soft);
-  transition: color 0.18s ease;
-}
-
-.cs-contact a:hover {
-  color: var(--w-ink);
-}
-
-.cs-contact .u {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-}
-
-.cs-contact .dot {
-  color: var(--w-ink-faint);
-}
-
 /* ---- responsive ----------------------------------------- */
 @media (max-width: 760px) {
   .cs-stats {
