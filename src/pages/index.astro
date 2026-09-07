@@ -11,7 +11,12 @@ import "../components/glasslab/glasslab.css";
 
 <Base>
   <div class="page">
-    <h1>{site.name}</h1>
+    <header>
+      <h1>{site.name}</h1>
+      <p class="mono">
+        <a class="link-underline" href="/website">Website — porting from Framer</a>
+      </p>
+    </header>
 
     <ul class="grid">
       {pieces.map((p) => (
@@ -66,12 +71,22 @@ import "../components/glasslab/glasslab.css";
     padding: clamp(1.5rem, 1rem + 4vw, 4rem);
   }
 
+  header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
   h1 {
     font-family: var(--font-display);
     font-weight: 400;
     font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
     letter-spacing: -0.01em;
     margin: 0;
+  }
+
+  header .mono a {
+    color: var(--ink-faint);
   }
 
   .grid {
