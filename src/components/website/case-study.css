@@ -228,6 +228,21 @@
   max-height: 300px;
 }
 
+/* column variant: two independent stacks (masonry-ish) */
+.cs-bento--cols {
+  align-items: start;
+}
+
+.cs-bento--cols .col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2vw, 1.5rem);
+}
+
+.cs-bento--cols .col > div {
+  width: 100%;
+}
+
 /* ---- before / after --------------------------------------- */
 .cs-ba {
   display: grid;

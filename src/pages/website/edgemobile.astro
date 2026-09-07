@@ -1,0 +1,115 @@
+---
+import Website from "../../layouts/Website.astro";
+import SiteHeader from "../../components/website/SiteHeader.astro";
+import { Reveal } from "../../components/website/Reveal";
+import "../../components/website/case-study.css";
+
+const V = "/website/case/edge";
+const P = "/website/video"; // shared prototype clips from the homepage
+---
+
+<Website
+  title="EdgeMobile"
+  description="EdgeMobile — designing Questrade's top income-generating mobile app for active traders."
+>
+  <SiteHeader />
+
+  <main class="cs">
+    <section class="cs-hero w-wrap">
+      <h1 class="cs-title">Designing Questrade’s top income-generating app</h1>
+    </section>
+
+    <div class="cs-media w-wrap">
+      <video src={`${V}/hero.mp4`} autoplay loop muted playsinline preload="metadata"></video>
+    </div>
+
+    <section class="cs-overview w-wrap">
+      <div class="cs-block">
+        <p class="cs-label">Project overview</p>
+        <p class="cs-body">
+          Questrade faced an outdated mobile experience and decided to split it
+          into two fully native apps, one for novice investors and one for active
+          traders.
+        </p>
+      </div>
+
+      <div class="cs-block">
+        <p class="cs-label">What I led</p>
+        <p class="cs-body">
+          Shipped core features including alerts, bracket orders, options
+          strategies, and charting, while introducing zero-to-one experiences
+          like streaming data and onboarding. Partnered with research on a
+          three-month VIP pre-release study to identify launch risks,
+          collaborated with product and engineering on launch and migration
+          plans, and led an app-wide audit resolving 60+ design inconsistencies.
+        </p>
+      </div>
+
+      <div class="cs-meta">
+        <div class="cs-block">
+          <p class="cs-label">My role</p>
+          <p class="cs-body">
+            1 Product Manager, 1 UX Researcher, 1 Content Designer, 4 Engineering
+            squads
+          </p>
+        </div>
+        <div class="cs-block">
+          <p class="cs-label">Timeline</p>
+          <p class="cs-body">1.5 years</p>
+        </div>
+      </div>
+    </section>
+
+    <Reveal client:load>
+      <section class="cs-impact w-wrap">
+        <h2>Project impact</h2>
+        <ul class="cs-stats">
+          <li><span class="n">$45M</span><span class="l">incremental trading volume</span></li>
+          <li><span class="n">+10K</span><span class="l">incremental increase in active traders</span></li>
+          <li><span class="n">4.5</span><span class="l">stars on App Store and Google Play</span></li>
+        </ul>
+      </section>
+    </Reveal>
+
+    <Reveal client:load>
+      <section class="cs-bento cs-bento--cols w-wrap">
+        <div class="col">
+          <div class="dark"><video src={`${P}/edge-order.mp4`} autoplay loop muted playsinline></video></div>
+          <div class="dark"><video src={`${P}/edge-hood.mp4`} autoplay loop muted playsinline></video></div>
+          <div class="dark"><video src={`${P}/edge-chart.mp4`} autoplay loop muted playsinline></video></div>
+          <div class="dark"><video src={`${V}/chain.mp4`} autoplay loop muted playsinline preload="metadata"></video></div>
+        </div>
+        <div class="col">
+          <div class="dark"><video src={`${V}/strip.mp4`} autoplay loop muted playsinline></video></div>
+          <div class="dark"><video src={`${V}/alerts.mp4`} autoplay loop muted playsinline></video></div>
+          <div class="dark phone"><video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video></div>
+        </div>
+      </section>
+    </Reveal>
+
+    <footer class="cs-footer w-wrap">
+      <h2>Currently looking for new roles</h2>
+      <p class="cs-contact">
+        <a href="mailto:valeapad@gmail.com">valeapad@gmail.com</a>
+        <span class="dot">•</span>
+        <a href="tel:+19292716949">929-271-6949</a>
+        <span class="dot">•</span>
+        <a
+          class="u"
+          href="https://www.linkedin.com/in/valentinapadure"
+          target="_blank"
+          rel="noopener">Linkedin</a
+        >
+      </p>
+    </footer>
+  </main>
+
+  <script>
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.querySelectorAll("video").forEach((v) => {
+        v.removeAttribute("autoplay");
+        v.pause();
+      });
+    }
+  </script>
+</Website>
