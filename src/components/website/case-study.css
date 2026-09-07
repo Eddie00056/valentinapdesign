@@ -50,12 +50,23 @@
   max-width: min(100%, 960px);
 }
 
+/* ---- section separators ----------------------------------- */
+/* one hairline at every major section boundary below the hero media */
+.cs-overview,
+.cs-impact,
+.cs-award,
+.cs-panels,
+.cs-bento,
+.cs-ba,
+.cs-gallery,
+.cs-media--cap {
+  border-top: 1px solid var(--w-line);
+}
+
 /* ---- overview / meta --------------------------------------- */
 .cs-overview {
   margin-block: clamp(2.5rem, 6vw, 5rem);
   padding-block: clamp(2rem, 4vw, 3rem);
-  border-top: 1px solid var(--w-line);
-  border-bottom: 1px solid var(--w-line);
 }
 
 /* the copy blocks inside sit at a readable measure, flush left

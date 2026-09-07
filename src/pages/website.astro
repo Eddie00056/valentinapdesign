@@ -291,7 +291,9 @@ const quotes = [
      .hero-pin is a tall spacer; .hero-sticky pins inside it. */
   .hero-pin {
     position: relative;
-    height: 160vh;
+    /* tall enough that the strike + a long fully-struck hold each get a
+       real stretch of scroll before the hero eases out (see HeroCreed) */
+    height: 240vh;
   }
 
   .hero-sticky {
@@ -315,6 +317,7 @@ const quotes = [
     flex-direction: column;
     justify-content: center;
     padding-block: clamp(4rem, 8vw, 9rem);
+    border-top: 1px solid var(--w-line);
   }
 
   /* .project keeps its own two-column grid; just centre it vertically */
@@ -531,6 +534,36 @@ const quotes = [
     background: #0c0c0c;
     border-radius: 20px;
     overflow: hidden;
+  }
+
+  /* card rim — reuse of the prototype's fractional-icon border
+     (.acs-frac-card::before): a 1px gradient hairline via the padding-box
+     mask trick, so the near-black media cards read as framed instead of
+     dissolving into the page. */
+  .media--single {
+    position: relative;
+    border-radius: 8px;
+  }
+
+  .media--single::after,
+  .media--edge .col > div::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      66deg,
+      rgba(255, 255, 255, 0.18) 0%,
+      rgba(255, 255, 255, 0.03) 42%,
+      rgba(255, 255, 255, 0.09) 100%
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 
   /* clip is absolutely positioned + centred so it can NEVER stretch the

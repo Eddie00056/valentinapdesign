@@ -9,9 +9,10 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
  * The hero is pinned (`.hero-pin` spacer + `.hero-sticky`) so the view holds
  * still while a stretch of scroll drives this reveal. Progress is how far the
  * pin container has scrolled through its own travel:
- *   - 0 → 0.4  : "I get shit work done" fades in
- *   - 0.5 → 0.9: a line strikes through "shit"
- *   - then the pin releases and normal scrolling continues to the projects.
+ *   - 0 → 0.28    : "I get shit work done." fades in
+ *   - 0.36 → 0.54 : a line strikes through "shit"
+ *   - 0.54 → 0.92 : a long beat, fully struck, everything still on screen
+ *   - 0.92 → 1    : the hero eases out and the pin releases to the projects.
  *
  * Reduced motion / no-JS: the finished joke is shown outright (see the
  * <noscript> override + reduced-motion CSS in website.astro).
@@ -33,10 +34,11 @@ export function HeroCreed() {
       const travel = r.height - window.innerHeight;
       const next = travel > 0 ? clamp(-r.top / travel, 0, 1) : 0;
       setP(next);
-      // hand the view off: once the strike is done, ease the hero out so
-      // it isn't a full-opacity block that then scrolls away
+      // hand the view off: only at the very end, after a long fully-struck
+      // hold, ease the hero out so it isn't a full-opacity block that then
+      // scrolls away
       if (sticky) {
-        const exit = clamp((next - 0.9) / 0.1, 0, 1);
+        const exit = clamp((next - 0.92) / 0.08, 0, 1);
         sticky.style.opacity = exit ? String(1 - exit) : "";
       }
     };
@@ -63,8 +65,8 @@ export function HeroCreed() {
     return () => document.documentElement.classList.remove("snap-hold");
   }, [p, reduce]);
 
-  const inT = clamp(p / 0.4, 0, 1);
-  const strikeT = clamp((p - 0.5) / 0.4, 0, 1);
+  const inT = clamp(p / 0.28, 0, 1);
+  const strikeT = clamp((p - 0.36) / 0.18, 0, 1);
 
   if (reduce) {
     return (
@@ -74,7 +76,7 @@ export function HeroCreed() {
           shit
           <span className="creed-strike-line" data-static aria-hidden="true" />
         </span>{" "}
-        work done
+        work done.
       </span>
     );
   }
@@ -90,7 +92,7 @@ export function HeroCreed() {
           style={{ transform: `scaleX(${strikeT})` }}
         />
       </span>{" "}
-      work done
+      work done.
     </span>
   );
 }
