@@ -314,13 +314,15 @@
   max-height: 82%;
 }
 
-/* the bell — portrait clip, floated small in a landscape band */
+/* the bell — a tiny icon in a wide shallow band (Framer). The clip is
+   portrait with a big baked margin, so it needs a very small cap for
+   the visible bell to land at ~55px. */
 .cs-bento .fit-bell {
-  aspect-ratio: 2 / 1;
+  aspect-ratio: 5 / 2;
 }
 .cs-bento .dark.fit-bell > video {
-  max-width: 24%;
-  max-height: 60%;
+  max-width: 13%;
+  max-height: 42%;
 }
 
 /* light cards: white ground, content centred with real breathing room */
