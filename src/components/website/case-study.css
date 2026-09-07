@@ -252,31 +252,36 @@
 }
 
 /* clip absolutely positioned + centred so it can never stretch the
-   card; capped well inside the edges so it floats as content-in-a-frame
-   rather than a zoomed-in fill. */
+   card; capped in ABSOLUTE px (not just %) so the baked-in UI floats at
+   a consistent modest size no matter how wide the case-study card is
+   (~650px here vs ~340px on the homepage — a % cap alone renders these
+   clips 2x bigger and reads as "zoomed in"). */
 .cs-bento .dark > video {
   position: absolute;
   inset: 0;
   margin: auto;
   width: auto;
   height: auto;
-  max-width: 88%;
-  max-height: 82%;
+  max-width: min(78%, 400px);
+  max-height: min(80%, 290px);
   object-fit: contain;
 }
 
 /* order ticket — room for all three rows (content ≈ 2.5:1) */
 .cs-bento .fit-wide {
-  aspect-ratio: 19 / 10;
+  aspect-ratio: 24 / 10;
+}
+.cs-bento .dark.fit-wide > video {
+  max-width: min(62%, 380px);
 }
 
 /* single price ticker — wide, short, text floats centred */
 .cs-bento .fit-price {
-  aspect-ratio: 26 / 10;
+  aspect-ratio: 30 / 10;
 }
-/* clip has oversized baked-in text — hold it down to the card type scale */
+/* clip has oversized baked-in text — hold it down hard */
 .cs-bento .dark.fit-price > video {
-  max-width: 70%;
+  max-width: min(52%, 300px);
 }
 
 /* chart — the one near-filled card */
@@ -284,17 +289,17 @@
   aspect-ratio: 8 / 5;
 }
 .cs-bento .dark.fit-fill > video {
-  max-width: 92%;
-  max-height: 92%;
+  max-width: min(80%, 420px);
+  max-height: min(88%, 330px);
 }
 
-/* wide data panel (options chain) */
+/* wide data panel (options chain) — needs a little more width to read */
 .cs-bento .fit-panel {
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 18 / 8;
 }
 .cs-bento .dark.fit-panel > video {
-  max-width: 94%;
-  max-height: 94%;
+  max-width: min(86%, 520px);
+  max-height: min(88%, 300px);
 }
 
 /* dual phone / spinner */
@@ -302,8 +307,8 @@
   aspect-ratio: 16 / 9;
 }
 .cs-bento .dark.fit-square > video {
-  max-width: 92%;
-  max-height: 92%;
+  max-width: min(66%, 400px);
+  max-height: min(92%, 400px);
 }
 
 /* the bell — small, centred, lots of air; no zoom */
@@ -311,8 +316,8 @@
   aspect-ratio: 8 / 5;
 }
 .cs-bento .dark.fit-bell > video {
-  max-width: 52%;
-  max-height: 56%;
+  max-width: min(40%, 220px);
+  max-height: min(52%, 220px);
 }
 
 /* light cards: white ground, content centred with real breathing room */
@@ -333,22 +338,24 @@
   object-fit: contain;
 }
 
-/* phone-mockup cards (light or dark): a fixed aspect stage, clip
-   centred and fully visible */
+/* phone-mockup cards (light or dark): a fixed aspect stage, the portrait
+   clip floating centred — same absolute-centre pattern as .dark so the
+   video can't stretch the card. */
 .cs-bento .phone {
-  aspect-ratio: 16 / 10;
-  display: grid;
-  place-items: center;
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  display: block;
 }
 
 .cs-bento .phone > video {
-  position: static;
-  inset: auto;
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  max-width: 100%;
-  max-height: 100%;
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: auto;
+  height: auto;
+  max-width: min(50%, 240px);
+  max-height: 94%;
   object-fit: contain;
 }
 
