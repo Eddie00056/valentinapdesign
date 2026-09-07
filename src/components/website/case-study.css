@@ -239,54 +239,53 @@
   overflow: hidden;
 }
 
-/* dark cards: each card's aspect-ratio ≈ the MEASURED content region of
-   its clip, and the clip fills it with object-fit:cover — so the dead
-   #0e0e0e frame margin is cropped away and the content fills the card,
-   like the Framer reference. */
+/* dark cards (Framer's method): a short/wide near-black box; the clip
+   sits centred with object-fit:contain and dark padding around it —
+   never stretched to fill. Clips carry baked-in #0c0c0c margin, so
+   contain + matching card bg reads as one continuous dark surface with
+   the UI floating in it. Nothing is cropped. */
 .cs-bento .dark {
-  background: #0e0e0e;
-  aspect-ratio: 16 / 10;
+  background: #0c0c0c;
+  aspect-ratio: 13 / 10;
+  overflow: hidden;
 }
 
 .cs-bento .dark > video {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
 }
 
-/* order ticket — content measured 4.4:1, keep all 3 rows */
+/* order ticket — tall enough for all three rows (content ≈ 2.5:1) */
 .cs-bento .fit-wide {
-  aspect-ratio: 9 / 2;
+  aspect-ratio: 2 / 1;
 }
 
-/* single price line — content measured 8.9:1 */
+/* single price line — roomy card, line floats centred */
 .cs-bento .fit-price {
-  aspect-ratio: 8 / 2;
+  aspect-ratio: 16 / 9;
 }
 
-/* chart — content fills its frame, ~1.6:1 */
+/* chart — the one near-filled card */
 .cs-bento .fit-fill {
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 13 / 10;
 }
 
-/* wide data panel (options table) — content ~2.6:1 */
+/* wide data panel (options chain) */
 .cs-bento .fit-panel {
-  aspect-ratio: 5 / 2;
+  aspect-ratio: 16 / 9;
 }
 
-/* dual phone / spinner — content ~1:1 */
+/* dual phone / spinner */
 .cs-bento .fit-square {
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
 }
 
-/* the bell floats small in its frame — zoom it up */
+/* the bell — small, centred, lots of air; no zoom */
 .cs-bento .fit-bell {
-  aspect-ratio: 1 / 1;
-}
-.cs-bento .fit-bell > video {
-  transform: scale(1.85);
+  aspect-ratio: 16 / 9;
 }
 
 /* light cards: white ground, content centred with real breathing room */
