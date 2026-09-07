@@ -2,6 +2,7 @@
 import Website from "../layouts/Website.astro";
 import { caseStudies } from "../data/site";
 import { Reveal } from "../components/website/Reveal";
+import { HeroCreed } from "../components/website/HeroCreed";
 import SiteHeader from "../components/website/SiteHeader.astro";
 
 const bySlug = Object.fromEntries(caseStudies.map((c) => [c.slug, c]));
@@ -47,25 +48,21 @@ const quotes = [
         opacity: 1 !important;
         transform: none !important;
       }
+      /* show the finished joke without JS */
+      .creed-strike-line {
+        transform: scaleX(1) !important;
+      }
     </style>
   </noscript>
 
   <main>
-    <Reveal client:load>
-      <section class="w-wrap bay hero">
-        <p class="statement">
-          Product Designer with 5+ years experience shaping fintech products
-          while focusing on fostering collaboration, pushing limits, and
-          delivering high-impact work.
-        </p>
-      </section>
-    </Reveal>
-
-    <Reveal client:load amount={0.6}>
-      <section class="w-wrap bay creed">
-        <p class="statement">I get <s>shit</s> work done</p>
-      </section>
-    </Reveal>
+    <section class="w-wrap bay hero">
+      <p class="statement">
+        Product Designer with 5+ years experience shaping fintech products
+        while focusing on fostering collaboration, pushing limits, and
+        delivering high-impact work{" "}<HeroCreed client:load />
+      </p>
+    </section>
 
     <section id="projects" class="w-wrap projects">
       <!-- Questrade Pro -->
@@ -198,7 +195,6 @@ const quotes = [
   /* scroll-snap targets — glide, then lock each section to the view.
      Each is a screenful so one snap == one "page". */
   .hero,
-  .creed,
   .project,
   #team,
   #contact {
@@ -214,7 +210,6 @@ const quotes = [
   }
 
   .hero,
-  .creed,
   #team,
   #contact {
     display: flex;
@@ -222,7 +217,6 @@ const quotes = [
     justify-content: center;
   }
 
-  .creed,
   #team,
   #contact {
     padding-block: clamp(4rem, 8vw, 9rem);
@@ -244,7 +238,6 @@ const quotes = [
 
   @media (prefers-reduced-motion: reduce) {
     .hero,
-    .creed,
     .project,
     #team,
     #contact {
@@ -252,11 +245,6 @@ const quotes = [
       scroll-snap-stop: normal;
       min-height: 0;
     }
-  }
-
-  .creed {
-    padding-top: 0;
-    padding-bottom: clamp(2.5rem, 2rem + 4vw, 5rem);
   }
 
   /* ---- big statements ------------------------------------------- */
@@ -281,9 +269,33 @@ const quotes = [
     }
   }
 
-  .creed s {
-    text-decoration-thickness: 2px;
-    text-decoration-color: currentColor;
+  /* ---- hero creed tail ("… high-impact work I get shit work done") --- */
+  /* rendered by the HeroCreed React island, so these opt out of scoping */
+  :global(.creed-tail) {
+    will-change: opacity;
+  }
+
+  :global(.creed-strike) {
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  :global(.creed-strike-line) {
+    position: absolute;
+    left: -0.04em;
+    right: -0.04em;
+    top: 0.56em;
+    height: 0.075em;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left center;
+    will-change: transform;
+    pointer-events: none;
+  }
+
+  :global(.creed-strike-line[data-static]) {
+    transform: scaleX(1);
   }
 
   /* ---- projects ------------------------------------------------- */
@@ -443,14 +455,13 @@ const quotes = [
   .media--edge .fit-wide {
     aspect-ratio: 19 / 10;
   }
-  /* single price ticker — wide, short, text floats centred */
+  /* single price ticker — wide, short; its baked-in text runs large so
+     hold the clip well down */
   .media--edge .fit-price {
     aspect-ratio: 26 / 10;
   }
-  /* clip has oversized baked-in text — hold it down to match the
-     other cards' type scale */
   .media--edge .col > div.fit-price > video {
-    max-width: 70%;
+    max-width: 48%;
   }
   /* chart — the one near-filled card; aspect matched to the clip */
   .media--edge .fit-fill {
@@ -460,13 +471,13 @@ const quotes = [
     max-width: 92%;
     max-height: 92%;
   }
-  /* the bell — small, centred, lots of air; no zoom */
+  /* the bell — a tiny icon in a wide shallow band */
   .media--edge .fit-bell {
-    aspect-ratio: 8 / 5;
+    aspect-ratio: 5 / 2;
   }
   .media--edge .col > div.fit-bell > video {
-    max-width: 62%;
-    max-height: 66%;
+    max-width: 16%;
+    max-height: 44%;
   }
 
   /* ---- testimonials ------------------------------------------- */
