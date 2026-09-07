@@ -210,38 +210,50 @@
   padding-block: clamp(1.5rem, 4vw, 3rem);
 }
 
-/* every card: same radius, same generous inner padding, clip shown in
-   FULL (contain) and centred — the dark cards use the clips' own
-   #0e0e0e ground so the clip's frame blends into the card (matches
-   the Framer reference). */
-.cs-bento > div {
+/* selectors are class-based so they hit cards whether they're direct
+   children of .cs-bento or nested inside a .col */
+.cs-bento .light,
+.cs-bento .dark {
   border-radius: 20px;
+  overflow: hidden;
+}
+
+/* dark cards: the clip already carries a wide #0e0e0e margin, so let it
+   run to the card edge — the card IS the clip, no seam, no crop. */
+.cs-bento .dark {
+  background: #0e0e0e;
+  display: block;
+}
+
+.cs-bento .dark > video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* light + phone cards: content is placed with real padding, shown whole */
+.cs-bento .light,
+.cs-bento .phone {
+  background: #f4f4f2;
   display: grid;
   place-items: center;
-  overflow: hidden;
-  padding: clamp(1.5rem, 4vw, 3rem);
+  padding: clamp(1.5rem, 4vw, 2.75rem);
   min-height: 220px;
 }
 
-.cs-bento .light {
-  background: #f4f4f2;
-}
-
-.cs-bento .dark {
+.cs-bento .phone {
   background: #0e0e0e;
 }
 
-.cs-bento > div > video {
+.cs-bento .light > video,
+.cs-bento .light > img,
+.cs-bento .phone > video {
   display: block;
   max-width: 100%;
-  max-height: 100%;
+  max-height: 320px;
   width: auto;
   height: auto;
   object-fit: contain;
-}
-
-.cs-bento .phone > video {
-  max-height: 340px;
 }
 
 /* column variant: two independent stacks (masonry-ish) */

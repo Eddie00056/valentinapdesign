@@ -396,23 +396,30 @@ const quotes = [
   }
 
   .media--edge > div {
-    /* card ground = the clips' own #0e0e0e, so the clip's frame blends
-       in; clip shown in full (contain) and centred with padding */
+    /* card ground = the clips' own #0e0e0e; wide clips run to the card
+       edge (the card IS the clip — no seam, no crop) */
     background: #0e0e0e;
     border-radius: 20px;
     overflow: hidden;
-    display: grid;
-    place-items: center;
-    padding: clamp(1.25rem, 3vw, 2.25rem);
-    min-height: 168px;
+    display: block;
   }
 
-  .media--edge video {
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
+  .media--edge > div > video {
+    display: block;
+    width: 100%;
     height: auto;
-    object-fit: contain;
+  }
+
+  /* the bell is a tall portrait clip — centre it small instead */
+  .media--edge .edge-bell {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 1.35 / 1;
+  }
+
+  .media--edge .edge-bell > video {
+    width: auto;
+    height: 62%;
   }
 
   /* ---- testimonials ------------------------------------------- */
