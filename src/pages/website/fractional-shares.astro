@@ -1,0 +1,140 @@
+---
+import Website from "../../layouts/Website.astro";
+import SiteHeader from "../../components/website/SiteHeader.astro";
+import { Reveal } from "../../components/website/Reveal";
+import "../../components/website/case-study.css";
+
+const V = "/website/case/fractional";
+const P = "/website/video"; // shared prototype clips from the homepage
+---
+
+<Website
+  title="Fractional Shares"
+  description="Fractional Shares at Questrade — 1 feature, 2 platforms, 2 personas, $33M in revenue."
+>
+  <SiteHeader />
+
+  <main class="cs">
+    <section class="cs-hero w-wrap">
+      <h1 class="cs-title">1 Feature. 2 Platforms. 2 Personas. $33M in Revenue</h1>
+    </section>
+
+    <div class="cs-media w-wrap">
+      <video src={`${V}/hero.mp4`} autoplay loop muted playsinline preload="metadata"></video>
+    </div>
+
+    <section class="cs-overview w-wrap">
+      <div class="cs-block">
+        <p class="cs-label">Project overview</p>
+        <p class="cs-body">
+          As Questrade eliminated trading commissions, it opened new
+          opportunities for growth, leading to the introduction of fractional
+          share trading. The goal was to provide traders with a more affordable
+          way to enter the market.
+        </p>
+      </div>
+
+      <div class="cs-block">
+        <p class="cs-label">What I led</p>
+        <p class="cs-body">
+          Led feature validation and secured leadership buy-in, driving iterative
+          design through user research and usability testing. Oversaw design
+          handoff and QA across four platforms, partnered with product on the
+          alpha launch, and designed an in-app survey to turn launch insights
+          into actionable findings.
+        </p>
+      </div>
+
+      <div class="cs-meta">
+        <div class="cs-block">
+          <p class="cs-label">My role</p>
+          <p class="cs-body">
+            1 Product Manager, 1 UX Researcher, 1 Content Designer, 4 Engineering
+            squads
+          </p>
+        </div>
+        <div class="cs-block">
+          <p class="cs-label">Timeline</p>
+          <p class="cs-body">5 months</p>
+        </div>
+      </div>
+    </section>
+
+    <Reveal client:load>
+      <section class="cs-impact w-wrap">
+        <h2>Project impact</h2>
+        <ul class="cs-stats">
+          <li><span class="n">65K</span><span class="l">increase in trading volume</span></li>
+          <li><span class="n">$33M</span><span class="l">total value traded ($507 avg. trade value)</span></li>
+          <li><span class="n">47K</span><span class="l">unique clients adopted the feature</span></li>
+        </ul>
+      </section>
+    </Reveal>
+
+    <section class="cs-award w-wrap">
+      <p class="headline">UX Design Awards</p>
+      <p class="sub">Fall 2025 Nominee</p>
+    </section>
+
+    <Reveal client:load>
+      <section class="cs-panels w-wrap">
+        <figure class="panel-light">
+          <figcaption>Regular trading platform</figcaption>
+          <video src={`${V}/regular.mp4`} autoplay loop muted playsinline></video>
+        </figure>
+        <figure class="panel-dark">
+          <figcaption>Advanced trading platform</figcaption>
+          <video src={`${V}/advanced.mp4`} autoplay loop muted playsinline></video>
+        </figure>
+      </section>
+    </Reveal>
+
+    <Reveal client:load>
+      <section class="cs-bento w-wrap">
+        <div class="light phone">
+          <video src={`${P}/fractional-phone.mp4`} autoplay loop muted playsinline></video>
+        </div>
+        <div class="light">
+          <video src={`${P}/fractional-icon.mp4`} autoplay loop muted playsinline></video>
+        </div>
+        <div class="dark">
+          <video src={`${V}/chart.mp4`} autoplay loop muted playsinline></video>
+        </div>
+        <div class="light">
+          <video src={`${P}/fractional-limit.mp4`} autoplay loop muted playsinline></video>
+        </div>
+        <div class="dark">
+          <video src={`${V}/stepper.mp4`} autoplay loop muted playsinline></video>
+        </div>
+        <div class="dark phone">
+          <video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video>
+        </div>
+      </section>
+    </Reveal>
+
+    <footer class="cs-footer w-wrap">
+      <h2>Currently looking for new roles</h2>
+      <p class="cs-contact">
+        <a href="mailto:valeapad@gmail.com">valeapad@gmail.com</a>
+        <span class="dot">•</span>
+        <a href="tel:+19292716949">929-271-6949</a>
+        <span class="dot">•</span>
+        <a
+          class="u"
+          href="https://www.linkedin.com/in/valentinapadure"
+          target="_blank"
+          rel="noopener">Linkedin</a
+        >
+      </p>
+    </footer>
+  </main>
+
+  <script>
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.querySelectorAll("video").forEach((v) => {
+        v.removeAttribute("autoplay");
+        v.pause();
+      });
+    }
+  </script>
+</Website>

@@ -5,7 +5,7 @@ import { caseStudies } from "../../data/site";
 export function getStaticPaths() {
   // Slugs with their own bespoke page take precedence; the rest fall back
   // to this stub until they're built.
-  const bespoke = new Set(["questrade-pro"]);
+  const bespoke = new Set(["questrade-pro", "fractional-shares"]);
   return caseStudies
     .filter((c) => !bespoke.has(c.slug))
     .map((c) => ({

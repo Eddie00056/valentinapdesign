@@ -121,6 +121,113 @@
   color: var(--w-ink-soft);
 }
 
+/* ---- award flourish -------------------------------------- */
+.cs-award {
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+  text-align: center;
+}
+
+.cs-award .headline {
+  margin: 0;
+  font-weight: 600;
+  font-size: clamp(1.75rem, 1.1rem + 3vw, 3rem);
+  letter-spacing: -0.02em;
+  color: var(--w-accent);
+}
+
+.cs-award .sub {
+  margin: 0.5rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--w-ink-soft);
+}
+
+/* ---- light / dark panel pair (e.g. Regular vs Advanced) --- */
+.cs-panels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding-block: clamp(1.5rem, 4vw, 3rem);
+}
+
+.cs-panels figure {
+  margin: 0;
+  border-radius: 16px;
+  padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 3vw, 2rem) 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  overflow: hidden;
+}
+
+.cs-panels figcaption {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cs-panels .panel-light {
+  background: #f4f4f2;
+}
+
+.cs-panels .panel-light figcaption {
+  color: #0c0c0c;
+}
+
+.cs-panels .panel-dark {
+  background: #000;
+}
+
+.cs-panels .panel-dark figcaption {
+  color: #fff;
+}
+
+.cs-panels video {
+  display: block;
+  width: 78%;
+  max-width: 320px;
+  height: auto;
+}
+
+/* ---- bento of prototype fragments ------------------------ */
+.cs-bento {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding-block: clamp(1.5rem, 4vw, 3rem);
+}
+
+.cs-bento > div {
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  min-height: 240px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.cs-bento .light {
+  background: #f4f4f2;
+}
+
+.cs-bento .dark {
+  background: #0b0b0b;
+  border: 1px solid var(--w-line);
+}
+
+.cs-bento video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.cs-bento .phone video {
+  width: auto;
+  max-height: 300px;
+}
+
 /* ---- before / after --------------------------------------- */
 .cs-ba {
   display: grid;
@@ -249,7 +356,9 @@
   }
 
   .cs-ba,
-  .cs-gallery {
+  .cs-gallery,
+  .cs-panels,
+  .cs-bento {
     grid-template-columns: 1fr;
   }
 }
