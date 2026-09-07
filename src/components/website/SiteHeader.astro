@@ -1,0 +1,83 @@
+---
+// Sticky identity + nav, shared by the /website homepage and every case study.
+---
+
+<header class="nav">
+  <div class="w-wrap nav-inner">
+    <a class="id" href="/website">
+      <img src="/website/portrait.png" alt="Valentina Padure" width="48" height="48" />
+      <span class="id-text">
+        <span class="id-name">VALENTINA PADURE</span>
+        <span class="id-mail">valeapad@gmail.com</span>
+      </span>
+    </a>
+    <nav class="links">
+      <a href="/website#projects">Projects</a>
+      <a href="/website#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--w-bg);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block: 0.875rem;
+  }
+
+  .id {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .id img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: none;
+  }
+
+  .id-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.28rem;
+    line-height: 1;
+  }
+
+  .id-name {
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.005em;
+  }
+
+  .id-mail {
+    font-size: 0.875rem;
+    color: var(--w-ink-soft);
+  }
+
+  .links {
+    display: flex;
+    gap: 1.75rem;
+  }
+
+  .links a {
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    color: var(--w-ink-mute);
+    transition: color 0.18s ease;
+  }
+
+  .links a:hover {
+    color: var(--w-ink);
+  }
+</style>

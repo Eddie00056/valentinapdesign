@@ -4,9 +4,11 @@ import { site } from "../data/site";
 interface Props {
   title?: string;
   description?: string;
+  /** enable full-page scroll-snap (the /website homepage only) */
+  snap?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, snap = false } = Astro.props;
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — Product Designer`;
 const canonical = new URL(
   Astro.url.pathname,
@@ -15,7 +17,7 @@ const canonical = new URL(
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class:list={[{ snap }]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -101,16 +103,21 @@ const canonical = new URL(
 
   html {
     -webkit-text-size-adjust: 100%;
-    /* glide, then lock each section to the top of the view */
-    scroll-snap-type: y mandatory;
-    scroll-padding-top: 4.75rem;
     scroll-behavior: smooth;
+    scroll-padding-top: 4.75rem;
+  }
+
+  /* glide, then lock each section to the top of the view — homepage only */
+  html.snap {
+    scroll-snap-type: y mandatory;
   }
 
   @media (prefers-reduced-motion: reduce) {
     html {
-      scroll-snap-type: none;
       scroll-behavior: auto;
+    }
+    html.snap {
+      scroll-snap-type: none;
     }
   }
 

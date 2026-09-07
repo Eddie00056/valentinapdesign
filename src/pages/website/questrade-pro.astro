@@ -1,0 +1,145 @@
+---
+import Website from "../../layouts/Website.astro";
+import SiteHeader from "../../components/website/SiteHeader.astro";
+import { Reveal } from "../../components/website/Reveal";
+import "../../components/website/case-study.css";
+
+const V = "/website/case/questrade";
+---
+
+<Website
+  title="Redesigning order placement"
+  description="Questrade Pro — redesigning order placement to cut time to trade by 60%."
+>
+  <SiteHeader />
+
+  <main class="cs">
+    <section class="cs-hero w-wrap">
+      <h1 class="cs-title">
+        Redesigning order placement to reduce trade time by 60%
+      </h1>
+    </section>
+
+    <div class="cs-media w-wrap">
+      <video
+        src="/website/video/questrade.mp4"
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"></video>
+    </div>
+
+    <section class="cs-overview w-wrap">
+      <div class="cs-block">
+        <p class="cs-label">Project overview</p>
+        <p class="cs-body">
+          Questrade began modernizing its aging desktop trading experience, which
+          lacked a cohesive design system and relied on outdated architecture.
+          The goal was to create a faster, more modern experience and reduce time
+          to place a trade.
+        </p>
+      </div>
+
+      <div class="cs-block">
+        <p class="cs-label">What I led</p>
+        <p class="cs-body">
+          Owned the platform’s highest-impact workflow, order placement, driving
+          the experience from discovery through delivery. Partnered with the
+          design systems team to establish a consistent, scalable design language
+          and supported engineering through handoff and implementation.
+        </p>
+      </div>
+
+      <div class="cs-meta">
+        <div class="cs-block">
+          <p class="cs-label">My role</p>
+          <p class="cs-body">
+            1 Product Manager, 1 UX Researcher, 1 Content Designer, 4 Engineering
+            squads
+          </p>
+        </div>
+        <div class="cs-block">
+          <p class="cs-label">Timeline</p>
+          <p class="cs-body">5 months</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="cs-media w-wrap">
+      <video src={`${V}/order-entry-3up.mp4`} autoplay loop muted playsinline></video>
+    </div>
+
+    <Reveal client:load>
+      <section class="cs-impact w-wrap">
+        <h2>Project impact</h2>
+        <ul class="cs-stats">
+          <li><span class="n">65%</span><span class="l">decrease in time to submit a trade</span></li>
+          <li><span class="n">3×</span><span class="l">fewer errors when placing an equity trade</span></li>
+          <li><span class="n">60K</span><span class="l">options contracts traded</span></li>
+        </ul>
+      </section>
+    </Reveal>
+
+    <Reveal client:load>
+      <section class="cs-ba w-wrap">
+        <figure class="is-before">
+          <figcaption>Before</figcaption>
+          <img src={`${V}/fig-a.png`} alt="The previous order-entry widget" loading="lazy" />
+        </figure>
+        <figure class="is-after">
+          <figcaption>After</figcaption>
+          <video src={`${V}/tall.mp4`} autoplay loop muted playsinline></video>
+        </figure>
+      </section>
+    </Reveal>
+
+    <Reveal client:load>
+      <section class="cs-ba cs-ba--wide w-wrap">
+        <figure class="is-before">
+          <figcaption>Before</figcaption>
+          <img src={`${V}/before.png`} alt="The previous desktop platform" loading="lazy" />
+        </figure>
+        <figure class="is-after">
+          <figcaption>After</figcaption>
+          <img src={`${V}/after.png`} alt="The redesigned desktop platform" loading="lazy" />
+        </figure>
+      </section>
+    </Reveal>
+
+    <div class="cs-media w-wrap">
+      <video
+        src={`${V}/options-chain.mp4`}
+        autoplay
+        loop
+        muted
+        playsinline
+        preload="metadata"></video>
+    </div>
+
+    <footer class="cs-footer w-wrap">
+      <h2>Currently looking for new roles</h2>
+      <p class="cs-contact">
+        <a href="mailto:valeapad@gmail.com">valeapad@gmail.com</a>
+        <span class="dot">•</span>
+        <a href="tel:+19292716949">929-271-6949</a>
+        <span class="dot">•</span>
+        <a
+          class="u"
+          href="https://www.linkedin.com/in/valentinapadure"
+          target="_blank"
+          rel="noopener">Linkedin</a
+        >
+      </p>
+    </footer>
+  </main>
+
+  <script>
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.querySelectorAll("video").forEach((v) => {
+        v.removeAttribute("autoplay");
+        v.pause();
+      });
+    }
+  </script>
+</Website>

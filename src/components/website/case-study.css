@@ -1,0 +1,255 @@
+/* Shared layout for /website/<project> case studies.
+   Rides on the tokens defined in Website.astro (--w-*). */
+
+.cs {
+  padding-bottom: clamp(4rem, 10vw, 8rem);
+}
+
+.cs-section {
+  margin-inline: auto;
+}
+
+/* ---- hero ------------------------------------------------------- */
+.cs-hero {
+  padding-top: clamp(3.5rem, 2rem + 8vw, 8rem);
+  padding-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
+}
+
+.cs-title {
+  margin: 0 auto;
+  max-width: 24ch;
+  text-align: center;
+  font-weight: 400;
+  font-size: clamp(2.25rem, 1.3rem + 4.4vw, 4.375rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+/* ---- media blocks -------------------------------------------- */
+.cs-media {
+  margin-block: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.cs-media video,
+.cs-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* ---- overview / meta --------------------------------------- */
+.cs-overview {
+  max-width: 44rem;
+  margin-block: clamp(2.5rem, 6vw, 5rem);
+  padding-block: clamp(2rem, 4vw, 3rem);
+  border-top: 1px solid var(--w-line);
+  border-bottom: 1px solid var(--w-line);
+}
+
+.cs-block + .cs-block {
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+.cs-label {
+  margin: 0 0 0.7rem;
+  font-family: var(--w-font-alt);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--w-ink);
+}
+
+.cs-body {
+  margin: 0;
+  max-width: 42ch;
+  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+  line-height: 1.55;
+  color: var(--w-ink-soft);
+}
+
+.cs-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(2rem, 8vw, 6rem);
+  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+}
+
+/* ---- impact -------------------------------------------------- */
+.cs-impact {
+  padding-block: clamp(3.5rem, 8vw, 7rem);
+  text-align: center;
+}
+
+.cs-impact h2 {
+  margin: 0 0 clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  font-size: clamp(2rem, 1.4rem + 3vw, 3.5rem);
+  letter-spacing: -0.02em;
+}
+
+.cs-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(2rem, 5vw, 3rem);
+}
+
+.cs-stats li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.cs-stats .n {
+  font-weight: 600;
+  font-size: clamp(2.25rem, 1.4rem + 3.2vw, 3.25rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--w-accent);
+}
+
+.cs-stats .l {
+  max-width: 18ch;
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  color: var(--w-ink-soft);
+}
+
+/* ---- before / after --------------------------------------- */
+.cs-ba {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding-block: clamp(1.5rem, 4vw, 3rem);
+}
+
+.cs-ba figure {
+  margin: 0;
+  background: var(--w-surface);
+  border-radius: 16px;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+.cs-ba figcaption {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.cs-ba .is-before figcaption {
+  color: var(--w-ink);
+}
+
+.cs-ba .is-after figcaption {
+  color: var(--w-accent);
+}
+
+.cs-ba img,
+.cs-ba video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* the order-entry pair: a small old widget vs a tall new flow — cap
+   their height so the cards stay balanced */
+.cs-ba:not(.cs-ba--wide) figure > :is(img, video) {
+  max-height: 460px;
+  width: auto;
+  max-width: 100%;
+}
+
+/* ---- secondary gallery ------------------------------------ */
+.cs-gallery {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding-block: clamp(1rem, 3vw, 2rem);
+}
+
+.cs-gallery > div {
+  background: var(--w-surface);
+  border-radius: 16px;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  min-height: 300px;
+}
+
+.cs-gallery img,
+.cs-gallery video {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.cs-gallery .tall video {
+  width: auto;
+  max-height: 460px;
+}
+
+/* ---- footer / contact ------------------------------------ */
+.cs-footer {
+  padding-block: clamp(4rem, 10vw, 8rem);
+  border-top: 1px solid var(--w-line);
+}
+
+.cs-footer h2 {
+  margin: 0 0 clamp(1.25rem, 3vw, 2rem);
+  font-weight: 400;
+  font-size: clamp(1.75rem, 1.1rem + 2.6vw, 2.5rem);
+  letter-spacing: -0.018em;
+}
+
+.cs-contact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 1rem;
+  color: var(--w-ink-soft);
+}
+
+.cs-contact a {
+  color: var(--w-ink-soft);
+  transition: color 0.18s ease;
+}
+
+.cs-contact a:hover {
+  color: var(--w-ink);
+}
+
+.cs-contact .u {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.cs-contact .dot {
+  color: var(--w-ink-faint);
+}
+
+/* ---- responsive ----------------------------------------- */
+@media (max-width: 760px) {
+  .cs-stats {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .cs-ba,
+  .cs-gallery {
+    grid-template-columns: 1fr;
+  }
+}
