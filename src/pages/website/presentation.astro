@@ -6,9 +6,11 @@ import { Reveal } from "../../components/website/Reveal";
 const V = "/website/case/gusto";
 const FILE_KEY = "8Mdlm1c4YU0ecxJ4B5p3vi";
 const DECK = `https://www.figma.com/slides/${FILE_KEY}/Case-study-presentation--GUSTO-`;
-// Figma Slides public embed player — its own Play / fullscreen / ← → controls.
-// src matches Figma's own "Copy public embed code" output (embed-host=share).
-const DECK_EMBED = `https://embed.figma.com/slides/${FILE_KEY}/Case-study-presentation--GUSTO-?node-id=0-1&embed-host=share`;
+
+// Self-hosted deck viewer — every slide exported to WebP, played back with
+// its own prev/next, keyboard nav and fullscreen. No Figma dependency.
+const DECK_BASE = `${V}/deck/`;
+const DECK_COUNT = 159;
 
 const hobbies = [
   { src: `${V}/hobby-cake.jpg`, alt: "A hand-decorated Spider-Man layer cake" },
@@ -127,7 +129,11 @@ const chapters = [
 
     <!-- ----------------------------------------------------------- deck player -->
     <section class="gp-deck w-wrap">
-      <div class="gp-deck-stage" data-embed={DECK_EMBED}>
+      <div
+        class="gp-deck-stage"
+        data-base={DECK_BASE}
+        data-count={DECK_COUNT}
+      >
         <button type="button" class="gp-deck-play">
           <span class="gp-deck-play-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
@@ -136,12 +142,32 @@ const chapters = [
           </span>
           <span class="gp-deck-play-text">
             <span class="gp-deck-play-label">Play the presentation</span>
-            <span class="gp-deck-play-sub">Full deck · ← → to move · fullscreen inside</span>
+            <span class="gp-deck-play-sub">{DECK_COUNT} slides · ← → to move · ⤢ for fullscreen</span>
           </span>
         </button>
+
+        <div class="gp-deck-viewer" hidden>
+          <img class="gp-deck-img" alt="" draggable="false" />
+          <button class="gp-deck-edge gp-deck-edge--prev" type="button" aria-label="Previous slide">
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button class="gp-deck-edge gp-deck-edge--next" type="button" aria-label="Next slide">
+            <span aria-hidden="true">›</span>
+          </button>
+          <div class="gp-deck-bar">
+            <span class="gp-deck-count" aria-live="polite">1 / {DECK_COUNT}</span>
+            <button class="gp-deck-fs" type="button" aria-label="Toggle fullscreen">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H4v4M16 3h4v4M8 21H4v-4M16 21h4v-4"></path>
+              </svg>
+            </button>
+          </div>
+          <div class="gp-deck-progress"><span></span></div>
+        </div>
       </div>
       <p class="gp-deck-note">
-        Or <a href={DECK} target="_blank" rel="noopener">open it in Figma&nbsp;↗</a>
+        <kbd>←</kbd> <kbd>→</kbd> or click the edges to move ·
+        <a href={DECK} target="_blank" rel="noopener">open in Figma&nbsp;↗</a>
       </p>
     </section>
 
@@ -274,21 +300,85 @@ const chapters = [
   </main>
 
   <script>
-    // Click-to-load the Figma Slides player (keeps the heavy embed off the
-    // initial load; gives a clean Play affordance).
+    // Self-hosted slide viewer: one <img> swapped between exported WebP
+    // slides, with prev/next, keyboard nav, edge-click and fullscreen.
     const stage = document.querySelector<HTMLElement>(".gp-deck-stage");
-    const play = stage?.querySelector(".gp-deck-play");
-    play?.addEventListener("click", () => {
-      const src = stage!.dataset.embed;
-      if (!src) return;
-      const frame = document.createElement("iframe");
-      frame.className = "gp-deck-frame";
-      frame.src = src;
-      frame.title = "Portfolio presentation — full slide deck";
-      frame.setAttribute("allow", "fullscreen");
-      frame.setAttribute("allowfullscreen", "");
-      stage!.replaceChildren(frame);
-    });
+    if (stage) {
+      const base = stage.dataset.base!;
+      const count = parseInt(stage.dataset.count || "0", 10);
+      const play = stage.querySelector<HTMLButtonElement>(".gp-deck-play")!;
+      const viewer = stage.querySelector<HTMLElement>(".gp-deck-viewer")!;
+      const img = stage.querySelector<HTMLImageElement>(".gp-deck-img")!;
+      const countEl = stage.querySelector<HTMLElement>(".gp-deck-count")!;
+      const bar = stage.querySelector<HTMLElement>(".gp-deck-progress span")!;
+      const fsBtn = stage.querySelector<HTMLButtonElement>(".gp-deck-fs")!;
+      const prevBtn = stage.querySelector<HTMLButtonElement>(".gp-deck-edge--prev")!;
+      const nextBtn = stage.querySelector<HTMLButtonElement>(".gp-deck-edge--next")!;
+
+      const src = (n: number) =>
+        `${base}${String(n).padStart(3, "0")}.webp`;
+      let i = 1;
+      let started = false;
+
+      const preload = (n: number) => {
+        if (n < 1 || n > count) return;
+        const p = new Image();
+        p.src = src(n);
+      };
+
+      const show = (n: number) => {
+        i = Math.min(count, Math.max(1, n));
+        img.src = src(i);
+        img.alt = `Slide ${i} of ${count}`;
+        countEl.textContent = `${i} / ${count}`;
+        bar.style.transform = `scaleX(${i / count})`;
+        preload(i + 1);
+        preload(i + 2);
+        preload(i - 1);
+      };
+
+      const start = () => {
+        if (started) return;
+        started = true;
+        play.hidden = true;
+        viewer.hidden = false;
+        stage.setAttribute("tabindex", "0");
+        stage.focus();
+        show(1);
+      };
+
+      play.addEventListener("click", start);
+      prevBtn.addEventListener("click", () => show(i - 1));
+      nextBtn.addEventListener("click", () => show(i + 1));
+
+      fsBtn.addEventListener("click", () => {
+        if (document.fullscreenElement) document.exitFullscreen();
+        else stage.requestFullscreen?.();
+      });
+      document.addEventListener("fullscreenchange", () => {
+        stage.classList.toggle("is-fs", document.fullscreenElement === stage);
+      });
+
+      stage.addEventListener("keydown", (e) => {
+        if (!started) return;
+        const k = e.key;
+        if (k === "ArrowRight" || k === "PageDown" || k === " ") {
+          e.preventDefault();
+          show(i + 1);
+        } else if (k === "ArrowLeft" || k === "PageUp") {
+          e.preventDefault();
+          show(i - 1);
+        } else if (k === "Home") {
+          e.preventDefault();
+          show(1);
+        } else if (k === "End") {
+          e.preventDefault();
+          show(count);
+        } else if (k === "f" || k === "F") {
+          fsBtn.click();
+        }
+      });
+    }
   </script>
 </Website>
 
@@ -372,13 +462,134 @@ const chapters = [
       );
   }
 
-  .gp-deck-frame {
+  /* fullscreen: let the stage fill the screen, image stays contained */
+  .gp-deck-stage:fullscreen {
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+    background: #000;
+    display: flex;
+  }
+
+  /* ---- viewer ---------------------------------------------------- */
+  .gp-deck-viewer {
+    position: absolute;
+    inset: 0;
+  }
+
+  .gp-deck-img {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
+    object-fit: contain;
+    background: #000;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* invisible left / right hit zones with a chevron that shows on hover */
+  .gp-deck-edge {
+    position: absolute;
+    top: 0;
+    bottom: 2.75rem;
+    width: 33%;
+    display: flex;
+    align-items: center;
+    padding: 0 1.25rem;
     border: 0;
+    background: none;
+    color: #fff;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .gp-deck-edge--prev {
+    left: 0;
+    justify-content: flex-start;
+  }
+
+  .gp-deck-edge--next {
+    right: 0;
+    justify-content: flex-end;
+  }
+
+  .gp-deck-stage:hover .gp-deck-edge,
+  .gp-deck-stage:focus-within .gp-deck-edge {
+    opacity: 0.35;
+  }
+
+  .gp-deck-edge:hover {
+    opacity: 0.9 !important;
+  }
+
+  .gp-deck-edge span {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+  }
+
+  /* bottom control bar */
+  .gp-deck-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.9rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  }
+
+  .gp-deck-count {
+    font-family: var(--w-font-alt);
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .gp-deck-fs {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 0;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .gp-deck-fs:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .gp-deck-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .gp-deck-progress span {
     display: block;
+    height: 100%;
+    background: var(--w-accent);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
   }
 
   /* click-to-load facade */
@@ -450,6 +661,14 @@ const chapters = [
 
   .gp-deck-note a {
     color: var(--w-accent);
+  }
+
+  .gp-deck-note kbd {
+    font: inherit;
+    padding: 0.05em 0.4em;
+    border: 1px solid var(--w-line);
+    border-radius: 5px;
+    color: var(--w-ink);
   }
 
   @media (max-width: 560px) {
