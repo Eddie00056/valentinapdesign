@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, MouseEvent as ReactMouseEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { pxHub, PX_BASE } from "./priceHub";
 import type { PriceState } from "./priceHub";
@@ -22,17 +22,115 @@ const SYMBOL = "DASH";
 const PREV_CLOSE = 192.91;
 const MUTED = "#8e97ad";
 const VAL = "#f2f2f8";
-const BORDER_DIM = "#23262c";
+const BORDER_DIM = "#3a3f47"; // resting field outline — visible enough to read as a container
+// selected-field treatment: plain white stroke, 1.5x the resting 1px border
+const SELECTED = "#ffffff";
+
+// row label — 12px (matches the alert screen's readout); the hierarchy against
+// the field value comes mostly from colour (full white vs dim) + the bordered
+// box, so the weight only needs a light nudge
+const labelStyle: CSSProperties = { color: VAL, fontSize: 14, fontWeight: 500 };
+// the value sitting inside a field box — dimmer than the label
+const valueStyle: CSSProperties = {
+  color: "#c9cdd6",
+  fontSize: 14,
+  fontVariantNumeric: "tabular-nums",
+};
+
+// inline validation message under a field label — reference treatment
+// (small, multi-line, sits in the label column), coloured red
+const fieldErrorStyle: CSSProperties = {
+  display: "block",
+  marginTop: 3,
+  color: DOWN,
+  fontSize: 12,
+  fontWeight: 400,
+  lineHeight: 1.35,
+};
 
 function fmt(n: number) {
   return n.toFixed(2);
 }
 
+const ORDER_TYPES = [
+  "Market",
+  "Limit",
+  "Stop",
+  "Stop limit",
+  "Trailing stop",
+  "Trailing stop limit",
+  "Limit on open",
+  "Limit on close",
+] as const;
+
+// optional caption shown under an order type in the picker drawer
+const ORDER_TYPE_DESC: Record<string, string> = {
+  Market: "Fractional trading available",
+};
+
+/* The unit switcher is a chevron next to the "Shares" label; the box holds
+   only the value. The earlier "prefix inside the box" take is kept as
+   OrderPlacementScreenBoxedPrefix (/work/order-placement-boxed-prefix). */
 export function OrderPlacementScreenBoxed() {
   const [s, setS] = useState<PriceState>({ price: PX_BASE, prev: PX_BASE, dir: 0, n: 0 });
-  const [qty] = useState(2);
+  const [qtyStr, setQtyStr] = useState("2");
+  const qty = parseFloat(qtyStr) || 0;
   const [qtyType, setQtyType] = useState<"shares" | "dollars">("shares");
-  const [qtyMenuOpen, setQtyMenuOpen] = useState(false);
+  const [orderType, setOrderType] = useState("Market");
+  const [limitStr, setLimitStr] = useState(() => PX_BASE.toFixed(2));
+
+  // which field box is currently selected — drives the 2px white border and
+  // (for Quantity / Order type) its picker drawer. Only one at a time.
+  const [activeField, setActiveField] = useState<string | null>(null);
+  const qtyMenuOpen = activeField === "quantity";
+  const orderTypeMenuOpen = activeField === "orderType";
+  const drawerOpen = qtyMenuOpen || orderTypeMenuOpen;
+
+  // the fake on-screen numeric keyboard: which text field it's editing
+  const [keyboardTarget, setKeyboardTarget] = useState<
+    null | "shares" | "limitPrice"
+  >(null);
+  const keyboardOpen = keyboardTarget !== null;
+  // the first keystroke after focusing a field replaces its value; later
+  // ones append (mirrors tapping into a filled iOS field)
+  const [kbFresh, setKbFresh] = useState(false);
+  const openKeyboard = (target: "shares" | "limitPrice") => {
+    setKeyboardTarget(target);
+    setActiveField(target === "shares" ? "quantityInput" : "limitPrice");
+    setKbFresh(true);
+  };
+  const closeAll = () => {
+    setActiveField(null);
+    setKeyboardTarget(null);
+  };
+  const pressKey = (k: string) => {
+    const isShares = keyboardTarget === "shares";
+    const cur = isShares ? qtyStr : limitStr;
+    const set = isShares ? setQtyStr : setLimitStr;
+    const base = kbFresh && k !== "back" ? "" : cur;
+    setKbFresh(false);
+    let next: string;
+    if (k === "back") next = cur.slice(0, -1);
+    else if (k === ".") next = base.includes(".") ? base : (base || "0") + ".";
+    else next = base === "0" ? k : base + k;
+    if (next.replace(".", "").length > 9) return;
+    set(next);
+  };
+
+  // limit orders can't be dollar-denominated — the quantity is locked to
+  // shares and the unit switcher (chevron) is hidden.
+  const isLimit = orderType === "Limit";
+  const effQtyType = isLimit ? "shares" : qtyType;
+  // fractional shares aren't allowed on a limit order
+  const qtyFractionalError =
+    isLimit && qty % 1 !== 0
+      ? "Switch to a market order to trade fractional shares."
+      : null;
+  const hasError = qtyFractionalError != null;
+  const toggleField = (name: string) => {
+    setKeyboardTarget(null);
+    setActiveField((f) => (f === name ? null : name));
+  };
 
   const [fracOpen, setFracOpen] = useState(false);
 
@@ -42,11 +140,18 @@ export function OrderPlacementScreenBoxed() {
   }, []);
 
   useEffect(() => {
-    if (!qtyMenuOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setQtyMenuOpen(false);
+    if (!activeField && !keyboardTarget) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeAll();
+    };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [qtyMenuOpen]);
+  }, [activeField, keyboardTarget]);
+
+  // picking a limit order forces the quantity back to shares
+  useEffect(() => {
+    if (orderType === "Limit") setQtyType("shares");
+  }, [orderType]);
 
   const bidPx = s.price - 0.01;
   const askPx = s.price + 0.01;
@@ -86,22 +191,241 @@ export function OrderPlacementScreenBoxed() {
   return (
     <PhoneStage>
       <PhoneFrame
-        fadeAt={100}
+        fullDevice
         footer={
           // pinned to the bottom of the screen area, outside the scrolling
           // content — the site's shared glass-pill buttons (glasslab/GlassButton),
-          // same red/green semantics as everywhere else on the site.
-          <div className="dark" style={{ marginTop: 10, display: "flex", gap: 10 }}>
-            <GlassButton variant="red" size="mobile" block>
+          // but recoloured (page-scoped) to the same green/red as the Bid/Ask
+          // pill (chart UP / DOWN) while keeping the glass treatment.
+          <motion.div
+            className="dark opb-actions"
+            initial={false}
+            // while the number pad is up, ride just above it (iOS accessory)
+            animate={{ y: keyboardOpen ? -212 : 0 }}
+            transition={{ type: "spring", visualDuration: 0.3, bounce: 0 }}
+            style={{
+              marginTop: 10,
+              display: "flex",
+              gap: 10,
+              position: "relative",
+              zIndex: 41,
+              background: "#000",
+              padding: keyboardOpen ? "8px 0" : 0,
+            }}
+          >
+            {/* eslint-disable-next-line react/no-unknown-property */}
+            <style>{`
+              div.opb-actions .btn--red {
+                background: #ff557d; /* exact chart DOWN — the "Ask" colour */
+                box-shadow: 0 8px 20px rgba(255, 85, 125, 0.18);
+                color: #000;
+              }
+              div.opb-actions .btn--red::before {
+                background: linear-gradient(170.89deg, rgba(255,255,255,0.55) 3.02%, rgba(255,255,255,0.05) 28.94%, rgba(255,255,255,0.28) 108.33%);
+              }
+              div.opb-actions .btn--green {
+                background: #48d597; /* exact chart UP — the "Bid" colour */
+                box-shadow: 0 8px 20px rgba(72, 213, 151, 0.18);
+                color: #000;
+              }
+              div.opb-actions .btn--green::before {
+                background: linear-gradient(170.89deg, rgba(255,255,255,0.55) 3.02%, rgba(255,255,255,0.05) 28.94%, rgba(255,255,255,0.28) 108.33%);
+              }
+              div.opb-actions .btn:disabled {
+                opacity: 0.4;
+                box-shadow: none;
+                cursor: not-allowed;
+                pointer-events: none;
+              }
+            `}</style>
+            <GlassButton variant="red" size="mobile" block disabled={hasError}>
               Sell
             </GlassButton>
-            <GlassButton variant="green" size="mobile" block>
+            <GlassButton variant="green" size="mobile" block disabled={hasError}>
               Buy
             </GlassButton>
-          </div>
+          </motion.div>
+        }
+        overlay={
+          <>
+            {/* scrim — dims the whole screen behind the sheet. Kept mounted,
+                opacity-toggled, so price-tick re-renders can't strand it. */}
+            <motion.div
+              initial={false}
+              animate={{ opacity: drawerOpen ? 1 : 0 }}
+              transition={{ duration: 0.18 }}
+              onClick={() => setActiveField(null)}
+              style={{
+                position: "absolute",
+                inset: 0,
+                background: "rgba(0,0,0,0.4)",
+                pointerEvents: drawerOpen ? "auto" : "none",
+              }}
+            />
+            {/* bottom drawer — slides up from the screen's bottom edge: no
+                handle or header, just the two unit rows split by a divider. */}
+            <motion.div
+              aria-hidden={!qtyMenuOpen}
+              initial={false}
+              animate={{ y: qtyMenuOpen ? "0%" : "100%" }}
+              transition={{ type: "spring", visualDuration: 0.32, bounce: 0 }}
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "#15161a",
+                borderRadius: "20px 20px 0 0",
+                // shadow only while open — otherwise the off-screen sheet's
+                // upward shadow bleeds a grey gradient over the CTA buttons.
+                boxShadow: qtyMenuOpen ? `inset 0 1px 0 ${BORDER_DIM}` : "none",
+                padding: "8px 12px calc(20px + env(safe-area-inset-bottom))",
+                pointerEvents: qtyMenuOpen ? "auto" : "none",
+              }}
+            >
+              {/* sheet title — left-aligned, set at the ticker/symbol size */}
+              <div
+                style={{
+                  color: VAL,
+                  fontSize: 18,
+                  fontWeight: 400,
+                  textAlign: "left",
+                  padding: "18px 10px 12px",
+                }}
+              >
+                Order type
+              </div>
+              <QtyMenuRow
+                icon={<DatabaseIcon />}
+                title="Share quantity"
+                sub="Buy and sell orders available"
+                selected={qtyType === "shares"}
+                onClick={() => {
+                  setQtyType("shares");
+                  setActiveField(null);
+                }}
+              />
+              <div style={{ height: 1, background: BORDER_DIM, margin: "0 10px" }} />
+              <QtyMenuRow
+                icon={<DollarIcon />}
+                title="Dollar amount"
+                sub="Buy orders available"
+                selected={qtyType === "dollars"}
+                onClick={() => {
+                  setQtyType("dollars");
+                  setActiveField(null);
+                }}
+              />
+            </motion.div>
+
+            {/* order-type drawer — plain left-aligned list, scrolls if the
+                eight types don't fit. Picking one closes the sheet. */}
+            <motion.div
+              aria-hidden={!orderTypeMenuOpen}
+              initial={false}
+              animate={{ y: orderTypeMenuOpen ? "0%" : "100%" }}
+              transition={{ type: "spring", visualDuration: 0.32, bounce: 0 }}
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                maxHeight: "78%",
+                display: "flex",
+                flexDirection: "column",
+                background: "#15161a",
+                borderRadius: "20px 20px 0 0",
+                boxShadow: orderTypeMenuOpen ? `inset 0 1px 0 ${BORDER_DIM}` : "none",
+                pointerEvents: orderTypeMenuOpen ? "auto" : "none",
+              }}
+            >
+              <div
+                style={{
+                  color: VAL,
+                  fontSize: 18,
+                  fontWeight: 400,
+                  textAlign: "left",
+                  padding: "18px 22px 12px",
+                }}
+              >
+                Order type
+              </div>
+              <div style={{ overflowY: "auto", padding: "0 12px calc(16px + env(safe-area-inset-bottom))" }}>
+                {ORDER_TYPES.map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => {
+                      setOrderType(t);
+                      setActiveField(null);
+                    }}
+                    style={{
+                      width: "100%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: 8,
+                      padding: "13px 10px",
+                      background: "transparent",
+                      border: "none",
+                      borderRadius: 10,
+                      cursor: "pointer",
+                      textAlign: "left",
+                      color: VAL,
+                      fontSize: 14,
+                    }}
+                  >
+                    <span style={{ minWidth: 0 }}>
+                      {t}
+                      {ORDER_TYPE_DESC[t] && (
+                        <span
+                          style={{
+                            display: "block",
+                            marginTop: 3,
+                            color: MUTED,
+                            fontSize: 12,
+                          }}
+                        >
+                          {ORDER_TYPE_DESC[t]}
+                        </span>
+                      )}
+                    </span>
+                    {t === orderType && (
+                      <span style={{ flex: "none", color: VAL }}>
+                        <CheckIcon />
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* fake native iOS number pad — slides up when a text field is
+                tapped; keys drive the field's value directly. Pixel offset
+                (keypad is ~224 tall) rather than "100%" — percentage y on a
+                sheet with a measured child wasn't animating reliably here. */}
+            <motion.div
+              aria-hidden={!keyboardOpen}
+              initial={{ y: 280 }}
+              animate={{ y: keyboardOpen ? 0 : 280 }}
+              transition={{ type: "spring", visualDuration: 0.3, bounce: 0 }}
+              style={{
+                position: "absolute",
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 2,
+                pointerEvents: keyboardOpen ? "auto" : "none",
+              }}
+            >
+              <IosKeypad onKey={pressKey} />
+            </motion.div>
+          </>
         }
       >
-        <div style={{ position: "relative" }}>
+        {/* tapping anywhere that isn't a field box clears the selection /
+            dismisses the keyboard (min-height so taps in the empty area
+            below the form still count) */}
+        <div style={{ position: "relative", minHeight: "100%" }} onClick={closeAll}>
           {/* native iOS drawer handle — this screen presents as a sheet, not
               a pushed page. */}
           <div style={{ display: "flex", justifyContent: "center" }}>
@@ -111,31 +435,86 @@ export function OrderPlacementScreenBoxed() {
           {/* ticker — a straight copy of the quote screen: just the symbol
               (no company name, matching the live page), the fractional-shares
               icon riding along on the right instead of its own icon row. */}
-          <div style={{ marginTop: 14, display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
-            <span style={{ fontSize: 18, fontWeight: 600, color: VAL }}>{SYMBOL}</span>
+          {/* ticker + price — the fractional-shares icon is centred against the
+              whole two-line block, not just the symbol line */}
+          <div style={{ marginTop: 14, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+            <div>
+              <span style={{ fontSize: 18, fontWeight: 600, color: VAL }}>{SYMBOL}</span>
+
+              <div style={{ marginTop: 2, display: "flex", gap: 4, alignItems: "flex-end" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "baseline",
+                    fontSize: 18,
+                    fontWeight: 600,
+                    lineHeight: 1,
+                    fontVariantNumeric: "tabular-nums",
+                  }}
+                >
+                  {chars.map((ch, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        overflow: "hidden",
+                        height: 22,
+                        color: ch.color,
+                        transition: "color 760ms cubic-bezier(.4,0,.2,1)",
+                      }}
+                    >
+                      <div style={{ display: "block", animation: ch.anim }}>
+                        <span style={{ height: 22, display: "flex", alignItems: "flex-end", justifyContent: "center", boxSizing: "border-box" }}>
+                          {ch.top}
+                        </span>
+                        <span style={{ height: 22, display: "flex", alignItems: "flex-end", justifyContent: "center", boxSizing: "border-box" }}>
+                          {ch.bottom}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <span
+                  style={{
+                    fontSize: 14,
+                    fontWeight: 400,
+                    height: 22,
+                    display: "flex",
+                    alignItems: "flex-end",
+                    lineHeight: 1,
+                    color: changeColor,
+                    transition: "color 520ms ease",
+                  }}
+                >
+                  {changeText}
+                </span>
+              </div>
+            </div>
+
             <button
               aria-label="Fractional shares"
               onClick={() => setFracOpen((o) => !o)}
-              className="opb-frac-btn"
+              // `acs-frac-card` adds the 66deg masked 1px rim (::before) — the
+              // same glass icon-button material as the alert creation screen's
+              // header icon (AlertCreationScreen's fracGlass + .acs-frac-card).
+              className="opb-frac-btn acs-frac-card"
               style={{
                 flex: "none",
                 width: 32,
                 height: 32,
+                position: "relative",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 borderRadius: 999,
                 border: "none",
+                overflow: "hidden",
                 cursor: "pointer",
-                // same glass `light`-icon-button treatment as the header icon
-                // on the quote screen (AlertCreationScreen's fracGlass) —
-                // not a flat transparent circle.
                 background:
                   "linear-gradient(66deg, rgba(255,255,255,0.1), rgba(255,255,255,0.045))",
                 boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
                 backdropFilter: "blur(18px)",
                 WebkitBackdropFilter: "blur(18px)",
-                color: fracOpen ? UP : "rgba(255,255,255,0.9)",
+                color: fracOpen ? "#fff" : "rgba(255,255,255,0.9)",
               }}
             >
               <FractionalIcon />
@@ -188,57 +567,9 @@ export function OrderPlacementScreenBoxed() {
             )}
           </AnimatePresence>
 
-          <div style={{ marginTop: 2, display: "flex", gap: 4, alignItems: "flex-end" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "baseline",
-                fontSize: 18,
-                fontWeight: 600,
-                lineHeight: 1,
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {chars.map((ch, i) => (
-                <div
-                  key={i}
-                  style={{
-                    overflow: "hidden",
-                    height: 22,
-                    color: ch.color,
-                    transition: "color 760ms cubic-bezier(.4,0,.2,1)",
-                  }}
-                >
-                  <div style={{ display: "block", animation: ch.anim }}>
-                    <span style={{ height: 22, display: "flex", alignItems: "flex-end", justifyContent: "center", boxSizing: "border-box" }}>
-                      {ch.top}
-                    </span>
-                    <span style={{ height: 22, display: "flex", alignItems: "flex-end", justifyContent: "center", boxSizing: "border-box" }}>
-                      {ch.bottom}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <span
-              style={{
-                fontSize: 14,
-                fontWeight: 400,
-                height: 22,
-                display: "flex",
-                alignItems: "flex-end",
-                lineHeight: 1,
-                color: changeColor,
-                transition: "color 520ms ease",
-              }}
-            >
-              {changeText}
-            </span>
-          </div>
-
           {/* bid / ask — one seamless pill, deep-tinted halves with the
               label + live price both set in the accent colour. */}
-          <div style={{ marginTop: 16, height: 22, display: "flex", borderRadius: 6, overflow: "hidden" }}>
+          <div style={{ marginTop: 16, height: 26, display: "flex", borderRadius: 6, overflow: "hidden" }}>
             <BidAskHalf label="Bid" price={bidPx} tint="rgba(72,213,151,0.14)" accent={UP} />
             <BidAskHalf label="Ask" price={askPx} tint="rgba(255,85,125,0.14)" accent={DOWN} />
           </div>
@@ -259,116 +590,198 @@ export function OrderPlacementScreenBoxed() {
               columnGap: 12,
             }}
           >
-            <span
-              role="button"
-              tabIndex={0}
-              onClick={() => setQtyMenuOpen((o) => !o)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  setQtyMenuOpen((o) => !o);
-                }
+            <div>
+              {isLimit ? (
+                // limit orders: units locked to shares, no switcher
+                <span style={{ ...labelStyle, display: "inline-block" }}>Shares</span>
+              ) : (
+                <span
+                  role="button"
+                  tabIndex={0}
+                  aria-expanded={qtyMenuOpen}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleField("quantity");
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleField("quantity");
+                    }
+                  }}
+                  style={{
+                    ...labelStyle,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 3,
+                    cursor: "pointer",
+                    color: qtyMenuOpen ? "#fff" : labelStyle.color,
+                  }}
+                >
+                  {effQtyType === "shares" ? "Shares" : "Dollar amount"}
+                  <ChevronDownIcon color={qtyMenuOpen ? "#fff" : MUTED} />
+                </span>
+              )}
+            </div>
+            {/* Quantity box — holds only the value; the whole box gets the 2px
+                white stroke when the value is selected, or a red stroke on
+                an error. */}
+            <div
+              style={{
+                ...fieldBoxStyle,
+                padding: 0,
+                position: "relative",
+                boxShadow: qtyFractionalError
+                  ? errStroke
+                  : activeField === "quantityInput"
+                    ? selStroke
+                    : restStroke,
               }}
-              style={{ display: "inline-flex", alignItems: "center", gap: 4, cursor: "pointer", color: VAL, fontSize: 14 }}
             >
-              {qtyType === "shares" ? "Quantity" : "Amount"}
-              <ChevronDownIcon color={qtyMenuOpen ? UP : VAL} />
-            </span>
-            <div style={{ ...fieldBoxStyle, justifyContent: "space-between", position: "relative" }}>
-              <span style={{ color: VAL, fontSize: 14, fontVariantNumeric: "tabular-nums" }}>
-                {qtyType === "shares" ? qty : `$${qty}`}
-              </span>
-
-              <AnimatePresence>
-                {qtyMenuOpen && (
-                  <motion.div
-                    key="qty-menu"
-                    initial={{ opacity: 0, y: -6, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -4, scale: 0.97 }}
-                    transition={{ type: "spring", visualDuration: 0.22, bounce: 0 }}
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  openKeyboard("shares");
+                }}
+                style={{
+                  alignSelf: "stretch",
+                  flex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  padding: "0 10px",
+                  cursor: "text",
+                }}
+              >
+                {effQtyType === "shares" ? (
+                  <input
+                    value={qtyStr}
+                    readOnly
+                    inputMode="none"
+                    // size=1 so the input's intrinsic width doesn't inflate
+                    // the grid's shared "auto" box column (was widening every
+                    // field on the shares/dollar toggle)
+                    size={1}
                     style={{
-                      position: "absolute",
-                      top: "calc(100% + 8px)",
-                      right: 0,
-                      width: "min(260px, 70vw)",
-                      zIndex: 20,
-                      background: "#0a0a0c",
-                      border: `1px solid ${BORDER_DIM}`,
-                      borderRadius: 14,
-                      padding: 6,
-                      boxShadow: "0 24px 48px rgba(0,0,0,0.55)",
-                      transformOrigin: "top right",
+                      ...valueStyle,
+                      width: "100%",
+                      minWidth: 0,
+                      textAlign: "right",
+                      background: "transparent",
+                      border: "none",
+                      outline: "none",
+                      padding: 0,
+                      cursor: "text",
+                    }}
+                  />
+                ) : (
+                  <span style={valueStyle}>{`$${qtyStr}`}</span>
+                )}
+              </div>
+            </div>
+            {/* error message — sits directly under the quantity box, in the
+                box's own grid column so it aligns with the field and wraps
+                within its width. width:0 + minWidth:100% keeps its text from
+                widening the shared "auto" box column. */}
+            {qtyFractionalError && (
+              <div
+                style={{
+                  ...fieldErrorStyle,
+                  gridColumn: "2",
+                  marginTop: -4,
+                  width: 0,
+                  minWidth: "100%",
+                }}
+              >
+                {qtyFractionalError}
+              </div>
+            )}
+
+            {/* Order type — opens its own picker drawer */}
+            <Field
+              label="Order type"
+              value={orderType}
+              caret
+              active={activeField === "orderType"}
+              onSelect={(e) => {
+                e.stopPropagation();
+                toggleField("orderType");
+              }}
+            />
+            {/* Limit price — only shown once a limit-style type is picked.
+                Wrapped so it eases in/out (subgrid keeps the box aligned with
+                the shared column) instead of hard-popping the layout. */}
+            <AnimatePresence initial={false}>
+              {orderType === "Limit" && (
+                <motion.div
+                  key="limit-price-row"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.24, ease: [0.4, 0, 0.2, 1] }}
+                  style={{
+                    gridColumn: "1 / -1",
+                    display: "grid",
+                    gridTemplateColumns: "subgrid",
+                    alignItems: "center",
+                    overflow: "hidden",
+                  }}
+                >
+                  <span style={{ ...labelStyle, display: "block" }}>Limit price</span>
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openKeyboard("limitPrice");
+                    }}
+                    style={{
+                      ...fieldBoxStyle,
+                      boxShadow:
+                        activeField === "limitPrice" ? selStroke : restStroke,
+                      cursor: "text",
                     }}
                   >
-                    <QtyMenuRow
-                      icon={<StackIcon />}
-                      title="Share quantity"
-                      sub="Buy and sell orders available"
-                      selected={qtyType === "shares"}
-                      onClick={() => {
-                        setQtyType("shares");
-                        setQtyMenuOpen(false);
-                      }}
-                    />
-                    <QtyMenuRow
-                      icon={<DollarIcon />}
-                      title="Dollar amount"
-                      sub="Buy orders available"
-                      selected={qtyType === "dollars"}
-                      onClick={() => {
-                        setQtyType("dollars");
-                        setQtyMenuOpen(false);
-                      }}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <Field label="Order type" value="Market" caret />
-            <Field label="Route" value="Auto" caret />
-            <Field label="Special instructions" value="None" caret />
-            <Field label="Account" value="Individual Margin" caret />
-            <Field
-              label="Estimated order total"
-              value={
-                <motion.span
-                  key={Math.round(total * 100)}
-                  initial={{ opacity: 0.5 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.25 }}
-                  style={{ fontWeight: 600 }}
-                >
-                  ${fmt(total)}
-                </motion.span>
-              }
-            />
-
-            {/* scrim while the quantity-type menu is open — starts right
-                below the quantity row (its height + the grid's row gap),
-                bleeding past the screen padding like the reference. */}
-            <AnimatePresence>
-              {qtyMenuOpen && (
-                <motion.div
-                  key="scrim"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  onClick={() => setQtyMenuOpen(false)}
-                  style={{
-                    position: "absolute",
-                    top: 54,
-                    left: -24,
-                    right: -24,
-                    bottom: -8,
-                    zIndex: 10,
-                    background: "rgba(0,0,0,0.6)",
-                  }}
-                />
+                    <span style={valueStyle}>{`$${limitStr}`}</span>
+                  </div>
+                </motion.div>
               )}
             </AnimatePresence>
+
+            {(
+              [
+                ["route", "Route", "NASDAQ"],
+                ["specialInstructions", "Special instructions", "None"],
+                ["account", "Account", "Individual Margin"],
+              ] as const
+            ).map(([name, label, value]) => (
+              <Field
+                key={name}
+                label={label}
+                value={value}
+                caret
+                active={activeField === name}
+                onSelect={(e) => {
+                  e.stopPropagation();
+                  toggleField(name);
+                }}
+              />
+            ))}
+            <Field
+              plain
+              label="Estimated order total"
+              value={
+                <>
+                  <motion.span
+                    key={Math.round(total * 100)}
+                    initial={{ opacity: 0.5 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.25 }}
+                  >
+                    ${fmt(total)}
+                  </motion.span>
+                  <span style={{ color: VAL, fontWeight: 400 }}> USD</span>
+                </>
+              }
+            />
           </div>
 
         </div>
@@ -404,7 +817,7 @@ function BidAskHalf({
         gap: 8,
       }}
     >
-      <span style={{ color: accent, fontSize: 12, lineHeight: 1 }}>{label}</span>
+      <span style={{ color: accent, fontSize: 14, lineHeight: 1 }}>{label}</span>
       <motion.span
         key={Math.round(price * 100)}
         initial={{ opacity: 0.4 }}
@@ -418,16 +831,24 @@ function BidAskHalf({
   );
 }
 
+// The field outline is drawn with an inset box-shadow, not a border, so the
+// selected state can go 1px -> 2px without nudging the box's content (a real
+// border would shrink the content box and shift the icons / values).
+const restStroke = `inset 0 0 0 1px ${BORDER_DIM}`;
+const selStroke = `inset 0 0 0 1.5px ${SELECTED}`;
+const errStroke = `inset 0 0 0 1.5px ${DOWN}`;
+
 const fieldBoxStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  gap: 8,
-  height: 44,
-  padding: "0 14px",
-  borderRadius: 12,
-  background: "rgba(255,255,255,0.03)",
-  border: `1px solid ${BORDER_DIM}`,
+  gap: 4,
+  boxSizing: "border-box",
+  height: 40,
+  padding: "0 10px",
+  borderRadius: 6,
+  background: "rgba(255,255,255,0.05)",
+  boxShadow: restStroke,
 };
 
 /** One field: label left, plain text (matching a real order-ticket's row
@@ -440,22 +861,73 @@ function Field({
   value,
   right,
   caret = false,
+  active = false,
+  onSelect,
+  plain = false,
+  error,
 }: {
   label: ReactNode;
   value?: ReactNode;
   right?: ReactNode;
   caret?: boolean;
+  active?: boolean;
+  onSelect?: (e: ReactMouseEvent) => void;
+  plain?: boolean;
+  /** Inline validation message shown under the label — same treatment as the
+      reference (small, multi-line, sits in the label column), coloured red. */
+  error?: ReactNode;
 }) {
+  // `plain` — a computed readout (Estimated order total), not an input: a
+  // hairline separates it from the fields above and the value is bare bold
+  // text on the right, no box (matches the reference order screen).
+  if (plain) {
+    return (
+      <>
+        <div
+          style={{
+            gridColumn: "1 / -1",
+            height: 1,
+            background: BORDER_DIM,
+            opacity: 0.5,
+            margin: "8px 0",
+          }}
+        />
+        <span style={labelStyle}>{label}</span>
+        <span
+          style={{
+            textAlign: "right",
+            color: VAL,
+            fontSize: 14,
+            fontWeight: 400,
+            fontVariantNumeric: "tabular-nums",
+          }}
+        >
+          {right ?? value}
+        </span>
+      </>
+    );
+  }
+
   // Two direct grid children (not a wrapping row) — the parent grid's
   // shared "auto" column is what gives every box the same width.
   return (
     <>
-      <span style={{ color: VAL, fontSize: 14 }}>{label}</span>
-      <div style={fieldBoxStyle}>
+      <span style={{ ...labelStyle, display: "block" }}>
+        {label}
+        {error != null && <span style={fieldErrorStyle}>{error}</span>}
+      </span>
+      <div
+        onClick={onSelect}
+        style={{
+          ...fieldBoxStyle,
+          boxShadow: error != null ? errStroke : active ? selStroke : restStroke,
+          cursor: onSelect ? "pointer" : undefined,
+        }}
+      >
         {right ?? (
           <>
-            <span style={{ color: VAL, fontSize: 14, fontVariantNumeric: "tabular-nums" }}>{value}</span>
-            {caret && <ChevronDownIcon color={VAL} />}
+            <span style={valueStyle}>{value}</span>
+            {caret && <ChevronDownIcon color={MUTED} />}
           </>
         )}
       </div>
@@ -483,7 +955,7 @@ function QtyMenuRow({
         width: "100%",
         display: "flex",
         alignItems: "flex-start",
-        gap: 12,
+        gap: 8,
         padding: "12px 10px",
         background: "transparent",
         border: "none",
@@ -495,10 +967,10 @@ function QtyMenuRow({
       <span style={{ flex: "none", color: VAL, marginTop: 2 }}>{icon}</span>
       <span style={{ flex: 1, minWidth: 0 }}>
         <div style={{ color: VAL, fontSize: 14, fontWeight: 500 }}>{title}</div>
-        <div style={{ color: MUTED, fontSize: 12, marginTop: 2 }}>{sub}</div>
+        <div style={{ color: MUTED, fontSize: 12, marginTop: 8 }}>{sub}</div>
       </span>
       {selected && (
-        <span style={{ flex: "none", color: UP, marginTop: 3 }}>
+        <span style={{ flex: "none", color: VAL, marginTop: 3 }}>
           <CheckIcon />
         </span>
       )}
@@ -510,47 +982,169 @@ function QtyMenuRow({
 
 /** Material Symbols "keyboard_arrow_down" — the "this row opens a picker"
     affordance, single chevron pointing down. */
-function ChevronDownIcon({ color = VAL }: { color?: string }) {
+function ChevronDownIcon({ color = VAL, size = 16 }: { color?: string; size?: number }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
       <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill={color} />
     </svg>
   );
 }
 
-function DollarIcon() {
+/** The two unit glyphs are the exact PNGs supplied for this screen
+    (public/prototypes/uploads), painted via CSS mask so they take
+    `currentColor` and scale cleanly instead of being re-drawn by hand. */
+function MaskGlyph({ src, size = 18 }: { src: string; size?: number }) {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 2v20M17 6.5c0-1.93-2.24-3.5-5-3.5s-5 1.57-5 3.5S9.24 10 12 10s5 1.57 5 3.5-2.24 3.5-5 3.5-5-1.57-5-3.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <span
+      aria-hidden="true"
+      style={{
+        display: "inline-block",
+        width: size,
+        height: size,
+        background: "currentColor",
+        WebkitMaskImage: `url(${src})`,
+        maskImage: `url(${src})`,
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+      }}
+    />
   );
 }
 
-function StackIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <ellipse cx="12" cy="6" rx="8" ry="3.2" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M4 6v6c0 1.77 3.58 3.2 8 3.2s8-1.43 8-3.2V6M4 12v6c0 1.77 3.58 3.2 8 3.2s8-1.43 8-3.2v-6"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
+function DollarIcon({ size = 18 }: { size?: number }) {
+  return <MaskGlyph src="/prototypes/uploads/limit_price-24px.png" size={size} />;
+}
+
+function DatabaseIcon({ size = 18 }: { size?: number }) {
+  return <MaskGlyph src="/prototypes/uploads/database.png" size={size} />;
 }
 
 function CheckIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path d="M4 12.5l5.5 5.5L20 7" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/* ---- fake iOS number pad ---- */
+
+const KEYPAD_KEYS: { digit: string; sub?: string }[] = [
+  { digit: "1" },
+  { digit: "2", sub: "ABC" },
+  { digit: "3", sub: "DEF" },
+  { digit: "4", sub: "GHI" },
+  { digit: "5", sub: "JKL" },
+  { digit: "6", sub: "MNO" },
+  { digit: "7", sub: "PQRS" },
+  { digit: "8", sub: "TUV" },
+  { digit: "9", sub: "WXYZ" },
+];
+
+const keypadFlatKeyStyle: CSSProperties = {
+  height: 44,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+};
+
+/** Portrait dark iOS phone-pad — three columns, 1-9 then [+ * #][0][⌫].
+    The "+ * #" key doubles as a decimal point for this number-entry use. */
+function IosKeypad({ onKey }: { onKey: (k: string) => void }) {
+  return (
+    <div style={{ background: "#353537", padding: "8px 3px 0", userSelect: "none" }}>
+      {/* eslint-disable-next-line react/no-unknown-property */}
+      <style>{`.opb-key:active { background:#8b8b8d !important; }`}</style>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
+        {KEYPAD_KEYS.map(({ digit, sub }) => (
+          <KeypadKey key={digit} onClick={() => onKey(digit)}>
+            <span style={{ fontSize: 24, lineHeight: 1.05, color: "#fff" }}>{digit}</span>
+            {sub && (
+              <span
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: 2,
+                  color: "#fff",
+                  marginTop: 1,
+                }}
+              >
+                {sub}
+              </span>
+            )}
+          </KeypadKey>
+        ))}
+        <button
+          type="button"
+          onClick={() => onKey(".")}
+          style={keypadFlatKeyStyle}
+          aria-label="Decimal point"
+        >
+          <span style={{ fontSize: 18, letterSpacing: 4, color: "#fff" }}>+ * #</span>
+        </button>
+        <KeypadKey onClick={() => onKey("0")}>
+          <span style={{ fontSize: 24, lineHeight: 1.05, color: "#fff" }}>0</span>
+        </KeypadKey>
+        <button
+          type="button"
+          onClick={() => onKey("back")}
+          style={keypadFlatKeyStyle}
+          aria-label="Delete"
+        >
+          <BackspaceIcon />
+        </button>
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", padding: "9px 0 8px" }}>
+        <div style={{ width: 134, height: 5, borderRadius: 3, background: "#fff" }} />
+      </div>
+    </div>
+  );
+}
+
+function KeypadKey({ children, onClick }: { children: ReactNode; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      className="opb-key"
+      onClick={onClick}
+      style={{
+        height: 44,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#6c6c6e",
+        border: "none",
+        borderRadius: 9,
+        cursor: "pointer",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function BackspaceIcon() {
+  return (
+    <svg width="27" height="20" viewBox="0 0 27 20" fill="none" aria-hidden="true">
+      <path
+        d="M9 1.5h14.5A2.5 2.5 0 0 1 26 4v12a2.5 2.5 0 0 1-2.5 2.5H9L1 10 9 1.5Z"
+        stroke="#fff"
+        strokeWidth="1.6"
+      />
+      <path
+        d="M12.5 7l7 6M19.5 7l-7 6"
+        stroke="#fff"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

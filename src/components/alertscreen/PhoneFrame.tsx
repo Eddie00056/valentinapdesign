@@ -32,6 +32,8 @@ export function PhoneFrame({
   children,
   fadeAt = 73,
   footer,
+  overlay,
+  fullDevice = false,
 }: {
   children: ReactNode;
   fadeAt?: number;
@@ -40,8 +42,22 @@ export function PhoneFrame({
       its own content and never scrolled away, so it can't get cut off by
       the frame's own `overflow: hidden`. */
   footer?: ReactNode;
+  /** Full-screen layer over the whole screen area (scroll content + footer),
+      anchored to the screen box rather than the scrolling content — for
+      scrims and bottom sheets. The wrapper is `pointer-events: none`; the
+      overlay's own interactive parts opt back in. */
+  overlay?: ReactNode;
+  /** Show the whole device instead of cropping its bottom. The default
+      renders a fixed 748px window (bottom of the PNG cropped, softened by
+      the bottom-fade mask) — tuned for the scrolling quote screen. With
+      `fullDevice`, the frame is the PNG's natural height (~825 @406), the
+      screen box rounds all four corners and insets 8px on every side, and
+      the fade mask is dropped so the titanium bottom edge is visible. */
+  fullDevice?: boolean;
 }) {
-  const phoneMask = `linear-gradient(to bottom, #000 0%, #000 ${fadeAt}%, transparent 100%)`;
+  const phoneMask = fullDevice
+    ? "none"
+    : `linear-gradient(to bottom, #000 0%, #000 ${fadeAt}%, transparent 100%)`;
 
   return (
     <div
@@ -57,17 +73,26 @@ export function PhoneFrame({
         letterSpacing: 0,
       }}
     >
-      <div style={{ position: "relative", width: 406, height: 748, overflow: "hidden" }}>
+      <div
+        style={{
+          position: "relative",
+          width: 406,
+          height: fullDevice ? "auto" : 748,
+          overflow: fullDevice ? "visible" : "hidden",
+        }}
+      >
         <img src={PHONE} alt="iPhone" style={{ width: "100%", display: "block" }} />
         <div
           style={{
             // screen inset L/R ~10.6px, top ~7.5px, corner radius ~58px @406.
+            // the bottom bezel is ~symmetric with the top (~8px @406), shown
+            // only in `fullDevice` mode.
             position: "absolute",
             left: 10,
             right: 10,
             top: 8,
-            bottom: 0,
-            borderRadius: "58px 58px 0 0",
+            bottom: fullDevice ? 8 : 0,
+            borderRadius: fullDevice ? 58 : "58px 58px 0 0",
             overflow: "hidden",
             background: "transparent",
             paddingTop: 50,
@@ -113,6 +138,11 @@ export function PhoneFrame({
             {footer && (
               <div style={{ flex: "none", padding: "0 24px 20px", background: "#000" }}>
                 {footer}
+              </div>
+            )}
+            {overlay != null && (
+              <div style={{ position: "absolute", inset: 0, zIndex: 40, overflow: "hidden", pointerEvents: "none" }}>
+                {overlay}
               </div>
             )}
           </div>

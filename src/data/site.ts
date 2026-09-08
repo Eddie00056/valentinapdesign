@@ -69,4 +69,9 @@ export const pieces: Piece[] = [
     href: "/work/alert-creation",
     title: "Alert creation",
   },
+  {
+    slug: "order-placement-boxed",
+    href: "/work/order-placement-boxed",
+    title: "Order placement",
+  },
 ];

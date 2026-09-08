@@ -56,6 +56,25 @@ import "../components/glasslab/glasslab.css";
               {p.slug === "alert-creation" && (
                 <AlertCreationPreview client:visible />
               )}
+              {p.slug === "order-placement-boxed" && (
+                <svg
+                  class="mark"
+                  viewBox="0 0 120 120"
+                  role="img"
+                  aria-label="Order placement"
+                >
+                  <rect width="120" height="120" rx="18" fill="#111317"></rect>
+                  <g fill="none" stroke="#3a3f47" stroke-width="3">
+                    <rect x="26" y="30" width="68" height="13" rx="4"></rect>
+                    <rect x="26" y="51" width="68" height="13" rx="4"></rect>
+                    <rect x="26" y="72" width="68" height="13" rx="4"></rect>
+                  </g>
+                  <rect x="20" y="95" width="37" height="12" rx="6" fill="#ff557d"
+                  ></rect>
+                  <rect x="63" y="95" width="37" height="12" rx="6" fill="#48d597"
+                  ></rect>
+                </svg>
+              )}
             </span>
           </a>
         </li>
