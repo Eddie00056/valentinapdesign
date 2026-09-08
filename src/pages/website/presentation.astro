@@ -4,8 +4,11 @@ import SiteHeader from "../../components/website/SiteHeader.astro";
 import { Reveal } from "../../components/website/Reveal";
 
 const V = "/website/case/gusto";
-const DECK =
-  "https://www.figma.com/slides/8Mdlm1c4YU0ecxJ4B5p3vi/Case-study-presentation--GUSTO-";
+const FILE_KEY = "8Mdlm1c4YU0ecxJ4B5p3vi";
+const DECK = `https://www.figma.com/slides/${FILE_KEY}/Case-study-presentation--GUSTO-`;
+// Figma Slides public embed player — its own Play / fullscreen / ← → controls.
+// src matches Figma's own "Copy public embed code" output (embed-host=share).
+const DECK_EMBED = `https://embed.figma.com/slides/${FILE_KEY}/Case-study-presentation--GUSTO-?node-id=0-1&embed-host=share`;
 
 const hobbies = [
   { src: `${V}/hobby-cake.jpg`, alt: "A hand-decorated Spider-Man layer cake" },
@@ -122,6 +125,26 @@ const chapters = [
       </a>
     </header>
 
+    <!-- ----------------------------------------------------------- deck player -->
+    <section class="gp-deck w-wrap">
+      <div class="gp-deck-stage" data-embed={DECK_EMBED}>
+        <button type="button" class="gp-deck-play">
+          <span class="gp-deck-play-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+              <path d="M8 5v14l11-7z"></path>
+            </svg>
+          </span>
+          <span class="gp-deck-play-text">
+            <span class="gp-deck-play-label">Play the presentation</span>
+            <span class="gp-deck-play-sub">Full deck · ← → to move · fullscreen inside</span>
+          </span>
+        </button>
+      </div>
+      <p class="gp-deck-note">
+        Or <a href={DECK} target="_blank" rel="noopener">open it in Figma&nbsp;↗</a>
+      </p>
+    </section>
+
     <!-- ------------------------------------------------------------- portrait -->
     <figure class="gp-portrait w-wrap">
       <img
@@ -129,7 +152,7 @@ const chapters = [
         width="2000"
         height="1400"
         alt="Valentina Padure"
-        fetchpriority="high"
+        loading="lazy"
       />
     </figure>
 
@@ -249,6 +272,24 @@ const chapters = [
       </section>
     </Reveal>
   </main>
+
+  <script>
+    // Click-to-load the Figma Slides player (keeps the heavy embed off the
+    // initial load; gives a clean Play affordance).
+    const stage = document.querySelector<HTMLElement>(".gp-deck-stage");
+    const play = stage?.querySelector(".gp-deck-play");
+    play?.addEventListener("click", () => {
+      const src = stage!.dataset.embed;
+      if (!src) return;
+      const frame = document.createElement("iframe");
+      frame.className = "gp-deck-frame";
+      frame.src = src;
+      frame.title = "Portfolio presentation — full slide deck";
+      frame.setAttribute("allow", "fullscreen");
+      frame.setAttribute("allowfullscreen", "");
+      stage!.replaceChildren(frame);
+    });
+  </script>
 </Website>
 
 <style>
@@ -309,6 +350,118 @@ const chapters = [
 
   .gp-link:hover {
     opacity: 0.68;
+  }
+
+  /* ---- deck player ------------------------------------------- */
+  .gp-deck {
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .gp-deck-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--w-line);
+    border-radius: 14px;
+    overflow: hidden;
+    background:
+      radial-gradient(
+        120% 90% at 50% 0%,
+        color-mix(in srgb, var(--w-accent) 9%, #0a0a0a) 0%,
+        #070707 62%
+      );
+  }
+
+  .gp-deck-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+  }
+
+  /* click-to-load facade */
+  .gp-deck-play {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: none;
+    border: 0;
+    color: var(--w-ink);
+    font: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .gp-deck-play:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .gp-deck-play-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--w-accent);
+    color: #04160e;
+    transition: transform 0.2s ease;
+  }
+
+  .gp-deck-play:hover .gp-deck-play-icon {
+    transform: scale(1.06);
+  }
+
+  .gp-deck-play-icon svg {
+    margin-left: 2px;
+  }
+
+  .gp-deck-play-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    text-align: left;
+  }
+
+  .gp-deck-play-label {
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+  }
+
+  .gp-deck-play-sub {
+    font-family: var(--w-font-alt);
+    font-size: 0.8125rem;
+    color: var(--w-ink-soft);
+  }
+
+  .gp-deck-note {
+    margin: 0.9rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--w-ink-soft);
+  }
+
+  .gp-deck-note a {
+    color: var(--w-accent);
+  }
+
+  @media (max-width: 560px) {
+    .gp-deck-play {
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+
+    .gp-deck-play-text {
+      text-align: center;
+      align-items: center;
+    }
   }
 
   /* ---- portrait ----------------------------------------------- */
