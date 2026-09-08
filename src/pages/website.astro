@@ -313,11 +313,15 @@ const quotes = [
 
   #team,
   #contact {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding-block: clamp(4rem, 8vw, 9rem);
+    padding-block: clamp(2.5rem, 1.75rem + 2.4vw, 4rem);
     border-top: 1px solid var(--w-line);
+  }
+
+  /* contact: tuck the copy right under its separator and don't leave a
+     cavernous gap under the last line */
+  #contact {
+    padding-top: clamp(1.75rem, 1.25rem + 1.4vw, 2.5rem);
+    padding-bottom: clamp(2.5rem, 1.75rem + 2vw, 3.75rem);
   }
 
   /* .project keeps its own two-column grid; just centre it vertically */
@@ -509,7 +513,9 @@ const quotes = [
   .media--edge {
     display: grid;
     grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-    align-items: start;
+    /* stretch both columns to the taller one's height so the last card in
+       each can grow to a shared bottom edge (see :last-child rule below) */
+    align-items: stretch;
     gap: 12px;
   }
 
@@ -522,6 +528,21 @@ const quotes = [
 
   .media--edge .col > * {
     width: 100%;
+  }
+
+  /* the shorter column's last card takes up the slack so its bottom edge
+     lines up with the taller column's — the centred clip inside just
+     floats in the extra dark space (Framer's method, above) */
+  .media--edge .col > div:last-child {
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* drop the height cap on the grown card's clip so its size stays
+     width-driven and the extra card height reads as dark space, not a
+     zoomed-in clip */
+  .media--edge .col > div:last-child > video {
+    max-height: none;
   }
 
   /* Framer's method: each card is a short/wide near-black box; the clip
