@@ -9,6 +9,7 @@ import "../glasslab/glass-button.css";
 // pulls in the rollUpA/B + rollDownA/B keyframes the price roll below uses
 // (ported verbatim from the quote screen).
 import "./alert-screen.css";
+import "./order-flow.css";
 import { PhoneFrame, PhoneStage } from "./PhoneFrame";
 
 /* Order placement — "boxed field" variation of OrderPlacementScreen.
@@ -51,6 +52,42 @@ const fieldErrorStyle: CSSProperties = {
 function fmt(n: number) {
   return n.toFixed(2);
 }
+
+const money = (n: number) =>
+  "$" +
+  n.toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+// review / placing / placed screen chrome
+const iconBtnStyle: CSSProperties = {
+  width: 24,
+  height: 24,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  background: "transparent",
+  border: "none",
+  cursor: "pointer",
+  padding: 0,
+};
+const reviewRowStyle: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "baseline",
+  gap: 12,
+  padding: "11px 0",
+};
+const flowCenterStyle: CSSProperties = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  minHeight: "60vh",
+  gap: 44,
+  textAlign: "center",
+};
 
 const ORDER_TYPES = [
   "Market",
@@ -153,6 +190,27 @@ export function OrderPlacementScreenBoxed() {
     if (orderType === "Limit") setQtyType("shares");
   }, [orderType]);
 
+  // ---- ticket -> review -> placing -> placed flow ----
+  const [step, setStep] = useState<"ticket" | "review" | "placing" | "placed">(
+    "ticket",
+  );
+  const [side, setSide] = useState<"Buy" | "Sell">("Buy");
+  const [lockedPx, setLockedPx] = useState(PX_BASE);
+
+  useEffect(() => {
+    if (step !== "placing") return;
+    const id = window.setTimeout(() => setStep("placed"), 1700);
+    return () => window.clearTimeout(id);
+  }, [step]);
+
+  const submit = (dir: "Buy" | "Sell") => {
+    if (hasError) return;
+    closeAll();
+    setSide(dir);
+    setLockedPx(s.price);
+    setStep("review");
+  };
+
   const bidPx = s.price - 0.01;
   const askPx = s.price + 0.01;
 
@@ -188,11 +246,45 @@ export function OrderPlacementScreenBoxed() {
 
   const total = s.price * qty;
 
+  // review screen: shares vs dollar-amount modes resolve differently
+  const isDollars = effQtyType === "dollars";
+  const reviewShares = isDollars ? (lockedPx ? qty / lockedPx : 0) : qty;
+  const reviewAmount = isDollars ? qty : qty * lockedPx;
+  const reviewRows: Array<[string, string]> = [
+    ["Order type", orderType],
+    ...(orderType === "Limit"
+      ? ([["Limit price", `$${limitStr}`]] as Array<[string, string]>)
+      : []),
+    ["Route", "NASDAQ"],
+    ["Special instructions", "None"],
+    ["Account", "Individual Margin"],
+    ["Total share quantity", reviewShares.toFixed(3)],
+  ];
+  const reviewTitle = `${side} ${
+    isDollars
+      ? money(qty)
+      : `${qty} ${qty === 1 ? "share" : "shares"}`
+  } of ${SYMBOL}\n@ ${
+    orderType === "Limit" ? `Limit ${money(parseFloat(limitStr) || 0)}` : orderType
+  }`;
+
   return (
     <PhoneStage>
       <PhoneFrame
         fullDevice
         footer={
+          step === "review" ? (
+            <button className="ofl-cta" onClick={() => setStep("placing")}>
+              Place order
+            </button>
+          ) : step === "placed" ? (
+            <button
+              className="ofl-cta ofl-cta--ghost"
+              onClick={() => setStep("ticket")}
+            >
+              Done
+            </button>
+          ) : step === "placing" ? undefined : (
           // pinned to the bottom of the screen area, outside the scrolling
           // content — the site's shared glass-pill buttons (glasslab/GlassButton),
           // but recoloured (page-scoped) to the same green/red as the Bid/Ask
@@ -207,8 +299,11 @@ export function OrderPlacementScreenBoxed() {
               marginTop: 10,
               display: "flex",
               gap: 10,
-              position: "relative",
-              zIndex: 41,
+              // only lift above the overlay while the number pad is up — with a
+              // drawer open (keyboard closed) the buttons must sit *under* the
+              // sheet, so drop back to normal flow
+              position: keyboardOpen ? "relative" : "static",
+              zIndex: keyboardOpen ? 41 : "auto",
               background: "#000",
               padding: keyboardOpen ? "8px 0" : 0,
             }}
@@ -238,15 +333,29 @@ export function OrderPlacementScreenBoxed() {
                 pointer-events: none;
               }
             `}</style>
-            <GlassButton variant="red" size="mobile" block disabled={hasError}>
+            <GlassButton
+              variant="red"
+              size="mobile"
+              block
+              disabled={hasError}
+              onClick={() => submit("Sell")}
+            >
               Sell
             </GlassButton>
-            <GlassButton variant="green" size="mobile" block disabled={hasError}>
+            <GlassButton
+              variant="green"
+              size="mobile"
+              block
+              disabled={hasError}
+              onClick={() => submit("Buy")}
+            >
               Buy
             </GlassButton>
           </motion.div>
+          )
         }
         overlay={
+          step === "ticket" ? (
           <>
             {/* scrim — dims the whole screen behind the sheet. Kept mounted,
                 opacity-toggled, so price-tick re-renders can't strand it. */}
@@ -420,12 +529,18 @@ export function OrderPlacementScreenBoxed() {
               <IosKeypad onKey={pressKey} />
             </motion.div>
           </>
+          ) : undefined
         }
       >
         {/* tapping anywhere that isn't a field box clears the selection /
             dismisses the keyboard (min-height so taps in the empty area
             below the form still count) */}
-        <div style={{ position: "relative", minHeight: "100%" }} onClick={closeAll}>
+        <div
+          style={{ position: "relative", minHeight: "100%" }}
+          onClick={step === "ticket" ? closeAll : undefined}
+        >
+          {step === "ticket" && (
+          <>
           {/* native iOS drawer handle — this screen presents as a sheet, not
               a pushed page. */}
           <div style={{ display: "flex", justifyContent: "center" }}>
@@ -783,7 +898,237 @@ export function OrderPlacementScreenBoxed() {
               }
             />
           </div>
+          </>
+          )}
 
+          {step === "review" && (
+            <div className="ofl-scr" style={{ color: VAL }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginTop: 6,
+                  height: 24,
+                }}
+              >
+                <button
+                  aria-label="Back"
+                  onClick={() => setStep("ticket")}
+                  style={iconBtnStyle}
+                >
+                  <svg width="8" height="13" viewBox="0 0 8 13" fill="none" aria-hidden="true">
+                    <path
+                      d="M6.5 1 L1 6.5 L6.5 12"
+                      stroke={VAL}
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </button>
+                <span style={{ fontSize: 15, fontWeight: 600 }}>Review order</span>
+                <button
+                  aria-label="Close"
+                  onClick={() => setStep("ticket")}
+                  style={iconBtnStyle}
+                >
+                  <svg width="13" height="13" viewBox="0 0 14 14" fill={VAL} aria-hidden="true">
+                    <path d="M14 1.41 12.59 0 7 5.59 1.41 0 0 1.41 5.59 7 0 12.59 1.41 14 7 8.41 12.59 14 14 12.59 8.41 7 14 1.41Z" />
+                  </svg>
+                </button>
+              </div>
+
+              <div
+                style={{
+                  whiteSpace: "pre-line",
+                  textAlign: "center",
+                  fontSize: 22,
+                  lineHeight: "30px",
+                  fontWeight: 500,
+                  margin: "40px 0 24px",
+                }}
+              >
+                {reviewTitle}
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column" }}>
+                {reviewRows.map(([label, value]) => (
+                  <div key={label} style={reviewRowStyle}>
+                    <span style={{ fontSize: 12, color: MUTED }}>{label}</span>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: VAL,
+                        textAlign: "right",
+                      }}
+                    >
+                      {value}
+                    </span>
+                  </div>
+                ))}
+                <div
+                  style={{
+                    height: 1,
+                    background: BORDER_DIM,
+                    opacity: 0.5,
+                    margin: "6px 0",
+                  }}
+                />
+                <div style={{ ...reviewRowStyle, alignItems: "flex-start" }}>
+                  <span>
+                    <span style={{ display: "block", fontSize: 12, color: MUTED }}>
+                      Estimated total
+                    </span>
+                    <span
+                      style={{
+                        display: "block",
+                        fontSize: 12,
+                        color: MUTED,
+                        marginTop: 4,
+                      }}
+                    >
+                      {`${reviewShares.toFixed(3)} @ ${money(lockedPx)}`}
+                    </span>
+                  </span>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      fontWeight: 600,
+                      color: VAL,
+                      textAlign: "right",
+                    }}
+                  >
+                    {money(reviewAmount)}{" "}
+                    <span style={{ color: MUTED, fontWeight: 400 }}>USD</span>
+                  </span>
+                </div>
+                <div style={reviewRowStyle}>
+                  <span style={{ fontSize: 12, color: MUTED }}>
+                    Commission &amp; fees
+                  </span>
+                  <span style={{ fontSize: 12, fontWeight: 600, color: VAL }}>
+                    $0.00 <span style={{ color: MUTED, fontWeight: 400 }}>USD</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {step === "placing" && (
+            <div className="ofl-scr" style={flowCenterStyle}>
+              <div
+                style={{
+                  whiteSpace: "pre-line",
+                  fontSize: 22,
+                  lineHeight: "30px",
+                  fontWeight: 500,
+                  color: VAL,
+                }}
+              >
+                {"Placing your\norder"}
+              </div>
+              <svg
+                className="ofl-spin"
+                width="72"
+                height="72"
+                viewBox="0 0 72 72"
+                fill="none"
+                aria-hidden="true"
+              >
+                <circle
+                  cx="36"
+                  cy="36"
+                  r="31"
+                  stroke="rgba(72,213,151,0.18)"
+                  strokeWidth="5"
+                />
+                <path
+                  d="M 36 5 A 31 31 0 0 1 67 36"
+                  stroke={UP}
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+          )}
+
+          {step === "placed" && (
+            <div className="ofl-scr" key="placed" style={flowCenterStyle}>
+              <div
+                className="ofl-rise"
+                style={{
+                  whiteSpace: "pre-line",
+                  fontSize: 22,
+                  lineHeight: "30px",
+                  fontWeight: 500,
+                  color: VAL,
+                }}
+              >
+                {"Your order has\nbeen placed"}
+              </div>
+              <div
+                style={{
+                  position: "relative",
+                  width: 150,
+                  height: 150,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <div
+                  className="ofl-ring"
+                  style={{
+                    position: "absolute",
+                    width: 150,
+                    height: 150,
+                    borderRadius: "50%",
+                    background: UP,
+                  }}
+                />
+                <div
+                  className="ofl-ring"
+                  style={{
+                    position: "absolute",
+                    width: 150,
+                    height: 150,
+                    borderRadius: "50%",
+                    background: UP,
+                    animationDelay: "0.22s",
+                  }}
+                />
+                <div
+                  className="ofl-disc"
+                  style={{
+                    position: "relative",
+                    width: 150,
+                    height: 150,
+                    borderRadius: "50%",
+                    background: UP,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <svg width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true">
+                    <path
+                      className="ofl-check"
+                      d="M 20 37.5 L 31.5 49 L 52 26"
+                      stroke="#0b0b0d"
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeDasharray="64"
+                      strokeDashoffset="64"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </PhoneFrame>
     </PhoneStage>
