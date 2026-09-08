@@ -35,6 +35,7 @@ export function HeroCreed() {
     const sticky = pin.querySelector<HTMLElement>(".hero-sticky");
     const html = document.documentElement;
 
+    let heldSnap = false;
     const stop = scroll(
       (progress: number) => {
         const tail = tailRef.current;
@@ -55,8 +56,15 @@ export function HeroCreed() {
             : "";
         }
 
-        html.classList.toggle("snap-hold", progress > 0.004 && progress < 0.985);
-        if (progress >= 0.985) html.dataset.pinReleased = String(Date.now());
+        // hold the section settler off ONLY while the reveal is running,
+        // and stamp the release exactly once on the way out (stamping it
+        // every frame past the pin would freeze the settler for good)
+        const inReveal = progress > 0.004 && progress < 0.985;
+        if (inReveal !== heldSnap) {
+          heldSnap = inReveal;
+          html.classList.toggle("snap-hold", inReveal);
+          if (!inReveal) html.dataset.pinReleased = String(Date.now());
+        }
       },
       { target: pin, offset: ["start 76px", "end start"] },
     );
