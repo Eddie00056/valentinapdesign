@@ -1,72 +1,75 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
+import { scroll } from "motion";
 import { useReducedMotion } from "motion/react";
 
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
 /**
- * The tail of the hero sentence: " I get shit work done".
+ * The tail of the hero sentence: " I get shit work done."
  *
  * The hero is pinned (`.hero-pin` spacer + `.hero-sticky`) so the view holds
- * still while a stretch of scroll drives this reveal. Progress is how far the
- * pin container has scrolled through its own travel:
- *   - 0 → 0.28    : "I get shit work done." fades in
- *   - 0.36 → 0.54 : a line strikes through "shit"
- *   - 0.54 → 0.92 : a long beat, fully struck, everything still on screen
- *   - 0.92 → 1    : the hero eases out and the pin releases to the projects.
+ * still while a stretch of scroll drives this reveal. Progress comes from
+ * Motion's `scroll()` — it uses the browser's native ScrollTimeline where
+ * available, so it's hardware-accelerated and stays smooth through slow
+ * scrolls. The container edge `76px` (the sticky header height) makes
+ * progress 0 at rest and moving on the very first pixel of scroll — no dead
+ * zone before the fade begins.
+ *
+ *   progress 0 → 0.2   : "I get shit work done." fades in
+ *   progress 0.32 → 0.5: a line strikes through "shit"
+ *   progress 0.5 → 0.84: a long beat, fully struck, everything on screen
+ *   progress 0.84 → 1  : the hero eases up and out; the pin releases
  *
  * Reduced motion / no-JS: the finished joke is shown outright (see the
  * <noscript> override + reduced-motion CSS in website.astro).
  */
 export function HeroCreed() {
   const reduce = useReducedMotion();
-  const [p, setP] = useState(0);
+  const tailRef = useRef<HTMLSpanElement>(null);
+  const lineRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     if (reduce) return;
     const pin = document.querySelector<HTMLElement>(".hero-pin");
     if (!pin) return;
-
     const sticky = pin.querySelector<HTMLElement>(".hero-sticky");
-    let raf = 0;
-    const measure = () => {
-      raf = 0;
-      const r = pin.getBoundingClientRect();
-      const travel = r.height - window.innerHeight;
-      const next = travel > 0 ? clamp(-r.top / travel, 0, 1) : 0;
-      setP(next);
-      // hand the view off: only at the very end, after a long fully-struck
-      // hold, ease the hero out so it isn't a full-opacity block that then
-      // scrolls away
+    const html = document.documentElement;
+
+    const stop = scroll(
+      (progress: number) => {
+        const tail = tailRef.current;
+        const line = lineRef.current;
+        if (tail) tail.style.opacity = String(clamp(progress / 0.2, 0, 1));
+        if (line) {
+          const s = clamp((progress - 0.32) / 0.18, 0, 1);
+          line.style.transform = `scaleX(${s})`;
+        }
+
+        // hand off: ease the hero up and out over the last stretch so the
+        // pin doesn't release a full-opacity block into a screen of black
+        const exit = clamp((progress - 0.84) / 0.16, 0, 1);
+        if (sticky) {
+          sticky.style.opacity = exit ? String(1 - exit) : "";
+          sticky.style.transform = exit
+            ? `translate3d(0, ${(-16 * exit).toFixed(2)}vh, 0)`
+            : "";
+        }
+
+        html.classList.toggle("snap-hold", progress > 0.004 && progress < 0.985);
+        if (progress >= 0.985) html.dataset.pinReleased = String(Date.now());
+      },
+      { target: pin, offset: ["start 76px", "end start"] },
+    );
+
+    return () => {
+      stop();
+      html.classList.remove("snap-hold");
       if (sticky) {
-        const exit = clamp((next - 0.92) / 0.08, 0, 1);
-        sticky.style.opacity = exit ? String(1 - exit) : "";
+        sticky.style.opacity = "";
+        sticky.style.transform = "";
       }
     };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(measure);
-    };
-
-    measure();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      cancelAnimationFrame(raf);
-      if (sticky) sticky.style.opacity = "";
-    };
   }, [reduce]);
-
-  // hold scroll-snap off while the pin is mid-reveal so a nearby snap
-  // target can't yank the page before the strike finishes
-  useEffect(() => {
-    const active = !reduce && p > 0.002 && p < 0.995;
-    document.documentElement.classList.toggle("snap-hold", active);
-    return () => document.documentElement.classList.remove("snap-hold");
-  }, [p, reduce]);
-
-  const inT = clamp(p / 0.28, 0, 1);
-  const strikeT = clamp((p - 0.36) / 0.18, 0, 1);
 
   if (reduce) {
     return (
@@ -82,14 +85,15 @@ export function HeroCreed() {
   }
 
   return (
-    <span className="creed-tail" style={{ opacity: inT }}>
+    <span className="creed-tail" ref={tailRef} style={{ opacity: 0 }}>
       I get{" "}
       <span className="creed-strike">
         shit
         <span
           className="creed-strike-line"
           aria-hidden="true"
-          style={{ transform: `scaleX(${strikeT})` }}
+          ref={lineRef}
+          style={{ transform: "scaleX(0)" }}
         />
       </span>{" "}
       work done.

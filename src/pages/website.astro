@@ -237,6 +237,9 @@ const quotes = [
       function settle() {
         if (tweening) return;
         if (html.classList.contains("snap-hold")) return; // hero pin busy
+        // let the hero pin hand off to the projects on its own — don't
+        // pounce with a settle the instant it releases
+        if (Date.now() - (+html.dataset.pinReleased || 0) < 700) return;
         const off = anchor();
         const maxPull = window.innerHeight * 0.55;
         let best = null;
@@ -291,18 +294,22 @@ const quotes = [
      .hero-pin is a tall spacer; .hero-sticky pins inside it. */
   .hero-pin {
     position: relative;
-    /* tall enough that the strike + a long fully-struck hold each get a
-       real stretch of scroll before the hero eases out (see HeroCreed) */
-    height: 240vh;
+    /* the strike + a long fully-struck hold each get a real stretch of
+       scroll before the hero eases out (see HeroCreed) */
+    height: 200vh;
   }
 
+  /* the sticky box is shorter than the viewport (and offset down a little)
+     so there's less empty screen to scroll past once the pin releases —
+     the hero still reads as roughly centred */
   .hero-sticky {
     position: sticky;
-    top: 0;
-    min-height: 100svh;
+    top: 9svh;
+    min-height: 82svh;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    will-change: opacity, transform;
   }
 
   /* only the media-heavy project rows fill the viewport; the text-only
@@ -344,6 +351,7 @@ const quotes = [
     }
     .hero-sticky {
       position: static;
+      top: auto;
       min-height: 0;
     }
     .project {
