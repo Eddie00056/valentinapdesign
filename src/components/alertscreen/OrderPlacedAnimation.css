@@ -1,0 +1,376 @@
+/* "Order placed" confirmation beat — a spinner that resolves into a drawn
+   check with a fill pop, glow and two out-rippling rings, and a
+   "Placing order" -> "Order placed" text crossfade. Ported 1:1 from the
+   standalone Design Canvas artboard; every timing keys off `--d` (the
+   spinner's dwell, set inline from the `durationMs` prop). */
+
+.opa-stage {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 48px 24px;
+  background: #0f0f0f;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+.opa-phone {
+  position: relative;
+  filter: drop-shadow(0 40px 60px rgba(0, 0, 0, 0.28));
+}
+
+.opa-phone > img {
+  width: 100%;
+  display: block;
+}
+
+.opa-screen {
+  position: absolute;
+  left: 1.5%;
+  right: 1.6%;
+  top: 0.7%;
+  bottom: 0.8%;
+  border-radius: 44px;
+  overflow: hidden;
+  perspective: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 37%;
+  box-sizing: border-box;
+}
+
+.opa-badge {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: op-pop3d 0.9s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 2s) + 0.12s) both;
+}
+
+.opa-ring {
+  width: 120px;
+  height: 120px;
+  transform: rotate(-90deg);
+}
+
+.opa-ring-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.09);
+  stroke-width: 3.5;
+}
+
+.opa-ring-fill {
+  fill: #409652;
+  opacity: 0;
+  transform-origin: center;
+  animation: op-fillIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--d, 2s) + 0.08s) forwards;
+}
+
+.opa-ring-draw {
+  fill: none;
+  stroke: #409652;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 301.6;
+  stroke-dashoffset: 301.6;
+  opacity: 0;
+  animation:
+    op-drawCircle 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--d, 2s) forwards,
+    op-textIn 0.01s linear var(--d, 2s) forwards;
+}
+
+.opa-spin {
+  fill: none;
+  stroke: #409652;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 240;
+  stroke-dashoffset: 180;
+  transform-origin: center;
+  animation:
+    op-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite,
+    op-spinOut 0.25s ease var(--d, 2s) forwards;
+}
+
+.opa-check {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  animation: op-checkPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) calc(var(--d, 2s) + 0.36s) both;
+}
+
+.opa-check path {
+  fill: none;
+  stroke: #409652;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: op-drawCheck 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 2s) + 0.38s) forwards;
+}
+
+.opa-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%) scale(0.5);
+  background: #409652;
+  border-radius: 50%;
+  filter: blur(24px);
+  opacity: 0;
+  pointer-events: none;
+  animation: op-glowIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 2s) + 0.1s) forwards;
+}
+
+.opa-ripple,
+.opa-ripple2 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 96px;
+  height: 96px;
+  transform: translate(-50%, -50%) scale(1);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.opa-ripple {
+  border: 2px solid rgba(64, 150, 82, 0.35);
+  animation: op-rippleOut 1s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 2s) + 0.4s) forwards;
+}
+
+.opa-ripple2 {
+  border: 1.5px solid rgba(64, 150, 82, 0.2);
+  animation: op-rippleOut2 1.3s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 2s) + 0.55s) forwards;
+}
+
+.opa-caption {
+  display: grid;
+  margin-top: 16px;
+  min-height: 26px;
+}
+
+.opa-caption > span {
+  grid-area: 1 / 1;
+  text-align: center;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+.opa-caption--from {
+  color: rgba(255, 255, 255, 0.45);
+  animation: op-textOut 0.35s ease var(--d, 2s) forwards;
+}
+
+.opa-caption--to {
+  color: rgba(255, 255, 255, 0.92);
+  opacity: 0;
+  animation: op-textIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) calc(var(--d, 2s) + 0.35s) forwards;
+}
+
+.opa-replay {
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+  font: inherit;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.opa-replay:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.opa-replay:focus-visible {
+  outline: 2px solid #48d597;
+  outline-offset: 2px;
+}
+
+@keyframes op-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes op-spinOut {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes op-drawCircle {
+  from {
+    stroke-dashoffset: 301.6;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes op-drawCheck {
+  from {
+    stroke-dashoffset: 48;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes op-fillIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  60% {
+    opacity: 0.14;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0.1;
+    transform: scale(1);
+  }
+}
+@keyframes op-checkPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes op-pop3d {
+  0% {
+    transform: scale(1) rotateX(0deg) rotateY(0deg);
+  }
+  22% {
+    transform: scale(1.15) rotateX(-8deg) rotateY(5deg);
+  }
+  48% {
+    transform: scale(0.95) rotateX(3deg) rotateY(-2deg);
+  }
+  72% {
+    transform: scale(1.03) rotateX(-1deg) rotateY(0.5deg);
+  }
+  100% {
+    transform: scale(1) rotateX(0deg) rotateY(0deg);
+  }
+}
+@keyframes op-glowIn {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.28;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0.16;
+  }
+}
+@keyframes op-rippleOut {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+    filter: blur(0px);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+@keyframes op-rippleOut2 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.35;
+    filter: blur(0px);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.4);
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+@keyframes op-textOut {
+  to {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+}
+@keyframes op-textIn {
+  from {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  to {
+    filter: blur(0px);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Reduced motion: no spin, no pop — jump straight to the settled check
+   and the "Order placed" caption. */
+@media (prefers-reduced-motion: reduce) {
+  .opa-badge,
+  .opa-ring-fill,
+  .opa-ring-draw,
+  .opa-spin,
+  .opa-check,
+  .opa-check path,
+  .opa-glow,
+  .opa-ripple,
+  .opa-ripple2,
+  .opa-caption--from,
+  .opa-caption--to {
+    animation: none !important;
+  }
+  .opa-spin,
+  .opa-glow,
+  .opa-ripple,
+  .opa-ripple2 {
+    opacity: 0 !important;
+  }
+  .opa-ring-fill {
+    opacity: 0.1 !important;
+  }
+  .opa-ring-draw {
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+  }
+  .opa-check {
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+  .opa-check path {
+    stroke-dashoffset: 0 !important;
+  }
+  .opa-caption--from {
+    opacity: 0 !important;
+  }
+  .opa-caption--to {
+    opacity: 1 !important;
+  }
+}

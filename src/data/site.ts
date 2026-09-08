@@ -74,4 +74,9 @@ export const pieces: Piece[] = [
     href: "/work/order-placement-boxed",
     title: "Order placement",
   },
+  {
+    slug: "order-placed-animation",
+    href: "/work/order-placed-animation",
+    title: "Order placed animation",
+  },
 ];
