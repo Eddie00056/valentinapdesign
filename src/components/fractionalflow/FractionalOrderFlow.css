@@ -1,0 +1,189 @@
+/* Fractional Order Flow — a four-screen fractional-share order ticket
+   (entry -> review -> sending -> done) ported 1:1 from the standalone
+   Design Canvas artboard. All keyframes are prefixed `fof-`; the two
+   typefaces (Open Sans, Roboto Slab) come from Google Fonts. */
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Roboto+Slab:wght@400&display=swap");
+
+.fof-stage {
+  min-height: 100vh;
+  background-color: #6f8b3f;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+  box-sizing: border-box;
+  font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.fof-frame {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.fof-frame img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
+.fof-screen input {
+  font-family: inherit;
+}
+.fof-screen button {
+  font-family: "Open Sans", sans-serif;
+  border: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.fof-screen *:focus,
+.fof-screen *:focus-visible,
+.fof-screen *:active {
+  outline: none !important;
+}
+
+@keyframes fof-scrIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fof-discIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes fof-ringOut {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.55);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
+@keyframes fof-checkDraw {
+  from {
+    stroke-dashoffset: 64;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes fof-riseIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fof-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes fof-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes fof-digitInUp {
+  0% {
+    transform: translateY(18px);
+    opacity: 0;
+    filter: blur(2px);
+  }
+  40% {
+    opacity: 1;
+  }
+  55% {
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+@keyframes fof-digitOutUp {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+  45% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(-18px);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+@keyframes fof-digitInDown {
+  0% {
+    transform: translateY(-18px);
+    opacity: 0;
+    filter: blur(2px);
+  }
+  40% {
+    opacity: 1;
+  }
+  55% {
+    filter: blur(0);
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+@keyframes fof-digitOutDown {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+    filter: blur(0);
+  }
+  45% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(18px);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+/* Reduced motion: keep the screen transitions and the check, drop the
+   looping spinner spin and the digit-roll churn. */
+@media (prefers-reduced-motion: reduce) {
+  .fof-screen [style*="fof-digitInUp"],
+  .fof-screen [style*="fof-digitOutUp"],
+  .fof-screen [style*="fof-digitInDown"],
+  .fof-screen [style*="fof-digitOutDown"] {
+    animation: none !important;
+  }
+}

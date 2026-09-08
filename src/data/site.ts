@@ -79,4 +79,9 @@ export const pieces: Piece[] = [
     href: "/work/order-placed-animation",
     title: "Order placed animation",
   },
+  {
+    slug: "fractional-order-flow",
+    href: "/work/fractional-order-flow",
+    title: "Fractional order flow",
+  },
 ];
