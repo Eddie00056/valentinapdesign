@@ -2,11 +2,102 @@
 import Website from "../../layouts/Website.astro";
 import SiteHeader from "../../components/website/SiteHeader.astro";
 import { Reveal } from "../../components/website/Reveal";
-import "../../components/website/case-study.css";
 
 const V = "/website/case/gusto";
 const DECK =
   "https://www.figma.com/slides/8Mdlm1c4YU0ecxJ4B5p3vi/Case-study-presentation--GUSTO-";
+
+const hobbies = [
+  { src: `${V}/hobby-cake.jpg`, alt: "A hand-decorated Spider-Man layer cake" },
+  { src: `${V}/hobby-calligraphy.jpg`, alt: "Pointed-pen calligraphy reading “Valentina”" },
+  { src: `${V}/hobby-jitsu.jpg`, alt: "Rolling on the mats at a jiu-jitsu gym" },
+  { src: `${V}/hobby-flowers.jpg`, alt: "A hand-tied floral arrangement" },
+];
+
+const chapters = [
+  {
+    num: "01",
+    title: "Order entry modernization",
+    blocks: [
+      {
+        label: "Problem",
+        body: "Questrade was seeing slower growth among active traders. The desktop platform was a legacy build with no cohesive design system, and placing an order was slow enough to limit trade efficiency and trader confidence.",
+      },
+      {
+        label: "Solution",
+        body: "Modernize the legacy desktop platform, starting with its highest-impact workflow: order entry. Research with active traders — 150+ trades a quarter — reframed the work around the full trading journey rather than the widget alone.",
+      },
+      {
+        label: "Principles",
+        body: "Reduce time to trade. Standardize order-type configurations across stocks, single-leg options and multi-leg strategies. Innovate while respecting the past — traders told us plainly not to break the one feature nobody complains about.",
+      },
+    ],
+    meta: [
+      ["My role", "Lead Designer, order entry widget"],
+      ["Timeline", "6 months"],
+      ["Team", "2 engineering teams · 1 UX researcher"],
+    ],
+    stats: [
+      ["60%", "faster to place trades"],
+      ["85%", "satisfaction score in the closed beta"],
+    ],
+  },
+  {
+    num: "02",
+    title: "Fractional shares",
+    blocks: [
+      {
+        label: "Goal",
+        body: "On the back of $0 commission trades, win more active traders and streamline trading. Fractional shares were the most-requested feature on the community forum — and no other Canadian broker offered them.",
+      },
+      {
+        label: "The framing",
+        body: "One feature, two platforms, two personas. How might we make fractional investing accessible to new investors without disrupting the speed advanced traders depend on? A north-star scope was mapped against a realistic MVP across symbol availability, order types and order management.",
+      },
+      {
+        label: "Design process",
+        body: "Two questions drove the work: how do I find the right symbol, and how do I place a fractional trade? Beyond the happy path, the hard part was the edge cases — fractional quantities only clear on market orders, so the UI had to guide traders out of limit-order and duration conflicts without dead ends.",
+      },
+    ],
+    meta: [
+      ["My role", "Product Designer"],
+      ["Timeline", "4 months"],
+      ["Team", "4 engineering teams · 1 UX researcher · 3 PMs"],
+    ],
+    stats: [
+      ["60K", "increase in trading volume"],
+      ["$33M", "total value traded"],
+    ],
+    award: "UX Design Awards — Fall 2025 nominee",
+  },
+  {
+    num: "03",
+    title: "Questrade Pro redesign",
+    blocks: [
+      {
+        label: "Context",
+        body: "As active-trader design lead I owned order placement across five platforms — bringing advanced charting, real-time streaming, symbol and account alerts, and real-time fractional share trading into one redesigned Pro experience.",
+      },
+      {
+        label: "The edge",
+        body: "No other Canadian broker offered real-time fractional trading. The redesign standardized a high-level input-field configuration that scaled from a stock order to a five-leg options strategy without a separate ticket for each.",
+      },
+      {
+        label: "Approach",
+        body: "Design for the happy path, then the edge cases, then symbol discoverability. Many order-entry variations were pressure-tested and simplified down — bracket orders, multi-leg options and alerts all folded into one consistent surface.",
+      },
+      {
+        label: "Success criteria",
+        body: "2× the active-trader cohort · 2× ARPU per active trader · 2× notional volume.",
+      },
+    ],
+    meta: [],
+    stats: [
+      ["4.2M", "monthly orders placed"],
+      ["$4.6B", "monthly notional value"],
+    ],
+  },
+];
 ---
 
 <Website
@@ -15,444 +106,485 @@ const DECK =
 >
   <SiteHeader />
 
-  <main class="cs">
-    <section class="cs-hero w-wrap">
+  <main class="gp">
+    <!-- ---------------------------------------------------------------- hero -->
+    <header class="gp-hero w-wrap">
       <p class="gp-kicker">Portfolio presentation</p>
-      <h1 class="cs-title">
-        Order entry, fractional shares, and Questrade Pro — end to end
+      <h1 class="gp-h1">
+        Order entry, fractional shares,<br />and&nbsp;Questrade&nbsp;Pro
       </h1>
       <p class="gp-lede">
         The deck I walk through live, rebuilt as a page. Three active-trader case
         studies at Questrade: the problem, the process, and what shipped.
       </p>
-      <a class="gp-deck-link" href={DECK} target="_blank" rel="noopener">
-        Open the deck in Figma ↗
+      <a class="gp-link" href={DECK} target="_blank" rel="noopener">
+        Open the deck in Figma&nbsp;↗
       </a>
-    </section>
+    </header>
 
-    <div class="cs-media w-wrap">
+    <!-- ------------------------------------------------------------- portrait -->
+    <figure class="gp-portrait w-wrap">
       <img
-        src={`${V}/intro.png`}
-        alt="This is me, this is where I'm from, this is what I like — cake decorating, calligraphy, jiu-jitsu, floral design"
-        loading="lazy"
+        src={`${V}/portrait.jpg`}
+        width="2000"
+        height="1400"
+        alt="Valentina Padure"
+        fetchpriority="high"
       />
-    </div>
+    </figure>
 
-    <section class="cs-overview w-wrap">
-      <div class="cs-block">
-        <p class="cs-label">This is me</p>
-        <p class="cs-body">
-          Product Designer with 5+ years shaping fintech products, most of it
-          spent on the tools active traders live in. I care about fostering
-          collaboration, pushing limits, and delivering high-impact work — and
-          away from the screen I decorate cakes, practice calligraphy, roll
-          jiu-jitsu, and arrange flowers.
-        </p>
-      </div>
-
-      <div class="cs-block">
-        <p class="cs-label">Design ownership across Questrade's highest-revenue products</p>
-        <p class="cs-body">
-          Order-placement design across five platforms, spanning the full
-          trading journey — idea generation, conviction building, execution, and
-          monitoring.
-        </p>
-      </div>
-    </section>
-
-    <Reveal client:load>
-      <section class="cs-impact w-wrap">
-        <h2>Five years, in numbers</h2>
-        <ul class="cs-stats gp-stats-4">
-          <li><span class="n">10+</span><span class="l">active-trader features shipped</span></li>
-          <li><span class="n">3+</span><span class="l">zero-to-one products launched</span></li>
-          <li><span class="n">4</span><span class="l">product designers led across team initiatives</span></li>
-          <li><span class="n">2</span><span class="l">industry design awards</span></li>
-        </ul>
-      </section>
-    </Reveal>
-
-    <!-- ============================ CHAPTER 01 ============================ -->
-    <Reveal client:load>
-      <section class="gp-chapter w-wrap">
-        <p class="gp-chapter-num">Case study 01</p>
-        <h2 class="gp-chapter-title">Order entry modernization</h2>
-      </section>
-    </Reveal>
-
-    <section class="cs-overview w-wrap">
-      <div class="cs-block">
-        <p class="cs-label">Problem</p>
-        <p class="cs-body">
-          Questrade was experiencing slower growth among active traders. The
-          desktop platform was a legacy build with no cohesive design system,
-          and placing an order was slow enough to limit trade efficiency and
-          trader confidence.
-        </p>
-      </div>
-
-      <div class="cs-block">
-        <p class="cs-label">Solution</p>
-        <p class="cs-body">
-          Modernize the legacy desktop platform, starting with the highest-impact
-          workflow: order entry. Research with active traders (150+ trades a
-          quarter) reframed the work around the full trading journey rather than
-          the widget alone.
-        </p>
-      </div>
-
-      <div class="cs-block">
-        <p class="cs-label">Design principles</p>
-        <p class="cs-body">
-          1. Reduce time to trade. 2. Standardize order-type configurations
-          across stocks, single-leg options, and multi-leg strategies.
-          3. Innovate while respecting the past — traders told us plainly not to
-          break the one feature nobody complains about.
-        </p>
-      </div>
-
-      <div class="cs-meta">
-        <div class="cs-block">
-          <p class="cs-label">My role</p>
-          <p class="cs-body">Lead Designer for the order entry widget</p>
-        </div>
-        <div class="cs-block">
-          <p class="cs-label">Timeline</p>
-          <p class="cs-body">6 months</p>
-        </div>
-        <div class="cs-block">
-          <p class="cs-label">Team</p>
-          <p class="cs-body">2 engineering teams, 1 UX researcher</p>
-        </div>
-      </div>
-    </section>
-
-    <div class="cs-media w-wrap">
-      <img
-        src={`${V}/orderentry-final.png`}
-        alt="The redesigned order entry widget — Stock and Option modes, profit/loss brackets, and special instructions"
-        loading="lazy"
-      />
-    </div>
-
-    <Reveal client:load>
-      <section class="cs-impact w-wrap">
-        <h2>Impact</h2>
-        <ul class="cs-stats gp-stats-2">
-          <li><span class="n">60%</span><span class="l">faster to place trades</span></li>
-          <li><span class="n">85%</span><span class="l">satisfaction score during the closed beta</span></li>
-        </ul>
-      </section>
-    </Reveal>
-
-    <!-- ============================ CHAPTER 02 ============================ -->
-    <Reveal client:load>
-      <section class="gp-chapter w-wrap">
-        <p class="gp-chapter-num">Case study 02</p>
-        <h2 class="gp-chapter-title">Fractional shares</h2>
-      </section>
-    </Reveal>
-
-    <section class="cs-overview w-wrap">
-      <div class="cs-block">
-        <p class="cs-label">Goal</p>
-        <p class="cs-body">
-          On the back of $0 commission trades, win more active traders and
-          streamline trading. Fractional shares were the most-requested feature
-          on the community forum — and no other Canadian broker offered them.
-        </p>
-      </div>
-
-      <div class="cs-block">
-        <p class="cs-label">The framing</p>
-        <p class="cs-body">
-          One feature, two platforms, two personas. How might we make fractional
-          investing accessible to new investors without disrupting the speed
-          advanced traders depend on? A north-star scope was mapped against a
-          realistic MVP across symbol availability, order types, and order
-          management.
-        </p>
-      </div>
-
-      <div class="cs-block">
-        <p class="cs-label">Design process</p>
-        <p class="cs-body">
-          Two questions drove the work: how do I find the right symbol, and how
-          do I place a fractional trade? Beyond the happy path, the hard part was
-          the edge cases — fractional quantities only clear on market orders, so
-          the UI had to guide traders out of limit-order and duration conflicts
-          without dead ends.
-        </p>
-      </div>
-
-      <div class="cs-meta">
-        <div class="cs-block">
-          <p class="cs-label">My role</p>
-          <p class="cs-body">Product Designer</p>
-        </div>
-        <div class="cs-block">
-          <p class="cs-label">Timeline</p>
-          <p class="cs-body">4 months</p>
-        </div>
-        <div class="cs-block">
-          <p class="cs-label">Team</p>
-          <p class="cs-body">
-            4 engineering teams, 1 UX researcher, 3 product managers
+    <!-- ---------------------------------------------------------------- intro -->
+    <section class="gp-section w-wrap">
+      <div class="gp-row">
+        <p class="gp-label">This is me</p>
+        <div class="gp-col">
+          <p class="gp-body">
+            Product Designer with 5+ years shaping fintech products, most of it
+            spent in the tools active traders live in. I care about fostering
+            collaboration, pushing limits, and delivering high-impact work.
+          </p>
+          <p class="gp-body">
+            I grew up in Moldova and I&rsquo;m based in New York. Away from the
+            screen I decorate cakes, practice calligraphy, roll jiu-jitsu, and
+            arrange flowers.
           </p>
         </div>
       </div>
-    </section>
 
-    <div class="cs-media cs-media--cap w-wrap">
-      <img
-        src={`${V}/fractional-pizza.png`}
-        alt="What is fractional trading? A fractional share shown as one slice of a whole pizza"
-        loading="lazy"
-      />
-    </div>
-
-    <Reveal client:load>
-      <section class="cs-impact w-wrap">
-        <h2>Impact</h2>
-        <ul class="cs-stats gp-stats-2">
-          <li><span class="n">60K</span><span class="l">increase in trading volume</span></li>
-          <li><span class="n">$33M</span><span class="l">total value traded</span></li>
+      <div class="gp-row gp-row--wide">
+        <p class="gp-label">This is what I like</p>
+        <ul class="gp-hobbies">
+          {
+            hobbies.map((h) => (
+              <li>
+                <img src={h.src} width="1100" height="1100" alt={h.alt} loading="lazy" />
+              </li>
+            ))
+          }
         </ul>
-      </section>
-    </Reveal>
-
-    <Reveal client:load>
-      <section class="cs-award w-wrap">
-        <p class="headline">UX Design Awards</p>
-        <p class="sub">Fall 2025 nominee</p>
-      </section>
-    </Reveal>
-
-    <!-- ============================ CHAPTER 03 ============================ -->
-    <Reveal client:load>
-      <section class="gp-chapter w-wrap">
-        <p class="gp-chapter-num">Case study 03</p>
-        <h2 class="gp-chapter-title">Questrade Pro redesign</h2>
-      </section>
-    </Reveal>
-
-    <section class="cs-overview w-wrap">
-      <div class="cs-block">
-        <p class="cs-label">Context</p>
-        <p class="cs-body">
-          As active-trader design lead, I owned order placement across five
-          platforms — bringing advanced charting, real-time streaming, symbol and
-          account alerts, and real-time fractional share trading into one
-          redesigned Pro experience.
-        </p>
-      </div>
-
-      <div class="cs-block">
-        <p class="cs-label">The edge</p>
-        <p class="cs-body">
-          No other Canadian broker offered real-time fractional trading. The
-          redesign standardized a high-level input-field configuration that
-          scaled from a stock order to a five-leg options strategy without a
-          separate ticket for each.
-        </p>
-      </div>
-
-      <div class="cs-block">
-        <p class="cs-label">Approach</p>
-        <p class="cs-body">
-          Design for the happy path, then for the edge cases, then for symbol
-          discoverability. Multiple order-entry variations were pressure-tested
-          and simplified down — bracket orders, multi-leg options, and alerts all
-          folded into one consistent surface.
-        </p>
-      </div>
-
-      <div class="cs-block">
-        <p class="cs-label">Success criteria</p>
-        <p class="cs-body">
-          2× the active-trader cohort · 2× ARPU per active trader · 2× notional
-          volume.
-        </p>
       </div>
     </section>
 
-    <div class="cs-media w-wrap">
-      <img
-        src={`${V}/pro-redesign.png`}
-        alt="Questrade Pro redesign — active-trader design lead, spanning advanced charting, real-time streaming, alerts, and real-time fractional share trading"
-        loading="lazy"
-      />
-    </div>
-
-    <div class="cs-media w-wrap">
-      <img
-        src={`${V}/pro-redesign-flow.png`}
-        alt="One order-entry flow spanning desktop and mobile"
-        loading="lazy"
-      />
-    </div>
-
+    <!-- ------------------------------------------------------------- overview -->
     <Reveal client:load>
-      <section class="cs-impact w-wrap">
-        <h2>Impact</h2>
-        <ul class="cs-stats gp-stats-2">
-          <li><span class="n">4.2M</span><span class="l">monthly orders placed</span></li>
-          <li><span class="n">$4.6B</span><span class="l">monthly notional value</span></li>
-        </ul>
+      <section class="gp-section gp-section--rule w-wrap">
+        <div class="gp-row">
+          <p class="gp-label">Design ownership</p>
+          <div class="gp-col">
+            <p class="gp-body gp-body--lg">
+              Order-placement design across five of Questrade&rsquo;s
+              highest-revenue platforms, spanning the full trading journey — idea
+              generation, conviction building, execution, and monitoring.
+            </p>
+          </div>
+        </div>
+
+        <dl class="gp-figures">
+          <div><dt>10+</dt><dd>active-trader features shipped</dd></div>
+          <div><dt>3+</dt><dd>zero-to-one products launched</dd></div>
+          <div><dt>4</dt><dd>designers led across team initiatives</dd></div>
+          <div><dt>2</dt><dd>industry design awards</dd></div>
+        </dl>
       </section>
     </Reveal>
 
+    <!-- ------------------------------------------------------------- chapters -->
+    {
+      chapters.map((c) => (
+        <Reveal client:load>
+          <section class="gp-chapter gp-section--rule w-wrap">
+            <div class="gp-row gp-row--head">
+              <p class="gp-chapter-num">{c.num}</p>
+              <h2 class="gp-chapter-title">{c.title}</h2>
+            </div>
+
+            {c.blocks.map((b) => (
+              <div class="gp-row">
+                <p class="gp-label">{b.label}</p>
+                <div class="gp-col">
+                  <p class="gp-body">{b.body}</p>
+                </div>
+              </div>
+            ))}
+
+            {c.meta.length > 0 && (
+              <div class="gp-row">
+                <p class="gp-label">Details</p>
+                <ul class="gp-meta">
+                  {c.meta.map(([k, v]) => (
+                    <li>
+                      <span class="gp-meta-k">{k}</span>
+                      <span class="gp-meta-v">{v}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div class="gp-row gp-row--wide">
+              <p class="gp-label">Impact</p>
+              <div class="gp-impact">
+                {c.stats.map(([n, l]) => (
+                  <div class="gp-impact-item">
+                    <span class="gp-impact-n">{n}</span>
+                    <span class="gp-impact-l">{l}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {c.award && <p class="gp-award">{c.award}</p>}
+          </section>
+        </Reveal>
+      ))
+    }
+
+    <!-- ---------------------------------------------------------------- close -->
     <Reveal client:load>
-      <section class="gp-close w-wrap">
-        <p class="gp-close-line">That's the walkthrough.</p>
-        <a class="gp-deck-link" href={DECK} target="_blank" rel="noopener">
-          Open the full deck in Figma ↗
+      <section class="gp-close gp-section--rule w-wrap">
+        <p class="gp-close-line">That&rsquo;s the walkthrough.</p>
+        <a class="gp-link" href={DECK} target="_blank" rel="noopener">
+          Open the full deck in Figma&nbsp;↗
         </a>
       </section>
     </Reveal>
   </main>
-
-  <script>
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      document.querySelectorAll("video").forEach((v) => {
-        v.removeAttribute("autoplay");
-        v.pause();
-      });
-    }
-  </script>
 </Website>
 
 <style>
-  /* ---- hero extras ------------------------------------------------ */
-  .gp-kicker {
-    margin: 0 auto clamp(1rem, 2vw, 1.5rem);
-    text-align: center;
+  /* Tiago-Costa register: one left-aligned column, big Elza display type,
+     tiny mono labels in a left rail, hairline rules, lots of air.
+     Rides on the --w-* tokens from Website.astro. */
+
+  .gp {
+    --rail: 12rem; /* width of the left label rail on wide screens */
+    --measure: 40rem; /* body copy measure */
+    padding-bottom: clamp(3.5rem, 8vw, 6rem);
+  }
+
+  /* ---- hero ----------------------------------------------------- */
+  .gp-hero {
+    padding-top: clamp(3.5rem, 2rem + 7vw, 7.5rem);
+    padding-bottom: clamp(2.5rem, 1.5rem + 4vw, 4.5rem);
+  }
+
+  .gp-kicker,
+  .gp-label {
+    margin: 0;
     font-family: var(--w-font-alt);
-    font-size: 0.8125rem;
+    font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--w-ink-soft);
   }
 
+  .gp-h1 {
+    margin: clamp(1.25rem, 2vw, 1.75rem) 0 0;
+    max-width: 18ch;
+    font-weight: 400;
+    font-size: clamp(2.5rem, 1.3rem + 5vw, 4.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.038em;
+    text-wrap: balance;
+  }
+
   .gp-lede {
-    margin: clamp(1.25rem, 3vw, 2rem) auto 0;
-    max-width: 52ch;
-    text-align: center;
-    font-size: clamp(1rem, 0.95rem + 0.4vw, 1.1875rem);
+    margin: clamp(1.5rem, 3vw, 2.25rem) 0 0;
+    max-width: 46ch;
+    font-size: clamp(1.0625rem, 1rem + 0.4vw, 1.25rem);
     line-height: 1.5;
     color: var(--w-ink-soft);
     text-wrap: pretty;
   }
 
-  .gp-deck-link {
+  .gp-link {
     display: inline-block;
-    margin-top: clamp(1.5rem, 3vw, 2.25rem);
+    margin-top: clamp(1.75rem, 3vw, 2.5rem);
     font-family: var(--w-font-alt);
     font-size: 1.0625rem;
     color: var(--w-accent);
     transition: opacity 0.18s ease;
   }
 
-  .gp-deck-link:hover {
-    opacity: 0.7;
+  .gp-link:hover {
+    opacity: 0.68;
   }
 
-  .cs-hero {
+  /* ---- portrait ----------------------------------------------- */
+  .gp-portrait {
+    margin: 0 auto;
+  }
+
+  .gp-portrait img {
+    display: block;
+    width: 100%;
+    height: auto; /* rendered at its native ratio — never cropped */
+    border-radius: 14px;
+  }
+
+  /* ---- section / row scaffold -------------------------------- */
+  .gp-section,
+  .gp-chapter,
+  .gp-close {
+    padding-top: clamp(2.5rem, 5vw, 4.25rem);
+    padding-bottom: clamp(0.75rem, 2vw, 1.25rem);
+  }
+
+  .gp-section--rule {
+    margin-top: clamp(2.5rem, 5vw, 4.25rem);
+    border-top: 1px solid var(--w-line);
+  }
+
+  /* a row = tiny label in a left rail + content column */
+  .gp-row {
+    display: grid;
+    grid-template-columns: var(--rail) minmax(0, 1fr);
+    gap: clamp(1rem, 4vw, 3rem);
+    padding-block: clamp(1.25rem, 2.5vw, 2rem);
+  }
+
+  .gp-row + .gp-row {
+    border-top: 1px solid var(--w-line);
+  }
+
+  .gp-row .gp-label {
+    padding-top: 0.35rem;
+  }
+
+  .gp-col {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 1rem;
+    max-width: var(--measure);
   }
 
-  /* ---- chapter divider ----------------------------------------- */
-  .gp-chapter {
-    border-top: 1px solid var(--w-line);
-    padding-top: clamp(3rem, 8vw, 6rem);
-    padding-bottom: clamp(0.5rem, 2vw, 1.5rem);
-    margin-top: clamp(3rem, 8vw, 6rem);
+  .gp-body {
+    margin: 0;
+    font-size: clamp(1rem, 0.96rem + 0.3vw, 1.125rem);
+    line-height: 1.62;
+    color: var(--w-ink-soft);
+  }
+
+  .gp-body--lg {
+    font-size: clamp(1.125rem, 1rem + 0.7vw, 1.5rem);
+    line-height: 1.42;
+    letter-spacing: -0.012em;
+    color: var(--w-ink);
+    max-width: 32ch;
+    hyphens: none;
+  }
+
+  /* ---- hobby grid ------------------------------------------- */
+  .gp-row--wide {
+    grid-template-columns: 1fr;
+    gap: clamp(1rem, 2.5vw, 1.75rem);
+  }
+
+  .gp-hobbies {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  }
+
+  .gp-hobbies img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1; /* source files are already square — no further crop */
+    object-fit: cover;
+    border-radius: 10px;
+  }
+
+  /* ---- figures (career overview) --------------------------- */
+  .gp-figures {
+    margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .gp-figures div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .gp-figures dt {
+    font-weight: 600;
+    font-size: clamp(2rem, 1.3rem + 2.8vw, 3rem);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--w-accent); /* fallback */
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--w-accent) 70%, #ffffff) 0%,
+      var(--w-accent) 55%,
+      color-mix(in srgb, var(--w-accent) 82%, #000000) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .gp-figures dd {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: var(--w-ink-soft);
+  }
+
+  /* ---- chapter -------------------------------------------- */
+  .gp-row--head {
+    align-items: baseline;
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
   }
 
   .gp-chapter-num {
-    margin: 0 0 0.6rem;
+    margin: 0;
+    padding-top: 0.5rem;
     font-family: var(--w-font-alt);
-    font-size: 0.8125rem;
+    font-size: 0.9375rem;
     font-weight: 500;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--w-accent);
+    font-variant-numeric: tabular-nums;
   }
 
   .gp-chapter-title {
     margin: 0;
     font-weight: 400;
-    font-size: clamp(1.875rem, 1.2rem + 3.4vw, 3.25rem);
-    line-height: 1.1;
-    letter-spacing: -0.03em;
+    font-size: clamp(2rem, 1.3rem + 3.4vw, 3.5rem);
+    line-height: 1.06;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
   }
 
-  /* the shared .cs-meta is a 2-item flex row; our chapters carry three
-     (role / timeline / team), so lay them out as an even three-up grid
-     rather than letting the third wrap under a tall row gap */
-  .cs-meta {
+  /* ---- chapter meta list --------------------------------- */
+  .gp-meta {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+  }
+
+  .gp-meta li {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: clamp(1.5rem, 4vw, 2.5rem);
+    grid-template-columns: 10rem minmax(0, 1fr);
+    gap: 1rem;
+    font-size: 0.9375rem;
+    line-height: 1.4;
   }
 
-  .cs-meta .cs-block + .cs-block {
-    margin-top: 0;
+  .gp-meta-k {
+    color: var(--w-ink-faint);
   }
 
-  /* keep the pizza metaphor from dominating as a full-bleed white block */
-  .cs-media--cap img {
-    width: auto;
-    max-width: min(100%, 760px);
+  .gp-meta-v {
+    color: var(--w-ink-soft);
   }
 
-  @media (max-width: 620px) {
-    .cs-meta {
-      grid-template-columns: 1fr;
-    }
+  /* ---- impact numbers ----------------------------------- */
+  .gp-impact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(2.5rem, 7vw, 5.5rem);
+    padding-top: clamp(0.5rem, 1.5vw, 1rem);
   }
 
-  /* two-up impact rows read better centred than stretched across 3 cols */
-  .cs-stats.gp-stats-2 {
-    grid-template-columns: repeat(2, minmax(0, 16rem));
-    justify-content: center;
+  .gp-impact-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
   }
 
-  /* the career-overview row carries four stats */
-  .cs-stats.gp-stats-4 {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .gp-impact-n {
+    font-weight: 600;
+    font-size: clamp(2.75rem, 1.8rem + 4.6vw, 5rem);
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    color: var(--w-accent); /* fallback */
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--w-accent) 70%, #ffffff) 0%,
+      var(--w-accent) 55%,
+      color-mix(in srgb, var(--w-accent) 82%, #000000) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
-  @media (max-width: 900px) {
-    .cs-stats.gp-stats-4 {
-      grid-template-columns: repeat(2, minmax(0, 14rem));
-      justify-content: center;
-      gap: 2.5rem 3rem;
-    }
+  .gp-impact-l {
+    max-width: 22ch;
+    font-size: 0.9375rem;
+    line-height: 1.4;
+    color: var(--w-ink-soft);
   }
 
-  /* ---- close ------------------------------------------------------ */
+  .gp-award {
+    margin: clamp(1.75rem, 4vw, 3rem) 0 0;
+    padding-left: calc(var(--rail) + clamp(1rem, 4vw, 3rem));
+    font-size: 0.9375rem;
+    letter-spacing: 0.01em;
+    color: var(--w-ink-soft);
+  }
+
+  /* ---- close -------------------------------------------- */
   .gp-close {
-    border-top: 1px solid var(--w-line);
-    margin-top: clamp(3rem, 8vw, 6rem);
-    padding-block: clamp(3rem, 8vw, 6rem);
-    text-align: center;
+    padding-top: clamp(3rem, 6vw, 5rem);
+    padding-bottom: 0;
   }
 
   .gp-close-line {
     margin: 0;
     font-weight: 400;
-    font-size: clamp(1.5rem, 1rem + 2.4vw, 2.5rem);
-    letter-spacing: -0.02em;
+    font-size: clamp(1.75rem, 1.2rem + 2.6vw, 2.75rem);
+    letter-spacing: -0.03em;
   }
 
-  @media (max-width: 760px) {
-    .cs-stats.gp-stats-2,
-    .cs-stats.gp-stats-4 {
+  /* ---- responsive -------------------------------------- */
+  @media (max-width: 860px) {
+    .gp {
+      --rail: 100%;
+    }
+
+    .gp-row,
+    .gp-row--head {
       grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .gp-row .gp-label,
+    .gp-chapter-num {
+      padding-top: 0;
+    }
+
+    .gp-figures {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem 1.5rem;
+    }
+
+    .gp-award {
+      padding-left: 0;
     }
   }
+
+  @media (max-width: 560px) {
+    .gp-hobbies {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .gp-meta li {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+  }
+
 </style>
