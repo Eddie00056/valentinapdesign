@@ -13,8 +13,10 @@ import "../components/glasslab/glasslab.css";
   <div class="page">
     <header>
       <h1>{site.name}</h1>
-      <p class="mono">
+      <p class="mono links-row">
         <a class="link-underline" href="/website">Website ↗</a>
+        <span class="sep" aria-hidden="true">·</span>
+        <a class="link-underline" href="/website/presentation">Presentation ↗</a>
       </p>
     </header>
 
@@ -86,6 +88,16 @@ import "../components/glasslab/glasslab.css";
   }
 
   header .mono a {
+    color: var(--ink-faint);
+  }
+
+  header .links-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+  }
+
+  header .links-row .sep {
     color: var(--ink-faint);
   }
 
