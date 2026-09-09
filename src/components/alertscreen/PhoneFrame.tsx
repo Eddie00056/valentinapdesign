@@ -136,7 +136,7 @@ export function PhoneFrame({
               {children}
             </div>
             {footer && (
-              <div style={{ flex: "none", padding: "0 24px 20px", background: "#000" }}>
+              <div style={{ flex: "none", padding: "0 24px 24px", background: "#000" }}>
                 {footer}
               </div>
             )}

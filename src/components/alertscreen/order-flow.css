@@ -1,26 +1,8 @@
-/* Review -> placing -> placed continuation of the boxed order ticket.
-   Recoloured to the ticket's dark palette (chart UP #48d597); timings
-   ported from the fractional order flow's done screen. */
-
-.ofl-scr {
-  animation: ofl-scrIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-.ofl-rise {
-  animation: ofl-riseIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.42s both;
-}
-.ofl-spin {
-  animation: ofl-spin 0.9s linear infinite;
-}
-.ofl-ring {
-  opacity: 0;
-  animation: ofl-ringOut 1.1s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
-}
-.ofl-disc {
-  animation: ofl-discIn 0.62s cubic-bezier(0.34, 1.56, 0.64, 1) 0.06s both;
-}
-.ofl-check {
-  animation: ofl-checkDraw 0.44s cubic-bezier(0.65, 0, 0.35, 1) 0.42s both;
-}
+/* Review screen CTA + the full-screen "Submitting order -> Order sent"
+   loading-checkmark beat. The checkmark animation is a spinner that
+   resolves into a drawn circle + fill pop + 3D pop + drawn check + glow +
+   two out-rippling rings, with a blur crossfade on the status text.
+   Recoloured to the ticket's green (#48d597). */
 
 .ofl-cta {
   width: 100%;
@@ -30,84 +12,346 @@
   background: #48d597;
   color: #0b0b0d;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   cursor: pointer;
   font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .ofl-cta--ghost {
   background: transparent;
   color: #f2f2f8;
   box-shadow: inset 0 0 0 1px #3a3f47;
 }
+.ofl-cta:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 
-@keyframes ofl-scrIn {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* full-width outline button — white 1px stroke, no fill */
+.ofl-btn-outline {
+  width: 100%;
+  height: 44px;
+  border: 1px solid #fff;
+  border-radius: 999px;
+  background: transparent;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 400;
+  cursor: pointer;
+  font-family: inherit;
 }
-@keyframes ofl-riseIn {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
+/* ---- loading checkmark ---- */
+
+.lc-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 16px;
+  text-align: center;
 }
-@keyframes ofl-spin {
+
+.lc-circle-wrap {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  margin: 0 auto;
+}
+
+.lc-main-svg {
+  width: 120px;
+  height: 120px;
+  transform: rotate(-90deg);
+}
+
+.lc-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 3.5;
+}
+
+.lc-spinner {
+  fill: none;
+  stroke: #48d597;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 240;
+  stroke-dashoffset: 180;
+  transform-origin: center;
+  animation: lc-spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+
+.lc-complete {
+  fill: none;
+  stroke: #48d597;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 301.6;
+  stroke-dashoffset: 301.6;
+  opacity: 0;
+}
+
+.lc-fill {
+  fill: #48d597;
+  opacity: 0;
+  transform-origin: center;
+  transform: scale(0);
+}
+
+.lc-checkmark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  width: 50px;
+  height: 50px;
+  opacity: 0;
+}
+
+.lc-check-path {
+  fill: none;
+  stroke: #48d597;
+  stroke-width: 4.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+}
+
+.lc-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%) scale(0.5);
+  background: #48d597;
+  border-radius: 50%;
+  filter: blur(24px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lc-ripple,
+.lc-ripple-2 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 96px;
+  height: 96px;
+  transform: translate(-50%, -50%) scale(1);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+.lc-ripple {
+  border: 2px solid rgba(72, 213, 151, 0.35);
+}
+.lc-ripple-2 {
+  border: 1.5px solid rgba(72, 213, 151, 0.2);
+}
+
+.lc-status {
+  display: grid;
+  justify-items: center;
+  min-height: 24px;
+}
+.lc-status > span {
+  grid-area: 1 / 1;
+  width: 100%;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+.lc-status-from {
+  color: rgba(255, 255, 255, 0.45);
+  transition:
+    filter 0.35s ease,
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+.lc-status-to {
+  color: rgba(255, 255, 255, 0.85);
+  opacity: 0;
+}
+
+.lc-container.completed .lc-spinner {
+  opacity: 0;
+}
+.lc-container.completed .lc-circle-wrap {
+  animation: lc-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+.lc-container.completed .lc-fill {
+  animation: lc-fillIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.08s forwards;
+}
+.lc-container.completed .lc-complete {
+  opacity: 1;
+  animation: lc-drawCircle 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.lc-container.completed .lc-check-path {
+  animation: lc-drawCheck 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.38s forwards;
+}
+.lc-container.completed .lc-checkmark {
+  animation: lc-checkPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.36s both;
+}
+.lc-container.completed .lc-glow {
+  animation: lc-glowIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s forwards;
+}
+.lc-container.completed .lc-ripple {
+  animation: lc-rippleOut 1s cubic-bezier(0.22, 1, 0.36, 1) 0.4s forwards;
+}
+.lc-container.completed .lc-ripple-2 {
+  animation: lc-rippleOut2 1.3s cubic-bezier(0.22, 1, 0.36, 1) 0.55s forwards;
+}
+.lc-container.completed .lc-status-from {
+  filter: blur(8px);
+  opacity: 0;
+  transform: translateY(6px) scale(0.96);
+}
+.lc-container.completed .lc-status-to {
+  animation: lc-textIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.35s forwards;
+}
+
+@keyframes lc-spin {
   to {
     transform: rotate(360deg);
   }
 }
-@keyframes ofl-discIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-  55% {
-    opacity: 1;
-    transform: scale(1.08);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-@keyframes ofl-ringOut {
-  0% {
-    opacity: 0.5;
-    transform: scale(0.55);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.9);
-  }
-}
-@keyframes ofl-checkDraw {
+@keyframes lc-drawCircle {
   to {
     stroke-dashoffset: 0;
   }
 }
+@keyframes lc-drawCheck {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes lc-fillIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  60% {
+    opacity: 0.1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 0.07;
+    transform: scale(1);
+  }
+}
+@keyframes lc-checkPop {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+/* pure center-origin scale pulse — no translate/rotate, so the ring never
+   shifts position between the loading spinner and the settled check */
+@keyframes lc-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.06);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lc-glowIn {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.6);
+    opacity: 0.12;
+  }
+}
+@keyframes lc-rippleOut {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
+    filter: blur(0px);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+@keyframes lc-rippleOut2 {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.35;
+    filter: blur(0px);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.4);
+    opacity: 0;
+    filter: blur(3px);
+  }
+}
+@keyframes lc-textIn {
+  from {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
+  }
+  to {
+    filter: blur(0px);
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .ofl-scr,
-  .ofl-rise,
-  .ofl-spin,
-  .ofl-ring,
-  .ofl-disc {
+  .lc-spinner,
+  .lc-container.completed .lc-circle-wrap,
+  .lc-container.completed .lc-fill,
+  .lc-container.completed .lc-complete,
+  .lc-container.completed .lc-check-path,
+  .lc-container.completed .lc-checkmark,
+  .lc-container.completed .lc-glow,
+  .lc-container.completed .lc-ripple,
+  .lc-container.completed .lc-ripple-2,
+  .lc-container.completed .lc-status-to {
     animation: none !important;
   }
-  .ofl-ring {
+  .lc-container.completed .lc-spinner {
     opacity: 0 !important;
   }
-  .ofl-check {
-    animation: none !important;
+  .lc-container.completed .lc-complete {
+    opacity: 1 !important;
     stroke-dashoffset: 0 !important;
+  }
+  .lc-container.completed .lc-checkmark {
+    opacity: 1 !important;
+    transform: translate(-50%, -50%) scale(1) !important;
+  }
+  .lc-container.completed .lc-check-path {
+    stroke-dashoffset: 0 !important;
+  }
+  .lc-container.completed .lc-status-from {
+    opacity: 0 !important;
+  }
+  .lc-container.completed .lc-status-to {
+    opacity: 1 !important;
   }
 }

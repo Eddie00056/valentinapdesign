@@ -30,7 +30,12 @@ const SELECTED = "#ffffff";
 // row label — 12px (matches the alert screen's readout); the hierarchy against
 // the field value comes mostly from colour (full white vs dim) + the bordered
 // box, so the weight only needs a light nudge
-const labelStyle: CSSProperties = { color: VAL, fontSize: 14, fontWeight: 500 };
+const labelStyle: CSSProperties = {
+  color: "#fff",
+  fontSize: 14,
+  fontWeight: 500,
+  letterSpacing: "0.01em",
+};
 // the value sitting inside a field box — dimmer than the label
 const valueStyle: CSSProperties = {
   color: "#c9cdd6",
@@ -60,7 +65,10 @@ const money = (n: number) =>
     maximumFractionDigits: 2,
   });
 
-// review / placing / placed screen chrome
+// shared spring for the button -> panel layout morph — quick
+const ORD_SPRING = { type: "spring", visualDuration: 0.26, bounce: 0 } as const;
+
+// review screen chrome
 const iconBtnStyle: CSSProperties = {
   width: 24,
   height: 24,
@@ -79,14 +87,32 @@ const reviewRowStyle: CSSProperties = {
   gap: 12,
   padding: "11px 0",
 };
-const flowCenterStyle: CSSProperties = {
+
+// order-placed confirmation card
+const placedInnerStyle: CSSProperties = {
   display: "flex",
   flexDirection: "column",
+  gap: 14,
+  padding: "0 18px",
+};
+const placedRowStyle: CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
   alignItems: "center",
-  justifyContent: "center",
-  minHeight: "60vh",
-  gap: 44,
-  textAlign: "center",
+  gap: 12,
+};
+const placedLabelStyle: CSSProperties = {
+  fontSize: 14,
+  fontWeight: 400,
+  color: "rgba(255, 255, 255, 0.5)",
+  letterSpacing: "0.01em",
+};
+const placedValueStyle: CSSProperties = {
+  fontSize: 14,
+  fontWeight: 400,
+  color: "#fff",
+  letterSpacing: "0.01em",
+  fontVariantNumeric: "tabular-nums",
 };
 
 const ORDER_TYPES = [
@@ -108,7 +134,13 @@ const ORDER_TYPE_DESC: Record<string, string> = {
 /* The unit switcher is a chevron next to the "Shares" label; the box holds
    only the value. The earlier "prefix inside the box" take is kept as
    OrderPlacementScreenBoxedPrefix (/work/order-placement-boxed-prefix). */
-export function OrderPlacementScreenBoxed() {
+export function OrderPlacementScreenBoxed({
+  singleCta = false,
+}: {
+  /** One "Place order" button instead of Buy/Sell; tapping it skips the
+      Review screen and goes straight into the placing -> placed animation. */
+  singleCta?: boolean;
+} = {}) {
   const [s, setS] = useState<PriceState>({ price: PX_BASE, prev: PX_BASE, dir: 0, n: 0 });
   const [qtyStr, setQtyStr] = useState("2");
   const qty = parseFloat(qtyStr) || 0;
@@ -203,12 +235,12 @@ export function OrderPlacementScreenBoxed() {
     return () => window.clearTimeout(id);
   }, [step]);
 
-  const submit = (dir: "Buy" | "Sell") => {
+  const submit = (dir: "Buy" | "Sell" = "Buy") => {
     if (hasError) return;
     closeAll();
     setSide(dir);
     setLockedPx(s.price);
-    setStep("review");
+    setStep(singleCta ? "placing" : "review");
   };
 
   const bidPx = s.price - 0.01;
@@ -248,6 +280,8 @@ export function OrderPlacementScreenBoxed() {
 
   // review screen: shares vs dollar-amount modes resolve differently
   const isDollars = effQtyType === "dollars";
+  // in dollar-amount mode the ticket estimates a share count instead of a cost
+  const estShares = s.price ? qty / s.price : 0;
   const reviewShares = isDollars ? (lockedPx ? qty / lockedPx : 0) : qty;
   const reviewAmount = isDollars ? qty : qty * lockedPx;
   const reviewRows: Array<[string, string]> = [
@@ -255,9 +289,9 @@ export function OrderPlacementScreenBoxed() {
     ...(orderType === "Limit"
       ? ([["Limit price", `$${limitStr}`]] as Array<[string, string]>)
       : []),
-    ["Route", "NASDAQ"],
+    ["Route", "Nasdaq"],
     ["Special instructions", "None"],
-    ["Account", "Individual Margin"],
+    ["Account", "Margin"],
     ["Total share quantity", reviewShares.toFixed(3)],
   ];
   const reviewTitle = `${side} ${
@@ -268,23 +302,175 @@ export function OrderPlacementScreenBoxed() {
     orderType === "Limit" ? `Limit ${money(parseFloat(limitStr) || 0)}` : orderType
   }`;
 
+  // order-placed confirmation card — the resolved details of the order.
+  // Quantity always reads as a share count (dollar orders resolve to shares).
+  const placedShares = Number.isInteger(reviewShares)
+    ? String(reviewShares)
+    : reviewShares.toFixed(3);
+  const placedQty = `${placedShares} ${reviewShares === 1 ? "share" : "shares"}`;
+  const placedTotal = isDollars
+    ? qty
+    : (isLimit ? parseFloat(limitStr) || 0 : lockedPx) * qty;
+  const placedRows: Array<[string, string]> = [
+    ["Account", "Margin"],
+    ["Order type", `${orderType} ${side.toLowerCase()}`],
+    ...(isLimit
+      ? ([["Limit price", `${money(parseFloat(limitStr) || 0)} USD`]] as Array<
+          [string, string]
+        >)
+      : []),
+    ["Quantity", placedQty],
+    ["Total cost", `${money(placedTotal)} USD`],
+  ];
+
+  // rendered on both order-placed panels. Always mounted (even while the
+  // spinner is still running) so it reserves its height and the checkmark
+  // never shifts when it fades in.
+  const placedCard = (visible: boolean) => (
+    <motion.div
+      initial={false}
+      animate={{ opacity: visible ? 1 : 0, y: visible ? 0 : 10 }}
+      transition={{ duration: 0.28, delay: visible ? 0.12 : 0, ease: [0.22, 1, 0.36, 1] }}
+      style={{
+        width: "100%",
+        marginTop: 28,
+        background: "rgba(255, 255, 255, 0.04)",
+        border: "1px solid rgba(255, 255, 255, 0.11)",
+        borderRadius: 14,
+        padding: "16px 0",
+        pointerEvents: visible ? "auto" : "none",
+      }}
+    >
+      <div style={placedInnerStyle}>
+        {placedRows.map(([label, value]) => (
+          <div key={label} style={placedRowStyle}>
+            <span style={placedLabelStyle}>{label}</span>
+            <span style={placedValueStyle}>{value}</span>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+
+  // shared body for both order-placed panels (single-CTA + two-button).
+  // A flex column: the checkmark + details card sit as one centred block,
+  // the buttons pin low. The card and buttons are always mounted (opacity
+  // toggled) so nothing reflows when the order resolves to `placed`.
+  const placedPanelContent = (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        padding: 24,
+        boxSizing: "border-box",
+      }}
+    >
+      {/* dismiss — same glass icon-button material as the ticket's header
+          controls (66deg masked 1px rim via `.acs-frac-card`) */}
+      <motion.button
+        aria-label="Dismiss"
+        onClick={() => setStep("ticket")}
+        className="acs-frac-card"
+        initial={false}
+        animate={{ opacity: step === "placed" ? 1 : 0 }}
+        transition={{ duration: 0.25, delay: step === "placed" ? 0.18 : 0 }}
+        style={{
+          position: "absolute",
+          top: 24,
+          right: 24,
+          width: 32,
+          height: 32,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: 999,
+          border: "none",
+          overflow: "hidden",
+          cursor: "pointer",
+          background:
+            "linear-gradient(66deg, rgba(255,255,255,0.1), rgba(255,255,255,0.045))",
+          boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+          backdropFilter: "blur(18px)",
+          WebkitBackdropFilter: "blur(18px)",
+          color: "rgba(255,255,255,0.9)",
+          pointerEvents: step === "placed" ? "auto" : "none",
+          zIndex: 4,
+        }}
+      >
+        <svg width="11" height="11" viewBox="0 0 14 14" fill="currentColor" aria-hidden="true">
+          <path d="M14 1.41 12.59 0 7 5.59 1.41 0 0 1.41 5.59 7 0 12.59 1.41 14 7 8.41 12.59 14 14 12.59 8.41 7 14 1.41Z" />
+        </svg>
+      </motion.button>
+
+      <div style={{ flex: 1, minHeight: 8 }} />
+      <motion.div
+        key="seq"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.2, delay: 0.08 }}
+        style={{
+          flex: "none",
+          width: "100%",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <PlacedSequence onDone={() => setStep("placed")} />
+      </motion.div>
+      {placedCard(step === "placed")}
+      <div style={{ flex: 1.35, minHeight: 8 }} />
+      <motion.div
+        initial={false}
+        animate={{
+          opacity: step === "placed" ? 1 : 0,
+          y: step === "placed" ? 0 : 8,
+        }}
+        transition={{ duration: 0.25, delay: step === "placed" ? 0.15 : 0 }}
+        style={{
+          flex: "none",
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          gap: 16,
+          pointerEvents: step === "placed" ? "auto" : "none",
+        }}
+      >
+        <button className="ofl-btn-outline" onClick={() => setStep("ticket")}>
+          Modify order
+        </button>
+        <button className="ofl-btn-outline" onClick={() => setStep("ticket")}>
+          Cancel order
+        </button>
+      </motion.div>
+    </div>
+  );
+
   return (
     <PhoneStage>
       <PhoneFrame
         fullDevice
         footer={
           step === "review" ? (
-            <button className="ofl-cta" onClick={() => setStep("placing")}>
-              Place order
-            </button>
-          ) : step === "placed" ? (
-            <button
-              className="ofl-cta ofl-cta--ghost"
-              onClick={() => setStep("ticket")}
+            <motion.button
+              layoutId="ord-surface"
+              transition={ORD_SPRING}
+              className="ofl-cta"
+              style={{ borderRadius: 999 }}
+              onClick={() => setStep("placing")}
             >
-              Done
-            </button>
-          ) : step === "placing" ? undefined : (
+              Place order
+            </motion.button>
+          ) : step === "placed" ? (
+            // buttons live inside the full-screen panel now
+            undefined
+          ) : step === "placing" ? undefined : singleCta ? (
+            // single-CTA: the button lives in the overlay so it can morph
+            // into the full screen (see below)
+            undefined
+          ) : (
           // pinned to the bottom of the screen area, outside the scrolling
           // content — the site's shared glass-pill buttons (glasslab/GlassButton),
           // but recoloured (page-scoped) to the same green/red as the Bid/Ask
@@ -355,7 +541,90 @@ export function OrderPlacementScreenBoxed() {
           )
         }
         overlay={
-          step === "ticket" ? (
+          <>
+          {singleCta ? (
+            // ONE persistent surface: the "Place order" pill at rest, which
+            // `layout`-morphs to fill the screen when the order is placed
+            // (grows from the pill's box, radius eases 999 -> 22).
+            <motion.div
+              layout
+              initial={false}
+              // the box grows on a spring, but the colour flips instantly so
+              // it never reads as a "green box" mid-morph
+              transition={{ layout: ORD_SPRING, backgroundColor: { duration: 0 } }}
+              animate={{
+                backgroundColor: step === "ticket" ? "#48d597" : "#0b0b0d",
+              }}
+              onClick={
+                step === "ticket" && !hasError ? () => submit() : undefined
+              }
+              style={
+                step === "ticket"
+                  ? {
+                      position: "absolute",
+                      left: 24,
+                      right: 24,
+                      bottom: 24,
+                      height: 44,
+                      borderRadius: 999,
+                      zIndex: keyboardOpen ? 0 : "auto",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      overflow: "hidden",
+                      cursor: hasError ? "default" : "pointer",
+                      opacity: hasError ? 0.4 : 1,
+                      pointerEvents: hasError ? "none" : "auto",
+                    }
+                  : {
+                      position: "absolute",
+                      inset: 0,
+                      borderRadius: 22,
+                      zIndex: 3,
+                      padding: 24,
+                      boxSizing: "border-box",
+                      overflow: "hidden",
+                      pointerEvents: "auto",
+                    }
+              }
+            >
+              {step === "ticket" ? (
+                <span
+                  style={{
+                    color: "#0b0b0d",
+                    fontWeight: 400,
+                    fontSize: 16,
+                    letterSpacing: "0.01em",
+                  }}
+                >
+                  Place order
+                </span>
+              ) : (
+                placedPanelContent
+              )}
+            </motion.div>
+          ) : (step === "placing" || step === "placed") ? (
+            // two-button variant: the review "Place order" button morphs
+            // (layoutId) into this full-screen panel
+            <motion.div
+              layoutId="ord-surface"
+              transition={ORD_SPRING}
+              style={{
+                position: "absolute",
+                inset: 0,
+                zIndex: 3,
+                background: "#0b0b0d",
+                borderRadius: 22,
+                overflow: "hidden",
+                padding: 24,
+                boxSizing: "border-box",
+                pointerEvents: "auto",
+              }}
+            >
+              {placedPanelContent}
+            </motion.div>
+          ) : null}
+          {step === "ticket" ? (
           <>
             {/* scrim — dims the whole screen behind the sheet. Kept mounted,
                 opacity-toggled, so price-tick re-renders can't strand it. */}
@@ -529,7 +798,8 @@ export function OrderPlacementScreenBoxed() {
               <IosKeypad onKey={pressKey} />
             </motion.div>
           </>
-          ) : undefined
+          ) : null}
+          </>
         }
       >
         {/* tapping anywhere that isn't a field box clears the selection /
@@ -699,7 +969,7 @@ export function OrderPlacementScreenBoxed() {
               marginTop: 22,
               position: "relative",
               display: "grid",
-              gridTemplateColumns: "1fr auto",
+              gridTemplateColumns: "1fr 120px",
               alignItems: "center",
               rowGap: 10,
               columnGap: 12,
@@ -763,7 +1033,7 @@ export function OrderPlacementScreenBoxed() {
                   flex: 1,
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "flex-end",
+                  justifyContent: "flex-start",
                   padding: "0 10px",
                   cursor: "text",
                 }}
@@ -781,7 +1051,7 @@ export function OrderPlacementScreenBoxed() {
                       ...valueStyle,
                       width: "100%",
                       minWidth: 0,
-                      textAlign: "right",
+                      textAlign: "left",
                       background: "transparent",
                       border: "none",
                       outline: "none",
@@ -863,9 +1133,9 @@ export function OrderPlacementScreenBoxed() {
 
             {(
               [
-                ["route", "Route", "NASDAQ"],
+                ["route", "Route", "Nasdaq"],
                 ["specialInstructions", "Special instructions", "None"],
-                ["account", "Account", "Individual Margin"],
+                ["account", "Account", "Margin"],
               ] as const
             ).map(([name, label, value]) => (
               <Field
@@ -882,19 +1152,32 @@ export function OrderPlacementScreenBoxed() {
             ))}
             <Field
               plain
-              label="Estimated order total"
+              label={
+                isDollars ? "Est. share quantity" : "Est. order total"
+              }
               value={
-                <>
+                isDollars ? (
                   <motion.span
-                    key={Math.round(total * 100)}
+                    key={Math.round(estShares * 10000)}
                     initial={{ opacity: 0.5 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.25 }}
                   >
-                    ${fmt(total)}
+                    {estShares.toFixed(3)}
                   </motion.span>
-                  <span style={{ color: VAL, fontWeight: 400 }}> USD</span>
-                </>
+                ) : (
+                  <>
+                    <motion.span
+                      key={Math.round(total * 100)}
+                      initial={{ opacity: 0.5 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      ${fmt(total)}
+                    </motion.span>
+                    <span style={{ color: VAL, fontWeight: 400 }}> USD</span>
+                  </>
+                )
               }
             />
           </div>
@@ -902,7 +1185,12 @@ export function OrderPlacementScreenBoxed() {
           )}
 
           {step === "review" && (
-            <div className="ofl-scr" style={{ color: VAL }}>
+            <motion.div
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              style={{ color: VAL }}
+            >
               <div
                 style={{
                   display: "flex",
@@ -1013,122 +1301,9 @@ export function OrderPlacementScreenBoxed() {
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
 
-          {step === "placing" && (
-            <div className="ofl-scr" style={flowCenterStyle}>
-              <div
-                style={{
-                  whiteSpace: "pre-line",
-                  fontSize: 22,
-                  lineHeight: "30px",
-                  fontWeight: 500,
-                  color: VAL,
-                }}
-              >
-                {"Placing your\norder"}
-              </div>
-              <svg
-                className="ofl-spin"
-                width="72"
-                height="72"
-                viewBox="0 0 72 72"
-                fill="none"
-                aria-hidden="true"
-              >
-                <circle
-                  cx="36"
-                  cy="36"
-                  r="31"
-                  stroke="rgba(72,213,151,0.18)"
-                  strokeWidth="5"
-                />
-                <path
-                  d="M 36 5 A 31 31 0 0 1 67 36"
-                  stroke={UP}
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                  fill="none"
-                />
-              </svg>
-            </div>
-          )}
-
-          {step === "placed" && (
-            <div className="ofl-scr" key="placed" style={flowCenterStyle}>
-              <div
-                className="ofl-rise"
-                style={{
-                  whiteSpace: "pre-line",
-                  fontSize: 22,
-                  lineHeight: "30px",
-                  fontWeight: 500,
-                  color: VAL,
-                }}
-              >
-                {"Your order has\nbeen placed"}
-              </div>
-              <div
-                style={{
-                  position: "relative",
-                  width: 150,
-                  height: 150,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <div
-                  className="ofl-ring"
-                  style={{
-                    position: "absolute",
-                    width: 150,
-                    height: 150,
-                    borderRadius: "50%",
-                    background: UP,
-                  }}
-                />
-                <div
-                  className="ofl-ring"
-                  style={{
-                    position: "absolute",
-                    width: 150,
-                    height: 150,
-                    borderRadius: "50%",
-                    background: UP,
-                    animationDelay: "0.22s",
-                  }}
-                />
-                <div
-                  className="ofl-disc"
-                  style={{
-                    position: "relative",
-                    width: 150,
-                    height: 150,
-                    borderRadius: "50%",
-                    background: UP,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <svg width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true">
-                    <path
-                      className="ofl-check"
-                      d="M 20 37.5 L 31.5 49 L 52 26"
-                      stroke="#0b0b0d"
-                      strokeWidth="6"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeDasharray="64"
-                      strokeDashoffset="64"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </PhoneFrame>
     </PhoneStage>
@@ -1136,6 +1311,51 @@ export function OrderPlacementScreenBoxed() {
 }
 
 /* ---- pieces ---- */
+
+/** Full-screen "Submitting order -> Order sent" beat: a spinner that
+    resolves into a drawn circle + fill pop + 3D pop + drawn check + glow
+    + two out-rippling rings; the status text blur-crossfades. All CSS
+    (order-flow.css, `.lc-*`). `onDone` fires once the check has settled. */
+function PlacedSequence({
+  durationMs = 1600,
+  onDone,
+}: {
+  durationMs?: number;
+  onDone?: () => void;
+}) {
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    const t1 = window.setTimeout(() => setDone(true), durationMs);
+    const t2 = window.setTimeout(() => onDone?.(), durationMs + 750);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <div className={"lc-container" + (done ? " completed" : "")}>
+      <div className="lc-status">
+        <span className="lc-status-from">Placing order</span>
+        <span className="lc-status-to">{SYMBOL} order placed</span>
+      </div>
+      <div className="lc-circle-wrap">
+        <svg className="lc-main-svg" viewBox="0 0 120 120" aria-hidden="true">
+          <circle className="lc-track" cx="60" cy="60" r="48" />
+          <circle className="lc-fill" cx="60" cy="60" r="46.25" />
+          <circle className="lc-complete" cx="60" cy="60" r="48" />
+          <circle className="lc-spinner" cx="60" cy="60" r="48" />
+        </svg>
+        <svg className="lc-checkmark" viewBox="0 0 50 50" aria-hidden="true">
+          <path className="lc-check-path" d="M12 26 L22 36 L38 16" />
+        </svg>
+        <div className="lc-glow" />
+        <div className="lc-ripple" />
+        <div className="lc-ripple-2" />
+      </div>
+    </div>
+  );
+}
 
 /** Half of the Bid/Ask pill — deep-tinted panel, label + live price both
     set in the accent colour (both sides read as one seamless capsule). */
@@ -1179,7 +1399,7 @@ function BidAskHalf({
 // The field outline is drawn with an inset box-shadow, not a border, so the
 // selected state can go 1px -> 2px without nudging the box's content (a real
 // border would shrink the content box and shift the icons / values).
-const restStroke = `inset 0 0 0 1px ${BORDER_DIM}`;
+const restStroke = "inset 0 0 0 1px rgba(58, 63, 71, 0.5)";
 const selStroke = `inset 0 0 0 1.5px ${SELECTED}`;
 const errStroke = `inset 0 0 0 1.5px ${DOWN}`;
 
@@ -1192,7 +1412,7 @@ const fieldBoxStyle: CSSProperties = {
   height: 40,
   padding: "0 10px",
   borderRadius: 6,
-  background: "rgba(255,255,255,0.05)",
+  background: "rgba(30, 33, 35, 0.8)",
   boxShadow: restStroke,
 };
 
@@ -1244,6 +1464,7 @@ function Field({
             color: VAL,
             fontSize: 14,
             fontWeight: 400,
+            letterSpacing: "0.01em",
             fontVariantNumeric: "tabular-nums",
           }}
         >
