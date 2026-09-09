@@ -84,4 +84,9 @@ export const pieces: Piece[] = [
     href: "/work/fractional-order-flow",
     title: "Fractional order flow",
   },
+  {
+    slug: "options-strategy-builder",
+    href: "/work/options-strategy-builder",
+    title: "Options strategy builder",
+  },
 ];

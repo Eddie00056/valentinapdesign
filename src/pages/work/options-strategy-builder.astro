@@ -1,0 +1,26 @@
+---
+import Bare from "../../layouts/Bare.astro";
+import { OptionsBuilder } from "../../components/optionsbuilder/OptionsBuilder";
+---
+
+<Bare title="Options strategy builder" bg="#0b0b0d">
+  <OptionsBuilder client:load />
+
+  <a class="ob-back" href="/" aria-label="Back to home">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M12.0833 15L7.08325 10L12.0833 5"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </a>
+
+  <style is:global>
+    html,
+    body {
+      overflow-y: auto !important;
+    }
+  </style>
+</Bare>

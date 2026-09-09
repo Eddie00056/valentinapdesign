@@ -1,0 +1,1058 @@
+/* Options strategy builder — an interaction study in *forming a multi-leg
+   options strategy*. Palette + type pulled directly from the real Figma
+   source (figma.com/design/bMeDLwCzyRqbnoFjt02IeA, node 88:2746 "Options -
+   Updated - Expanded"), via get_design_context — not approximated from
+   screenshots. Every row/field is exactly 20px tall, type is a flat 12px
+   throughout, radius is 6px (4px for the order-type fields) — nothing
+   here is a full stadium pill. Font is DM Sans (matches the Figma spec;
+   already loaded site-wide by Bare.astro, no new @import needed). Every
+   moving part is Motion (see OptionsBuilder.tsx); ticks off the shared
+   pxHub price clock so it reads as live. */
+
+/* Root-cause fix: every pill in this component is a <button>, and none of
+   the individual rules ever set `border: 0` — so the browser's native
+   button chrome (Chrome: `border-width: 2px; border-style: outset`) was
+   rendering the whole time underneath/alongside the masked glass ring.
+   `appearance: none` does NOT reliably drop that in every engine. This is
+   the actual bright, uniform "border" that persisted across every ring
+   opacity tweak — it was never the ring. Reset once, globally, here. */
+/* `font: inherit` (the shorthand) would be the obvious way to reset native
+   button typography, but it expands to `font-size: inherit` etc at THIS
+   selector's specificity (0,1,1) — which then beats every single-class
+   button rule below it (.ob-sidebtn, .ob-seg-btn, .ob-strat-btn, .ob-field,
+   .ob-cta, .ob-x — all specificity 0,1,0), silently reverting their
+   font-size back to the browser default regardless of source order. Reset
+   only what's needed for chrome removal; leave font sizing to each
+   component's own rule. */
+.ob-stage button {
+  appearance: none;
+  border: 0;
+  outline: none;
+  font-family: inherit;
+  color: inherit;
+  margin: 0;
+}
+
+.ob-stage {
+  /* colour/neutral, colour/green, colour/red tokens as measured in Figma */
+  --up: #48d597;
+  --down: #ff557d;
+  --ink: #fefffd;
+  --muted: #c0c3c2;
+  --chip: #2c3334;
+  --sunk: #171f20;
+  --panel: #0f1719;
+  --line: #242b2c;
+  --line-soft: #242b2c;
+  --green-bg: #0e231e;
+  --green-line: #48d597;
+
+  /* align-items: start (not center) — centering vertically re-anchors the
+     card's whole position every time its height changes (adding/removing a
+     leg), so unrelated content at the top visibly shifts too. Pinning the
+     top means the card only ever grows/shrinks downward. */
+  min-height: 100dvh;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  padding: 96px 20px;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #131417 0%, #0b0b0d 100%);
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.ob-card {
+  /* 10% smaller than the 480px spec (fields scaled to match, Buy/Call
+     excluded) — widened slightly from that 432px so the leg row has
+     enough room for the X now that it's a normal flex child instead of
+     absolutely positioned (needs ~424.5px content width; 456 - 24px
+     card padding = 432px, leaving a small buffer). */
+  width: min(456px, 100%);
+  box-sizing: border-box;
+  /* Figma: the #0f1719 panel sits 4px in from the card edge, and its own
+     content sits another 8px in from the panel edge — 12px total from the
+     card edge to any content, left/right. Confirmed by the leg row's own
+     spec width: 480 − 2×12 = 456px, exactly what the Figma leg row is. */
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #070f11;
+  border: 1px solid var(--line-soft);
+  box-shadow: 0 40px 90px -40px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* No glass rim anywhere — the real Figma fields are flat fills with either
+   no border or a border matching their own background (invisible). The
+   Stock/Option track is the one exception with a real visible border (set
+   directly on .ob-seg below). */
+
+/* ---------- instrument + strategy ---------- */
+
+.ob-row2 {
+  display: flex;
+  align-items: center;
+  /* flex-start (not space-between) — with 3 children, space-between put an
+     equally huge gap between EVERY pair, pushing Custom far from
+     Stock/Option. Custom sits close to the selector; only the price gets
+     pushed to the far right (via margin-left:auto below). */
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+/* Stock/Option — "Component 38" in Figma: w104 h20, 1px 20%-white border,
+   radius 6. Not a pill — a small rounded-rect track. */
+.ob-seg {
+  position: relative;
+  display: flex;
+  /* Figma: the track is a fixed 104px, split into two equal 52px halves —
+     needs an explicit width for the children's flex:1 to actually equalize
+     against (an intrinsic-sized inline-flex has nothing to grow into).
+     Scaled to 90% along with the card. */
+  width: 93.6px;
+  height: 20px;
+  /* Shift left to sit flush with the legs/params containers below, which
+     bleed 8px further out than the header row's own 12px inset. */
+  margin-left: -8px;
+  border-radius: 6px;
+  border: 1px solid rgba(254, 255, 253, 0.2);
+  background: none;
+}
+
+.ob-seg-btn {
+  position: relative;
+  appearance: none;
+  border: 0;
+  margin: 0;
+  background: none;
+  font: inherit;
+  font-weight: 400;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  /* Figma: the track splits into two equal 52px halves — flex:1 (not
+     content-hugging padding) keeps Stock/Option the same width regardless
+     of label length. */
+  flex: 1 1 0;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.16s ease;
+}
+
+.ob-seg-t {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ob-seg-btn[data-on="true"] {
+  color: var(--up);
+}
+
+.ob-seg-btn:disabled {
+  /* Figma: the inactive "Stock" label is plain full-strength ink, not
+     dimmed — the disabled state here is purely functional (this ticket is
+     locked to Option), the cursor is the only non-visual cue. */
+  cursor: not-allowed;
+  color: var(--ink);
+}
+
+.ob-seg-ind {
+  position: absolute;
+  inset: -1px;
+  border-radius: 6px;
+  background: var(--green-bg);
+  border: 1px solid var(--green-line);
+  z-index: 0;
+}
+
+/* strategy chip + menu — "Input field" in Figma: flat neutral pill, same
+   as every other field, not accent-tinted. */
+.ob-strat {
+  position: relative;
+}
+
+.ob-strat-btn {
+  appearance: none;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  /* Fixed width matching what this pill measured at when it read
+     "Butterfly" — not sized for the longest possible label, just pinned
+     so it stops resizing as the strategy re-classifies. Scaled to 90%
+     along with the card. */
+  width: 79.2px;
+  justify-content: space-between;
+  box-sizing: border-box;
+  gap: 4px;
+  height: 20px;
+  padding: 0 4px 0 6px;
+  border-radius: 6px;
+  /* Figma: the Custom field is specifically neutral-300 (#242b2c) — every
+     other field (Qty/date/strike/Call, Limit/Day, Margin) is neutral-400
+     (#2c3334, = --chip). It's the one field a shade darker than the rest. */
+  background: #242b2c;
+  color: var(--ink);
+  font-weight: 400;
+  font-size: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+
+.ob-strat-label {
+  position: relative;
+  display: inline-grid;
+  overflow: hidden;
+}
+
+.ob-strat-label > span {
+  grid-area: 1 / 1;
+}
+
+.ob-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  /* left, not right — Custom sits near the left of the header row now, so
+     anchoring from its right edge left the menu short of covering what's
+     behind it (content peeking out past its right side). */
+  left: 0;
+  min-width: 180px;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--sunk);
+  border: 1px solid var(--line);
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.8);
+  transform-origin: top left;
+}
+
+.ob-menu button {
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.ob-menu button:hover {
+  background: var(--chip);
+}
+
+.ob-menu button[data-active="true"] {
+  color: var(--up);
+}
+
+.ob-menu button span {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- section label ---------- */
+
+.ob-label {
+  display: block;
+  margin: 16px 0 9px;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ---------- legs ---------- */
+
+/* Each leg is its own rounded #171f20 container (Figma: "Leg - Expanded") —
+   not one shared panel. .ob-legs-panel is now just spacing/alignment: it
+   keeps the same 12px-from-card content inset as the header row above it,
+   with no background of its own. */
+.ob-legs-panel {
+  margin-top: 6px;
+}
+
+.ob-legs {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Spacing BETWEEN the leg containers themselves (each its own rounded
+     box) — not to be confused with .ob-row's own gap, which is the field-
+     to-field spacing INSIDE a single leg. */
+  gap: 2px;
+}
+
+.ob-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  /* Figma (node 2899:7651): gap-4 between fields within a leg row. */
+  gap: 4px;
+  box-sizing: border-box;
+  /* No explicit height — the 20px-tall chips inside plus this row's own
+     4px top/bottom padding give 28px naturally. An explicit height:20px
+     here (border-box) used to squeeze the content into 12px and rely on
+     Motion overriding it with an inline height:28px during the mount
+     animation; now that rows aren't height-animated any more, the row
+     sizes itself correctly without that crutch. */
+  margin: 0 -8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--sunk);
+}
+
+.ob-sidebtn {
+  position: relative;
+  appearance: none;
+  border: 0;
+  font: inherit;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 20px;
+  min-width: 34px;
+  /* Figma's Buy/Sell chip is a fixed 38px (w-[38px]) — tighter than our
+     8px each side. 6px keeps "Sell" from touching its edges while giving
+     the row's fixed-width fields the little extra room they need now that
+     the remove button sits statically in the row's own right corner. */
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--chip);
+  font-weight: 400;
+  font-size: 12px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: color 0.16s ease, background 0.16s ease;
+}
+
+/* Each leg field is its own separate rounded chip — matches the Figma
+   reference: Qty / date / strike / Call each stand apart with a small gap,
+   like the Buy pill next to them. */
+.ob-chip {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 4px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: var(--chip);
+  font-size: 12px;
+  color: var(--ink);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* "Qty" is a prefix sub-box, same treatment as the Limit field's "Limit $"
+   label — its own bordered box with 3px horizontal / 6px vertical padding,
+   divided from the value area, not just inline text sharing the chip's
+   own padding. */
+/* "Qty" is a prefix sub-box, same treatment as the Limit field's "Limit $"
+   label (spec: 3px horizontal / 6px vertical padding, divider on the
+   right) — auto-width, not a fixed 64px like Limit's, since "Qty" is much
+   shorter and this chip only has 115px total to work with. Only this
+   label sub-box changes — the chip's own padding/gap stay untouched. */
+.ob-chip-k {
+  flex: none;
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  /* Left matches the dropdown fields' own inset (button.ob-field: 8px),
+     not the 3px used on the other three sides. */
+  padding: 6px 8px;
+  border-right: 1px solid var(--sunk);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.ob-chip--qty {
+  width: 103.5px;
+  /* .ob-field (Limit) has no padding of its own — .ob-field-k's own 3px
+     inset is the ONLY space before its text. .ob-chip still had its base
+     8px left padding on top of .ob-chip-k's own padding, pushing "Qty" in
+     ~4x further than "Limit" sits. Zero it so the two prefixes align. */
+  padding-left: 0;
+  /* Match .ob-stepper's own 3px right padding — the base .ob-chip's 8px
+     was leaving the +/- sitting well short of the pill's right edge,
+     unlike the flush Limit stepper. */
+  padding-right: 3px;
+}
+
+.ob-chip--exp {
+  width: 103.5px;
+  flex: none;
+  /* Figma: the date/strike fields are left-aligned (their trailing arrow
+     icon absorbs the rest of the row via justify-between) — not centered. */
+  justify-content: flex-start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ob-chip--strike {
+  /* Fixed width (not shrink-wrapped to digits) so two legs with different
+     strikes don't shift everything after them — Figma still left-aligns
+     the value itself within that fixed box. */
+  justify-content: flex-start;
+  width: 103.5px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+.ob-chip input {
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 400;
+  width: 22px;
+  text-align: center;
+  padding: 0;
+  /* text-align:center means padding-left would just push the centred
+     text off-centre — margin nudges the whole box right instead, adding
+     to .ob-chip's own 4px gap so the divider-to-value space matches
+     Limit's 6px left padding. */
+  margin-left: 2px;
+  outline: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.ob-cp {
+  appearance: none;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  font-weight: 400;
+  font-size: 12px;
+  /* fixed width for the same reason as .ob-chip--strike — "Call" and "Put"
+     are different lengths and must not shift the row's own width. Tighter
+     padding than the base .ob-chip (4px, not 8px) — the row's fixed-width
+     fields need the room now that the remove button sits statically in
+     the row's own corner. */
+  justify-content: center;
+  padding: 0 4px;
+  width: 38px;
+}
+
+/* A stock leg shows "Call" by default (first click on its badge just
+   confirms that, matching the label already on screen) — colour it the
+   same as a real call rather than a third neutral state. */
+.ob-cp[data-kind="put"] { color: var(--down); }
+.ob-cp:not([data-kind="put"]) { color: #ffffff; }
+
+/* Absolutely positioned (not a flex child) — the row's fixed-width fields
+   already use its full content budget, so the remove button can't also
+   take flex space without pushing content past the row's edge. It overlays
+   the row's own top-right corner instead. Static/always-visible, not a
+   hover reveal — every leg keeps it on screen. */
+/* Normal flex child now, not absolutely positioned — sits exactly
+   .ob-row's own 4px gap after the Call/Put badge (the last field), which
+   also means it can never overlap that badge regardless of row width,
+   unlike an absolute offset that depended on how much slack was left. */
+.ob-x {
+  flex: none;
+  /* Consume any leftover slack in the row itself, so X sits flush at the
+     row's own right edge instead of wherever normal flex flow (packed
+     left, slack trailing after it) happens to leave it. */
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
+  /* Matches .ob-chevron's own colour exactly (not --muted) so the two
+     icons read identically regardless of which field background they
+     each sit on. */
+  color: #d8dad9;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: color 0.14s ease;
+}
+
+.ob-x:focus-visible {
+  outline: 2px solid var(--up);
+  outline-offset: 1px;
+}
+
+.ob-x:hover {
+  color: var(--down);
+}
+
+/* ---------- add leg ---------- */
+/* Figma: "+ Add call / Add put / Add stock" carry NO button chrome at all —
+   just a 14px icon + 12px label sitting directly on the panel. */
+
+.ob-add {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-sizing: border-box;
+  /* Same container treatment as a leg row (.ob-row): sunk background,
+     radius, bleed + padding recipe — the add-buttons line is now its own
+     container too, not bare text sitting directly on the card. Top margin
+     matches .ob-legs's own container-to-container gap (2px), so the gap
+     above this container is the same as the gap between the legs above it. */
+  margin: 2px -8px 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--sunk);
+  flex-wrap: wrap;
+}
+
+.ob-add button {
+  position: relative;
+  appearance: none;
+  background: none;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.16s ease;
+}
+
+.ob-add button:hover:not(:disabled) {
+  color: #ffffff;
+}
+
+.ob-add button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ---------- net + live quote ---------- */
+
+.ob-net {
+  overflow: hidden;
+}
+
+.ob-net-inner {
+  margin-top: 4px;
+}
+
+.ob-net-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* "Total:" + Bid/Ask, right-aligned as a group — matches the playground
+   mock's layout (no separate net-debit headline, no depth bar). */
+.ob-total-row {
+  display: flex;
+  /* "Total:" has no header label above it the way Bid/Ask do — align it to
+     the bottom edge so it sits flush with the value boxes, not centred
+     against the header+box stack (which reads as floating/unaligned). */
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ob-total-label {
+  /* matches .ob-quote-box's own height exactly — bare text is only ~14px
+     tall next to a 20px box, so even with matching column structure above
+     it, the two never landed on the same centre. Now every column is
+     header-height + gap + a 20px-tall row, full stop. */
+  display: flex;
+  align-items: center;
+  height: 20px;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.ob-net-k {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.ob-net-v {
+  font-size: 12px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+
+/* boxed Bid / Ask pair, matching the playground mock's "Bid / Ask" boxes */
+.ob-quote-pair {
+  display: flex;
+  gap: 6px;
+}
+
+.ob-quote-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.ob-quote-h {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.ob-quote-box {
+  position: relative;
+  box-sizing: border-box;
+  min-width: 50px;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-weight: 400;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.ob-quote-box.bid {
+  color: var(--up);
+  background: rgba(72, 213, 151, 0.14);
+}
+
+.ob-quote-box.ask {
+  color: var(--down);
+  background: rgba(255, 85, 125, 0.14);
+}
+
+.ob-depth {
+  position: relative;
+  height: 4px;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: rgba(255, 85, 125, 0.22);
+  overflow: hidden;
+}
+
+.ob-depth-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--up);
+  border-radius: 3px;
+}
+
+.ob-depth-mark {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: rgba(255, 255, 255, 0.28);
+  border-radius: 1px;
+}
+
+/* ---------- order params ---------- */
+
+/* Order-type fields get the same #171f20 panel treatment as the legs. */
+.ob-params-panel {
+  margin-top: 8px;
+  margin-left: -8px;
+  margin-right: -8px;
+  /* Match .ob-row's own padding (4px top/bottom, 8px left/right) — this
+     had 8px all around, taller than the leg containers. */
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--sunk);
+}
+
+.ob-params {
+  display: grid;
+  /* Two equal columns, wrapping into two rows: Order type + Limit price
+     on row one, Duration + Account on row two — adding the account
+     selector without widening the card, each pair filling the full
+     row width instead of a cramped third column. */
+  grid-template-columns: repeat(2, 1fr);
+  /* Figma (node 2899:7724): gap-4 — same inter-field gap as the leg rows,
+     not the 8px this had drifted to. */
+  gap: 4px;
+}
+
+.ob-field {
+  position: relative;
+  height: 20px;
+  border-radius: 4px;
+  background: var(--chip);
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+button.ob-field {
+  appearance: none;
+  font: inherit;
+  width: 100%;
+  padding: 0 8px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 400;
+  cursor: pointer;
+  justify-content: space-between;
+}
+
+button.ob-field:hover {
+  background: #333b3c;
+}
+
+
+.ob-field-k {
+  flex: none;
+  /* 64px was sized for "Limit $" together — now that the $ is gone, that
+     left a lot of dead space before the divider. Shrunk to fit "Limit"
+     alone plus its own 8px/8px padding. Scaled to 90% with the card. */
+  width: 43.2px;
+  box-sizing: border-box;
+  /* Left matches the dropdown fields' own inset (button.ob-field: 8px),
+     not the 3px used on the other three sides. */
+  padding: 6px 8px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  border-right: 1px solid var(--sunk);
+}
+
+.ob-field input {
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 400;
+  padding: 0 6px;
+  width: 100%;
+  min-width: 0;
+  outline: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.ob-field input:disabled { color: #4a5259; }
+.ob-field input::placeholder { color: #4a5259; font-weight: 400; }
+
+/* order-type switch (Market <-> Limit only) */
+.ob-field.ob-field--switch {
+  /* space-between (not flex-start) — this field fills its full grid
+     column, so the trailing chevron needs to sit at the field's right
+     edge to read as a dropdown, not float next to the label mid-field. */
+  justify-content: space-between;
+  gap: 4px;
+}
+
+/* Single source of truth for every dropdown chevron's colour — same as
+   .ob-x's default/hover pair, targeted directly by class rather than a
+   generic `svg` type selector that's easy to accidentally out-specificity
+   with an unrelated rule. */
+.ob-chevron {
+  flex: none;
+  /* Same hex as .ob-x (--muted) reads visibly dimmer here because this
+     sits on the lighter --chip field background instead of --sunk's
+     darker row background — a brighter value compensates so the two
+     read as the same brightness rather than matching on paper only. */
+  color: #d8dad9;
+  /* Hidden until the field is hovered/focused — see the reveal rules
+     below, next to each field's own green-stroke "selected" treatment. */
+  opacity: 0;
+  transition: color 0.16s ease, opacity 0.12s ease;
+}
+
+.ob-strat-btn:hover .ob-chevron,
+.ob-strat-btn:focus-visible .ob-chevron,
+button.ob-field:hover .ob-chevron,
+button.ob-field:focus-visible .ob-chevron {
+  opacity: 1;
+}
+
+.ob-strat-btn:hover .ob-chevron,
+.ob-strat-btn:focus-visible .ob-chevron,
+.ob-strat-btn:active .ob-chevron,
+button.ob-field:hover .ob-chevron,
+button.ob-field:focus-visible .ob-chevron,
+button.ob-field:active .ob-chevron {
+  color: #ffffff;
+}
+
+/* "Selected" = hovered or focused — a green stroke around the field
+   itself, same moment the chevron/stepper reveal. */
+.ob-strat-btn:hover,
+.ob-strat-btn:focus-visible,
+button.ob-field:hover,
+button.ob-field:focus-visible {
+  box-shadow: inset 0 0 0 1px var(--up);
+}
+
+/* Limit-price amount stepper */
+.ob-stepper {
+  padding-right: 3px;
+  transition: opacity 0.16s ease;
+}
+
+.ob-stepper.is-disabled {
+  opacity: 0.45;
+}
+
+.ob-stepper-num {
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0 6px;
+  text-align: left;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 400;
+  cursor: text;
+}
+
+.ob-stepper-num:disabled {
+  cursor: not-allowed;
+}
+
+.ob-stepper-num--editing {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  cursor: text;
+  padding-left: 6px;
+}
+
+.ob-stepper-num--editing input {
+  appearance: none;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 400;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  outline: none;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Invisible padding + matching negative margin around the visible square —
+   a bigger hit/hover target without growing the pill's own layout. Scaled
+   down from the reference's 5px: the field is only 20px tall with its own
+   overflow:hidden, so anything past ~2px here would just get clipped. */
+.ob-stepper-hit {
+  flex: none;
+  padding: 2px;
+  margin: -2px;
+  cursor: default;
+  /* Hidden until the field is hovered/focused, same as the chevrons. */
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+
+.ob-stepper:hover .ob-stepper-hit,
+.ob-stepper:focus-within .ob-stepper-hit,
+.ob-chip--qty:hover .ob-stepper-hit,
+.ob-chip--qty:focus-within .ob-stepper-hit {
+  opacity: 1;
+}
+
+/* "Selected" = hovered or focused — a green stroke around the field
+   itself, same moment the +/- reveal. */
+.ob-stepper:hover,
+.ob-stepper:focus-within,
+.ob-chip--qty:hover,
+.ob-chip--qty:focus-within {
+  box-shadow: inset 0 0 0 1px var(--up);
+}
+
+/* .ob-field (Limit) has no gap of its own, so its stepper sits right up
+   against the value with only its own -2px pull. .ob-chip (Qty) has a
+   4px gap between every child, which was leaving noticeably more space
+   before the +/- than Limit has — cancel that gap here specifically. */
+/* margin-left:auto (not a fixed negative offset) — pushes the stepper
+   all the way to the chip's own right edge regardless of how much slack
+   the fixed-width input leaves, instead of just sitting wherever normal
+   flex flow places it after the input. */
+.ob-chip--qty .ob-stepper-hit {
+  margin-left: auto;
+}
+
+.ob-stepper-btns {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 16px;
+  /* shorter than the 20px pill and centred via the pill's own
+     align-items:center — flush-height made it look glued to the pill's
+     top/bottom edge instead of a distinct control sitting inside it. */
+  height: 16px;
+  /* Two separate boxes, not one shape with an internal divider line — a
+     small gap between them, each with its own rounded corners. */
+  gap: 1px;
+}
+
+.ob-stepper-btns button {
+  appearance: none;
+  border: 0;
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  /* Flat — no glass rim, no shadow. Needs to be visibly lighter than the
+     pill it sits in (--chip matches the pill's own background exactly,
+     so the button disappeared into it) to read as its own grey box. */
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.ob-stepper-btns button:hover:not(:disabled),
+.ob-stepper-btns button:focus-visible:not(:disabled),
+.ob-stepper-btns button:active:not(:disabled) {
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+.ob-stepper-btns button:disabled {
+  cursor: not-allowed;
+}
+
+/* ---------- footer ---------- */
+
+.ob-foot {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  /* Duration moved into the params grid (next to Limit) — the footer now
+     holds only the CTA, so it sits at the trailing edge rather than
+     spanning a now-empty space-between. */
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ob-cta {
+  position: relative;
+  appearance: none;
+  border: 0;
+  font: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  background: var(--up);
+  color: #000000;
+  font-weight: 400;
+  font-size: 12px;
+  cursor: pointer;
+  /* stays visible (not hidden) — .ob-cta-ring needs to expand past the
+     button's own bounds on submit; .ob-cta-label clips its own text. */
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.ob-cta-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 6px;
+  border: 2px solid var(--up);
+  pointer-events: none;
+}
+
+.ob-cta-label {
+  position: relative;
+  display: inline-grid;
+  overflow: hidden;
+}
+
+.ob-cta-label > span {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+  /* Explicit, redundant with .ob-cta's own color — belt-and-suspenders
+     against whatever kept overriding it at this leaf. */
+  color: #000;
+}
+
+.ob-back {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 30;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #f2f2f8;
+  background: rgba(17, 19, 23, 0.72);
+  border: 1px solid #1d2328;
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  transition: color 0.15s ease;
+}
+
+.ob-back:hover { color: #fff; }
+.ob-back svg { transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.ob-back:hover svg { transform: translateX(-2px); }
+.ob-back:focus-visible { outline: 2px solid var(--up); outline-offset: 2px; }
+
+@media (max-width: 380px) {
+  .ob-params { grid-template-columns: 1fr; }
+  .ob-row2 { flex-wrap: wrap; }
+  .ob-back { top: 12px; left: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ob-x, .ob-back svg, .ob-add button, .ob-seg-btn { transition: none; }
+}
