@@ -5,6 +5,7 @@ import { TogglePreview } from "../components/motionlab/TogglePreview";
 import { LimitOrderErrorPreview } from "../components/glasslab/LimitOrderErrorPreview";
 import { FractionalSharesBannerPreview } from "../components/glasslab/FractionalSharesBannerPreview";
 import { AlertCreationPreview } from "../components/alertscreen/AlertCreationPreview";
+import { IframePreview } from "../components/gallery/IframePreview";
 import "../components/motionlab/motionlab.css";
 import "../components/glasslab/glasslab.css";
 ---
@@ -39,7 +40,7 @@ import "../components/glasslab/glasslab.css";
                   role="img"
                   aria-label="Alert creation prototype"
                 >
-                  <rect width="120" height="120" rx="18" fill="#111317"></rect>
+                  <rect width="120" height="120" rx="18" fill="#ffffff"></rect>
                   <g
                     stroke="#48d597"
                     stroke-width="4"
@@ -63,7 +64,7 @@ import "../components/glasslab/glasslab.css";
                   role="img"
                   aria-label="Order placement"
                 >
-                  <rect width="120" height="120" rx="18" fill="#111317"></rect>
+                  <rect width="120" height="120" rx="18" fill="#ffffff"></rect>
                   <g fill="none" stroke="#3a3f47" stroke-width="3">
                     <rect x="26" y="30" width="68" height="13" rx="4"></rect>
                     <rect x="26" y="51" width="68" height="13" rx="4"></rect>
@@ -82,7 +83,7 @@ import "../components/glasslab/glasslab.css";
                   role="img"
                   aria-label="Order placed animation"
                 >
-                  <rect width="120" height="120" rx="18" fill="#111317"></rect>
+                  <rect width="120" height="120" rx="18" fill="#ffffff"></rect>
                   <circle cx="60" cy="60" r="34" fill="#48d597"
                     fill-opacity="0.1"></circle>
                   <circle
@@ -103,35 +104,17 @@ import "../components/glasslab/glasslab.css";
                 </svg>
               )}
               {p.slug === "options-strategy-builder" && (
-                <svg
-                  class="mark"
-                  viewBox="0 0 120 120"
-                  role="img"
-                  aria-label="Options strategy builder"
-                >
-                  <rect width="120" height="120" rx="18" fill="#111317"></rect>
-                  <g fill="none" stroke="#3a3f47" stroke-width="3">
-                    <rect x="40" y="30" width="54" height="13" rx="4"></rect>
-                    <rect x="40" y="53" width="54" height="13" rx="4"></rect>
-                    <rect x="40" y="76" width="54" height="13" rx="4"></rect>
-                  </g>
-                  <path
-                    d="M30 36.5 L30 82.5"
-                    stroke="#48d597"
-                    stroke-width="3"
-                    stroke-linecap="round"></path>
-                  <g fill="#48d597">
-                    <circle cx="30" cy="36.5" r="4"></circle>
-                    <circle cx="30" cy="59.5" r="4"></circle>
-                    <circle cx="30" cy="82.5" r="4"></circle>
-                  </g>
-                  <line x1="30" y1="36.5" x2="40" y2="36.5" stroke="#48d597"
-                    stroke-width="3"></line>
-                  <line x1="30" y1="59.5" x2="40" y2="59.5" stroke="#48d597"
-                    stroke-width="3"></line>
-                  <line x1="30" y1="82.5" x2="40" y2="82.5" stroke="#48d597"
-                    stroke-width="3"></line>
-                </svg>
+                <IframePreview
+                  client:visible
+                  src="/work/options-strategy-builder"
+                  cropWidth={284}
+                  cropHeight={172}
+                  frameWidth={1200}
+                  frameHeight={500}
+                  scale={0.57}
+                  offsetX={-200}
+                  offsetY={-43}
+                />
               )}
               {p.slug === "fractional-order-flow" && (
                 <svg
@@ -140,7 +123,7 @@ import "../components/glasslab/glasslab.css";
                   role="img"
                   aria-label="Fractional order flow"
                 >
-                  <rect width="120" height="120" rx="18" fill="#111317"></rect>
+                  <rect width="120" height="120" rx="18" fill="#ffffff"></rect>
                   <rect x="26" y="28" width="68" height="26" rx="6"
                     fill="none" stroke="#3a3f47" stroke-width="3"></rect>
                   <rect x="34" y="37" width="30" height="4" rx="2" fill="#6f8b3f"
@@ -198,28 +181,44 @@ import "../components/glasslab/glasslab.css";
     color: var(--ink-faint);
   }
 
+  /* Masonry: browser-computed column count (not a fixed breakpoint list),
+     each tile's own height set by its content instead of a forced
+     aspect-ratio — the whole point being tiles of very different natural
+     shapes (a tall phone mockup next to a short toggle-switch snippet)
+     sitting in the same grid, Pinterest-style. */
   .grid {
     list-style: none;
     margin: 0;
     padding: 0;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 360px));
-    gap: 1.5rem;
+    column-width: 300px;
+    column-gap: 1.5rem;
+  }
+
+  .grid li {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
   }
 
   .thumb {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 4 / 3;
+    display: block;
     overflow: hidden;
     border: 1px solid var(--line);
     border-radius: 10px;
-    background: var(--paper-raised);
+    background: #ffffff;
     transition: border-color 0.15s ease;
   }
 
   a:hover .thumb {
     border-color: var(--ink-faint);
+  }
+
+  /* Tiles still on the placeholder icon mark (not yet a live/real
+     preview) keep the old centred-square treatment so they don't
+     collapse to nothing. */
+  .thumb:has(.mark) {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
   }
 
   .thumb .mark {
