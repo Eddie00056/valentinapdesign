@@ -67,6 +67,71 @@ const pageTitle = title ? `${title} — ${site.name}` : site.name;
     <script is:inline>
       if (window.self !== window.top) {
         document.documentElement.setAttribute("data-embed", "");
+
+        /* Some pieces are a static artboard wrapped in a nested iframe, so
+           the CSS rule above cannot reach their chrome — and that markup is
+           generated, with no class or id to target.
+
+           In those artboards the work itself is statically positioned
+           inside #dc-root, and the only fixed-position elements are the
+           overlay toolbars (screen tabs, zoom, "Hide UI"). So position is
+           the discriminator. Their own "Hide UI" button is not usable here:
+           it toggles a different layer and leaves the toolbar standing. */
+        /* A rule, not a sweep. Sweeping elements on a timer left the
+           toolbar visible for the first second or so, which reads as a
+           flash of chrome every time a tile loads. These artboards declare
+           position inline, so an attribute selector catches each toolbar
+           the moment it parses — the sweep below stays as a backstop for
+           anything created later. */
+        var NESTED_CSS =
+          '[style*="position: fixed"],[style*="position:fixed"]{display:none !important}';
+
+        var hideNestedChrome = function () {
+          document.querySelectorAll("iframe").forEach(function (f) {
+            var d, w;
+            try {
+              d = f.contentDocument;
+              w = f.contentWindow;
+            } catch (e) {
+              return;
+            }
+            if (!d || !d.documentElement || !w) return;
+
+            if (!d.getElementById("embed-chrome-hide")) {
+              var st = d.createElement("style");
+              st.id = "embed-chrome-hide";
+              st.textContent = NESTED_CSS;
+              (d.head || d.documentElement).appendChild(st);
+            }
+
+            if (!d.body) return;
+            d.querySelectorAll("body *").forEach(function (el) {
+              if (w.getComputedStyle(el).position === "fixed") {
+                el.style.setProperty("display", "none", "important");
+              }
+            });
+          });
+        };
+
+        var armNested = function () {
+          hideNestedChrome();
+          document.querySelectorAll("iframe").forEach(function (f) {
+            f.addEventListener("load", function () {
+              setTimeout(hideNestedChrome, 60);
+            });
+          });
+        };
+
+        /* Start before load: the nested document usually exists well
+           before the outer page finishes, and the earlier the style lands
+           the less chance the toolbar paints at all. */
+        hideNestedChrome();
+        var t = setInterval(hideNestedChrome, 100);
+        setTimeout(function () {
+          clearInterval(t);
+        }, 4000);
+        addEventListener("DOMContentLoaded", armNested);
+        addEventListener("load", armNested);
       }
     </script>
   </body>

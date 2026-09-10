@@ -51,7 +51,10 @@ const ZOOM_DEFAULT = 1;
         pieces.map((p) => (
           <li>
             <a href={p.href} aria-label={p.title}>
-              <span class="thumb" style={`aspect-ratio: 1280 / ${p.previewHeight}`}>
+              <span
+                class="thumb"
+                style={`aspect-ratio: ${p.previewWidth} / ${p.previewHeight}; --vw: ${p.previewWidth}`}
+              >
                 <iframe
                   src={p.href}
                   title={p.title}
@@ -59,7 +62,7 @@ const ZOOM_DEFAULT = 1;
                   aria-hidden="true"
                   loading="lazy"
                   scrolling="no"
-                  style={`height: ${p.previewHeight}px`}
+                  style={`width: ${p.previewWidth}px; height: ${p.previewHeight}px`}
                 />
               </span>
             </a>
@@ -78,13 +81,14 @@ const ZOOM_DEFAULT = 1;
     page.style.setProperty("--cols", String(ZOOM_STEPS[+slider.value]));
   });
 
-  /* Each tile renders its real page at a fixed 1280px and scales it to the
-     tile's measured width. Measuring beats computing it from the column
-     count: a multi-column layout stretches its columns to fill the
-     container, so the rendered width is never a number you can predict. */
+  /* Each tile renders its page at that piece's own viewport width and
+     scales it to the tile's measured width. Measuring beats computing it
+     from the column count: a multi-column layout stretches its columns to
+     fill the container, so the rendered width is never predictable. */
   const fit = (el) => {
     const w = el.getBoundingClientRect().width;
-    if (w) el.style.setProperty("--s", String(w / 1280));
+    const vw = Number(getComputedStyle(el).getPropertyValue("--vw")) || 1280;
+    if (w) el.style.setProperty("--s", String(w / vw));
   };
 
   const thumbs = [...document.querySelectorAll(".thumb")];
@@ -249,13 +253,12 @@ const ZOOM_DEFAULT = 1;
     transform: scale(1.015);
   }
 
-  /* The page renders at a fixed 1280px and is scaled to the tile by --s,
+  /* The page renders at its own --vw and is scaled to the tile by --s,
      set from the tile's measured width by the script above. */
   .thumb iframe {
     position: absolute;
     top: 0;
     left: 0;
-    width: 1280px;
     border: 0;
     transform: scale(var(--s, 0.34));
     transform-origin: top left;

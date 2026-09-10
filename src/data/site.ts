@@ -10,13 +10,20 @@ export type Piece = {
   href: string;
   title: string;
   /**
-   * Viewport height, in px, that the gallery renders this piece's page at
-   * behind a fixed 1280px width. It sets the tile's aspect ratio, so it is
-   * how the masonry gets its variety: phone screens are tall, a toggle or
-   * a banner is short. Nothing is cropped — the page's own background
-   * becomes the tile's margin, which is what lets the UI float rather
-   * than fill.
+   * Viewport the gallery renders this piece's page at, in px. The tile
+   * scales that viewport to its own width, so these two numbers decide
+   * both the tile's aspect ratio AND how large the work reads inside it.
+   *
+   * Narrower viewport = the work fills more of the tile. A phone screen
+   * is already most of a 1280px page, but a lone toggle is a few percent
+   * of one and reads as a speck; those pieces render at a viewport sized
+   * close to the component so they land near half the tile's width, which
+   * is where the reference grid sits.
+   *
+   * Nothing is cropped — the page's own background becomes the tile's
+   * margin, which is what lets the work float rather than fill.
    */
+  previewWidth: number;
   previewHeight: number;
 };
 
@@ -57,60 +64,70 @@ export const pieces: Piece[] = [
     slug: "stock-option-toggle",
     href: "/work/stock-option-toggle",
     title: "Stock / Option toggle",
-    previewHeight: 640,
+    previewWidth: 560,
+    previewHeight: 340,
   },
   {
     slug: "limit-order-error",
     href: "/work/limit-order-error",
     title: "Limit order error",
-    previewHeight: 640,
+    previewWidth: 700,
+    previewHeight: 420,
   },
   {
     slug: "fractional-shares-banner",
     href: "/work/fractional-shares-banner",
     title: "Fractional shares banner",
-    previewHeight: 640,
+    previewWidth: 900,
+    previewHeight: 480,
   },
   {
     slug: "alert-prototype",
     href: "/work/alert-prototype",
     title: "Alert creation prototype",
+    previewWidth: 900,
     previewHeight: 900,
   },
   {
     slug: "alert-creation",
     href: "/work/alert-creation",
     title: "Alert creation",
-    previewHeight: 900,
+    previewWidth: 820,
+    previewHeight: 840,
   },
   {
     slug: "order-placement-boxed",
     href: "/work/order-placement-boxed",
     title: "Order placement",
-    previewHeight: 900,
+    previewWidth: 820,
+    previewHeight: 840,
   },
   {
     slug: "order-placed-animation",
     href: "/work/order-placed-animation",
     title: "Order placed animation",
-    previewHeight: 900,
+    previewWidth: 780,
+    previewHeight: 800,
   },
   {
     slug: "fractional-order-flow",
     href: "/work/fractional-order-flow",
     title: "Fractional order flow",
-    previewHeight: 980,
+    previewWidth: 900,
+    previewHeight: 960,
   },
   {
     slug: "options-strategy-builder",
     href: "/work/options-strategy-builder",
     title: "Options strategy builder",
-    previewHeight: 720,
+    previewWidth: 860,
+    previewHeight: 560,
   },
   {
     slug: "option-chain",
     href: "/work/option-chain",
     title: "Option chain",
-    previewHeight: 700,
+    previewWidth: 1120,
+    previewHeight: 620,
   },
 ];
