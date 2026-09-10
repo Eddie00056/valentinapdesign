@@ -30,3 +30,12 @@ export const EASING = {
 } as const;
 
 export const SEG_SPRING = { type: "spring", stiffness: 460, damping: 40 } as const;
+
+/** Spot line reflow. Smooth and settled, no overshoot — the line is
+    reporting where price is, not celebrating that it moved. */
+export const LADDER_SPRING = {
+  type: "spring",
+  stiffness: 300,
+  damping: 34,
+  mass: 0.9,
+} as const;

@@ -1,5 +1,5 @@
 import type React from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
 import {
   type ChainRow as ChainRowData,
   type Expiry,
@@ -7,7 +7,7 @@ import {
   type OptionSide,
 } from "./types";
 import { formatCount, formatCurrency, formatPercent } from "./format";
-import { DURATION, EASING } from "./motion";
+import { DURATION, EASING, LADDER_SPRING } from "./motion";
 import { useQuoteFlash } from "./useQuoteFlash";
 import { ChevronRight } from "./icons";
 import { Rolling } from "../shared/RollingNumber";
@@ -162,8 +162,7 @@ function Row({
 /* ------------------------------------------------------------------ */
 
 interface ChainTableProps {
-  above: ChainRowData[];
-  below: ChainRowData[];
+  rows: ChainRowData[];
   side: OptionSide;
   spot: number;
   expiry: Expiry;
@@ -183,30 +182,53 @@ interface ChainTableProps {
  * market breathing rather than a table repainting.
  *
  * Nothing here remounts on a side or expiry change. The ladder is
- * anchored, so the same ten strikes are on screen either way — only their
- * numbers differ, and the odometers carry that. Replaying an entrance
- * stagger would be staging a load for data that never arrives, which is
- * what made switching call/put feel like a page fetch.
+ * anchored, so the same eleven strikes are on screen either way — only
+ * their numbers differ, and the odometers carry that. Replaying an
+ * entrance stagger would be staging a load for data that never arrives,
+ * which is what made switching call/put feel like a page fetch.
+ *
+ * The one thing that does move is the spot line: it sits between the two
+ * strikes that straddle price, so crossing a strike slides it past that
+ * row on a spring.
  */
 export function ChainTable({
-  above,
-  below,
+  rows,
   side,
   spot,
   expiry,
   openStrike,
   onToggleStrike,
 }: ChainTableProps) {
-  const render = (rows: ChainRowData[]) =>
-    rows.map((row) => (
-      <Row
-        key={row.strike}
-        row={row}
-        side={side}
-        isOpen={openStrike === row.strike}
-        onToggle={() => onToggleStrike(row.strike)}
-      />
-    ));
+  const reduce = useReducedMotion();
+  const spring = reduce ? { duration: 0 } : LADDER_SPRING;
+
+  /* Rows descend through price, so the line belongs just above the first
+     strike that spot has not cleared. Crossing a strike changes this
+     index by one, and that index change is the whole animation. */
+  const lineIndex = rows.findIndex((row) => row.strike <= spot);
+  const insertAt = lineIndex === -1 ? rows.length : lineIndex;
+
+  /* One flat array with stable keys, so React MOVES the line's node
+     rather than unmounting and remounting it — that is what lets Motion
+     animate it from its old position to its new one instead of having it
+     blink out and reappear a row up. */
+  const ladder: React.ReactNode[] = [];
+  rows.forEach((row, i) => {
+    if (i === insertAt) ladder.push(<SpotLine key="spot" spot={spot} spring={spring} />);
+    ladder.push(
+      <motion.div key={row.strike} layout="position" transition={spring}>
+        <Row
+          row={row}
+          side={side}
+          isOpen={openStrike === row.strike}
+          onToggle={() => onToggleStrike(row.strike)}
+        />
+      </motion.div>,
+    );
+  });
+  if (insertAt === rows.length) {
+    ladder.push(<SpotLine key="spot" spot={spot} spring={spring} />);
+  }
 
   return (
     <div className="oc-table">
@@ -219,15 +241,28 @@ export function ChainTable({
         ))}
       </div>
 
-      <div>
-        {render(above)}
-
-        <div className="oc-spot" role="separator">
-          <span className="oc-spot-pill oc-num">${formatCurrency(spot)}</span>
-        </div>
-
-        {render(below)}
-      </div>
+      <LayoutGroup id={`ladder-${expiry.id}`}>{ladder}</LayoutGroup>
     </div>
+  );
+}
+
+/**
+ * The spot line.
+ *
+ * `layout="position"` animates where it sits without touching its size,
+ * so the dotted rule and the pill travel together and neither gets
+ * scale-distorted on the way.
+ */
+function SpotLine({
+  spot,
+  spring,
+}: {
+  spot: number;
+  spring: object;
+}) {
+  return (
+    <motion.div className="oc-spot" role="separator" layout="position" transition={spring}>
+      <span className="oc-spot-pill oc-num">${formatCurrency(spot)}</span>
+    </motion.div>
   );
 }

@@ -3,8 +3,8 @@ import { motion } from "motion/react";
 import { QuoteBar } from "./QuoteBar";
 import { ChainTable } from "./ChainTable";
 import { ExpiryPicker } from "./ExpiryPicker";
-import { ANCHOR_SPOT, useChainState } from "./useChainState";
-import { pxHub, PX_BASE, type PriceState } from "../alertscreen/priceHub";
+import { useChainState } from "./useChainState";
+import { pxHub } from "../alertscreen/priceHub";
 import { UNDERLYING } from "./mock";
 import { SEG_SPRING } from "./motion";
 import { type OptionSide } from "./types";
@@ -16,8 +16,26 @@ const SIDES: { id: OptionSide; label: string }[] = [
   { id: "put", label: "Put" },
 ];
 
-/** Render cadence. Everything on the table updates on this beat. */
-const TICK_MS = 7000;
+/* ONE clock drives everything on this widget.
+
+   Price used to step on its own timer while the columns walked on
+   another, so the two drifted and a price change never landed on the same
+   frame as a column update. Both now come off the same tick: the beat is
+   5s, price holds low for two beats and high for one, so every figure on
+   the table — spot, quotes, volume, open interest — changes together. */
+const TICK_MS = 5000;
+
+/** Beats per demo loop: low, low, high. */
+const LOOP = 3;
+
+/* Scripted price beat.
+
+   The point of the piece is the spot line crossing a strike, so price is
+   staged rather than left to wander: it rests just under $175 with the
+   line sitting below the $175 row (2 beats = 10s), steps over the strike
+   so the line springs up past that row (1 beat = 5s), then drops back. */
+const LOW = 174.93;
+const HIGH = 175.01;
 
 export interface OptionChainProps {
   onClose?: () => void;
@@ -31,19 +49,6 @@ export interface OptionChainProps {
  * ladder.
  */
 export function OptionChain({ onClose }: OptionChainProps) {
-  /* The price source stays the shared one — `pxHub` is the site-wide walk
-     the alert screen and the order builder already run on, re-based from
-     its 194.29 onto this widget's $175 spot. What differs here is the
-     cadence: the hub steps every 2.2s, this table renders every 7s. So it
-     samples the hub rather than subscribing to it, which means each update
-     lands three steps of the walk at once — a visible move rather than a
-     twitch, and still one price for the whole site. */
-  const [px, setPx] = useState<PriceState>({
-    price: PX_BASE,
-    prev: PX_BASE,
-    dir: 0,
-    n: 0,
-  });
   const [tick, setTick] = useState(0);
   /* Bumping this remounts the glow span, which restarts its one-shot
      keyframe — the same replay trick the order-placed animation uses. */
@@ -52,16 +57,20 @@ export function OptionChain({ onClose }: OptionChainProps) {
   useEffect(() => {
     const hub = pxHub();
     const id = setInterval(() => {
-      setPx({ price: hub.price, prev: hub.prev, dir: hub.dir, n: hub.n });
+      // Reading the hub keeps this widget on the same walk as the rest of
+      // the site even though the spot itself is staged below.
+      void hub.price;
       setTick((t) => t + 1);
     }, TICK_MS);
     return () => clearInterval(id);
   }, []);
 
-  const spot = ANCHOR_SPOT + (px.price - PX_BASE);
+  /* Derived from the same tick, not a second timer — which is what keeps
+     the price step and the column walk on the same frame. */
+  const spot = tick % LOOP === LOOP - 1 ? HIGH : LOW;
   const state = useChainState(spot, tick);
 
-  const change = spot - (ANCHOR_SPOT - UNDERLYING.change);
+  const change = spot - (LOW - UNDERLYING.change);
 
   return (
     <section className="oc-root" aria-label="Options chain">
@@ -106,8 +115,7 @@ export function OptionChain({ onClose }: OptionChainProps) {
         </div>
 
         <ChainTable
-          above={state.above}
-          below={state.below}
+          rows={state.rows}
           side={state.side}
           spot={spot}
           expiry={state.expiry}

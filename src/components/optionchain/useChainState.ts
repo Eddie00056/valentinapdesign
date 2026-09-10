@@ -2,8 +2,9 @@ import { useCallback, useMemo, useState } from "react";
 import { applyTickToRow, buildChain, EXPIRIES } from "./mock";
 import { type ChainRow, type OptionSide } from "./types";
 
-/** Strikes step $5 either side of the spot line. Five rows above, five
-    below, and no scroll — the whole ladder is on screen at once. */
+/** Strikes step $5 either side of the $175 anchor, and the anchor itself
+    is a row. Eleven rows, no scroll — the whole ladder is on screen at
+    once, and the spot line rides between whichever two straddle price. */
 export const STRIKE_STEP = 5;
 export const ROWS_PER_SIDE = 5;
 
@@ -26,18 +27,17 @@ export function useChainState(spot: number, tick: number) {
   }, []);
 
   /**
-   * The ladder is anchored, not derived from the live price: five strikes
-   * above the line and five below, fixed at $5 apart. Deriving it from a
-   * moving spot would let a row pop in and out as the price crosses a
-   * strike, and this table does not scroll — the rows have to hold still.
+   * The ladder is anchored, not derived from the live price: $150 to $200
+   * at $5 steps, the $175 anchor included as its own row. Deriving the
+   * set from a moving spot would let rows pop in and out as price crosses
+   * a strike, and this table does not scroll — the rows have to hold
+   * still so the only thing that moves is the line between them.
    */
   const ladder = useMemo(() => {
     const anchor = ANCHOR_SPOT;
-    const perSide = ROWS_PER_SIDE;
     const wanted = new Set<number>();
-    for (let i = 1; i <= perSide; i++) {
+    for (let i = -ROWS_PER_SIDE; i <= ROWS_PER_SIDE; i++) {
       wanted.add(anchor + i * STRIKE_STEP);
-      wanted.add(anchor - i * STRIKE_STEP);
     }
 
     const byStrike = new Map<number, ChainRow>();
@@ -45,28 +45,19 @@ export function useChainState(spot: number, tick: number) {
       if (wanted.has(row.strike)) byStrike.set(row.strike, row);
     }
 
-    const pick = (from: number, dir: 1 | -1) =>
-      Array.from({ length: perSide }, (_, i) =>
-        byStrike.get(from + dir * (i + 1) * STRIKE_STEP),
-      ).filter((r): r is ChainRow => r !== undefined);
-
-    return {
-      // Highest strike first, so the ladder reads down to the spot line.
-      above: pick(anchor, 1).reverse(),
-      below: pick(anchor, -1),
-    };
+    // Highest strike first, so the ladder reads downward through price.
+    return [...wanted]
+      .sort((a, b) => b - a)
+      .map((strike) => byStrike.get(strike))
+      .filter((r): r is ChainRow => r !== undefined);
   }, [expiry]);
 
   /* The ladder itself is stable; only the quotes on it walk. Ticking here
      rather than inside the builder keeps the strike set from being rebuilt
      every beat. */
-  const above = useMemo(
-    () => ladder.above.map((row) => applyTickToRow(row, tick)),
-    [ladder.above, tick],
-  );
-  const below = useMemo(
-    () => ladder.below.map((row) => applyTickToRow(row, tick)),
-    [ladder.below, tick],
+  const rows = useMemo(
+    () => ladder.map((row) => applyTickToRow(row, tick)),
+    [ladder, tick],
   );
 
   return {
@@ -77,8 +68,7 @@ export function useChainState(spot: number, tick: number) {
     expiry,
     openStrike,
     toggleStrike,
-    above,
-    below,
+    rows,
     spot,
   };
 }
