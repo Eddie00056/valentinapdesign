@@ -197,26 +197,30 @@ export function ChainTable({
      around spot — landing at the top would show eleven strikes nobody is
      trading. Runs once per expiry, not on every tick. */
   useEffect(() => {
+    const box = scrollRef.current;
+    if (!box) return;
+
     let frame = 0;
-    let tries = 0;
+    let frames = 0;
+    let settled = 0;
+    let abandoned = false;
 
-    /* Deferred to a frame, and retried until it takes.
+    /* Held until it takes, rather than done once on mount.
        
-       Running straight from the effect landed on a scroller that had not
-       been laid out yet — clientHeight 0, so the delta computed to
-       nothing and the ladder opened pinned to $230 with the money 165px
-       below the fold. Waiting a frame is usually enough; the retry covers
-       the hydration order not being guaranteed. */
+       Running straight from the effect put the ladder at the top with the
+       money 165px below the fold: at that moment the scroller had not
+       been laid out, so `scrollTop +=` clamped to 0 against content that
+       was not yet taller than the box. A single deferred frame fixed it
+       locally and still failed in production, where hydration and font
+       loading push that moment further out — so this keeps checking for
+       about a second and stops as soon as the position holds for two
+       consecutive frames.
+       
+       One second is the ceiling, not the cost: in practice it settles in
+       two or three frames and stops. */
     const centre = () => {
-      const box = scrollRef.current;
-      const line = box?.querySelector<HTMLElement>(".oc-spot");
-      if (!box || !line) return;
-
-      if (box.clientHeight === 0 && tries < 10) {
-        tries += 1;
-        frame = requestAnimationFrame(centre);
-        return;
-      }
+      const line = box.querySelector<HTMLElement>(".oc-spot");
+      if (!line || abandoned) return;
 
       /* Measured from rects, not offsetTop: the line is positioned, and
          its offsetParent is the card rather than this scroller, so
@@ -225,19 +229,35 @@ export function ChainTable({
       const viewBox = box.getBoundingClientRect();
       const delta =
         lineBox.top + lineBox.height / 2 - (viewBox.top + viewBox.height / 2);
-      box.scrollTop += delta;
 
-      /* A sub-pixel remainder is the spot line's own half-pixel, not a
-         failure — anything larger means the scroll did not stick, so try
-         again next frame. */
-      if (Math.abs(delta) > 1 && tries < 10) {
-        tries += 1;
-        frame = requestAnimationFrame(centre);
+      if (Math.abs(delta) > 1) {
+        box.scrollTop += delta;
+        settled = 0;
+      } else {
+        settled += 1;
       }
+
+      frames += 1;
+      if (settled < 2 && frames < 60) frame = requestAnimationFrame(centre);
     };
 
+    /* The moment the reader touches the ladder it is theirs — a retry
+       that outlived the first scroll would yank them back to the money. */
+    const abandon = () => {
+      abandoned = true;
+      cancelAnimationFrame(frame);
+    };
+    box.addEventListener("wheel", abandon, { passive: true, once: true });
+    box.addEventListener("pointerdown", abandon, { passive: true, once: true });
+    box.addEventListener("keydown", abandon, { once: true });
+
     frame = requestAnimationFrame(centre);
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      box.removeEventListener("wheel", abandon);
+      box.removeEventListener("pointerdown", abandon);
+      box.removeEventListener("keydown", abandon);
+    };
   }, [expiry.id, side]);
 
   /* Rows descend through price, so the line belongs just above the first
