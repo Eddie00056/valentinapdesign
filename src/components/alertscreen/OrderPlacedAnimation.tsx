@@ -60,8 +60,8 @@ export function OrderPlacedAnimation({
   // getAnimations().cancel()/play().
   const [run, setRun] = useState(0);
   const withSound = useRef(true);
-  const chimeTimer = useRef<number>();
-  const loopTimer = useRef<number>();
+  const chimeTimer = useRef<number | undefined>(undefined);
+  const loopTimer = useRef<number | undefined>(undefined);
 
   const dur = Math.min(6000, Math.max(600, durationMs));
 

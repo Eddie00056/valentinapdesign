@@ -89,4 +89,9 @@ export const pieces: Piece[] = [
     href: "/work/options-strategy-builder",
     title: "Options strategy builder",
   },
+  {
+    slug: "option-chain",
+    href: "/work/option-chain",
+    title: "Option chain",
+  },
 ];

@@ -1,0 +1,679 @@
+/* ------------------------------------------------------------------
+   Options chain widget.
+
+   Built to the Figma frame (Portfolio-presentation, node 156:110260),
+   measured off a 3x export: 780px content, 12px DM Sans, 20px rows,
+   118px strike band. Every colour below was sampled from that render —
+   the palette is the same one the options strategy builder uses, so the
+   two pieces sit in one language. DM Sans is loaded by Bare.astro.
+
+   Card-relative geometry, in CSS px:
+     content 780 · rows full-bleed · strike band 330..448
+     side columns 5 x 63.4 · row 20 · divider 1
+------------------------------------------------------------------ */
+
+.oc-root {
+  /* sampled from the 3x export */
+  --ink: #fefffd;
+  --muted: #c0c3c2;
+  --faint: #9b9f9f;
+  --up: #48d597;
+  --down: #ff557d;
+
+  --shell: #070f11;     /* card ground */
+  --band: #0f1719;      /* stats + toolbar bands, unshaded rows */
+  --itm: #171f20;       /* in-the-money row tint */
+  --chip: #2c3334;      /* fields, expiry rows, segmented track */
+  --quote: #202729;     /* price box */
+  --stat: #262f2f;      /* bid/ask box */
+  --green-bg: #0e231e;
+  --titlebar: #353c3f;
+
+  --line: #343b3c;      /* under expiry rows */
+  --line-row: #192022;  /* between unshaded rows */
+  --line-itm: #202829;  /* between shaded rows */
+
+  --flash-up: rgba(72, 213, 151, 0.22);
+  --flash-down: rgba(255, 85, 125, 0.22);
+
+  --row-h: 20px;
+
+  /* The toolbar band insets its controls by 5px; the quote row above it
+     has no band, so it takes the same inset explicitly. Without this the
+     two rows start at different x and the pills read as misaligned. */
+  --band-pad: 5px;
+  /* Total control height. The bordered controls are content-box 20px + a
+     1px rim either side; the filled ones carry no rim, so they take the
+     22px directly. Either way every pill is the same height. */
+  --ctl-h: 22px;
+  /* First column: the Call/Put track is 93.6px of content + 2px of rim. */
+  --ctl-1: 95.6px;
+  /* Second column. Both rows' right-hand control takes this so their
+     right edges line up — trimmed to the price's own content rather than
+     to the longest expiry, so there is no dead space at rest. The expiry
+     takes it as a MIN width (see .oc-exp-btn): its label is wider than
+     this, so the control grows past it rather than overflowing. */
+  --ctl-2: 154px;
+
+  width: 100%;
+  max-width: 796px;
+  margin-inline: auto;
+  overflow: hidden;
+  border-radius: 10px;
+  background: var(--shell);
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.oc-root *,
+.oc-root *::before,
+.oc-root *::after { box-sizing: border-box; }
+
+/* Native button chrome reset. NOTE the specificity: this selector is
+   (0,1,1), so it BEATS any single-class rule below it — a plain
+   `.oc-something { border: 1px … }` on a <button> silently loses to the
+   `border: 0` here. Component rules that need to paint a border on a
+   button must carry the `.oc-root` prefix to outrank it. (Same trap the
+   options builder documents in its own reset.) */
+.oc-root button {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.oc-root button:disabled { cursor: default; opacity: 0.4; }
+
+.oc-root :focus-visible {
+  outline: 2px solid var(--up);
+  outline-offset: 1px;
+  border-radius: 4px;
+}
+
+/* Tabular figures everywhere a number can tick — without this the whole
+   grid shivers on every update. */
+.oc-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+.oc-up { color: var(--up); }
+.oc-down { color: var(--down); }
+.oc-muted { color: var(--muted); }
+.oc-faint { color: var(--faint); }
+
+/* ---------- title bar ---------- */
+
+.oc-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 29px;
+  padding-inline: 11px;
+  background: var(--titlebar);
+}
+
+.oc-titlebar h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #f5f7f4;
+}
+
+.oc-titlebar-actions { display: flex; align-items: center; gap: 9px; }
+
+/* Press feedback copied from the glass button set (`.btn--mobile:active`
+   in glass-button.css) — the iOS scale-down the star and bell use on the
+   alert screen, same 0.14s ease and the same 0.97 / 0.92 pair, so a tap
+   here reads identically to a tap there. */
+.oc-titlebar button {
+  display: inline-flex;
+  color: #e8ebe9;
+  opacity: 0.9;
+  transition:
+    transform 0.14s ease,
+    opacity 0.14s ease;
+}
+
+.oc-titlebar button:hover { opacity: 1; }
+
+.oc-titlebar button:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+/* Click glow. One shot: blooms out from behind the icon and is gone —
+   it never rests in a lit state, so it reads as a response to the tap
+   rather than a selected mode. The span is remounted by key on each
+   click, which restarts the keyframe. */
+.oc-linkout { position: relative; }
+
+.oc-glow {
+  position: absolute;
+  inset: -7px;
+  border-radius: 9px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(74, 144, 255, 0.38),
+    rgba(74, 144, 255, 0.14) 45%,
+    rgba(74, 144, 255, 0) 72%
+  );
+  pointer-events: none;
+  animation: oc-glow 620ms cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@keyframes oc-glow {
+  0% { opacity: 0; transform: scale(0.65); }
+  30% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.45); }
+}
+
+/* ---------- content box ---------- */
+
+.oc-body { padding: 8px; }
+
+/* ---------- quote bar ---------- */
+
+.oc-quote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--ctl-h);
+  padding-inline: var(--band-pad);
+}
+
+.oc-search {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: var(--ctl-1);
+  height: var(--ctl-h);
+  padding-inline: 9px;
+  border-radius: 6px;
+  background: var(--chip);
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.oc-search svg { flex: none; color: var(--muted); }
+
+/* Symbol is locked for this study. Greyed rather than removed so the
+   header still reads as a searchable chain. */
+.oc-search[aria-disabled="true"] {
+  color: var(--faint);
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.oc-search[aria-disabled="true"] svg { color: var(--faint); }
+
+.oc-quote-box {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: var(--ctl-2);
+  height: var(--ctl-h);
+  padding-inline: 9px;
+  border-radius: 6px;
+  background: var(--quote);
+}
+
+/* Matches .ob-quote-box in options-builder.css — 12px, weight 400,
+   tabular figures. `Rolling` zeroes letter-spacing itself, because the
+   page's 0.02em otherwise lands at every digit-cell boundary and reads as
+   an uneven gap. */
+.oc-quote-px {
+  font-size: 12px;
+  color: var(--ink);
+}
+
+.oc-quote-chg { font-size: 12px; }
+
+/* ---------- toolbar ---------- */
+
+.oc-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding-inline: var(--band-pad);
+  background: var(--band);
+  border-radius: 6px 6px 0 0;
+  margin-top: 4px;
+}
+
+/* Buy/Sell and Call/Put selectors.
+
+   These are the options strategy builder's Stock/Option toggle, copied
+   value for value from `.ob-seg` / `.ob-seg-btn` / `.ob-seg-ind` in
+   options-builder.css — 93.6px track (the Figma 104 at that card's 0.9
+   scale), 20px tall, radius 6, 1px 20%-white rim, transparent ground.
+
+   box-sizing is content-box on purpose. The builder renders on a Bare
+   layout, which does not load global.css, so `.ob-seg` inherits the UA
+   default and its 93.6/20 are CONTENT dimensions with the 1px rim added
+   outside. This root sets border-box on everything, so the same numbers
+   would otherwise describe a smaller box and the 20px buttons would
+   overflow their own track — which is exactly what made the two toggles
+   sit differently. */
+.oc-seg {
+  position: relative;
+  display: flex;
+  box-sizing: content-box;
+  width: 93.6px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(254, 255, 253, 0.2);
+  background: none;
+  flex: none;
+}
+
+.oc-root .oc-seg-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+  box-sizing: border-box;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  /* Deliberate divergence from `.ob-seg-btn`, which keeps its inactive
+     label at full-strength ink. Here the unselected side is dropped to
+     the secondary tone so the chain's active side is unambiguous at a
+     glance — the table below only ever shows one of them. */
+  color: var(--muted);
+  /* Clips the indicator's 1px overhang below — that is what keeps the
+     mint rim from showing as a bright outline. */
+  overflow: hidden;
+  transition: color 0.16s ease;
+}
+
+.oc-root .oc-seg-btn:hover { color: var(--ink); }
+
+.oc-root .oc-seg-btn[aria-checked="true"],
+.oc-root .oc-seg-btn[aria-checked="true"]:hover { color: var(--up); }
+
+/* The builder declares a 1px mint border here, but its button's
+   overflow:hidden clips the whole ring away — the rendered result is a
+   flat plate with no rim. Reproducing it as a real border is what put a
+   green sliver down the inner edge: the track's halves are 46.8px, so the
+   clip boundary lands mid-pixel and a fraction of the rim survives.
+   Dropping the border matches the builder's render exactly and removes
+   the artifact deterministically. */
+.oc-seg-ind {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 6px;
+  background: var(--green-bg);
+}
+
+/* ---------- menu ---------- */
+
+.oc-menu { position: relative; display: inline-flex; }
+
+.oc-menu-list {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  z-index: 30;
+  padding: 4px;
+  border-radius: 8px;
+  background: #0c1314;
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+}
+
+.oc-menu-list--right { left: auto; right: 0; }
+
+.oc-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  text-align: left;
+  transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.oc-menu-item:hover { background: var(--chip); }
+
+/* ---------- table ---------- */
+
+.oc-table {
+  margin-top: 4px;
+  background: var(--band);
+  border-radius: 0 0 6px 6px;
+  overflow: hidden;
+}
+
+/* Six columns, sized off the reference: strike leads and everything else
+   is right-aligned so the digits stack into readable columns. */
+.oc-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1.2fr 0.85fr 0.95fr 0.95fr;
+  align-items: center;
+  width: 100%;
+}
+
+.oc-head {
+  height: 26px;
+  border-bottom: 1px solid var(--line-row);
+}
+
+/* Headers centre over their column. Symmetric padding, otherwise the
+   right inset the value cells use would pull the label off centre. */
+.oc-head .oc-cell {
+  justify-content: center;
+  padding-inline: 6px;
+  color: var(--muted);
+}
+
+.oc-cell {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  padding-right: 12px;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Strike leads the row: caret, then the figure, hard left. Only the
+   header row centres (see `.oc-head .oc-cell`); the values stay put. */
+.oc-cell--strike {
+  justify-content: flex-start;
+  gap: 5px;
+  padding-left: 6px;
+  padding-right: 0;
+}
+
+.oc-row {
+  height: 24px;
+  text-align: left;
+  border-bottom: 1px solid var(--line-row);
+  transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.oc-row:hover { background: var(--itm); }
+
+.oc-row-caret {
+  display: inline-flex;
+  color: var(--faint);
+  flex: none;
+  transition: transform 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.oc-row[aria-expanded="true"] { background: var(--itm); }
+.oc-row[aria-expanded="true"] .oc-row-caret { transform: rotate(90deg); }
+
+/* Bid and ask are the two tradeable numbers, so both get the chip the
+   builder puts on its own quote boxes — same 14% ground, same 6px radius.
+   Each pill carries its own resting ground as a custom property, which is
+   what lets one pair of flash keyframes settle correctly on either colour. */
+.oc-cell--pill { padding-right: 4px; }
+.oc-cell--last { padding-right: 6px; }
+
+/* Registered so the angle can actually be transitioned — an unregistered
+   custom property is not animatable, which is the whole trick behind the
+   metallic-badge shimmer this borrows from. */
+@property --oc-sheen {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+.oc-pill {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 46px;
+  padding: 1px 7px;
+  border-radius: 6px;
+  background: var(--pill-bg);
+  color: var(--pill-fg);
+  transition:
+    --oc-sheen 0.7s cubic-bezier(0.32, 0.72, 0.24, 1),
+    transform 0.14s ease,
+    opacity 0.14s ease;
+}
+
+/* Press feedback, same as the title-bar icons and the glass button set's
+   `.btn--mobile:active` — 0.97 / 0.92 over 0.14s. */
+.oc-pill:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+/* A 1px conic ring, mask-composited so its inner radius traces the pill
+   exactly. Far quieter than the badge it comes from: the sweep is the
+   pill's own colour rather than metal, it peaks at half alpha instead of
+   solid white, the angle travels 14deg rather than 18, and there is no
+   lift — a 24px row has nowhere to rise to. */
+.oc-pill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from calc(180deg + var(--oc-sheen, 0deg)) at 50% 50%,
+    var(--sheen-lo) 0deg,
+    var(--sheen-hi) 72deg,
+    var(--sheen-lo) 148deg,
+    var(--sheen-hi) 242deg,
+    var(--sheen-lo) 318deg,
+    var(--sheen-lo) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s ease;
+}
+
+.oc-pill:hover::before,
+.oc-row:focus-visible .oc-pill::before { opacity: 1; }
+
+.oc-pill:hover,
+.oc-row:focus-visible .oc-pill { --oc-sheen: 14deg; }
+
+.oc-pill--bid {
+  --pill-bg: rgba(255, 85, 125, 0.14);
+  --pill-fg: var(--down);
+  --sheen-lo: rgba(255, 85, 125, 0.1);
+  --sheen-hi: rgba(255, 85, 125, 0.5);
+}
+
+.oc-pill--ask {
+  --pill-bg: rgba(72, 213, 151, 0.14);
+  --pill-fg: var(--up);
+  --sheen-lo: rgba(72, 213, 151, 0.1);
+  --sheen-hi: rgba(72, 213, 151, 0.5);
+}
+
+@keyframes oc-flash-up {
+  from { background-color: var(--flash-up); }
+  to { background-color: var(--pill-bg); }
+}
+
+@keyframes oc-flash-down {
+  from { background-color: var(--flash-down); }
+  to { background-color: var(--pill-bg); }
+}
+
+.oc-pill[data-flash="up"] { animation: oc-flash-up 320ms ease-out; }
+.oc-pill[data-flash="down"] { animation: oc-flash-down 320ms ease-out; }
+
+/* ---------- spot line ---------- */
+
+/* The one moving thing on the table: a dotted rule with the live price
+   riding it, drawn between the two strikes that straddle spot. */
+.oc-spot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+}
+
+.oc-spot::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  border-top: 1px dotted #4a5354;
+}
+
+.oc-spot-pill {
+  position: relative;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--chip);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ---------- expanded detail ---------- */
+
+.oc-detail {
+  padding: 10px 12px 12px;
+  background: var(--shell);
+  border-bottom: 1px solid var(--line-row);
+}
+
+.oc-detail-h {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.oc-detail-rule {
+  height: 1px;
+  margin: 7px 0 9px;
+  background: var(--line);
+}
+
+.oc-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.oc-detail-grid--greeks { margin-bottom: 0; }
+
+.oc-detail-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.oc-detail-k { color: var(--muted); }
+.oc-detail-v { color: var(--ink); }
+
+/* ---------- expiry picker ---------- */
+
+/* Same component as the selectors either side of it: content-box, 20px
+   tall, radius 6, 1px 20%-white rim, transparent ground — so the three
+   controls sit on one line with matching caps and rims. */
+.oc-root .oc-exp-btn {
+  display: inline-flex;
+  align-items: center;
+  /* Fixed width, so the caret parks at the right edge the way a select
+     does rather than trailing the label at a different x per date. */
+  justify-content: space-between;
+  gap: 7px;
+  box-sizing: content-box;
+  min-width: calc(var(--ctl-2) - 2px);
+  height: 20px;
+  padding-inline: 9px;
+  border-radius: 6px;
+  border: 1px solid rgba(254, 255, 253, 0.2);
+  background: none;
+  font-size: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* Let the longest label ("Sep 15, 2028 (737D)") set the measure and clip
+   nothing; the row's own padding supplies the air. */
+.oc-exp-label {
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* The marks sit right after the label rather than being pushed to a far
+   edge — with the list hugging its content there is no dead column for
+   them to be pushed into. */
+.oc-exp-marks {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 16px;
+  color: var(--ink);
+  flex: none;
+}
+
+.oc-exp-e {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--chip);
+  color: var(--muted);
+  font-size: 10px;
+}
+
+/* ---------- responsive ---------- */
+
+@media (max-width: 720px) {
+  .oc-cell { padding-right: 7px; }
+  .oc-cell--strike { padding-left: 4px; }
+  /* Symmetric, so the centred headers stay centred once columns tighten. */
+  .oc-head .oc-cell { padding-inline: 4px; }
+  /* Open interest is the first thing to go — the ladder still reads
+     without it, and the table must not start scrolling sideways. */
+  .oc-grid { grid-template-columns: 1.15fr 1fr 0fr 0.9fr 1fr 1fr; }
+  .oc-grid > .oc-cell:nth-child(3) { display: none; }
+  .oc-detail-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oc-pill:hover,
+  .oc-row:focus-visible .oc-pill { --oc-sheen: 0deg; }
+
+  .oc-pill:active { transform: none; }
+  .oc-glow { animation: none; opacity: 0; }
+
+  .oc-root *,
+  .oc-root *::before,
+  .oc-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

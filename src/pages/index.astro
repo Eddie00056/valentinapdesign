@@ -116,6 +116,39 @@ import "../components/glasslab/glasslab.css";
                   offsetY={-43}
                 />
               )}
+              {p.slug === "option-chain" && (
+                <svg
+                  class="mark"
+                  viewBox="0 0 120 120"
+                  role="img"
+                  aria-label="Option chain"
+                >
+                  <rect width="120" height="120" rx="18" fill="#ffffff"></rect>
+                  {/* Mirrored strikes reading outward from a centre gutter,
+                      with the spot divider cutting across at the money. */}
+                  <g fill="#d8dbda">
+                    <rect x="18" y="30" width="26" height="4" rx="2"></rect>
+                    <rect x="76" y="30" width="26" height="4" rx="2"></rect>
+                    <rect x="18" y="42" width="26" height="4" rx="2"></rect>
+                    <rect x="76" y="42" width="26" height="4" rx="2"></rect>
+                    <rect x="18" y="74" width="26" height="4" rx="2"></rect>
+                    <rect x="76" y="74" width="26" height="4" rx="2"></rect>
+                    <rect x="18" y="86" width="26" height="4" rx="2"></rect>
+                    <rect x="76" y="86" width="26" height="4" rx="2"></rect>
+                  </g>
+                  <g fill="#3a3f47">
+                    <rect x="18" y="54" width="26" height="4" rx="2"></rect>
+                    <rect x="76" y="54" width="26" height="4" rx="2"></rect>
+                  </g>
+                  <rect x="54" y="26" width="12" height="68" rx="3" fill="none"
+                    stroke="#e5e3df" stroke-width="2"></rect>
+                  <g stroke="#48d597" stroke-width="2" stroke-linecap="round">
+                    <path d="M18 66 H44"></path>
+                    <path d="M76 66 H102"></path>
+                  </g>
+                  <circle cx="60" cy="66" r="4" fill="#48d597"></circle>
+                </svg>
+              )}
               {p.slug === "fractional-order-flow" && (
                 <svg
                   class="mark"

@@ -1,0 +1,66 @@
+---
+import Bare from "../../layouts/Bare.astro";
+import { OptionChain } from "../../components/optionchain/OptionChain";
+---
+
+<Bare title="Options chain" bg="#0b0b0d">
+  <main class="oc-page">
+    <OptionChain client:load />
+  </main>
+
+  <a class="oc-back" href="/" aria-label="Back to home">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M12.0833 15L7.08325 10L12.0833 5"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </a>
+
+  <style is:global>
+    html,
+    body {
+      overflow-y: auto !important;
+    }
+
+    .oc-page {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(16px, 3vw, 44px);
+    }
+
+    .oc-page > * {
+      width: 100%;
+      max-width: 796px;
+    }
+
+    .oc-back {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #c0c3c2;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+    }
+
+    .oc-back:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fefffd;
+    }
+  </style>
+</Bare>
