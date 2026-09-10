@@ -39,7 +39,25 @@
   --down: #ff557d;
   --ink: #fefffd;
   --muted: #c0c3c2;
-  --chip: #2c3334;
+  /* Field states, sampled off the Atlas state documents (Dropdown, and
+     Input field — Label as Prefix / Clickable Prefix + Quantity). One
+     ramp serves both: a dropdown and an input field are the same control
+     in that library, and only the selected state carries a border. */
+  --chip: #2c3334;          /* default                       */
+  --chip-hover: #414748;    /* hover                         */
+  --chip-press: #4c5252;    /* pressed                       */
+  --chip-sel: #112d25;      /* selected — with --up border   */
+  /* Error is documented and tokenised, but nothing on this ticket can
+     enter it yet: there is no invalid state to trigger. Wired the moment
+     one exists (the doc's own example is "legs of this strategy cannot
+     contain identical components"). */
+  --chip-err: #2c1921;
+  --chip-err-hover: #37252c;
+  --chip-err-sel: #29181f;
+  --err-line: #f55278;
+  /* The stepper arrow's own plate, inside an already-hovered field. */
+  --arrow-hover: #54595a;
+  --arrow-press: #5d6363;
   --sunk: #171f20;
   --panel: #0f1719;
   --line: #242b2c;
@@ -85,17 +103,24 @@
    inset of 12, and the bar contributes 4 of that, so the title container
    takes the other 8. */
 .ob-shell {
-  /* Sized by its widest row, not by a number.
+  /* Pinned to the widest row this card ever holds — the options ticket's
+     leg row — so switching to a stock ticket, which is narrower, does not
+     resize the widget under the pointer.
 
-     456 came from the Figma's card spec, but every field in the leg row
-     is a fixed width, so that row adds up to 418.5 and the card carried
-     ~33px of dead space after the remove button — visible as a gap
-     between the X and the widget's own edge.
+     Stated as the sum rather than a magic number, so it still follows
+     --field-w the way `fit-content` did:
 
-     fit-content lets the leg row set the width and everything else fill
-     it, so the card stays wrapped around its content if a field's width
-     ever changes. The cap is for narrow screens. */
-  width: fit-content;
+       34  Buy/Sell        + 34  Call/Put   + 16  remove
+       3 x --field-w       (Qty, expiry, strike)
+       5 x 4               the leg row's own gaps
+       2 x 6               the legs container's padding
+       2 x 4               the card's padding
+       2 x 1               the card's border
+
+     456 was the Figma's card spec and left ~33px of dead space after the
+     remove button; fit-content fixed that but tied the width to whichever
+     ticket was open. The cap is for narrow screens. */
+  width: calc(3 * var(--field-w) + 84px + 20px + 12px + 8px + 2px);
   max-width: 100%;
   box-sizing: border-box;
   /* No override needed any more: the shell's own 4 + 6 is exactly the
@@ -122,8 +147,14 @@
      left edges where the chain has two. The 12 is still in the design; it
      is just spelled 4 here plus the 6 each control carries, and the
      panels sit on the same 4 as everything else instead of punching back
-     out through it. */
-  padding: 8px 4px 4px;
+     out through it.
+
+     Bottom is 8, not the chain's 4. The chain's last row is a full-bleed
+     surface that runs to the card's edge; this ticket's last row is the
+     footer — content, sitting on the same 8 of air every other band on the
+     ticket is separated by. At 4 the CTA read as pinned to the bottom
+     edge while the gap above it stayed 8. */
+  padding: 8px 4px;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -192,6 +223,8 @@
 }
 
 .ob-strat-btn {
+  /* Positioning context for the selected rim's ::after overlay. */
+  position: relative;
   appearance: none;
   font: inherit;
   display: inline-flex;
@@ -312,7 +345,6 @@
 .ob-params-panel {
   background: var(--panel);
   border-radius: 6px;
-  overflow: hidden;
 }
 
 .ob-legs-panel {
@@ -412,6 +444,213 @@ button.ob-chip--strike {
   cursor: pointer;
   transition: background 0.16s ease, box-shadow 0.16s ease;
 }
+
+/* The three chips you can act on take the same fill ramp as the fields —
+   Buy/Sell, Call/Put, and the instrument. They are buttons on the same
+   ticket; a field lighting up under the pointer while the chip beside it
+   stays flat reads as one of them being dead. */
+.ob-stage .ob-sidebtn,
+.ob-stage .ob-cp {
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.ob-stage .ob-sidebtn:hover,
+.ob-stage .ob-cp:hover {
+  background: var(--chip-hover);
+}
+
+.ob-stage .ob-sidebtn:active:not(:disabled),
+.ob-stage .ob-cp:active {
+  background: var(--chip-press);
+}
+
+/* Stock ticket: order type, size and price on one row, in three EQUAL
+   columns. It was `1fr auto 1fr`, sizing the middle track to Qty's own
+   fixed width — which left the two either side wider and the row reading
+   as three different fields rather than one set.
+
+   The `.ob-stage` prefix is load-bearing: this ties `.ob-params` at
+   (0,1,0) and that rule sits later in the file, so a bare class lost and
+   the row wrapped onto two lines. */
+.ob-stage .ob-params--stock {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Qty carries a fixed --field-w in a leg row, where it sits beside chips
+   of that width. Here it is a grid item and takes its track instead. */
+.ob-stage .ob-params--stock .ob-chip--qty {
+  width: 100%;
+}
+
+/* The attachments row inside the params container.
+
+   It inherits .ob-add wholesale — the rule above it, the 6px below, the
+   8px between buttons — and only needs the air ABOVE that rule, which on
+   the options ticket comes from the leg row's own bottom padding and has
+   no equivalent here. Without it the divider sat hard against the fields.
+
+   `.ob-stage` prefix required: this ties .ob-add at (0,1,0) and that rule
+   sits later in the file. An earlier version of this block set margin and
+   padding here and silently did nothing at all. */
+/* Nothing to add: .ob-add already carries the rule, the 6 above and
+   below, and the 8 between buttons, and this container pads like the legs
+   panel — so the row's own bottom padding IS the container's bottom, the
+   same as "+ Add call". */
+
+/* With nothing open, this row is the container's only child and its rule
+   would draw along the top edge of an empty box. */
+.ob-attach-panel > .ob-add:first-child { border-top: 0; }
+
+/* ---------- stock attachments ---------- */
+
+/* Their own container, built exactly like the legs panel: --panel at
+   radius 6, and `0 6px` — no vertical padding, because the rows inside
+   bring their own and the last one's 6 doubles as the container's. */
+.ob-attach-panel {
+  margin-top: 8px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+/* No surface of its own — the container above is the surface. A second
+   fill nested in the first read as a third level of the ticket, and the
+   fields carry their own anyway. 6 top, matching a leg row's. */
+.ob-attach {
+  padding: 6px 0;
+}
+
+.ob-attach-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* 8, per the asset — the title is a heading for the fields under it,
+     not another row in the stack. */
+  margin-bottom: 8px;
+}
+
+.ob-attach-title {
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.ob-attach-title[data-tone="up"] { color: var(--up); }
+.ob-attach-title[data-tone="down"] { color: var(--down); }
+.ob-attach-title[data-tone="neutral"] { color: var(--ink); }
+
+/* A bordered box, unlike the leg row's bare X — this one closes a whole
+   section rather than a line, so it carries an edge. */
+.ob-stage .ob-attach-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  /* The file's button reset clears margin but not padding, so this kept
+     the UA's ~6px either side — which left the 16px glyph 6.4px of content
+     box to shrink into. */
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid rgba(254, 255, 253, 0.2);
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.16s ease;
+}
+
+.ob-stage .ob-attach-x:hover { background: var(--chip-hover); }
+.ob-stage .ob-attach-x:active { background: var(--chip-press); }
+
+/* Type, size, price — the parent order's row, repeated. */
+.ob-attach-grid {
+  display: grid;
+  gap: 4px;
+}
+
+/* Three across, exactly like the parent order's own row. */
+.ob-attach-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Qty carries a fixed --field-w for a leg row; here it takes its track. */
+.ob-stage .ob-attach-grid .ob-chip--qty {
+  width: 100%;
+}
+
+/* ---------- dropdown menu ---------- */
+
+/* An open field takes the Selected state and holds it — the doc's
+   "Selected" column IS the open dropdown, not a hover. */
+.ob-stage [data-open] {
+  background: var(--chip-sel);
+}
+
+.ob-stage [data-open]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 1px solid var(--up);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.ob-stage [data-open] .ob-chevron { opacity: 1; color: #ffffff; }
+
+/* Covers the page so the next click anywhere closes the menu. Transparent:
+   the doc shows no scrim behind an open dropdown. */
+.ob-dd-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+}
+
+/* Measured off the Atlas doc at its own scale (its field is 48px tall for
+   a 20px control, so 2.4x): fill #171B1C, a 1px #454949 rim, radius 6,
+   items on a 26.7 pitch, and the panel starting 4 below the field.
+
+   `fixed`, positioned from the trigger's rect — see the Dropdown
+   component. Both containers on this ticket clip to a radius and the card
+   clips to 12, so an absolutely positioned menu would be cut off by
+   whichever it opened inside. */
+.ob-dd-menu {
+  position: fixed;
+  z-index: 41;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 0;
+  border-radius: 6px;
+  border: 1px solid #454949;
+  background: #171b1c;
+  box-shadow: 0 14px 28px -12px rgba(0, 0, 0, 0.7);
+}
+
+.ob-stage .ob-dd-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  height: 27px;
+  padding: 0 10px;
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.ob-stage .ob-dd-item:hover,
+.ob-stage .ob-dd-item:focus-visible {
+  outline: none;
+  background: var(--chip);
+}
+
+/* The check is the only accent in the panel. */
+.ob-stage .ob-dd-item svg { color: var(--up); flex: none; }
 
 /* "Qty" is a prefix sub-box, same treatment as the Limit field's "Limit $"
    label — its own bordered box with 3px horizontal / 6px vertical padding,
@@ -628,7 +867,19 @@ button.ob-chip--strike {
    endpoint, so the ink starts at 3.2 units, or 2.8px at size 14.
    Cancelling 3.5 therefore overshot by 0.7 and hung the plus out past the
    pill's edge. */
-.ob-add button svg { margin-left: -2.8px; }
+.ob-add button svg {
+  margin-left: -2.8px;
+  /* Lifted off the box centre onto the text's optical centre.
+
+     `align-items: center` centres the two BOXES, and the plus is centred
+     in its own — but "Add call" and "Add put" carry no descender, so their
+     ink runs ascender-to-baseline and its centre sits 0.75px above the
+     line box's. Measured from the font's own metrics (actual ascent 7.92,
+     descent 0.13 at 11px), not eyeballed. `relative` so it moves without
+     disturbing the row's layout. */
+  position: relative;
+  top: -0.75px;
+}
 
 .ob-add button:hover:not(:disabled) {
   color: #ffffff;
@@ -652,8 +903,8 @@ button.ob-chip--strike {
 .ob-quote-read {
   display: flex;
   align-items: center;
-  /* Wider than the gap inside a label/value pair, so "Bid $9.09" and
-     "Ask $9.09" read as two readings rather than four words. */
+  /* Wider than the gap inside a label/value pair, so the readings hold
+     apart as readings rather than running into one another. */
   gap: 10px;
   /* Pushes the CTA to the trailing edge, where it was before this row
      existed. */
@@ -672,14 +923,41 @@ button.ob-chip--strike {
 .ob-quote-v {
   color: var(--muted);
   font-weight: 400;
+  /* 11, matching "+ Add call". These two and that row are the ticket's
+     secondary text — things the ticket tells you, rather than fields you
+     set — so they sit a step under the 12 everything else takes. */
+  font-size: 11px;
 }
 
 .ob-quote-k {
+  white-space: nowrap;
   /* 4 to its own value; the 10 on the row separates the pairs. */
   margin-right: -6px;
 }
 
-.ob-quote-v { font-variant-numeric: tabular-nums; }
+/* Fixed box, so the three readings hold station as their figures tick.
+
+   DM Sans as served has no tabular figures — `tabular-nums` below computes
+   and does nothing — so "$3.11" and "$3.00" are different widths, and
+   without a floor here every tick shoved Mid and Ask sideways.
+
+   Measured, not guessed: the widest five-character money string is "$0.00"
+   at 31. That is the size a quote on this ticket actually takes — 39, the
+   six-character "$00.00", was holding a column's worth of air open for a
+   value that never arrives. It is a min-width rather than a width, so an
+   order big enough to need the sixth character grows the row instead of
+   clipping. Left-aligned, so the figure stays against the key that names
+   it and any slack falls before the NEXT key. */
+.ob-quote-v {
+  display: inline-block;
+  min-width: 31px;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The total is the mark times 100, so it carries two more digits than the
+   quotes beside it and needs its own floor. */
+.ob-quote-v--total { min-width: 47px; }
 
 /* ---------- order params ---------- */
 
@@ -733,10 +1011,23 @@ button.ob-field {
   justify-content: space-between;
 }
 
+/* Hover, per the Atlas docs: one step lighter than the field's default.
+   Every field-shaped control takes it — the pickers, the order-type
+   switch, and the two that hold a stepper. */
 button.ob-field:hover,
 button.ob-chip--exp:hover,
-button.ob-chip--strike:hover {
-  background: #333b3c;
+button.ob-chip--strike:hover,
+.ob-chip--qty:hover,
+.ob-stepper:hover {
+  background: var(--chip-hover);
+}
+
+/* Pressed. A step lighter again, and only while the pointer is down. */
+button.ob-field:active,
+button.ob-chip--exp:active,
+button.ob-chip--strike:active,
+.ob-strat-btn:active {
+  background: var(--chip-press);
 }
 
 
@@ -827,21 +1118,47 @@ button.ob-chip--strike:focus-visible .ob-chevron {
   color: #ffffff;
 }
 
-/* "Selected" = hovered or focused — a green stroke around the field
-   itself, same moment the chevron/stepper reveal. */
-.ob-strat-btn:hover,
+/* Selected — the doc's term for an open or focused field. The only state
+   in the set that carries a border: a mint plate inside a mint rim, the
+   same pair the segmented control's selected side uses.
+
+   Hover is a fill and nothing else, per the docs. A rim on every
+   mouseover made the ticket flicker green as the pointer crossed it. */
 .ob-strat-btn:focus-visible,
-button.ob-field:hover,
 button.ob-field:focus-visible,
-button.ob-chip--exp:hover,
 button.ob-chip--exp:focus-visible,
-button.ob-chip--strike:hover,
-button.ob-chip--strike:focus-visible {
-  box-shadow: inset 0 0 0 1px var(--up);
+button.ob-chip--strike:focus-visible,
+.ob-chip--qty:focus-within,
+.ob-stepper:focus-within {
+  background: var(--chip-sel);
+}
+
+/* The rim is an overlay, not `box-shadow: inset`.
+
+   An inset shadow paints beneath the element's own children, so the
+   prefix key's `border-right` — the divider inside Qty and Limit — was
+   drawing straight over the top and bottom of the rim and cutting it in
+   two. A positioned ::after on its own stacking level closes the rim over
+   everything inside the field. */
+.ob-strat-btn:focus-visible::after,
+button.ob-field:focus-visible::after,
+button.ob-chip--exp:focus-visible::after,
+button.ob-chip--strike:focus-visible::after,
+.ob-chip--qty:focus-within::after,
+.ob-stepper:focus-within::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 1px solid var(--up);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 /* Limit-price amount stepper */
 .ob-stepper {
+  /* Positioning context for the selected rim's ::after overlay. */
+  position: relative;
   padding-right: 3px;
   transition: opacity 0.16s ease;
 }
@@ -914,14 +1231,8 @@ button.ob-chip--strike:focus-visible {
   opacity: 1;
 }
 
-/* "Selected" = hovered or focused — a green stroke around the field
-   itself, same moment the +/- reveal. */
-.ob-stepper:hover,
-.ob-stepper:focus-within,
-.ob-chip--qty:hover,
-.ob-chip--qty:focus-within {
-  box-shadow: inset 0 0 0 1px var(--up);
-}
+/* Hover fill and stepper reveal are handled above; the green stroke here
+   would fight the focus-only rule. */
 
 /* .ob-field (Limit) has no gap of its own, so its stepper sits right up
    against the value with only its own -2px pull. .ob-chip (Qty) has a
@@ -959,20 +1270,24 @@ button.ob-chip--strike:focus-visible {
   align-items: center;
   justify-content: center;
   border-radius: 3px;
-  /* Flat — no glass rim, no shadow. Needs to be visibly lighter than the
-     pill it sits in (--chip matches the pill's own background exactly,
-     so the button disappeared into it) to read as its own grey box. */
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--muted);
+  /* No plate. The reference shows two bare carets sitting on the field's
+     own fill — the grey box behind them existed to separate a + and a -
+     from the pill, and a filled triangle reads as a control without it. */
+  background: none;
+  color: var(--ink);
   cursor: pointer;
   padding: 0;
   transition: background 0.12s ease, color 0.12s ease;
 }
 
 .ob-stepper-btns button:hover:not(:disabled),
-.ob-stepper-btns button:focus-visible:not(:disabled),
+.ob-stepper-btns button:focus-visible:not(:disabled) {
+  background: var(--arrow-hover);
+  color: #ffffff;
+}
+
 .ob-stepper-btns button:active:not(:disabled) {
-  background: rgba(255, 255, 255, 0.18);
+  background: var(--arrow-press);
   color: #ffffff;
 }
 
@@ -993,9 +1308,7 @@ button.ob-chip--strike:focus-visible {
   gap: 8px;
   /* Same inner line as the ticker row — see .ob-ticker. */
   padding-inline: 6px;
-  /* The reading animates in and out; without a floor the footer's height
-     would step as it does. 20 is the height of every control on the
-     ticket. */
+  /* 20, the height of every control on the ticket. */
   min-height: 20px;
 }
 

@@ -30,7 +30,11 @@ export function LinkOut({ size = 14 }: { size?: number }) {
   );
 }
 
-export function Close({ size = 15 }: { size?: number }) {
+/* 14, matching the link-out and the plate both now sit in. It was 15,
+   which no longer fits its own plate — and it drew SMALLER than the
+   link-out regardless, since this X spans 8 of the 16-unit grid where the
+   chain spans about 10.5. */
+export function Close({ size = 14 }: { size?: number }) {
   return (
     <svg {...base(size)}>
       <path d="M4 4l8 8M12 4l-8 8" />
@@ -98,7 +102,7 @@ export function WidgetShell({
             aria-label="Close"
             onClick={onClose}
           >
-            <Close size={15} />
+            <Close size={14} />
           </button>
         </div>
       </header>

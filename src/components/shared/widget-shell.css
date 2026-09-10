@@ -11,6 +11,8 @@
      --wshell-bg         card ground                        #070f11
      --wshell-bar-pad    inset around the bar's containers  4px
      --wshell-title-pad  inset inside the title's container 6px
+     --wshell-row-h      title container height             20px
+     --wshell-icon       icon plate, square                 14px
 
    The two insets add up to the title's optical left edge, and that is the
    number to match against whatever the body puts at ITS left edge. The
@@ -45,14 +47,28 @@
 /* ---------- title bar ---------- */
 
 /* Two nested insets: the bar holds `--wshell-bar-pad` around its
-   contents, and the title and each icon are a 24px container carrying
-   padding of their own. The height is that arithmetic rather than a
-   magic number — move the container and the bar follows it. */
+   contents, and the title and each icon are a `--wshell-row-h` container
+   carrying padding of their own.
+
+   The title's container is 20 — the height every control in these widgets
+   takes. It was 24, which made the bar the only band on the card built to
+   a different measure and left it reading tall against a title whose ink
+   is only 11.3 high.
+
+   The icon plates are 14: the glyph's own box, with no padding around it.
+   They were 20, which put 3 of empty plate on every side of each icon and
+   pushed the two of them 16 apart optically against a declared 6.
+
+   No explicit height. It used to be `pad * 2 + 24`, which is the right
+   arithmetic for a content box but not for this element: the border-bottom
+   below sits inside the border box, so that height left only 23.2 for a
+   24px container and the flex centring split the shortfall — 3.6 above,
+   4.4 below, against a padding that plainly said 4. Letting padding and
+   content set the height makes the declared 4 the drawn 4. */
 .wshell-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: calc(var(--wshell-bar-pad, 4px) * 2 + 24px);
   padding: var(--wshell-bar-pad, 4px);
   /* Flat #353D3F at 40%. The blur behind it is what makes it read as
      glass; the fill is only a tint, so the band does not brighten across
@@ -69,7 +85,7 @@
 .wshell-title {
   display: flex;
   align-items: center;
-  height: 24px;
+  height: var(--wshell-row-h, 20px);
   margin: 0;
   padding-inline: var(--wshell-title-pad, 6px);
   font-size: 12px;
@@ -80,10 +96,9 @@
   color: rgba(254, 255, 253, 0.88);
 }
 
-/* 2, not the 9 this used to be. Each icon brings 5 of its own padding
-   now, so the glyphs still read 12 apart — the gap only has to separate
-   the two plates. */
-.wshell-actions { display: flex; align-items: center; gap: 2px; }
+/* 6 between the two icon plates. Each icon also brings 5 of its own
+   padding, so the glyphs themselves read about 16 apart. */
+.wshell-actions { display: flex; align-items: center; gap: 6px; }
 
 /* Press feedback from the glass button set (`.btn--mobile:active` in
    glass-button.css) — the iOS scale-down the star and bell use on the
@@ -96,12 +111,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  /* The icon's container, matching the title's. A 24px square around a
-     14px glyph is 5 of padding — the plate only shows on hover, but the
-     target is there at rest either way, which is the point of giving the
-     icon a box rather than hanging the glyph off the bar. */
-  width: 24px;
-  height: 24px;
+  /* The glyph's box exactly — the plate is the icon, not a pad around it.
+     The drawn ink is smaller than this again (9–10px), so the hover plate
+     still reads as having room without holding any of its own. */
+  width: var(--wshell-icon, 14px);
+  height: var(--wshell-icon, 14px);
+  /* Keeps the plate square against a glyph that would otherwise stretch
+     it, and stops flex shrinking either one. */
+  flex: none;
   padding: 0;
   border: 0;
   border-radius: 6px;
@@ -133,9 +150,9 @@
 
 .wshell-glow {
   position: absolute;
-  /* -2 against a 24px plate puts the bloom at the same 28px across it
-     had when it surrounded a bare 14px glyph. */
-  inset: -2px;
+  /* -7 against a 14px plate puts the bloom at the same 28px across it has
+     always been. */
+  inset: -7px;
   border-radius: 9px;
   background: radial-gradient(
     circle at 50% 50%,
