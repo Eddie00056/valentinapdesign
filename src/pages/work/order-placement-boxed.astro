@@ -68,5 +68,13 @@ import { OrderPlacementScreenBoxed } from "../../components/alertscreen/OrderPla
         transition: none;
       }
     }
+
+    /* PhoneStage (the ambient backdrop the phone sits on) paints its own
+       inline gradient that fully covers the viewport, independent of
+       Bare's own `bg` — !important is the only way to override an inline
+       style from a stylesheet. */
+    :global(.phone-stage) {
+      background: #ffffff !important;
+    }
   </style>
 </Bare>
