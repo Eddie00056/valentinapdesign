@@ -453,9 +453,11 @@
    builder puts on its own quote boxes — same 14% ground, same 6px radius.
    Each pill carries its own resting ground as a custom property, which is
    what lets one pair of flash keyframes settle correctly on either colour. */
-/* Pills centre in their cell so the column reads as one stack under a
-   centred header, rather than hugging the right edge. */
-.oc-cell--pill {
+/* Centred value columns — IV and the two pills. Their values are all the
+   same width, so centring still stacks into one clean line, and it puts
+   them under their own centred headers. */
+.oc-cell--pill,
+.oc-cell--mid {
   justify-content: center;
   padding-inline: 4px;
 }

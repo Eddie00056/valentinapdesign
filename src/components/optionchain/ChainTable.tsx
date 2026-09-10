@@ -21,7 +21,7 @@ const COLUMNS = [
   { label: "Strike", align: "start" },
   { label: "Volume", align: "end" },
   { label: "Open interest", align: "end" },
-  { label: "IV", align: "end" },
+  { label: "IV", align: "center" },
   { label: "Bid", align: "center" },
   { label: "Ask", align: "center" },
 ] as const;
@@ -127,7 +127,7 @@ function Row({
         <span className="oc-cell">
           <Rolling value={formatCount(quote.openInterest)} />
         </span>
-        <span className="oc-cell">
+        <span className="oc-cell oc-cell--mid">
           <Rolling value={formatPercent(quote.iv, 2)} />
         </span>
         {/* The pills are their own targets: a click on a price is a
