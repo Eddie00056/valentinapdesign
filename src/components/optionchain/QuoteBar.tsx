@@ -1,3 +1,4 @@
+import type React from "react";
 import { type Underlying } from "./types";
 import { formatCurrency, formatSignedPercent } from "./format";
 import { Rolling } from "../shared/RollingNumber";
@@ -16,7 +17,10 @@ export function QuoteBar({
   price,
   change,
   changePct,
+  children,
 }: {
+  /** Trailing controls, folded into the same row. */
+  children?: React.ReactNode;
   underlying: Underlying;
   /** Live values off the shared clock — `underlying` supplies identity only. */
   price: number;
@@ -46,6 +50,8 @@ export function QuoteBar({
           />
         </span>
       </span>
+
+      {children}
     </div>
   );
 }

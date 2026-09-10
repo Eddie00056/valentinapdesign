@@ -12,13 +12,18 @@ import { useQuoteFlash } from "./useQuoteFlash";
 import { ChevronRight } from "./icons";
 import { Rolling } from "../shared/RollingNumber";
 
+/* Each header takes its column's own alignment, the way Robinhood's chain
+   does: the strike reads from the left, the plain figures right-align onto
+   the same edge their digits stack on, and the two pill columns centre
+   over their pills. A header that doesn't share its values' alignment
+   stops reading as that column's label. */
 const COLUMNS = [
-  "Strike",
-  "Volume",
-  "Open interest",
-  "IV",
-  "Bid",
-  "Ask",
+  { label: "Strike", align: "start" },
+  { label: "Volume", align: "end" },
+  { label: "Open interest", align: "end" },
+  { label: "IV", align: "end" },
+  { label: "Bid", align: "center" },
+  { label: "Ask", align: "center" },
 ] as const;
 
 function quoteFor(row: ChainRowData, side: OptionSide): OptionQuote {
@@ -133,7 +138,7 @@ function Row({
             <Rolling value={`$${formatCurrency(quote.bid)}`} />
           </span>
         </span>
-        <span className="oc-cell oc-cell--pill oc-cell--last" onClick={swallow}>
+        <span className="oc-cell oc-cell--pill" onClick={swallow}>
           <span className="oc-pill oc-pill--ask" data-flash={askFlash ?? undefined}>
             <Rolling value={`$${formatCurrency(quote.ask)}`} />
           </span>
@@ -233,10 +238,9 @@ export function ChainTable({
   return (
     <div className="oc-table">
       <div className="oc-grid oc-head" role="row">
-        <span className="oc-cell oc-cell--strike">Strike</span>
-        {COLUMNS.slice(1).map((c) => (
-          <span key={c} className="oc-cell">
-            {c}
+        {COLUMNS.map((c) => (
+          <span key={c.label} className={`oc-cell oc-cell--h-${c.align}`}>
+            {c.label}
           </span>
         ))}
       </div>

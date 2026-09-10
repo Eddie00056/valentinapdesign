@@ -98,9 +98,8 @@ export function OptionChain({ onClose }: OptionChainProps) {
           price={spot}
           change={change}
           changePct={change / (spot - change)}
-        />
-
-        <div className="oc-toolbar">
+        >
+          <span className="oc-quote-split" />
           <Segmented
             label="Call or put"
             layoutId="oc-side"
@@ -112,7 +111,8 @@ export function OptionChain({ onClose }: OptionChainProps) {
             selectedId={state.expiryId}
             onSelect={state.setExpiryId}
           />
-        </div>
+        </QuoteBar>
+
 
         <ChainTable
           rows={state.rows}

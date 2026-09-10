@@ -112,10 +112,9 @@
 /* ---------- title bar ---------- */
 
 /* Glass, lightly. The solid #353c3f read as a bright lid on a dark card,
-   so it is now a translucent white wash over the shell instead. The old
-   flat colour was equivalent to 18.5% white; this runs 14.5% down to
-   7.5%, landing the mid-tone near 11% — a step, not a plunge. The 66deg
-   angle and the soft top rim are the house glass recipe from
+   so it is now a translucent white wash over the shell instead — landing
+   a touch darker than the flat colour did, which is the fade. The 66deg
+   gradient and the soft top rim are the house glass recipe from
    glass-button.css, dialled well down: this is chrome, not a control. */
 .oc-titlebar {
   display: flex;
@@ -128,9 +127,8 @@
     rgba(255, 255, 255, 0.145),
     rgba(255, 255, 255, 0.075)
   );
-  /* Only bites when something varied sits behind the card — the shell is
-     flat, so this costs nothing today and keeps the treatment honest if
-     the widget is ever placed on a backdrop. */
+  /* Only bites when something varied sits behind the card, but it costs
+     nothing over the flat shell and keeps the treatment honest. */
   backdrop-filter: blur(18px) saturate(1.15);
   -webkit-backdrop-filter: blur(18px) saturate(1.15);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -201,13 +199,22 @@
 
 /* ---------- quote bar ---------- */
 
+/* One control row: symbol and price anchored left, what you'd trade
+   pushed right. The split is an auto margin rather than a divider — the
+   two groups separate without another line across the widget. */
 .oc-quote {
   display: flex;
   align-items: center;
   gap: 8px;
   height: var(--ctl-h);
+  margin-bottom: 8px;
   padding-inline: var(--band-pad);
 }
+
+/* Auto margin, not a fixed gap: everything after it is pushed to the
+   right edge of the row, so the trade controls land over the Bid/Ask end
+   of the table while symbol and price stay anchored left. */
+.oc-quote-split { margin-left: auto; }
 
 .oc-search {
   display: flex;
@@ -256,22 +263,11 @@
 
 .oc-quote-chg { font-size: 12px; }
 
-/* ---------- toolbar ---------- */
+/* ---------- selectors ---------- */
 
-.oc-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 40px;
-  padding-inline: var(--band-pad);
-  background: var(--band);
-  border-radius: 6px 6px 0 0;
-  margin-top: 4px;
-}
+/* Call/Put selector.
 
-/* Buy/Sell and Call/Put selectors.
-
-   These are the options strategy builder's Stock/Option toggle, copied
+   This is the options strategy builder's Stock/Option toggle, copied
    value for value from `.ob-seg` / `.ob-seg-btn` / `.ob-seg-ind` in
    options-builder.css — 93.6px track (the Figma 104 at that card's 0.9
    scale), 20px tall, radius 6, 1px 20%-white rim, transparent ground.
@@ -281,8 +277,7 @@
    default and its 93.6/20 are CONTENT dimensions with the 1px rim added
    outside. This root sets border-box on everything, so the same numbers
    would otherwise describe a smaller box and the 20px buttons would
-   overflow their own track — which is exactly what made the two toggles
-   sit differently. */
+   overflow their own track. */
 .oc-seg {
   position: relative;
   display: flex;
@@ -295,6 +290,9 @@
   flex: none;
 }
 
+/* `.oc-root` prefix is load-bearing: the native-chrome reset at the top
+   of this file is (0,1,1) and beats a bare single-class rule, so the
+   colours below would silently lose to its `color: inherit`. */
 .oc-root .oc-seg-btn {
   position: relative;
   display: inline-flex;
@@ -308,11 +306,10 @@
   font-size: 12px;
   /* Deliberate divergence from `.ob-seg-btn`, which keeps its inactive
      label at full-strength ink. Here the unselected side is dropped to
-     the secondary tone so the chain's active side is unambiguous at a
-     glance — the table below only ever shows one of them. */
+     the secondary tone so the active side is unambiguous — the table
+     below only ever shows one of them. */
   color: var(--muted);
-  /* Clips the indicator's 1px overhang below — that is what keeps the
-     mint rim from showing as a bright outline. */
+  /* Clips the indicator's overhang; see .oc-seg-ind. */
   overflow: hidden;
   transition: color 0.16s ease;
 }
@@ -324,11 +321,9 @@
 
 /* The builder declares a 1px mint border here, but its button's
    overflow:hidden clips the whole ring away — the rendered result is a
-   flat plate with no rim. Reproducing it as a real border is what put a
-   green sliver down the inner edge: the track's halves are 46.8px, so the
-   clip boundary lands mid-pixel and a fraction of the rim survives.
-   Dropping the border matches the builder's render exactly and removes
-   the artifact deterministically. */
+   flat plate with no rim. Reproducing it as a real border put a green
+   sliver down the inner edge: the track's halves are 46.8px, so the clip
+   boundary lands mid-pixel and a fraction of the rim survived. */
 .oc-seg-ind {
   position: absolute;
   inset: 0;
@@ -373,9 +368,8 @@
 /* ---------- table ---------- */
 
 .oc-table {
-  margin-top: 4px;
   background: var(--band);
-  border-radius: 0 0 6px 6px;
+  border-radius: 6px;
   overflow: hidden;
 }
 
@@ -393,12 +387,27 @@
   border-bottom: 1px solid var(--line-row);
 }
 
-/* Headers centre over their column. Symmetric padding, otherwise the
-   right inset the value cells use would pull the label off centre. */
-.oc-head .oc-cell {
+.oc-head .oc-cell { color: var(--muted); }
+
+/* Strike: the label sits over the FIGURE, not over the caret — 6px cell
+   inset + an 11px caret + the 5px gap is where "$200" begins. */
+.oc-head .oc-cell--h-start {
+  justify-content: flex-start;
+  padding-left: 22px;
+  padding-right: 0;
+}
+
+/* Plain figures: same right inset as the value cells, so label and digits
+   land on one edge. */
+.oc-head .oc-cell--h-end {
+  justify-content: flex-end;
+  padding-right: 12px;
+}
+
+/* Pill columns: centred, matching the pills below them. */
+.oc-head .oc-cell--h-center {
   justify-content: center;
-  padding-inline: 6px;
-  color: var(--muted);
+  padding-inline: 4px;
 }
 
 .oc-cell {
@@ -444,8 +453,12 @@
    builder puts on its own quote boxes — same 14% ground, same 6px radius.
    Each pill carries its own resting ground as a custom property, which is
    what lets one pair of flash keyframes settle correctly on either colour. */
-.oc-cell--pill { padding-right: 4px; }
-.oc-cell--last { padding-right: 6px; }
+/* Pills centre in their cell so the column reads as one stack under a
+   centred header, rather than hugging the right edge. */
+.oc-cell--pill {
+  justify-content: center;
+  padding-inline: 4px;
+}
 
 /* Registered so the angle can actually be transitioned — an unregistered
    custom property is not animatable, which is the whole trick behind the
