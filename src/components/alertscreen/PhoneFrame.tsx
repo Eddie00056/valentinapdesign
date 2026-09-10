@@ -156,6 +156,7 @@ export function PhoneFrame({
 export function PhoneStage({ children }: { children: ReactNode }) {
   return (
     <div
+      className="phone-stage"
       style={{
         minHeight: "100vh",
         display: "flex",

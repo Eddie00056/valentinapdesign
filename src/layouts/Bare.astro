@@ -36,9 +36,38 @@ const pageTitle = title ? `${title} — ${site.name}` : site.name;
         background: var(--bg);
         overflow: hidden;
       }
+
+      /* Tiles read as one dark surface with the work floating on it, the
+         way the reference grid does. Only the embedded copy is re-grounded
+         — each piece keeps its own backdrop on its real page. */
+      html[data-embed],
+      html[data-embed] body {
+        background: #141414 !important;
+      }
+
+      html[data-embed] .back,
+      html[data-embed] .ob-back,
+      html[data-embed] .oc-back,
+      html[data-embed] .shell-nav,
+      html[data-embed] .shell-foot,
+      html[data-embed] .pshell-nav,
+      html[data-embed] .bg-toggle {
+        display: none !important;
+      }
     </style>
   </head>
   <body>
     <slot />
+
+    <!-- Embed mode. The gallery renders these pages live inside its tiles,
+         where a page's own chrome — the back button, the demo shell's nav
+         and footer — is not part of the work being shown. Marking the
+         document lets one global rule below hide all of it, rather than
+         each page having to know it might be framed. -->
+    <script is:inline>
+      if (window.self !== window.top) {
+        document.documentElement.setAttribute("data-embed", "");
+      }
+    </script>
   </body>
 </html>

@@ -1,175 +1,132 @@
 ---
 import Base from "../layouts/Base.astro";
 import { site, pieces } from "../data/site";
-import { TogglePreview } from "../components/motionlab/TogglePreview";
-import { LimitOrderErrorPreview } from "../components/glasslab/LimitOrderErrorPreview";
-import { FractionalSharesBannerPreview } from "../components/glasslab/FractionalSharesBannerPreview";
-import { AlertCreationPreview } from "../components/alertscreen/AlertCreationPreview";
-import { IframePreview } from "../components/gallery/IframePreview";
-import "../components/motionlab/motionlab.css";
-import "../components/glasslab/glasslab.css";
+
+/* Gallery zoom, expressed as column COUNT rather than column width. A
+   width-based slider wastes steps: two different widths often resolve to
+   the same number of columns, and the widest drops to a single column.
+   Counts always change what you see. `column-width` still rides along as
+   a floor, so narrow viewports quietly use fewer than asked. */
+const ZOOM_STEPS = [5, 4, 3, 2];
+/* Three columns — the density the reference grid sits at, and enough room
+   for a phone screen to still read. */
+const ZOOM_DEFAULT = 2;
 ---
 
 <Base>
-  <div class="page">
+  <div class="page" style={`--cols: ${ZOOM_STEPS[ZOOM_DEFAULT]}`}>
     <header>
-      <h1>{site.name}</h1>
-      <p class="mono links-row">
-        <a class="link-underline" href="/website">Website ↗</a>
-        <span class="sep" aria-hidden="true">·</span>
-        <a class="link-underline" href="/website/presentation">Presentation ↗</a>
-      </p>
+      <div class="head-left">
+        <h1>{site.name}</h1>
+        <p class="mono links-row">
+          <a class="link-underline" href="/website">Website ↗</a>
+          <span class="sep" aria-hidden="true">·</span>
+          <a class="link-underline" href="/website/presentation">Presentation ↗</a>
+        </p>
+      </div>
+
+      <div class="zoom">
+        <svg class="zoom-i" viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.2"></circle>
+          <path d="M10.2 10.2 13.4 13.4"></path>
+        </svg>
+        <input
+          id="zoom"
+          type="range"
+          min="0"
+          max={ZOOM_STEPS.length - 1}
+          step="1"
+          value={ZOOM_DEFAULT}
+          aria-label="Thumbnail size"
+        />
+        <svg class="zoom-i zoom-i--lg" viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.2"></circle>
+          <path d="M10.2 10.2 13.4 13.4M7 5.1v3.8M5.1 7h3.8"></path>
+        </svg>
+      </div>
     </header>
 
     <ul class="grid">
-      {pieces.map((p) => (
-        <li>
-          <a href={p.href} aria-label={p.title}>
-            <span class="thumb">
-              {p.slug === "stock-option-toggle" && <TogglePreview client:visible />}
-              {p.slug === "limit-order-error" && (
-                <LimitOrderErrorPreview client:visible />
-              )}
-              {p.slug === "fractional-shares-banner" && (
-                <FractionalSharesBannerPreview client:visible />
-              )}
-              {p.slug === "alert-prototype" && (
-                <svg
-                  class="mark"
-                  viewBox="0 0 120 120"
-                  role="img"
-                  aria-label="Alert creation prototype"
-                >
-                  <rect width="120" height="120" rx="18" fill="#ffffff"></rect>
-                  <g
-                    stroke="#48d597"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    fill="none"
-                  >
-                    <path d="M78 52a18 18 0 1 0-36 0c0 13-5 17-5 17h46s-5-4-5-17Z"
-                    ></path>
-                    <path d="M52 76a8 8 0 0 0 16 0"></path>
-                  </g>
-                </svg>
-              )}
-              {p.slug === "alert-creation" && (
-                <AlertCreationPreview client:visible />
-              )}
-              {p.slug === "order-placement-boxed" && (
-                <svg
-                  class="mark"
-                  viewBox="0 0 120 120"
-                  role="img"
-                  aria-label="Order placement"
-                >
-                  <rect width="120" height="120" rx="18" fill="#ffffff"></rect>
-                  <g fill="none" stroke="#3a3f47" stroke-width="3">
-                    <rect x="26" y="30" width="68" height="13" rx="4"></rect>
-                    <rect x="26" y="51" width="68" height="13" rx="4"></rect>
-                    <rect x="26" y="72" width="68" height="13" rx="4"></rect>
-                  </g>
-                  <rect x="20" y="95" width="37" height="12" rx="6" fill="#ff557d"
-                  ></rect>
-                  <rect x="63" y="95" width="37" height="12" rx="6" fill="#48d597"
-                  ></rect>
-                </svg>
-              )}
-              {p.slug === "order-placed-animation" && (
-                <svg
-                  class="mark"
-                  viewBox="0 0 120 120"
-                  role="img"
-                  aria-label="Order placed animation"
-                >
-                  <rect width="120" height="120" rx="18" fill="#ffffff"></rect>
-                  <circle cx="60" cy="60" r="34" fill="#48d597"
-                    fill-opacity="0.1"></circle>
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="34"
-                    fill="none"
-                    stroke="#48d597"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    d="M47 61 L56 70 L74 50"
-                    fill="none"
-                    stroke="#48d597"
-                    stroke-width="4"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"></path>
-                </svg>
-              )}
-              {p.slug === "options-strategy-builder" && (
-                <IframePreview
-                  client:visible
-                  src="/work/options-strategy-builder"
-                  cropWidth={284}
-                  cropHeight={172}
-                  frameWidth={1200}
-                  frameHeight={500}
-                  scale={0.57}
-                  offsetX={-200}
-                  offsetY={-43}
+      {
+        pieces.map((p) => (
+          <li>
+            <a href={p.href} aria-label={p.title}>
+              <span class="thumb" style={`aspect-ratio: 1280 / ${p.previewHeight}`}>
+                <iframe
+                  src={p.href}
+                  title={p.title}
+                  tabindex="-1"
+                  aria-hidden="true"
+                  loading="lazy"
+                  scrolling="no"
+                  style={`height: ${p.previewHeight}px`}
                 />
-              )}
-              {p.slug === "option-chain" && (
-                <IframePreview
-                  client:visible
-                  src="/work/option-chain"
-                  cropWidth={340}
-                  cropHeight={210}
-                  frameWidth={1100}
-                  frameHeight={760}
-                  scale={0.42}
-                  offsetX={-64}
-                  offsetY={-78}
-                />
-              )}
-              {p.slug === "fractional-order-flow" && (
-                <svg
-                  class="mark"
-                  viewBox="0 0 120 120"
-                  role="img"
-                  aria-label="Fractional order flow"
-                >
-                  <rect width="120" height="120" rx="18" fill="#ffffff"></rect>
-                  <rect x="26" y="28" width="68" height="26" rx="6"
-                    fill="none" stroke="#3a3f47" stroke-width="3"></rect>
-                  <rect x="34" y="37" width="30" height="4" rx="2" fill="#6f8b3f"
-                  ></rect>
-                  <rect x="34" y="45" width="20" height="3" rx="1.5"
-                    fill="#3a3f47"></rect>
-                  <rect x="26" y="62" width="68" height="14" rx="4"
-                    fill="none" stroke="#3a3f47" stroke-width="3"></rect>
-                  <rect x="26" y="90" width="68" height="14" rx="7" fill="#227c20"
-                  ></rect>
-                </svg>
-              )}
-            </span>
-          </a>
-        </li>
-      ))}
+              </span>
+            </a>
+          </li>
+        ))
+      }
     </ul>
   </div>
 </Base>
 
+<script data-zoom-steps={JSON.stringify(ZOOM_STEPS)} is:inline define:vars={{ ZOOM_STEPS }}>
+  const page = document.querySelector(".page");
+  const slider = document.getElementById("zoom");
+
+  slider?.addEventListener("input", () => {
+    page.style.setProperty("--cols", String(ZOOM_STEPS[+slider.value]));
+  });
+
+  /* Each tile renders its real page at a fixed 1280px and scales it to the
+     tile's measured width. Measuring beats computing it from the column
+     count: a multi-column layout stretches its columns to fill the
+     container, so the rendered width is never a number you can predict. */
+  const fit = (el) => {
+    const w = el.getBoundingClientRect().width;
+    if (w) el.style.setProperty("--s", String(w / 1280));
+  };
+
+  const thumbs = [...document.querySelectorAll(".thumb")];
+  thumbs.forEach(fit);
+
+  if ("ResizeObserver" in window) {
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) fit(e.target);
+    });
+    thumbs.forEach((t) => ro.observe(t));
+  } else {
+    addEventListener("resize", () => thumbs.forEach(fit));
+  }
+</script>
+
 <style>
+  /* Dark gallery, after tcosta.com/wspoc: a black page, near-black cards at
+     an 8px radius, and each prototype rendered live inside its own card so
+     the page's own background becomes the tile's margin. Nothing is
+     cropped to fit and nothing is scaled up to fill — the UI floats. */
   .page {
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    gap: clamp(2rem, 1rem + 6vw, 5rem);
-    padding: clamp(1.5rem, 1rem + 4vw, 4rem);
+    gap: clamp(1.5rem, 1rem + 4vw, 3rem);
+    padding: clamp(1.25rem, 1rem + 2vw, 2rem);
+    background: #000;
+    color: #f2f2f2;
   }
 
   header {
     display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .head-left {
+    display: flex;
     flex-direction: column;
-    gap: 0.6rem;
+    gap: 0.5rem;
   }
 
   h1 {
@@ -178,10 +135,15 @@ import "../components/glasslab/glasslab.css";
     font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
     letter-spacing: -0.01em;
     margin: 0;
+    color: #f2f2f2;
   }
 
   header .mono a {
-    color: var(--ink-faint);
+    color: #8a8a8a;
+  }
+
+  header .mono a:hover {
+    color: #f2f2f2;
   }
 
   header .links-row {
@@ -191,56 +153,123 @@ import "../components/glasslab/glasslab.css";
   }
 
   header .links-row .sep {
-    color: var(--ink-faint);
+    color: #4a4a4a;
   }
 
-  /* Masonry: browser-computed column count (not a fixed breakpoint list),
-     each tile's own height set by its content instead of a forced
-     aspect-ratio — the whole point being tiles of very different natural
-     shapes (a tall phone mockup next to a short toggle-switch snippet)
-     sitting in the same grid, Pinterest-style. */
+  /* ---------- zoom ---------- */
+
+  .zoom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: #141414;
+    border: 1px solid #232323;
+  }
+
+  .zoom-i {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    fill: none;
+    stroke: #8a8a8a;
+    stroke-width: 1.5;
+    stroke-linecap: round;
+  }
+
+  .zoom-i--lg {
+    width: 16px;
+    height: 16px;
+  }
+
+  #zoom {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 104px;
+    height: 3px;
+    border-radius: 3px;
+    background: #333;
+    cursor: pointer;
+  }
+
+  #zoom::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #f2f2f2;
+    transition: transform 0.18s cubic-bezier(0.3, 1.9, 0.4, 1);
+  }
+
+  #zoom:hover::-webkit-slider-thumb,
+  #zoom:active::-webkit-slider-thumb {
+    transform: scale(1.25);
+  }
+
+  #zoom::-moz-range-thumb {
+    width: 11px;
+    height: 11px;
+    border: 0;
+    border-radius: 50%;
+    background: #f2f2f2;
+  }
+
+  /* ---------- grid ---------- */
+
   .grid {
     list-style: none;
     margin: 0;
     padding: 0;
-    column-width: 300px;
-    column-gap: 1.5rem;
+    column-count: var(--cols);
+    /* Floor, so a narrow viewport uses fewer columns than asked rather
+       than squeezing five unreadable ones in. */
+    column-width: 260px;
+    column-gap: 20px;
   }
 
   .grid li {
     break-inside: avoid;
-    margin-bottom: 1.5rem;
+    margin-bottom: 20px;
   }
 
-  /* Every thumb is a centred stage. Previews scale their content with
-     `transform`, which changes what you see but not what the element
-     occupies — so a thumb that took its height from the content's layout
-     box collapsed (the toggle's 20px track left a 21px tile) or let the
-     visual spill past the card. Each preview now declares an explicit
-     box and this centres it. */
   .thumb {
-    display: grid;
-    place-items: center;
+    display: block;
+    position: relative;
     overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: #ffffff;
-    transition: border-color 0.15s ease;
+    border-radius: 8px;
+    background: #141414;
+    /* Tiago's springy curve — it overshoots a touch, which is what makes
+       the lift read as a nudge rather than a fade. */
+    transition: transform 0.5s cubic-bezier(0.3, 1.9, 0.4, 1);
   }
 
   a:hover .thumb {
-    border-color: var(--ink-faint);
+    transform: scale(1.015);
   }
 
-  /* Tiles still on the placeholder icon mark (not yet a live/real
-     preview) keep the old centred-square treatment so they don't
-     collapse to nothing. */
-  .thumb:has(.mark) {
-    aspect-ratio: 4 / 3;
+  /* The page renders at a fixed 1280px and is scaled to the tile by --s,
+     set from the tile's measured width by the script above. */
+  .thumb iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    border: 0;
+    transform: scale(var(--s, 0.34));
+    transform-origin: top left;
+    pointer-events: none;
   }
 
-  .thumb .mark {
-    width: 84px;
-    height: 84px;
+  @media (prefers-reduced-motion: reduce) {
+    .thumb,
+    #zoom::-webkit-slider-thumb {
+      transition: none;
+    }
+
+    a:hover .thumb {
+      transform: none;
+    }
   }
 </style>

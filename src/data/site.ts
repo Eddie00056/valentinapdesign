@@ -9,6 +9,15 @@ export type Piece = {
   slug: string;
   href: string;
   title: string;
+  /**
+   * Viewport height, in px, that the gallery renders this piece's page at
+   * behind a fixed 1280px width. It sets the tile's aspect ratio, so it is
+   * how the masonry gets its variety: phone screens are tall, a toggle or
+   * a banner is short. Nothing is cropped — the page's own background
+   * becomes the tile's margin, which is what lets the UI float rather
+   * than fill.
+   */
+  previewHeight: number;
 };
 
 // Case studies ported from the Framer site. One dynamic route renders
@@ -48,50 +57,60 @@ export const pieces: Piece[] = [
     slug: "stock-option-toggle",
     href: "/work/stock-option-toggle",
     title: "Stock / Option toggle",
+    previewHeight: 640,
   },
   {
     slug: "limit-order-error",
     href: "/work/limit-order-error",
     title: "Limit order error",
+    previewHeight: 640,
   },
   {
     slug: "fractional-shares-banner",
     href: "/work/fractional-shares-banner",
     title: "Fractional shares banner",
+    previewHeight: 640,
   },
   {
     slug: "alert-prototype",
     href: "/work/alert-prototype",
     title: "Alert creation prototype",
+    previewHeight: 900,
   },
   {
     slug: "alert-creation",
     href: "/work/alert-creation",
     title: "Alert creation",
+    previewHeight: 900,
   },
   {
     slug: "order-placement-boxed",
     href: "/work/order-placement-boxed",
     title: "Order placement",
+    previewHeight: 900,
   },
   {
     slug: "order-placed-animation",
     href: "/work/order-placed-animation",
     title: "Order placed animation",
+    previewHeight: 900,
   },
   {
     slug: "fractional-order-flow",
     href: "/work/fractional-order-flow",
     title: "Fractional order flow",
+    previewHeight: 980,
   },
   {
     slug: "options-strategy-builder",
     href: "/work/options-strategy-builder",
     title: "Options strategy builder",
+    previewHeight: 720,
   },
   {
     slug: "option-chain",
     href: "/work/option-chain",
     title: "Option chain",
+    previewHeight: 700,
   },
 ];

@@ -1,0 +1,1324 @@
+---
+/**
+ * GUSTO portfolio deck — rebuilt in-house.
+ *
+ * Each slide is either a native `kind` (real HTML type on a 1920×1080 canvas
+ * that scales to fit) or a pixel-faithful 3× raster of the Figma slide while
+ * that slide is still being ported. Nothing regresses mid-migration.
+ * Slide data + copy live in `src/data/gustoDeck.json`.
+ */
+import deck from "../../../data/gustoDeck.json";
+import { FractionalOrderFlow } from "../../fractionalflow/FractionalOrderFlow";
+
+type Slide = Record<string, any>;
+const slides = deck as Slide[];
+const COUNT = slides.length;
+const IMG = "/website/case/gusto/slides/";
+
+const nums = (a: any): number[] | "all" =>
+  a === "all" ? "all" : Array.isArray(a) ? a : [];
+const isOn = (active: any, i: number) =>
+  active === "all" || (Array.isArray(active) && active.includes(i));
+---
+
+<section class="gd w-wrap">
+  <div class="gd-stage" data-count={COUNT}>
+    <button type="button" class="gd-play">
+      <span class="gd-play-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
+          ><path d="M8 5v14l11-7z"></path></svg
+        >
+      </span>
+      <span class="gd-play-text">
+        <span class="gd-play-label">Play the presentation</span>
+        <span class="gd-play-sub"
+          >{COUNT} slides · ← → to move · ⤢ for fullscreen</span
+        >
+      </span>
+    </button>
+
+    <div class="gd-viewer" hidden>
+      <div class="gd-frame">
+        <div class="gd-canvas">
+          {
+            slides.map((s) => (
+              <article
+                class:list={["gd-slide", `gd-slide--${s.bg}`]}
+                data-n={s.n}
+                hidden
+              >
+                {s.raster ? (
+                  <img
+                    class="gd-raster"
+                    src={IMG + s.raster}
+                    alt=""
+                    loading="lazy"
+                    draggable="false"
+                  />
+                ) : s.kind === "cover" ? (
+                  <div class="gd-cover">
+                    <h2>{s.title}</h2>
+                    <p>{s.sub}</p>
+                  </div>
+                ) : s.kind === "divider" ? (
+                  <div
+                    class:list={[
+                      "gd-divider",
+                      `is-${s.size || "lg"}`,
+                      `al-${s.align || "center"}`,
+                      s.tone ? `tone-${s.tone}` : null,
+                    ]}
+                  >
+                    <span>{s.text}</span>
+                  </div>
+                ) : s.kind === "titlecard" ? (
+                  <>
+                    <div class="gd-titlecard">
+                      {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
+                      <h2>{s.title}</h2>
+                    </div>
+                    {s.shot && (
+                      <img
+                        class="gd-media-shot"
+                        src={`${IMG}../shots/${s.shot.src}.webp`}
+                        alt=""
+                        style={`left:${s.shot.x}%;top:${s.shot.y}%;width:${s.shot.w}%`}
+                      />
+                    )}
+                  </>
+                ) : s.kind === "statement" || s.kind === "quote" ? (
+                  <div class:list={["gd-statement", { "is-quote": s.kind === "quote" }]}>
+                    {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
+                    <p class="gd-statement-t">{s.text}</p>
+                  </div>
+                ) : s.kind === "numbered" ? (
+                  <div class="gd-numbered">
+                    {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
+                    <ol>
+                      {s.items.map((it: string, i: number) => (
+                        <li class:list={[{ "is-dim": !isOn(s.active, i) }]}>
+                          <span class="gd-num">{i + 1}.</span>
+                          <span>{it}</span>
+                        </li>
+                      ))}
+                    </ol>
+                    {s.shot && (
+                      <img
+                        class="gd-media-shot"
+                        src={`${IMG}../shots/${s.shot.src}.webp`}
+                        alt=""
+                        style={`left:${s.shot.x}%;top:${s.shot.y}%;width:${s.shot.w}%`}
+                      />
+                    )}
+                  </div>
+                ) : s.kind === "checklist" ? (
+                  <div class="gd-checklist">
+                    {s.heading && <p class="gd-media-h">{s.heading}</p>}
+                    <div class="gd-cl-cols">
+                      {s.cols.map((col: any) => (
+                        <div class="gd-cl-col">
+                          <p class="gd-cl-title">{col.title}</p>
+                          {col.sections.map((sec: any) => (
+                            <div class="gd-cl-sec">
+                              <p class="gd-cl-label">{sec.label}</p>
+                              {sec.items.map(([t, ok]: [string, boolean]) => (
+                                <p class:list={["gd-cl-item", { no: !ok }]}>
+                                  <span class="gd-cl-mark">{ok ? "✓" : "✕"}</span>
+                                  {t}
+                                </p>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : s.kind === "twocard" ? (
+                  <div class="gd-twocard">
+                    {s.heading && <p class="gd-media-h">{s.heading}</p>}
+                    <div class="gd-tc-row">
+                      {s.cards.map((c: any) => (
+                        <div class="gd-tc-card">
+                          <p class="gd-tc-title">{c.title}</p>
+                          {c.points.map((pt: string) => (
+                            <p class="gd-tc-pt">{pt}</p>
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : s.kind === "figures" ? (
+                  <div class:list={["gd-figures", `tone-${s.tone}`]}>
+                    <div class="gd-figrow">
+                      {s.items.map(([n, l]: [string, string]) => (
+                        <div class="gd-fig">
+                          <span class="gd-fig-n">{n}</span>
+                          <span class="gd-fig-l">{l}</span>
+                        </div>
+                      ))}
+                    </div>
+                    {s.note && <p class="gd-fig-note">{s.note}</p>}
+                  </div>
+                ) : s.kind === "journey" ? (
+                  <div class="gd-journey">
+                    {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
+                    <div class="gd-journey-row">
+                      {s.steps.map((st: string, i: number) => (
+                        <>
+                          {i > 0 && <span class="gd-arrow" aria-hidden="true" />}
+                          <span
+                            class:list={["gd-step", { "is-active": s.active === i }]}
+                          >
+                            {st}
+                          </span>
+                        </>
+                      ))}
+                    </div>
+                  </div>
+                ) : s.kind === "twocol" ? (
+                  <div class="gd-twocol">
+                    <span>{s.left}</span>
+                    <span>{s.right}</span>
+                  </div>
+                ) : s.kind === "livefractional" ? (
+                  <div class="gd-proto-wrap">
+                    <FractionalOrderFlow client:visible bgOpacity={0.25} />
+                  </div>
+                ) : s.kind === "photobuild" ? (
+                  <div class="gd-pb">
+                    <div class="gd-pb-row">
+                      <div class="gd-pb-item">
+                        <p class="gd-pb-k">This is me</p>
+                        <div class="gd-pb-card gd-pb-card--me">
+                          <img src={`${IMG}../portrait.jpg`} alt="" />
+                        </div>
+                      </div>
+                      {s.reveal >= 2 && (
+                        <div class="gd-pb-item">
+                          <p class="gd-pb-k">This is where I&rsquo;m from</p>
+                          <div class="gd-pb-card gd-pb-card--map">
+                            <img src={`${IMG}../shots/worldmap.webp`} alt="" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {s.reveal >= 3 && (
+                      <div class="gd-pb-hobbies-wrap">
+                        <p class="gd-pb-k">This is what I like</p>
+                        <div class="gd-pb-hobbies">
+                          {[
+                            "shots/hobby-dance",
+                            "hobby-cake",
+                            "hobby-calligraphy",
+                            "hobby-jitsu",
+                            "hobby-flowers",
+                          ].map((f) => (
+                            <img
+                              class="gd-pb-hobby"
+                              src={`${IMG}../${f}.${f.startsWith("shots/") ? "webp" : "jpg"}`}
+                              alt=""
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : s.kind === "role" ? (
+                  <div class="gd-role">
+                    <div class="gd-role-col">
+                      {s.rows.map(([k, v]: [string, string]) => (
+                        <div class="gd-role-row">
+                          <p class="gd-kicker">{k}</p>
+                          <p class="gd-role-v">{v}</p>
+                        </div>
+                      ))}
+                    </div>
+                    {s.shot && (
+                      <img
+                        class="gd-role-shot"
+                        src={`${IMG}../shots/${s.shot.src}.webp`}
+                        alt=""
+                        style={`left:${s.shot.x}%;top:${s.shot.y}%;width:${s.shot.w}%`}
+                      />
+                    )}
+                  </div>
+                ) : s.kind === "media" ? (
+                  <div class="gd-media">
+                    {s.heading && <p class="gd-media-h">{s.heading}</p>}
+                    {s.bigTitle && (
+                      <p class="gd-media-big">
+                        {s.bigTitle}
+                        {s.bigAccent && <span class="g">{s.bigAccent}</span>}
+                      </p>
+                    )}
+                    {(s.labels || []).map((l: any) => (
+                      <p class="gd-media-l" style={`left:${l.x}%;top:${l.y ?? 19}%`}>
+                        {l.text}
+                      </p>
+                    ))}
+                    {(s.shots || []).map((sh: any) => (
+                      <img
+                        class="gd-media-shot"
+                        src={`${IMG}../shots/${sh.src}.webp`}
+                        alt=""
+                        style={`left:${sh.x}%;top:${sh.y}%;width:${sh.w}%`}
+                      />
+                    ))}
+                  </div>
+                ) : s.kind === "ownership" ? (
+                  <div class:list={["gd-own", { "is-dim": s.dim }]}>
+                    {s.reveal >= 1 && (
+                      <div class="gd-own-card gd-own-head">
+                        <div class="gd-own-pills">
+                          {[0, 1, 2, 3].map(() => (
+                            <span class="gd-pill">
+                              <b>$271.01</b> <i>+$3.64 +3.09%</i>
+                            </span>
+                          ))}
+                        </div>
+                        <p>Design ownership spread across highest revenue products</p>
+                      </div>
+                    )}
+                    {s.reveal >= 2 && (
+                      <div class="gd-own-card gd-own-metric">
+                        <span class="gd-own-n">10+</span>
+                        <span class="gd-own-l">active trader features</span>
+                      </div>
+                    )}
+                    {s.reveal >= 3 && (
+                      <div class="gd-own-icons">
+                        <div class="gd-own-card gd-own-icon">
+                          <img src={`${IMG}../own/adv-charting.webp`} alt="" />
+                          <span>Advanced charting</span>
+                        </div>
+                        <div class="gd-own-card gd-own-icon">
+                          <img src={`${IMG}../own/sym-alerts.webp`} alt="" />
+                          <span>Symbol alerts</span>
+                        </div>
+                      </div>
+                    )}
+                    {s.reveal >= 4 && (
+                      <div class="gd-own-card gd-own-metric">
+                        <span class="gd-own-n">3+</span>
+                        <span class="gd-own-l">0→1 products launched</span>
+                      </div>
+                    )}
+                    {s.reveal >= 5 && (
+                      <div class="gd-own-icons">
+                        <div class="gd-own-card gd-own-icon">
+                          <img src={`${IMG}../own/rt-chip.webp`} alt="" class="is-chip" />
+                          <span>Real time streaming</span>
+                        </div>
+                        <div class="gd-own-card gd-own-icon">
+                          <img src={`${IMG}../own/frac-trading.webp`} alt="" />
+                          <span>Fractional trading</span>
+                        </div>
+                      </div>
+                    )}
+                    {s.reveal >= 6 && (
+                      <div class="gd-own-icons">
+                        <div class="gd-own-card gd-own-icon">
+                          <img src={`${IMG}../own/questrade-pro.webp`} alt="" />
+                          <span>Questrade Pro</span>
+                        </div>
+                        <div class="gd-own-card gd-own-icon">
+                          <img src={`${IMG}../own/edge-mobile.webp`} alt="" />
+                          <span>Edge Mobile</span>
+                        </div>
+                      </div>
+                    )}
+                    {s.reveal >= 7 && (
+                      <div class="gd-own-card gd-own-team">
+                        <p>Led 4 Product Designers + Multiple team initiatives</p>
+                      </div>
+                    )}
+                    {s.reveal >= 8 && (
+                      <div class="gd-own-card gd-own-metric">
+                        <span class="gd-own-n">2</span>
+                        <span class="gd-own-l">awards</span>
+                      </div>
+                    )}
+                  </div>
+                ) : null}
+              </article>
+            ))
+          }
+        </div>
+      </div>
+
+      <button class="gd-edge gd-edge--prev" type="button" aria-label="Previous slide"
+        ><span aria-hidden="true">‹</span></button
+      >
+      <button class="gd-edge gd-edge--next" type="button" aria-label="Next slide"
+        ><span aria-hidden="true">›</span></button
+      >
+      <div class="gd-bar">
+        <span class="gd-count" aria-live="polite">1 / {COUNT}</span>
+        <button class="gd-fs" type="button" aria-label="Toggle fullscreen">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round"
+            ><path d="M8 3H4v4M16 3h4v4M8 21H4v-4M16 21h4v-4"></path></svg
+          >
+        </button>
+      </div>
+      <div class="gd-progress"><span></span></div>
+    </div>
+  </div>
+
+  <p class="gd-note">
+    <kbd>←</kbd> <kbd>→</kbd> or click the edges to move · rebuilt from the deck,
+    slide for slide
+  </p>
+</section>
+
+<script>
+  const stage = document.querySelector<HTMLElement>(".gd-stage");
+  if (stage) {
+    const count = parseInt(stage.dataset.count || "0", 10);
+    const play = stage.querySelector<HTMLButtonElement>(".gd-play")!;
+    const viewer = stage.querySelector<HTMLElement>(".gd-viewer")!;
+    const frame = stage.querySelector<HTMLElement>(".gd-frame")!;
+    const canvas = stage.querySelector<HTMLElement>(".gd-canvas")!;
+    const slides = Array.from(stage.querySelectorAll<HTMLElement>(".gd-slide"));
+    const countEl = stage.querySelector<HTMLElement>(".gd-count")!;
+    const bar = stage.querySelector<HTMLElement>(".gd-progress span")!;
+    const fsBtn = stage.querySelector<HTMLButtonElement>(".gd-fs")!;
+    const prevBtn = stage.querySelector<HTMLButtonElement>(".gd-edge--prev")!;
+    const nextBtn = stage.querySelector<HTMLButtonElement>(".gd-edge--next")!;
+
+    const W = 1920;
+    const H = 1080;
+    let i = 1;
+    let started = false;
+
+    const fit = () => {
+      const fs = document.fullscreenElement === stage;
+      const bw = fs ? window.innerWidth : frame.clientWidth;
+      const bh = fs ? window.innerHeight : frame.clientWidth * (H / W);
+      const s = Math.min(bw / W, bh / H);
+      canvas.style.transform = `translate(${(bw - W * s) / 2}px, ${
+        (bh - H * s) / 2
+      }px) scale(${s})`;
+      frame.style.height = fs ? "100%" : `${bw * (H / W)}px`;
+    };
+
+    const warm = (n: number) => {
+      slides[n - 1]
+        ?.querySelectorAll<HTMLImageElement>("img[loading='lazy']")
+        .forEach((img) => (img.loading = "eager"));
+    };
+
+    const show = (n: number) => {
+      i = Math.min(count, Math.max(1, n));
+      slides.forEach(
+        (el) => (el.hidden = parseInt(el.dataset.n || "0", 10) !== i),
+      );
+      warm(i);
+      warm(i + 1);
+      warm(i + 2);
+      warm(i - 1);
+      countEl.textContent = `${i} / ${count}`;
+      bar.style.transform = `scaleX(${i / count})`;
+    };
+
+    const startShow = () => {
+      if (started) return;
+      started = true;
+      play.hidden = true;
+      viewer.hidden = false;
+      stage.setAttribute("tabindex", "0");
+      fit();
+      show(1);
+      stage.focus();
+    };
+
+    play.addEventListener("click", startShow);
+    prevBtn.addEventListener("click", () => show(i - 1));
+    nextBtn.addEventListener("click", () => show(i + 1));
+    fsBtn.addEventListener("click", () => {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else stage.requestFullscreen?.();
+    });
+    document.addEventListener("fullscreenchange", () => {
+      stage.classList.toggle("is-fs", document.fullscreenElement === stage);
+      fit();
+    });
+    window.addEventListener("resize", () => started && fit());
+    stage.addEventListener("keydown", (e) => {
+      if (!started) return;
+      const k = e.key;
+      if (k === "ArrowRight" || k === "PageDown" || k === " ") {
+        e.preventDefault();
+        show(i + 1);
+      } else if (k === "ArrowLeft" || k === "PageUp") {
+        e.preventDefault();
+        show(i - 1);
+      } else if (k === "Home") {
+        e.preventDefault();
+        show(1);
+      } else if (k === "End") {
+        e.preventDefault();
+        show(count);
+      } else if (k === "f" || k === "F") {
+        fsBtn.click();
+      }
+    });
+  }
+</script>
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+  .gd {
+    padding-top: clamp(1.5rem, 3vw, 2.5rem);
+    --gd-coral: #f7975c;
+    --gd-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  .gd-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border: 1px solid var(--w-line);
+    border-radius: 14px;
+    overflow: hidden;
+    background: radial-gradient(
+      120% 90% at 50% 0%,
+      color-mix(in srgb, var(--w-accent) 9%, #0a0a0a) 0%,
+      #070707 62%
+    );
+  }
+  .gd-stage:fullscreen {
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+    background: #000;
+  }
+
+  .gd-viewer {
+    position: absolute;
+    inset: 0;
+  }
+  .gd-frame {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .gd-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: top left;
+  }
+
+  .gd-slide {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: var(--gd-font);
+    -webkit-font-smoothing: antialiased;
+  }
+  .gd-slide--black {
+    background: #010101;
+    color: #fff;
+  }
+  .gd-slide--white {
+    background: #fff;
+    color: #0b0b0b;
+  }
+
+  .gd-raster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* ---- shared bits ---- */
+  .gd-kicker {
+    margin: 0 0 26px;
+    font-size: 21px;
+    font-weight: 500;
+    letter-spacing: 0.19em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
+  }
+  .gd-slide--white .gd-kicker {
+    color: rgba(0, 0, 0, 0.5);
+  }
+
+  /* ---- cover ---- */
+  .gd-cover {
+    position: absolute;
+    left: 4.6%;
+    bottom: 20%;
+  }
+  .gd-cover h2 {
+    margin: 0;
+    font-size: 104px;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1;
+  }
+  .gd-cover p {
+    margin: 18px 0 0;
+    font-size: 46px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---- divider ---- */
+  .gd-divider {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 8%;
+  }
+  .gd-divider.al-center {
+    justify-content: center;
+    text-align: center;
+  }
+  .gd-divider.al-left {
+    justify-content: flex-start;
+  }
+  .gd-divider span {
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.04;
+  }
+  .gd-divider.is-lg span {
+    font-size: 104px;
+  }
+  .gd-divider.is-md span {
+    font-size: 60px;
+    font-weight: 400;
+    letter-spacing: -0.025em;
+  }
+  .gd-divider.tone-green span {
+    color: #0a5a1e;
+  }
+
+  /* ---- titlecard ---- */
+  .gd-titlecard {
+    position: absolute;
+    left: 4.6%;
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 48%;
+  }
+  .gd-titlecard h2 {
+    margin: 0;
+    font-size: 100px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.03;
+    white-space: pre-line;
+  }
+
+  /* ---- statement / quote ---- */
+  .gd-statement {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 9%;
+  }
+  .gd-statement-t {
+    margin: 0;
+    font-size: 52px;
+    font-weight: 400;
+    line-height: 1.28;
+    letter-spacing: -0.02em;
+    white-space: pre-line;
+    text-wrap: balance;
+  }
+  .gd-statement.is-quote .gd-statement-t {
+    font-size: 46px;
+  }
+
+  /* ---- numbered ---- */
+  .gd-numbered {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 10%;
+  }
+  .gd-numbered .gd-kicker {
+    margin-bottom: 40px;
+  }
+  .gd-numbered ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  .gd-numbered li {
+    display: flex;
+    gap: 18px;
+    font-size: 47px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .gd-numbered li.is-dim {
+    color: rgba(255, 255, 255, 0.32);
+  }
+  .gd-slide--white .gd-numbered li.is-dim {
+    color: rgba(0, 0, 0, 0.28);
+  }
+  .gd-num {
+    opacity: 0.85;
+  }
+  .gd-numbered li.is-dim .gd-num {
+    opacity: 1;
+  }
+
+  /* ---- figures ---- */
+  .gd-figures {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+  }
+  .gd-figrow {
+    display: flex;
+    gap: 8%;
+  }
+  .gd-fig {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    max-width: 620px;
+    text-align: center;
+  }
+  .gd-fig-n {
+    font-size: 220px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+  }
+  .tone-mint .gd-fig-n {
+    background: linear-gradient(180deg, #b6f3d5 0%, #64d29c 52%, #33a86a 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .tone-green .gd-fig-n {
+    color: #0a5a1e;
+  }
+  .gd-fig-l {
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .gd-slide--white .gd-fig-l {
+    color: #0b0b0b;
+  }
+  .gd-fig-note {
+    margin: 20px 0 0;
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #0a5a1e;
+  }
+
+  /* ---- journey ---- */
+  .gd-journey {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .gd-journey .gd-kicker {
+    margin-bottom: 34px;
+  }
+  .gd-journey-row {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+  }
+  .gd-step {
+    font-size: 38px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  .gd-step.is-active {
+    font-weight: 600;
+    color: #fff;
+  }
+  .gd-arrow {
+    width: 90px;
+    height: 2px;
+    background: currentColor;
+    position: relative;
+    opacity: 0.7;
+    flex: none;
+  }
+  .gd-arrow::after {
+    content: "";
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: translateY(-50%) rotate(45deg);
+  }
+
+  /* ---- checklist (69, 70) ---- */
+  .gd-checklist {
+    position: absolute;
+    inset: 0;
+  }
+  .gd-cl-cols {
+    position: absolute;
+    left: 12%;
+    right: 8%;
+    top: 13%;
+    display: flex;
+    gap: 8%;
+  }
+  .gd-cl-col {
+    flex: 1;
+  }
+  .gd-cl-title {
+    margin: 0 0 22px;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: #0b0b0b;
+  }
+  .gd-cl-sec {
+    margin-bottom: 16px;
+  }
+  .gd-cl-label {
+    margin: 0 0 8px;
+    font-size: 19px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #232528;
+  }
+  .gd-cl-item {
+    margin: 0 0 5px;
+    font-size: 16px;
+    color: #555965;
+    display: flex;
+    gap: 9px;
+    align-items: baseline;
+  }
+  .gd-cl-mark {
+    color: #1f9d4d;
+    font-weight: 600;
+  }
+  .gd-cl-item.no .gd-cl-mark {
+    color: #c0473d;
+  }
+
+  /* ---- twocard (68) ---- */
+  .gd-twocard {
+    position: absolute;
+    inset: 0;
+  }
+  .gd-tc-row {
+    position: absolute;
+    left: 13%;
+    right: 8%;
+    top: 36%;
+    display: flex;
+    gap: 6%;
+  }
+  .gd-tc-card {
+    flex: 1;
+  }
+  .gd-tc-title {
+    margin: 0 0 22px;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: #232528;
+  }
+  .gd-tc-pt {
+    margin: 0 0 14px;
+    font-size: 17px;
+    line-height: 1.35;
+    color: #555965;
+    max-width: 30ch;
+  }
+
+  /* ---- live prototype embed (89–91: FractionalOrderFlow) ---- */
+  .gd-proto-wrap {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .gd-proto-wrap :global(.fof-stage) {
+    min-height: 100% !important;
+    height: 100%;
+    /* the component's frame is 440.55×909.3px; that already reads clearly
+       at the deck's 1920×1080 canvas size, so keep it near 1:1 and just
+       nudge it slightly down to leave a hair of margin top/bottom */
+    transform: scale(0.95);
+  }
+
+  /* ---- photobuild (2, 3, 4) ---- */
+  .gd-pb {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 34px;
+  }
+  .gd-pb-row {
+    display: flex;
+    gap: 26px;
+    align-items: flex-start;
+  }
+  .gd-pb-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .gd-pb-k {
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .gd-pb-card {
+    background: #fff;
+    padding: 9px 9px 9px;
+    border-radius: 3px;
+  }
+  .gd-pb-card--me img {
+    width: 300px;
+    aspect-ratio: 3 / 4;
+  }
+  .gd-pb-card--map img {
+    width: 340px;
+    aspect-ratio: 16 / 10;
+  }
+  .gd-pb-card img {
+    display: block;
+    object-fit: cover;
+    border-radius: 1px;
+  }
+  .gd-pb-hobbies-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .gd-pb-hobbies {
+    display: flex;
+    gap: 14px;
+  }
+  .gd-pb-hobby {
+    width: 148px;
+    height: 148px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  /* ---- role (slides 20, 61) ---- */
+  .gd-role {
+    position: absolute;
+    inset: 0;
+  }
+  .gd-role-col {
+    position: absolute;
+    left: 9.5%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 34px;
+  }
+  .gd-role-row .gd-kicker {
+    margin: 0 0 8px;
+  }
+  .gd-role-v {
+    margin: 0;
+    font-size: 33px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.28;
+    white-space: pre-line;
+  }
+  .gd-role-shot {
+    position: absolute;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  /* ---- media (heading + screenshot crops) ---- */
+  .gd-media {
+    position: absolute;
+    inset: 0;
+  }
+  .gd-media-h {
+    position: absolute;
+    left: 3.4%;
+    top: 6%;
+    margin: 0;
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .gd-slide--white .gd-media-h {
+    color: #0b0b0b;
+  }
+  .gd-media-big {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 7%;
+    margin: 0;
+    text-align: center;
+    font-size: 80px;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+  .gd-media-big .g {
+    color: #46d497;
+  }
+  .gd-media-l {
+    position: absolute;
+    margin: 0;
+    transform: translateX(-50%);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.82);
+  }
+  .gd-slide--white .gd-media-l {
+    color: rgba(0, 0, 0, 0.7);
+  }
+  .gd-media-shot {
+    position: absolute;
+    height: auto;
+    border-radius: 4px;
+  }
+
+  /* ---- ownership build (slides 6–14) ---- */
+  .gd-own {
+    position: absolute;
+    top: 2%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 858px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .gd-own-card {
+    border-radius: 16px;
+    background: linear-gradient(180deg, #0c110e 0%, #030504 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .gd-own-head {
+    padding: 12px 30px 12px;
+    text-align: center;
+  }
+  .gd-own-pills {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 13px;
+  }
+  .gd-pill {
+    font-size: 12.5px;
+    letter-spacing: -0.01em;
+    padding: 5px 11px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.055);
+    white-space: nowrap;
+  }
+  .gd-pill b {
+    font-weight: 600;
+  }
+  .gd-pill i {
+    font-style: normal;
+    color: #4ec98a;
+  }
+  .gd-own-head p {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+  .gd-own-metric {
+    display: flex;
+    align-items: center;
+    gap: 44px;
+    padding: 7px 46px;
+  }
+  .gd-own-n {
+    font-size: 66px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    background: linear-gradient(180deg, #ffd3ac 0%, #f7975c 55%, #e07846 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    min-width: 120px;
+  }
+  .gd-own-l {
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .gd-own-icons {
+    display: flex;
+    gap: 12px;
+  }
+  .gd-own-icon {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    padding: 14px 20px 13px;
+  }
+  .gd-own-icon img {
+    width: 108px;
+    height: auto;
+  }
+  .gd-own-icon img.is-chip {
+    width: 220px;
+  }
+  .gd-own-icon span {
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .gd-own-team {
+    padding: 9px 30px;
+    text-align: center;
+  }
+  .gd-own-team p {
+    margin: 0;
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .gd-own.is-dim > *:not(:last-child):not(:nth-last-child(2)) {
+    opacity: 0.24;
+  }
+
+  /* ---- twocol ---- */
+  .gd-twocol {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8%;
+    padding: 0 8%;
+  }
+  .gd-twocol span {
+    font-size: 46px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---- edges / bar / progress ---- */
+  .gd-edge {
+    position: absolute;
+    top: 0;
+    bottom: 2.75rem;
+    width: 33%;
+    display: flex;
+    align-items: center;
+    padding: 0 1.25rem;
+    border: 0;
+    background: none;
+    color: #fff;
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    z-index: 3;
+  }
+  .gd-edge--prev {
+    left: 0;
+    justify-content: flex-start;
+  }
+  .gd-edge--next {
+    right: 0;
+    justify-content: flex-end;
+  }
+  .gd-stage:hover .gd-edge,
+  .gd-stage:focus-within .gd-edge {
+    opacity: 0.35;
+  }
+  .gd-edge:hover {
+    opacity: 0.9 !important;
+  }
+  .gd-edge span {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+  }
+
+  .gd-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0.9rem;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+    z-index: 3;
+  }
+  .gd-count {
+    font-family: var(--w-font-alt);
+    font-size: 0.8125rem;
+    color: rgba(255, 255, 255, 0.85);
+    font-variant-numeric: tabular-nums;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+  .gd-fs {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 0;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+  .gd-fs:hover {
+    background: rgba(255, 255, 255, 0.26);
+  }
+  .gd-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.12);
+    z-index: 3;
+  }
+  .gd-progress span {
+    display: block;
+    height: 100%;
+    background: var(--w-accent);
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.25s ease;
+  }
+
+  /* ---- play facade ---- */
+  .gd-play {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: none;
+    border: 0;
+    color: var(--w-ink);
+    font: inherit;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  .gd-play:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .gd-play-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: var(--w-accent);
+    color: #04160e;
+    transition: transform 0.2s ease;
+  }
+  .gd-play:hover .gd-play-icon {
+    transform: scale(1.06);
+  }
+  .gd-play-icon svg {
+    margin-left: 2px;
+  }
+  .gd-play-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    text-align: left;
+  }
+  .gd-play-label {
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+  }
+  .gd-play-sub {
+    font-family: var(--w-font-alt);
+    font-size: 0.8125rem;
+    color: var(--w-ink-soft);
+  }
+  .gd-note {
+    margin: 0.9rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--w-ink-soft);
+  }
+  .gd-note kbd {
+    font: inherit;
+    padding: 0.05em 0.4em;
+    border: 1px solid var(--w-line);
+    border-radius: 5px;
+    color: var(--w-ink);
+  }
+  @media (max-width: 560px) {
+    .gd-play {
+      flex-direction: column;
+      gap: 0.9rem;
+    }
+    .gd-play-text {
+      text-align: center;
+      align-items: center;
+    }
+  }
+</style>
