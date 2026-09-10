@@ -27,7 +27,6 @@
   --quote: #202729;     /* price box */
   --stat: #262f2f;      /* bid/ask box */
   --green-bg: #0e231e;
-  --titlebar: #353c3f;
 
   --line: #343b3c;      /* under expiry rows */
   --line-row: #192022;  /* between unshaded rows */
@@ -112,13 +111,30 @@
 
 /* ---------- title bar ---------- */
 
+/* Glass, lightly. The solid #353c3f read as a bright lid on a dark card,
+   so it is now a translucent white wash over the shell instead. The old
+   flat colour was equivalent to 18.5% white; this runs 14.5% down to
+   7.5%, landing the mid-tone near 11% — a step, not a plunge. The 66deg
+   angle and the soft top rim are the house glass recipe from
+   glass-button.css, dialled well down: this is chrome, not a control. */
 .oc-titlebar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 29px;
   padding-inline: 11px;
-  background: var(--titlebar);
+  background: linear-gradient(
+    66deg,
+    rgba(255, 255, 255, 0.145),
+    rgba(255, 255, 255, 0.075)
+  );
+  /* Only bites when something varied sits behind the card — the shell is
+     flat, so this costs nothing today and keeps the treatment honest if
+     the widget is ever placed on a backdrop. */
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 .oc-titlebar h2 {
@@ -126,7 +142,9 @@
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: #f5f7f4;
+  /* Eased off full white so the title sits in the glass rather than on
+     top of it. */
+  color: rgba(254, 255, 253, 0.88);
 }
 
 .oc-titlebar-actions { display: flex; align-items: center; gap: 9px; }
@@ -138,7 +156,7 @@
 .oc-titlebar button {
   display: inline-flex;
   color: #e8ebe9;
-  opacity: 0.9;
+  opacity: 0.75;
   transition:
     transform 0.14s ease,
     opacity 0.14s ease;
