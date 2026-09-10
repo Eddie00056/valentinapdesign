@@ -1,0 +1,159 @@
+/* Floating widget chrome: the card edge and the title bar.
+
+   Extracted from the option chain, which is where it was designed. Both
+   that piece and the options strategy builder are the same object — a
+   dark card floating on the page ground with a named bar across the top —
+   so the edge, the bar and the icon plates live here once.
+
+   What a consumer still owns: its own width, its body padding, and
+   everything inside. What it can tune, without forking the file:
+
+     --wshell-bg         card ground                        #070f11
+     --wshell-bar-pad    inset around the bar's containers  4px
+     --wshell-title-pad  inset inside the title's container 6px
+
+   The two insets add up to the title's optical left edge, and that is the
+   number to match against whatever the body puts at ITS left edge. The
+   chain's body starts content at 4 + 6; the builder's at 12, so it moves
+   the title container to 8 and leaves the bar at 4. */
+
+.wshell {
+  position: relative;
+  /* Border and radius from the strategy-builder Figma's own tokens:
+     atl/border/radius/l = 12, and the edge is atl/colour/elevation/2/100
+     = #353d3f66 — the elevation-2 surface at 40%, which is why it reads
+     as a lit edge rather than a drawn line on this ground.
+
+     The shadow is the house card treatment from options-builder.css
+     rather than the Figma's: the file's effect values were not readable
+     (Figma MCP rate limit), and this is the same situation — a floating
+     dark card. Worth swapping for the real values when quota allows. */
+  border-radius: 12px;
+  border: 1px solid #353d3f66;
+  background: var(--wshell-bg, #070f11);
+  box-shadow:
+    0 40px 90px -40px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wshell *,
+.wshell *::before,
+.wshell *::after { box-sizing: border-box; }
+
+/* ---------- title bar ---------- */
+
+/* Two nested insets: the bar holds `--wshell-bar-pad` around its
+   contents, and the title and each icon are a 24px container carrying
+   padding of their own. The height is that arithmetic rather than a
+   magic number — move the container and the bar follows it. */
+.wshell-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: calc(var(--wshell-bar-pad, 4px) * 2 + 24px);
+  padding: var(--wshell-bar-pad, 4px);
+  /* Flat #353D3F at 40%. The blur behind it is what makes it read as
+     glass; the fill is only a tint, so the band does not brighten across
+     its width the way a gradient did. */
+  background: rgba(53, 61, 63, 0.4);
+  /* Only bites when something varied sits behind the card, but it costs
+     nothing over a flat shell and keeps the treatment honest. */
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.wshell-title {
+  display: flex;
+  align-items: center;
+  height: 24px;
+  margin: 0;
+  padding-inline: var(--wshell-title-pad, 6px);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  /* Eased off full white so the title sits in the glass rather than on
+     top of it. */
+  color: rgba(254, 255, 253, 0.88);
+}
+
+/* 2, not the 9 this used to be. Each icon brings 5 of its own padding
+   now, so the glyphs still read 12 apart — the gap only has to separate
+   the two plates. */
+.wshell-actions { display: flex; align-items: center; gap: 2px; }
+
+/* Press feedback from the glass button set (`.btn--mobile:active` in
+   glass-button.css) — the iOS scale-down the star and bell use on the
+   alert screen, same 0.14s and the same 0.97 / 0.92 pair, so a tap here
+   reads identically to a tap there.
+
+   The `.wshell` prefix is load-bearing wherever a consumer's own button
+   reset is (0,1,1): a bare single-class rule would silently lose to it. */
+.wshell .wshell-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* The icon's container, matching the title's. A 24px square around a
+     14px glyph is 5 of padding — the plate only shows on hover, but the
+     target is there at rest either way, which is the point of giving the
+     icon a box rather than hanging the glyph off the bar. */
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: #e8ebe9;
+  opacity: 0.75;
+  cursor: pointer;
+  transition:
+    transform 0.14s ease,
+    opacity 0.14s ease,
+    background-color 0.14s ease;
+}
+
+.wshell .wshell-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.wshell .wshell-btn:active {
+  transform: scale(0.97);
+  opacity: 0.92;
+}
+
+/* Click glow. One shot: blooms out from behind the icon and is gone — it
+   never rests in a lit state, so it reads as a response to the tap rather
+   than a selected mode. The span is remounted by key on each click, which
+   restarts the keyframe. */
+.wshell-linkout { position: relative; }
+
+.wshell-glow {
+  position: absolute;
+  /* -2 against a 24px plate puts the bloom at the same 28px across it
+     had when it surrounded a bare 14px glyph. */
+  inset: -2px;
+  border-radius: 9px;
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgb(74 144 255 / 0.38),
+    rgb(74 144 255 / 0.14) 45%,
+    rgb(74 144 255 / 0) 72%
+  );
+  pointer-events: none;
+  animation: wshell-glow 0.52s ease-out forwards;
+}
+
+@keyframes wshell-glow {
+  0% { opacity: 0; transform: scale(0.6); }
+  35% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.25); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wshell .wshell-btn:active { transform: none; }
+  .wshell-glow { animation: none; opacity: 0; }
+}

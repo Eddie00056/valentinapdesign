@@ -59,22 +59,9 @@
   max-width: 100%;
   margin-inline: auto;
   overflow: hidden;
-  /* Border and radius from the strategy-builder Figma's own tokens:
-     atl/border/radius/l = 12, and the edge is atl/colour/elevation/2/100
-     = #353d3f66 — the elevation-2 surface at 40%, which is why it reads
-     as a lit edge rather than a drawn line on this ground.
-
-     The shadow is the house card treatment from options-builder.css
-     rather than the Figma's: the file's effect values were not readable
-     (Figma MCP rate limit), and this is the same situation — a floating
-     dark card — that the builder already solved. Worth swapping for the
-     real values when quota allows. */
-  border-radius: 12px;
-  border: 1px solid #353d3f66;
-  background: var(--shell);
-  box-shadow:
-    0 40px 90px -40px rgba(0, 0, 0, 0.85),
-    inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  /* Edge, radius, ground and shadow come from .wshell. Only the ground's
+     value is stated here, because the shell reads it from a variable. */
+  --wshell-bg: var(--shell);
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 12px;
   letter-spacing: 0.02em;
@@ -82,10 +69,6 @@
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
 }
-
-.oc-root *,
-.oc-root *::before,
-.oc-root *::after { box-sizing: border-box; }
 
 /* Native button chrome reset. NOTE the specificity: this selector is
    (0,1,1), so it BEATS any single-class rule below it — a plain
@@ -135,126 +118,18 @@
 
 /* ---------- title bar ---------- */
 
-/* Glass, lightly. The solid #353c3f read as a bright lid on a dark card,
-   so it is now a translucent white wash over the shell instead — landing
-   a touch darker than the flat colour did, which is the fade. The 66deg
-   gradient and the soft top rim are the house glass recipe from
-   glass-button.css, dialled well down: this is chrome, not a control. */
-.oc-titlebar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  /* Two nested insets, per the Figma: the bar holds 4 around its
-     contents, and the title and the icon group are each a 24px container
-     carrying padding of their own. 4 + 24 + 4 is the height; the same 4
-     is the gap at the sides. Nothing here is a magic number — move the
-     container and the bar follows it. */
-  height: 32px;
-  padding: 4px;
-  /* Flat #353D3F at 40%, not the two-stop white gradient it used to be.
-     The blur behind it is what still makes it read as glass; the fill is
-     just a tint now, so the band no longer brightens across its width. */
-  background: rgba(53, 61, 63, 0.4);
-  /* Only bites when something varied sits behind the card, but it costs
-     nothing over the flat shell and keeps the treatment honest. */
-  backdrop-filter: blur(18px) saturate(1.15);
-  -webkit-backdrop-filter: blur(18px) saturate(1.15);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
-}
-
-/* The title's own container. Its 6 of padding is what sets the title's
-   optical left edge, and it is 6 because that is what the search pill
-   below carries and what every table cell puts before its figure. All
-   three boxes start at their band's 4, so the title, the magnifier and
-   the row carets all begin on one line. */
-.oc-titlebar h2 {
-  display: flex;
-  align-items: center;
-  height: 24px;
-  margin: 0;
-  padding-inline: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  /* Eased off full white so the title sits in the glass rather than on
-     top of it. */
-  color: rgba(254, 255, 253, 0.88);
-}
-
-/* 2, not 9. Each icon now brings 5 of its own padding, so the glyphs
-   still read 12 apart — the gap only has to separate the two plates. */
-.oc-titlebar-actions { display: flex; align-items: center; gap: 2px; }
-
-/* Press feedback copied from the glass button set (`.btn--mobile:active`
-   in glass-button.css) — the iOS scale-down the star and bell use on the
-   alert screen, same 0.14s ease and the same 0.97 / 0.92 pair, so a tap
-   here reads identically to a tap there. */
-.oc-titlebar button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  /* The icon's container, matching the title's. A 24px square around a
-     14px glyph is 5 of padding — the plate only shows on hover, but the
-     target is there at rest either way, which is the point of giving the
-     icon a box rather than hanging the glyph off the bar. */
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
-  color: #e8ebe9;
-  opacity: 0.75;
-  transition:
-    transform 0.14s ease,
-    opacity 0.14s ease,
-    background-color 0.14s ease;
-}
-
-.oc-titlebar button:hover {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.oc-titlebar button:active {
-  transform: scale(0.97);
-  opacity: 0.92;
-}
-
-/* Click glow. One shot: blooms out from behind the icon and is gone —
-   it never rests in a lit state, so it reads as a response to the tap
-   rather than a selected mode. The span is remounted by key on each
-   click, which restarts the keyframe. */
-.oc-linkout { position: relative; }
-
-.oc-glow {
-  position: absolute;
-  /* Was -7 around a bare 14px glyph. The button is a 24px plate now, so
-     -2 keeps the bloom the same 28px across. */
-  inset: -2px;
-  border-radius: 9px;
-  background: radial-gradient(
-    circle at 50% 50%,
-    rgb(74 144 255 / 0.38),
-    rgb(74 144 255 / 0.14) 45%,
-    rgb(74 144 255 / 0) 72%
-  );
-  pointer-events: none;
-  animation: oc-glow 620ms cubic-bezier(0.2, 0, 0, 1) forwards;
-}
-
-@keyframes oc-glow {
-  0% { opacity: 0; transform: scale(0.65); }
-  30% { opacity: 1; transform: scale(1); }
-  100% { opacity: 0; transform: scale(1.45); }
-}
-
-/* ---------- content box ---------- */
+/* Title bar, icon plates and the pop-out glow now live in
+   shared/widget-shell.css — this piece and the options strategy builder
+   are the same object and were carrying two copies of it. The chain's
+   body starts its content at 4 + 6, which is what the shell's default
+   insets already produce, so it overrides nothing. */
 
 /* Sides and bottom at ads/size/nano (4); the top at ads/size/micro (8).
-   The header is a band of its own, so the control row needs a little more
+   The bar is a band of its own, so the control row needs a little more
    separating it from that edge than it needs from the card's — at a flat
-   4 the two read as one block. The title bar carries the same 4 at the
-   sides, so the title, the search field and the table's first column all
-   start on one line. */
+   4 the two read as one block. The bar carries the same 4 at the sides,
+   so the title, the search field and the table's first column all start
+   on one line. */
 .oc-body { padding: 8px 4px 4px; }
 
 /* ---------- quote bar ---------- */
@@ -279,72 +154,17 @@
    of the table while symbol and price stay anchored left. */
 .oc-quote-split { margin-left: auto; }
 
-/* Symbol and price in one pill.
-
-   It wears the search field's chip, not the price box's darker fill: the
-   field is the thing you would act on, so it keeps its own surface and
-   the price is read inside it. Width is fixed because DM Sans has no
-   tabular figures — sized to content it would breathe by a pixel or two
-   on every tick, and the whole row would twitch with it. */
+/* The pill itself is shared/ticker-pill.css. Only its width is set
+   here, because the width is a property of THIS piece's price walk. */
 .oc-quote-id {
-  display: flex;
-  align-items: center;
-  /* 7 — the same gap the price keeps from its change, so the pill has
-     only two values in it: 4 from the magnifier to the symbol, 7 between
-     figures. At 10 this one was the widest gap in the pill and read as a
-     hole rather than a join. */
-  gap: 7px;
-  width: var(--ctl-id);
-  height: var(--ctl-h);
-  padding-inline: 6px;
-  border-radius: 6px;
-  background: var(--chip);
-  color: var(--ink);
-  font-size: 12px;
+  --tpill-w: var(--ctl-id);
+  /* 20, matching the builder's search pill. It is 2 shorter than the
+     bordered controls beside it — the Call/Put track and the expiry are
+     20 of content plus a 1px rim either side — so this row now sits on
+     two heights rather than one. Deliberate: the search field is the same
+     control on both pages and reads at the same size on both. */
+  --tpill-h: 20px;
 }
-
-.oc-search {
-  display: flex;
-  align-items: center;
-  /* The symbol and the price carry the title's 600. They are the two
-     pieces of identity in the widget — what you are looking at and what
-     it costs — so they read at the same strength as its name. The change
-     beside them stays at 400: it is a reading off the price, not a peer
-     of it, and at 600 the whole pill turned into one bold run. */
-  font-weight: 600;
-  /* 4 against the expiry trigger's 2. Both icons sit on a 16px grid
-     scaled down, but the magnifier's glyph fills far more of its box than
-     the chevron does, so matching the numbers made the search read
-     tighter than the trigger. Matched optically instead. */
-  gap: 4px;
-}
-
-.oc-search svg { flex: none; color: var(--ink); }
-
-/* Symbol is locked for this study. Greyed rather than removed so the
-   header still reads as a searchable chain. */
-/* Locked, but not dimmed — the symbol is the one piece of identity in
-   the header and reads as ink like everything else. The cursor is the
-   only cue that it cannot be typed into. */
-.oc-search[aria-disabled="true"] { cursor: not-allowed; }
-
-.oc-quote-box {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-/* Matches .ob-quote-box in options-builder.css — 12px, weight 400,
-   tabular figures. `Rolling` zeroes letter-spacing itself, because the
-   page's 0.02em otherwise lands at every digit-cell boundary and reads as
-   an uneven gap. */
-.oc-quote-px {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.oc-quote-chg { font-size: 12px; }
 
 /* ---------- selectors ---------- */
 
@@ -361,10 +181,19 @@
    outside. This root sets border-box on everything, so the same numbers
    would otherwise describe a smaller box and the 20px buttons would
    overflow their own track. */
+/* content-box, and the `.oc-root` prefix is load-bearing. The shell's
+   reset (`.wshell *`) makes everything inside the card border-box, and a
+   bare `.oc-seg` ties it on specificity (0,1,0) — the winner is then
+   decided by the bundler's stylesheet order, not the import list. It lost:
+   the track's content box shrank to 18.4 while its buttons stayed 20, so
+   each half overhung by 0.8 and the mint plate hung below the track's own
+   bottom edge. The height below is the INNER height; the rim sits outside
+   it. */
+.oc-root .oc-seg { box-sizing: content-box; }
+
 .oc-seg {
   position: relative;
   display: flex;
-  box-sizing: content-box;
   /* Follows the buttons: two halves at 6 of padding either side. The
      track stays fixed rather than hugging so both halves are the same
      width — "Call" is wider than "Put", and a half that resized under the

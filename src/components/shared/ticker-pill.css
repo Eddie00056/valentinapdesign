@@ -1,0 +1,88 @@
+/* Symbol and price in one pill.
+
+   They were two boxes in the option chain — a search field and a darker
+   price box — and the seam between them was doing no work: what a widget
+   is showing and what that underlying costs are one statement, read left
+   to right. The pill wears the search field's chip rather than the price
+   box's fill, because the field is the half you would act on.
+
+   Tunable by the consumer:
+
+     --tpill-w   fixed width; `auto` lets it hug (see the warning below)
+     --tpill-h   height, default 22
+
+   Prefer a fixed width. DM Sans as served by Google Fonts has NO tabular
+   figures — a pill sized to its content resizes on most ticks and drags
+   the row it sits in along with it. Measure the widest frame the piece's
+   own price walk produces and set that plus a pixel. */
+
+.tpill {
+  display: flex;
+  align-items: center;
+  /* 7 — the same gap the price keeps from its change, so the pill holds
+     only two values: 4 from the magnifier to the symbol, 7 between
+     figures. Wider than that and this gap reads as a hole, not a join. */
+  gap: 7px;
+  width: var(--tpill-w, auto);
+  /* 22 by default, which is what a bordered control measures: 20 of content
+     plus a 1px rim either side. A consumer whose neighbouring controls are
+     flat chips — no rim, so a flat 20 — sets this to 20 to match them. */
+  height: var(--tpill-h, 22px);
+  padding-inline: 6px;
+  border-radius: 6px;
+  background: #2c3334;
+  color: #fefffd;
+  font-size: 12px;
+}
+
+.tpill-sym {
+  display: flex;
+  align-items: center;
+  /* 4 against the 2 an expiry trigger uses. Both glyphs sit on a 16px
+     grid scaled down, but the magnifier fills far more of its box than a
+     chevron does, so matching the numbers made this read tighter.
+     Matched optically instead. */
+  gap: 4px;
+  /* The symbol and the price carry the title bar's 600. They are the two
+     pieces of identity in a widget — what you are looking at and what it
+     costs — so they read at the same strength as its name. */
+  font-weight: 600;
+}
+
+.tpill-sym svg { flex: none; }
+
+/* Locked, but not dimmed — the symbol is the one piece of identity in the
+   header and reads as ink like everything else. The cursor is the only
+   cue that it cannot be typed into. */
+.tpill[aria-disabled="true"] .tpill-sym { cursor: not-allowed; }
+
+.tpill-quote {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.tpill-px {
+  font-weight: 600;
+  color: #fefffd;
+}
+
+/* The change stays at 400 against the price's 600: it is a reading off
+   the price, not a peer of it. At a matching weight the whole pill turns
+   into one bold run with nothing separating the two halves. */
+.tpill-chg { font-weight: 400; }
+
+.tpill-chg[data-dir="up"] { color: #48d597; }
+.tpill-chg[data-dir="down"] { color: #ff557d; }
+
+/* `tabular-nums` computes but does nothing in DM Sans — see the note
+   above. It is declared so that a future swap to a font that HAS the
+   feature picks it up, and the zeroed tracking is the part that actually
+   works: the page's 0.02em otherwise lands at every digit boundary and
+   reads as an uneven gap. */
+.tpill-px,
+.tpill-chg {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0;
+}

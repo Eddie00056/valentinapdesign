@@ -200,27 +200,25 @@ export function ChainTable({
     const box = scrollRef.current;
     if (!box) return;
 
-    let frame = 0;
-    let frames = 0;
-    let settled = 0;
+    let done = false;
     let abandoned = false;
 
-    /* Held until it takes, rather than done once on mount.
-       
-       Running straight from the effect put the ladder at the top with the
-       money 165px below the fold: at that moment the scroller had not
-       been laid out, so `scrollTop +=` clamped to 0 against content that
-       was not yet taller than the box. A single deferred frame fixed it
-       locally and still failed in production, where hydration and font
-       loading push that moment further out — so this keeps checking for
-       about a second and stops as soon as the position holds for two
-       consecutive frames.
-       
-       One second is the ceiling, not the cost: in practice it settles in
-       two or three frames and stops. */
-    const centre = () => {
+    /* Centred on the money, and it has to keep trying to get there.
+
+       Done once from the effect, this landed at the top with the money
+       165px below the fold: at that moment the scroller is not taller
+       than its content yet, so `scrollTop +=` clamps to 0. Retrying on
+       requestAnimationFrame fixed it on a focused tab and still did
+       nothing on a background one — rAF does not fire while a document is
+       hidden, which is exactly how this widget loads inside the gallery's
+       iframes. A timer runs either way, so the retry is a timer. */
+    const attempt = () => {
+      if (done || abandoned) return true;
+
       const line = box.querySelector<HTMLElement>(".oc-spot");
-      if (!line || abandoned) return;
+      /* No line, or nothing to scroll, means the ladder is not laid out
+         yet. Not a failure — just not yet. */
+      if (!line || box.scrollHeight <= box.clientHeight) return false;
 
       /* Measured from rects, not offsetTop: the line is positioned, and
          its offsetParent is the card rather than this scroller, so
@@ -230,30 +228,45 @@ export function ChainTable({
       const delta =
         lineBox.top + lineBox.height / 2 - (viewBox.top + viewBox.height / 2);
 
-      if (Math.abs(delta) > 1) {
-        box.scrollTop += delta;
-        settled = 0;
-      } else {
-        settled += 1;
+      /* A sub-pixel remainder is the line's own half-pixel, not a miss. */
+      if (Math.abs(delta) <= 1) {
+        done = true;
+        return true;
       }
 
-      frames += 1;
-      if (settled < 2 && frames < 60) frame = requestAnimationFrame(centre);
+      box.scrollTop += delta;
+      return false;
     };
+
+    attempt();
+    const tick = setInterval(() => {
+      if (attempt()) clearInterval(tick);
+    }, 50);
+    /* A ceiling, so a piece that never lays out cannot leave a timer
+       running for the life of the page. */
+    const ceiling = setTimeout(() => clearInterval(tick), 2000);
+
+    /* A tab that was hidden through all of the above gets one more go the
+       moment it is looked at. */
+    const onShow = () => {
+      if (!document.hidden) attempt();
+    };
+    document.addEventListener("visibilitychange", onShow);
 
     /* The moment the reader touches the ladder it is theirs — a retry
        that outlived the first scroll would yank them back to the money. */
     const abandon = () => {
       abandoned = true;
-      cancelAnimationFrame(frame);
+      clearInterval(tick);
     };
     box.addEventListener("wheel", abandon, { passive: true, once: true });
     box.addEventListener("pointerdown", abandon, { passive: true, once: true });
     box.addEventListener("keydown", abandon, { once: true });
 
-    frame = requestAnimationFrame(centre);
     return () => {
-      cancelAnimationFrame(frame);
+      clearInterval(tick);
+      clearTimeout(ceiling);
+      document.removeEventListener("visibilitychange", onShow);
       box.removeEventListener("wheel", abandon);
       box.removeEventListener("pointerdown", abandon);
       box.removeEventListener("keydown", abandon);

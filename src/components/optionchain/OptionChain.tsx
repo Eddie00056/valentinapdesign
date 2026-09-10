@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type React from "react";
 import { motion } from "motion/react";
+import { WidgetShell } from "../shared/WidgetShell";
 import { QuoteBar } from "./QuoteBar";
 import { ChainTable } from "./ChainTable";
 import { ExpiryPicker } from "./ExpiryPicker";
@@ -9,7 +10,6 @@ import { pxHub } from "../alertscreen/priceHub";
 import { UNDERLYING } from "./mock";
 import { SEG_SPRING } from "./motion";
 import { type OptionSide } from "./types";
-import { Close, LinkOut } from "./icons";
 import "./option-chain.css";
 
 const SIDES: { id: OptionSide; label: string }[] = [
@@ -73,9 +73,6 @@ export function OptionChain({ onClose }: OptionChainProps) {
   const [tick, setTick] = useState(0);
   const [width, setWidth] = useState(DEFAULT_W);
   const rootRef = useRef<HTMLElement | null>(null);
-  /* Bumping this remounts the glow span, which restarts its one-shot
-     keyframe — the same replay trick the order-placed animation uses. */
-  const [glow, setGlow] = useState(0);
 
   useEffect(() => {
     const hub = pxHub();
@@ -143,30 +140,13 @@ export function OptionChain({ onClose }: OptionChainProps) {
   }, []);
 
   return (
-    <section
+    <WidgetShell
+      title="Options chain"
       className="oc-root"
-      aria-label="Options chain"
-      ref={rootRef}
+      onClose={onClose}
+      innerRef={rootRef}
       style={{ width }}
     >
-      <header className="oc-titlebar">
-        <h2>Options chain</h2>
-        <div className="oc-titlebar-actions">
-          <button
-            type="button"
-            className="oc-linkout"
-            aria-label="Open in a new window"
-            onClick={() => setGlow((g) => g + 1)}
-          >
-            {glow > 0 && <span key={glow} className="oc-glow" aria-hidden="true" />}
-            <LinkOut size={14} />
-          </button>
-          <button type="button" aria-label="Close" onClick={onClose}>
-            <Close size={15} />
-          </button>
-        </div>
-      </header>
-
       <div className="oc-body">
         <QuoteBar
           underlying={UNDERLYING}
@@ -215,7 +195,7 @@ export function OptionChain({ onClose }: OptionChainProps) {
       >
         <span className="oc-resize-grip" aria-hidden="true" />
       </div>
-    </section>
+    </WidgetShell>
   );
 }
 
