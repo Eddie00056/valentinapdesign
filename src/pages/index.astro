@@ -8,9 +8,9 @@ import { site, pieces } from "../data/site";
    Counts always change what you see. `column-width` still rides along as
    a floor, so narrow viewports quietly use fewer than asked. */
 const ZOOM_STEPS = [5, 4, 3, 2];
-/* Three columns — the density the reference grid sits at, and enough room
-   for a phone screen to still read. */
-const ZOOM_DEFAULT = 2;
+/* Second step from the zoomed-out end: four columns, dropping to fewer on
+   narrower viewports once the 260px floor bites. */
+const ZOOM_DEFAULT = 1;
 ---
 
 <Base>
