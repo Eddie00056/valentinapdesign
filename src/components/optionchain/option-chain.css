@@ -102,9 +102,13 @@
 
 /* Tabular figures everywhere a number can tick — without this the whole
    grid shivers on every update. */
+/* Tabular figures everywhere a number can tick, and zero letter-spacing
+   with them: the page's 0.02em lands between digits and reads as an
+   uneven gap on a column of numbers. */
 .oc-num {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
+  letter-spacing: 0;
 }
 
 .oc-up { color: var(--up); }
@@ -563,27 +567,53 @@
 /* ---------- spot line ---------- */
 
 /* The one moving thing on the table: a dotted rule with the live price
-   riding it, drawn between the two strikes that straddle spot. */
+   riding it, drawn between the two strikes that straddle spot.
+
+   It takes NO height. It stays in flow, so it always lands at the right
+   boundary — including under an expanded row — but occupies nothing, so
+   crossing a strike moves the line alone. Previously it held a 26px band,
+   which meant every row below it jumped a full band's height each time
+   price crossed: the line looked fine, the table lurched. */
 .oc-spot {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 26px;
+  height: 0;
+  z-index: 2;
 }
 
+/* The pill floats over the rows rather than sitting in a band, so it has
+   to land somewhere that isn't carrying a figure. Strike values are short
+   and left-aligned, volume is right-aligned, which leaves a dead column
+   between them — roughly 12% to 28% of the table. The pill sits there
+   instead of dead centre, where it covered open interest. */
+.oc-spot-inner {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 13%;
+  pointer-events: none;
+}
+
+/* The rule sits on the zero-height slot itself, i.e. exactly on the seam
+   between the two strikes. */
 .oc-spot::before {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
+  top: 0;
   border-top: 1px dotted #4a5354;
 }
 
 .oc-spot-pill {
   position: relative;
   padding: 2px 9px;
+  /* It now floats over the rows rather than sitting in a band of its own,
+     so it needs a ground of its own to stay legible. */
+  box-shadow: 0 0 0 3px var(--band);
   border-radius: 999px;
   background: var(--chip);
   color: var(--ink);

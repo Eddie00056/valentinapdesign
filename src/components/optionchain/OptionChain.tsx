@@ -20,22 +20,32 @@ const SIDES: { id: OptionSide; label: string }[] = [
 
    Price used to step on its own timer while the columns walked on
    another, so the two drifted and a price change never landed on the same
-   frame as a column update. Both now come off the same tick: the beat is
-   5s, price holds low for two beats and high for one, so every figure on
-   the table — spot, quotes, volume, open interest — changes together. */
-const TICK_MS = 5000;
+   frame as a column update. Both now come off the same tick, so every
+   figure on the table — spot, quotes, volume, open interest — changes
+   together.
 
-/** Beats per demo loop: low, low, high. */
-const LOOP = 3;
+   2200ms is pxHub's own step, so each render lands exactly one step of
+   the site-wide walk rather than several at once. */
+const TICK_MS = 2200;
 
-/* Scripted price beat.
+/* Scripted price walk.
 
-   The point of the piece is the spot line crossing a strike, so price is
-   staged rather than left to wander: it rests just under $175 with the
-   line sitting below the $175 row (2 beats = 10s), steps over the strike
-   so the line springs up past that row (1 beat = 5s), then drops back. */
-const LOW = 174.93;
-const HIGH = 175.01;
+   Every value sits strictly inside the $170-$175 band, so the spot line
+   stays on one seam for the life of the demo and never re-seats between
+   rows. The line's position is still derived from price — cross a strike
+   and it would move — the staged data simply never asks it to, because a
+   row-height jump every few seconds is the one thing on this table that
+   pulls the eye away from the numbers.
+
+   Deterministic rather than random: the same sequence every load, so the
+   piece reads identically each time it is opened. */
+const SPOT_SEQ = [
+  174.62, 174.08, 173.31, 172.76, 173.14, 173.85, 174.41, 174.07, 173.52,
+  172.94, 173.63, 174.26,
+];
+
+/** Yesterday's close, set so the demo opens at the familiar +$3.18. */
+const PREV_CLOSE = SPOT_SEQ[0] - UNDERLYING.change;
 
 export interface OptionChainProps {
   onClose?: () => void;
@@ -67,10 +77,10 @@ export function OptionChain({ onClose }: OptionChainProps) {
 
   /* Derived from the same tick, not a second timer — which is what keeps
      the price step and the column walk on the same frame. */
-  const spot = tick % LOOP === LOOP - 1 ? HIGH : LOW;
+  const spot = SPOT_SEQ[tick % SPOT_SEQ.length];
   const state = useChainState(spot, tick);
 
-  const change = spot - (LOW - UNDERLYING.change);
+  const change = spot - PREV_CLOSE;
 
   return (
     <section className="oc-root" aria-label="Options chain">

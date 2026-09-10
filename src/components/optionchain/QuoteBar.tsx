@@ -1,8 +1,8 @@
 import type React from "react";
 import { type Underlying } from "./types";
 import { formatCurrency, formatSignedPercent } from "./format";
-import { Rolling } from "../shared/RollingNumber";
 import { Search } from "./icons";
+import { Rolling } from "../shared/RollingNumber";
 
 /**
  * Symbol and price.
@@ -11,6 +11,9 @@ import { Search } from "./icons";
  * tabular figures that odometer-roll digit by digit on a 300/30 spring,
  * from the shared `Rolling`. Same component, so the two pages tick
  * identically.
+ *
+ * The ladder below deliberately does NOT roll — fifty-odd figures
+ * rotating at once reads as churn. One price up here does not.
  */
 export function QuoteBar({
   underlying,
@@ -40,10 +43,7 @@ export function QuoteBar({
       </span>
 
       <span className="oc-quote-box">
-        <Rolling
-          className="oc-quote-px"
-          value={`$${formatCurrency(price)}`}
-        />
+        <Rolling className="oc-quote-px" value={`$${formatCurrency(price)}`} />
         <span className={`oc-quote-chg ${isUp ? "oc-up" : "oc-down"}`}>
           <Rolling
             value={`${isUp ? "+" : "−"}$${formatCurrency(Math.abs(change))} ${formatSignedPercent(changePct)}`}

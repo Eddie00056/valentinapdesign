@@ -10,7 +10,6 @@ import { formatCount, formatCurrency, formatPercent } from "./format";
 import { DURATION, EASING, LADDER_SPRING } from "./motion";
 import { useQuoteFlash } from "./useQuoteFlash";
 import { ChevronRight } from "./icons";
-import { Rolling } from "../shared/RollingNumber";
 
 /* Each header takes its column's own alignment, the way Robinhood's chain
    does: the strike reads from the left, the plain figures right-align onto
@@ -121,26 +120,28 @@ function Row({
           </span>
           <span className="oc-num oc-bold">${row.strike}</span>
         </span>
-        <span className="oc-cell">
-          <Rolling value={formatCount(quote.volume)} />
-        </span>
-        <span className="oc-cell">
-          <Rolling value={formatCount(quote.openInterest)} />
-        </span>
-        <span className="oc-cell oc-cell--mid">
-          <Rolling value={formatPercent(quote.iv, 2)} />
+        <span className="oc-cell oc-num">{formatCount(quote.volume)}</span>
+        <span className="oc-cell oc-num">{formatCount(quote.openInterest)}</span>
+        <span className="oc-cell oc-cell--mid oc-num">
+          {formatPercent(quote.iv, 2)}
         </span>
         {/* The pills are their own targets: a click on a price is a
             price action, not a request to open the row. Swallowing it
             here keeps the rest of the row expanding as before. */}
         <span className="oc-cell oc-cell--pill" onClick={swallow}>
-          <span className="oc-pill oc-pill--bid" data-flash={bidFlash ?? undefined}>
-            <Rolling value={`$${formatCurrency(quote.bid)}`} />
+          <span
+            className="oc-pill oc-pill--bid oc-num"
+            data-flash={bidFlash ?? undefined}
+          >
+            ${formatCurrency(quote.bid)}
           </span>
         </span>
         <span className="oc-cell oc-cell--pill" onClick={swallow}>
-          <span className="oc-pill oc-pill--ask" data-flash={askFlash ?? undefined}>
-            <Rolling value={`$${formatCurrency(quote.ask)}`} />
+          <span
+            className="oc-pill oc-pill--ask oc-num"
+            data-flash={askFlash ?? undefined}
+          >
+            ${formatCurrency(quote.ask)}
           </span>
         </span>
       </button>
@@ -182,9 +183,10 @@ interface ChainTableProps {
  * no scroll — the whole ladder is on screen at once, so the eye compares
  * strikes by position rather than by scrolling.
  *
- * Every figure is a `Rolling` odometer, so a value that changes rolls to
- * its new digits instead of swapping. At a 7s cadence that reads as a
- * market breathing rather than a table repainting.
+ * Figures update in place, without a per-digit roll. Fifty-odd numbers
+ * all rotating at once read as the table churning rather than as a market
+ * moving; the tick flash on bid and ask carries what actually changed, and
+ * tabular figures keep the columns from shivering as digits swap.
  *
  * Nothing here remounts on a side or expiry change. The ladder is
  * anchored, so the same eleven strikes are on screen either way — only
@@ -255,7 +257,9 @@ export function ChainTable({
  *
  * `layout="position"` animates where it sits without touching its size,
  * so the dotted rule and the pill travel together and neither gets
- * scale-distorted on the way.
+ * scale-distorted on the way. The row it renders between never moves —
+ * the slot is zero-height and the rule is drawn on it, so crossing a
+ * strike slides the line across a table that holds still.
  */
 function SpotLine({
   spot,
@@ -266,7 +270,9 @@ function SpotLine({
 }) {
   return (
     <motion.div className="oc-spot" role="separator" layout="position" transition={spring}>
-      <span className="oc-spot-pill oc-num">${formatCurrency(spot)}</span>
+      <span className="oc-spot-inner">
+        <span className="oc-spot-pill oc-num">${formatCurrency(spot)}</span>
+      </span>
     </motion.div>
   );
 }
