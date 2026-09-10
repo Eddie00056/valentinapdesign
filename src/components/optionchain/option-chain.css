@@ -27,6 +27,9 @@
   --quote: #202729;     /* price box */
   --stat: #262f2f;      /* bid/ask box */
   --green-bg: #0e231e;
+  /* Shared by the earnings badge and the pop-out's click glow, so the two
+     blue moments in this widget are the same blue. */
+  --info: #4a90ff;
 
   --line: #343b3c;      /* under expiry rows */
   --line-row: #192022;  /* between unshaded rows */
@@ -179,9 +182,9 @@
   border-radius: 9px;
   background: radial-gradient(
     circle at 50% 50%,
-    rgba(74, 144, 255, 0.38),
-    rgba(74, 144, 255, 0.14) 45%,
-    rgba(74, 144, 255, 0) 72%
+    rgb(74 144 255 / 0.38),
+    rgb(74 144 255 / 0.14) 45%,
+    rgb(74 144 255 / 0) 72%
   );
   pointer-events: none;
   animation: oc-glow 620ms cubic-bezier(0.2, 0, 0, 1) forwards;
@@ -669,6 +672,9 @@
   flex: none;
 }
 
+/* Earnings flag. Blue rather than neutral — it is the one thing in this
+   list that is a warning about the date rather than a property of it, and
+   it borrows the same blue the pop-out flashes on click. */
 .oc-exp-e {
   display: inline-flex;
   align-items: center;
@@ -676,8 +682,8 @@
   width: 15px;
   height: 15px;
   border-radius: 50%;
-  background: var(--chip);
-  color: var(--muted);
+  background: rgb(74 144 255 / 0.18);
+  color: var(--info);
   font-size: 10px;
 }
 
