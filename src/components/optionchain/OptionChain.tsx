@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type React from "react";
 import { motion } from "motion/react";
 import { QuoteBar } from "./QuoteBar";
 import { ChainTable } from "./ChainTable";
@@ -47,6 +48,16 @@ const SPOT_SEQ = [
 /** Yesterday's close, set so the demo opens at the familiar +$3.18. */
 const PREV_CLOSE = SPOT_SEQ[0] - UNDERLYING.change;
 
+/* Resize bounds.
+
+   The floor is not the table's — six columns would happily go on
+   shrinking. It is the control row: symbol, price, Call/Put and the
+   expiry are fixed widths that total about 550, so below this they start
+   to crowd each other. */
+const MIN_W = 560;
+const MAX_W = 1100;
+const DEFAULT_W = 590;
+
 export interface OptionChainProps {
   onClose?: () => void;
 }
@@ -60,6 +71,8 @@ export interface OptionChainProps {
  */
 export function OptionChain({ onClose }: OptionChainProps) {
   const [tick, setTick] = useState(0);
+  const [width, setWidth] = useState(DEFAULT_W);
+  const rootRef = useRef<HTMLElement | null>(null);
   /* Bumping this remounts the glow span, which restarts its one-shot
      keyframe — the same replay trick the order-placed animation uses. */
   const [glow, setGlow] = useState(0);
@@ -82,8 +95,60 @@ export function OptionChain({ onClose }: OptionChainProps) {
 
   const change = spot - PREV_CLOSE;
 
+  /* The widget is centred, so width is driven from the pointer's distance
+     to its centre rather than from a delta. That way the edge sits under
+     the cursor the whole drag instead of trailing it at half speed. */
+  const onResize = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const root = rootRef.current;
+    if (!root) return;
+    e.preventDefault();
+    // Capture is a nicety — it keeps the drag alive if the pointer leaves
+    // the handle — but it throws if the pointer is already gone, and that
+    // must not take the whole drag down with it.
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* not capturable; the window listeners below still carry the drag */
+    }
+    const centre = root.getBoundingClientRect().left + root.offsetWidth / 2;
+    const ceiling = Math.min(MAX_W, window.innerWidth - 32);
+
+    const move = (ev: PointerEvent) => {
+      const next = (ev.clientX - centre) * 2;
+      setWidth(Math.round(Math.min(ceiling, Math.max(MIN_W, next))));
+    };
+    const up = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  }, []);
+
+  /* Keyboard equivalent — a drag handle that only responds to a pointer
+     is unreachable for anyone not using one. */
+  const onResizeKey = useCallback((e: React.KeyboardEvent) => {
+    const step = e.shiftKey ? 50 : 10;
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      setWidth((w) =>
+        Math.round(
+          Math.min(
+            Math.min(MAX_W, window.innerWidth - 32),
+            Math.max(MIN_W, w + (e.key === "ArrowRight" ? step : -step)),
+          ),
+        ),
+      );
+    }
+  }, []);
+
   return (
-    <section className="oc-root" aria-label="Options chain">
+    <section
+      className="oc-root"
+      aria-label="Options chain"
+      ref={rootRef}
+      style={{ width }}
+    >
       <header className="oc-titlebar">
         <h2>Options chain</h2>
         <div className="oc-titlebar-actions">
@@ -132,6 +197,23 @@ export function OptionChain({ onClose }: OptionChainProps) {
           openStrike={state.openStrike}
           onToggleStrike={state.toggleStrike}
         />
+      </div>
+
+      <div
+        className="oc-resize"
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize the widget"
+        aria-valuenow={width}
+        aria-valuemin={MIN_W}
+        aria-valuemax={MAX_W}
+        tabIndex={0}
+        onPointerDown={onResize}
+        onKeyDown={onResizeKey}
+        onDoubleClick={() => setWidth(DEFAULT_W)}
+        title="Drag to resize — double-click to reset"
+      >
+        <span className="oc-resize-grip" aria-hidden="true" />
       </div>
     </section>
   );

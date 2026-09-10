@@ -241,6 +241,25 @@ function roundTo(value: number, dp: number): number {
   return Math.round(value * f) / f;
 }
 
+/* Premium ceiling for this study.
+
+   Real Black-Scholes puts a deep-ITM contract around $25, which makes the
+   bid/ask chips wide enough to hold six characters — and a chip sized for
+   a value that only appears on two rows is oversized on the other twenty.
+   Prices are squeezed under a ceiling so every chip can be built for
+   "$5.01" instead.
+
+   A hard clamp would flatten the whole ITM wing to one number. This curve
+   is essentially linear near zero (a $0.14 contract stays $0.14) and
+   asymptotic at the ceiling, so ordering survives and the wing still
+   climbs — it just never arrives. The greeks and IV are untouched; only
+   the quoted premium is compressed. */
+const PREMIUM_CAP = 5.01;
+
+function capPremium(value: number): number {
+  return PREMIUM_CAP * (1 - Math.exp(-value / PREMIUM_CAP));
+}
+
 function buildQuote(
   side: OptionSide,
   strike: number,
@@ -252,14 +271,17 @@ function buildQuote(
   const years = expiry.dte / 365;
   const iv = impliedVol(spot, strike, years, baseVol);
   const bs = blackScholes(side, spot, strike, years, iv);
-  const mark = Math.max(0.01, bs.price);
+  const mark = Math.max(0.01, capPremium(bs.price));
 
   // Spread widens with distance from the money and with time to expiry.
   const absDelta = Math.abs(bs.delta);
   const spreadPct = 0.012 + 0.09 * (1 - absDelta * 2 > 0 ? 1 - absDelta * 2 : 0);
   const halfSpread = Math.max(0.01, mark * spreadPct * (0.7 + rand() * 0.6)) / 2;
-  const bid = Math.max(0, roundTo(mark - halfSpread, 2));
-  const ask = roundTo(mark + halfSpread, 2);
+  /* The ceiling applies to what is QUOTED, not just the mark — ask is
+     mark plus half a spread, so capping the mark alone still let the deep
+     wing print above it. */
+  const ask = Math.min(PREMIUM_CAP, roundTo(mark + halfSpread, 2));
+  const bid = Math.max(0, Math.min(ask, roundTo(mark - halfSpread, 2)));
 
   // Volume and OI peak near the money and decay into the wings.
   const atmProximity = Math.exp(-((Math.log(strike / spot) / 0.09) ** 2) / 2);
@@ -377,45 +399,92 @@ function hashSymbol(symbol: string): number {
  * Only about a third of contracts move on any given tick, which is what a real
  * chain looks like. A wall of simultaneously flashing cells reads as a bug.
  */
+/* How often each field moves on a given tick, per contract.
+
+   These are deliberately different from each other. A quote update and a
+   print are separate events in a real book: volume ticking up on one
+   strike says nothing about whether its bid moved, and open interest only
+   really settles overnight. Driving them off one shared coin-flip made
+   the whole table change in lockstep, which reads as a repaint rather
+   than as a market. */
+const ODDS = {
+  /** A trade prints. The most common thing that happens to a contract. */
+  volume: 0.3,
+  /** A quote moves. Carries bid/ask/last/mark together — they all derive
+      from the same mark, so a quote update legitimately moves all of them. */
+  price: 0.22,
+  /** Vol gets re-marked. Slower than price. */
+  iv: 0.12,
+  /** Open interest. Slowest of the four; it is a daily settlement figure. */
+  openInterest: 0.06,
+} as const;
+
+/**
+ * Walk one contract to tick `n`.
+ *
+ * Every draw is independent, so on a given tick most contracts change in
+ * one field, many change in none, and a few change in several — which is
+ * what a chain actually looks like. Seeded on the contract symbol and the
+ * tick, so it stays deterministic: the same sequence every load, and the
+ * value at tick n never depends on how the page got there.
+ */
 export function applyTick(quote: OptionQuote, n: number): OptionQuote {
   if (n === 0) return quote;
 
   const rand = mulberry32(hashSymbol(quote.occSymbol) + n * 2654435761);
 
-  /* Liquidity always advances: volume only accumulates through a session,
-     and open interest drifts. These move on every tick so no row is ever
-     completely frozen. */
-  const volume = quote.volume + Math.round(rand() * quote.volume * 0.03);
-  const openInterest = Math.max(
-    0,
-    quote.openInterest + Math.round((rand() - 0.45) * quote.openInterest * 0.02),
-  );
+  // Drawn up front, one per field, so adding a field never shifts the
+  // sequence the others see.
+  const rVolume = rand();
+  const rPrice = rand();
+  const rIv = rand();
+  const rOi = rand();
+  const mVolume = rand();
+  const mPrice = rand();
+  const mIv = rand();
+  const mOi = rand();
 
-  /* Price moves on about half of contracts per tick. Walking every quote
-     at once reads as a bug rather than as a market. */
-  if (rand() > 0.5) return { ...quote, volume, openInterest };
+  let next: OptionQuote | null = null;
+  const edit = () => (next ??= { ...quote });
 
-  const step = Math.max(0.01, quote.mark * 0.012);
-  const drift = (rand() - 0.5) * 2 * step;
-  const mark = Math.max(0.01, roundTo(quote.mark + drift, 2));
-  const halfSpread = Math.max(0.01, (quote.ask - quote.bid) / 2);
+  if (rVolume < ODDS.volume) {
+    // Volume only ever accumulates through a session.
+    edit().volume = quote.volume + Math.max(1, Math.round(mVolume * quote.volume * 0.04));
+  }
 
-  return {
-    ...quote,
-    volume,
-    openInterest,
-    mark,
-    bid: Math.max(0, roundTo(mark - halfSpread, 2)),
-    ask: roundTo(mark + halfSpread, 2),
-    last: roundTo(mark, 2),
-    change: roundTo(quote.change + drift, 2),
-    changePct: roundTo(quote.changePct + drift / Math.max(mark, 0.01) / 10, 4),
-    // Break-even tracks the premium, so chance of profit moves with it.
-    breakEven: roundTo(
+  if (rOi < ODDS.openInterest) {
+    edit().openInterest = Math.max(
+      0,
+      quote.openInterest + Math.round((mOi - 0.45) * quote.openInterest * 0.02),
+    );
+  }
+
+  if (rIv < ODDS.iv) {
+    edit().iv = Math.max(0.01, roundTo(quote.iv + (mIv - 0.5) * 0.012, 4));
+  }
+
+  if (rPrice < ODDS.price) {
+    const step = Math.max(0.01, quote.mark * 0.012);
+    const drift = (mPrice - 0.5) * 2 * step;
+    const mark = Math.max(0.01, Math.min(PREMIUM_CAP, roundTo(quote.mark + drift, 2)));
+    const halfSpread = Math.max(0.01, (quote.ask - quote.bid) / 2);
+    const q = edit();
+    q.mark = mark;
+    q.ask = Math.min(PREMIUM_CAP, roundTo(mark + halfSpread, 2));
+    q.bid = Math.max(0, Math.min(q.ask, roundTo(mark - halfSpread, 2)));
+    q.last = roundTo(mark, 2);
+    q.change = roundTo(quote.change + drift, 2);
+    q.changePct = roundTo(quote.changePct + drift / Math.max(mark, 0.01) / 10, 4);
+    // Break-even tracks the premium.
+    q.breakEven = roundTo(
       quote.side === 'call' ? quote.strike + mark : quote.strike - mark,
       2,
-    ),
-  };
+    );
+  }
+
+  // Identity is preserved when nothing moved, so React skips the row and
+  // the flash hooks below it never fire.
+  return next ?? quote;
 }
 
 export function applyTickToRow(row: ChainRow, n: number): ChainRow {

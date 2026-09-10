@@ -1,6 +1,6 @@
 import { EXPIRIES } from "./mock";
 import { Menu, MenuItem } from "./ui";
-import { Check, Stepper } from "./icons";
+import { Check, ChevronDown } from "./icons";
 
 /**
  * Expiry selector.
@@ -28,9 +28,9 @@ export function ExpiryPicker({
       renderTrigger={() => (
         <>
           <span>
-            Exp {selected.label} ({selected.dte}D)
+            {selected.label} ({selected.dte}D)
           </span>
-          <Stepper size={12} />
+          <ChevronDown size={11} />
         </>
       )}
     >

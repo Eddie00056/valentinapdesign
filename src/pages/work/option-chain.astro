@@ -33,9 +33,10 @@ import { OptionChain } from "../../components/optionchain/OptionChain";
       padding: clamp(16px, 3vw, 44px);
     }
 
+    /* The widget owns its own width now — it is draggable — so the page
+       only needs to keep it off the edges. */
     .oc-page > * {
-      width: 100%;
-      max-width: 796px;
+      max-width: 100%;
     }
 
     .oc-back {

@@ -24,9 +24,12 @@
   --band: #0f1719;      /* stats + toolbar bands, unshaded rows */
   --itm: #171f20;       /* in-the-money row tint */
   --chip: #2c3334;      /* fields, expiry rows, segmented track */
-  --quote: #202729;     /* price box */
   --stat: #262f2f;      /* bid/ask box */
   --green-bg: #0e231e;
+  /* atl/colour/primary/900 from the strategy-builder Figma — the selected
+     segment's plate. A touch cooler and lighter than the builder's
+     --green-bg, which is what stops the mint rim reading as a halo. */
+  --primary-900: #112d25;
   /* Shared by the earnings badge and the pop-out's click glow, so the two
      blue moments in this widget are the same blue. */
   --info: #4a90ff;
@@ -35,34 +38,43 @@
   --line-row: #192022;  /* between unshaded rows */
   --line-itm: #202829;  /* between shaded rows */
 
-  --flash-up: rgba(72, 213, 151, 0.22);
-  --flash-down: rgba(255, 85, 125, 0.22);
 
   --row-h: 20px;
 
-  /* The toolbar band insets its controls by 5px; the quote row above it
-     has no band, so it takes the same inset explicitly. Without this the
-     two rows start at different x and the pills read as misaligned. */
-  --band-pad: 5px;
   /* Total control height. The bordered controls are content-box 20px + a
      1px rim either side; the filled ones carry no rim, so they take the
      22px directly. Either way every pill is the same height. */
   --ctl-h: 22px;
-  /* First column: the Call/Put track is 93.6px of content + 2px of rim. */
-  --ctl-1: 95.6px;
-  /* Second column. Both rows' right-hand control takes this so their
-     right edges line up — trimmed to the price's own content rather than
-     to the longest expiry, so there is no dead space at rest. The expiry
-     takes it as a MIN width (see .oc-exp-btn): its label is wider than
-     this, so the control grows past it rather than overflowing. */
-  --ctl-2: 154px;
+  /* The symbol-and-price pill. Fixed, and measured rather than guessed:
+     the widest frame the staged price walk produces is 181.1px of
+     content, plus 6 of padding either side and a pixel of slack. Re-walk
+     the sequence and re-measure whenever anything inside changes size:
+     the 14px magnifier added 2, the symbol and price going to 600 added
+     3.2, and tightening the gap gave 3 back. It has to be fixed — DM Sans carries no tabular figures, so a pill sized to
+     its content would resize on most ticks and drag the row with it. */
+  --ctl-id: 194px;
 
-  width: 100%;
-  max-width: 796px;
+  /* Width is owned by the component now — it is draggable, so the value
+     arrives as an inline style. This is the ceiling for narrow screens. */
+  max-width: 100%;
   margin-inline: auto;
   overflow: hidden;
-  border-radius: 10px;
+  /* Border and radius from the strategy-builder Figma's own tokens:
+     atl/border/radius/l = 12, and the edge is atl/colour/elevation/2/100
+     = #353d3f66 — the elevation-2 surface at 40%, which is why it reads
+     as a lit edge rather than a drawn line on this ground.
+
+     The shadow is the house card treatment from options-builder.css
+     rather than the Figma's: the file's effect values were not readable
+     (Figma MCP rate limit), and this is the same situation — a floating
+     dark card — that the builder already solved. Worth swapping for the
+     real values when quota allows. */
+  border-radius: 12px;
+  border: 1px solid #353d3f66;
   background: var(--shell);
+  box-shadow:
+    0 40px 90px -40px rgba(0, 0, 0, 0.85),
+    inset 0 1px 0 rgba(255, 255, 255, 0.02);
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 12px;
   letter-spacing: 0.02em;
@@ -102,9 +114,14 @@
 
 /* Tabular figures everywhere a number can tick — without this the whole
    grid shivers on every update. */
-/* Tabular figures everywhere a number can tick, and zero letter-spacing
-   with them: the page's 0.02em lands between digits and reads as an
-   uneven gap on a column of numbers. */
+/* Zero letter-spacing on figures: the page's 0.02em lands between digits
+   and reads as an uneven gap down a column of numbers.
+
+   The tabular request is aspirational — the DM Sans build served by
+   Google Fonts carries no `tnum`, so it is currently inert and every
+   number here is proportional. It costs nothing and starts working the
+   day the font ships the feature. Anything that must not change width is
+   given a fixed box instead (see .oc-pill). */
 .oc-num {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
@@ -127,13 +144,17 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 29px;
-  padding-inline: 11px;
-  background: linear-gradient(
-    66deg,
-    rgba(255, 255, 255, 0.145),
-    rgba(255, 255, 255, 0.075)
-  );
+  /* Two nested insets, per the Figma: the bar holds 4 around its
+     contents, and the title and the icon group are each a 24px container
+     carrying padding of their own. 4 + 24 + 4 is the height; the same 4
+     is the gap at the sides. Nothing here is a magic number — move the
+     container and the bar follows it. */
+  height: 32px;
+  padding: 4px;
+  /* Flat #353D3F at 40%, not the two-stop white gradient it used to be.
+     The blur behind it is what still makes it read as glass; the fill is
+     just a tint now, so the band no longer brightens across its width. */
+  background: rgba(53, 61, 63, 0.4);
   /* Only bites when something varied sits behind the card, but it costs
      nothing over the flat shell and keeps the treatment honest. */
   backdrop-filter: blur(18px) saturate(1.15);
@@ -142,8 +163,17 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
+/* The title's own container. Its 6 of padding is what sets the title's
+   optical left edge, and it is 6 because that is what the search pill
+   below carries and what every table cell puts before its figure. All
+   three boxes start at their band's 4, so the title, the magnifier and
+   the row carets all begin on one line. */
 .oc-titlebar h2 {
+  display: flex;
+  align-items: center;
+  height: 24px;
   margin: 0;
+  padding-inline: 6px;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -152,7 +182,9 @@
   color: rgba(254, 255, 253, 0.88);
 }
 
-.oc-titlebar-actions { display: flex; align-items: center; gap: 9px; }
+/* 2, not 9. Each icon now brings 5 of its own padding, so the glyphs
+   still read 12 apart — the gap only has to separate the two plates. */
+.oc-titlebar-actions { display: flex; align-items: center; gap: 2px; }
 
 /* Press feedback copied from the glass button set (`.btn--mobile:active`
    in glass-button.css) — the iOS scale-down the star and bell use on the
@@ -160,14 +192,27 @@
    here reads identically to a tap there. */
 .oc-titlebar button {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* The icon's container, matching the title's. A 24px square around a
+     14px glyph is 5 of padding — the plate only shows on hover, but the
+     target is there at rest either way, which is the point of giving the
+     icon a box rather than hanging the glyph off the bar. */
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
   color: #e8ebe9;
   opacity: 0.75;
   transition:
     transform 0.14s ease,
-    opacity 0.14s ease;
+    opacity 0.14s ease,
+    background-color 0.14s ease;
 }
 
-.oc-titlebar button:hover { opacity: 1; }
+.oc-titlebar button:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
 
 .oc-titlebar button:active {
   transform: scale(0.97);
@@ -182,7 +227,9 @@
 
 .oc-glow {
   position: absolute;
-  inset: -7px;
+  /* Was -7 around a bare 14px glyph. The button is a 24px plate now, so
+     -2 keeps the bloom the same 28px across. */
+  inset: -2px;
   border-radius: 9px;
   background: radial-gradient(
     circle at 50% 50%,
@@ -202,7 +249,13 @@
 
 /* ---------- content box ---------- */
 
-.oc-body { padding: 8px; }
+/* Sides and bottom at ads/size/nano (4); the top at ads/size/micro (8).
+   The header is a band of its own, so the control row needs a little more
+   separating it from that edge than it needs from the card's — at a flat
+   4 the two read as one block. The title bar carries the same 4 at the
+   sides, so the title, the search field and the table's first column all
+   start on one line. */
+.oc-body { padding: 8px 4px 4px; }
 
 /* ---------- quote bar ---------- */
 
@@ -212,10 +265,13 @@
 .oc-quote {
   display: flex;
   align-items: center;
-  gap: 8px;
+  /* The only gap this is ever seen at is Call/Put to expiry — everything
+     before the split is pushed apart by the auto margin instead. At 4 the
+     two trade controls read as one group of settings rather than two
+     unrelated fields parked beside each other. */
+  gap: 4px;
   height: var(--ctl-h);
   margin-bottom: 8px;
-  padding-inline: var(--band-pad);
 }
 
 /* Auto margin, not a fixed gap: everything after it is pushed to the
@@ -223,40 +279,59 @@
    of the table while symbol and price stay anchored left. */
 .oc-quote-split { margin-left: auto; }
 
-.oc-search {
+/* Symbol and price in one pill.
+
+   It wears the search field's chip, not the price box's darker fill: the
+   field is the thing you would act on, so it keeps its own surface and
+   the price is read inside it. Width is fixed because DM Sans has no
+   tabular figures — sized to content it would breathe by a pixel or two
+   on every tick, and the whole row would twitch with it. */
+.oc-quote-id {
   display: flex;
   align-items: center;
-  gap: 6px;
-  width: var(--ctl-1);
+  /* 7 — the same gap the price keeps from its change, so the pill has
+     only two values in it: 4 from the magnifier to the symbol, 7 between
+     figures. At 10 this one was the widest gap in the pill and read as a
+     hole rather than a join. */
+  gap: 7px;
+  width: var(--ctl-id);
   height: var(--ctl-h);
-  padding-inline: 9px;
+  padding-inline: 6px;
   border-radius: 6px;
   background: var(--chip);
   color: var(--ink);
   font-size: 12px;
 }
 
-.oc-search svg { flex: none; color: var(--muted); }
+.oc-search {
+  display: flex;
+  align-items: center;
+  /* The symbol and the price carry the title's 600. They are the two
+     pieces of identity in the widget — what you are looking at and what
+     it costs — so they read at the same strength as its name. The change
+     beside them stays at 400: it is a reading off the price, not a peer
+     of it, and at 600 the whole pill turned into one bold run. */
+  font-weight: 600;
+  /* 4 against the expiry trigger's 2. Both icons sit on a 16px grid
+     scaled down, but the magnifier's glyph fills far more of its box than
+     the chevron does, so matching the numbers made the search read
+     tighter than the trigger. Matched optically instead. */
+  gap: 4px;
+}
+
+.oc-search svg { flex: none; color: var(--ink); }
 
 /* Symbol is locked for this study. Greyed rather than removed so the
    header still reads as a searchable chain. */
-.oc-search[aria-disabled="true"] {
-  color: var(--faint);
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
-.oc-search[aria-disabled="true"] svg { color: var(--faint); }
+/* Locked, but not dimmed — the symbol is the one piece of identity in
+   the header and reads as ink like everything else. The cursor is the
+   only cue that it cannot be typed into. */
+.oc-search[aria-disabled="true"] { cursor: not-allowed; }
 
 .oc-quote-box {
   display: flex;
   align-items: center;
   gap: 7px;
-  width: var(--ctl-2);
-  height: var(--ctl-h);
-  padding-inline: 9px;
-  border-radius: 6px;
-  background: var(--quote);
 }
 
 /* Matches .ob-quote-box in options-builder.css — 12px, weight 400,
@@ -265,6 +340,7 @@
    an uneven gap. */
 .oc-quote-px {
   font-size: 12px;
+  font-weight: 600;
   color: var(--ink);
 }
 
@@ -289,7 +365,11 @@
   position: relative;
   display: flex;
   box-sizing: content-box;
-  width: 93.6px;
+  /* Follows the buttons: two halves at 6 of padding either side. The
+     track stays fixed rather than hugging so both halves are the same
+     width — "Call" is wider than "Put", and a half that resized under the
+     sliding plate would make the plate resize with it. */
+  width: 85.6px;
   height: 20px;
   border-radius: 6px;
   border: 1px solid rgba(254, 255, 253, 0.2);
@@ -308,35 +388,36 @@
   flex: 1 1 0;
   box-sizing: border-box;
   height: 20px;
-  padding: 0 8px;
+  padding: 0 6px;
   border-radius: 6px;
   font-size: 12px;
-  /* Deliberate divergence from `.ob-seg-btn`, which keeps its inactive
-     label at full-strength ink. Here the unselected side is dropped to
-     the secondary tone so the active side is unambiguous — the table
-     below only ever shows one of them. */
-  color: var(--muted);
+  /* Back in line with `.ob-seg-btn`: the inactive label reads at
+     full-strength ink. The mint plate and rim carry the selected state on
+     their own — dimming the other side on top of that was saying the same
+     thing twice, and it made Put look unavailable rather than unchosen. */
+  color: var(--ink);
   /* Clips the indicator's overhang; see .oc-seg-ind. */
   overflow: hidden;
   transition: color 0.16s ease;
 }
 
-.oc-root .oc-seg-btn:hover { color: var(--ink); }
+.oc-root .oc-seg-btn[aria-checked="true"] { color: var(--up); }
 
-.oc-root .oc-seg-btn[aria-checked="true"],
-.oc-root .oc-seg-btn[aria-checked="true"]:hover { color: var(--up); }
+/* Selected segment, per the strategy-builder Figma: an atl/primary/900
+   plate (#112d25) inside an atl/primary/200 rim (#48d597), at radius 6.
 
-/* The builder declares a 1px mint border here, but its button's
-   overflow:hidden clips the whole ring away — the rendered result is a
-   flat plate with no rim. Reproducing it as a real border put a green
-   sliver down the inner edge: the track's halves are 46.8px, so the clip
-   boundary lands mid-pixel and a fraction of the rim survived. */
+   The rim sits at inset 0 rather than the builder's -1px. That -1px is
+   what produced the green sliver earlier: the track's halves are 46.8px,
+   so the button's overflow clip lands mid-pixel and shaved a fraction of
+   the rim off the inner edge. At inset 0 the rim draws complete, inside
+   the clip, on every half. */
 .oc-seg-ind {
   position: absolute;
   inset: 0;
   z-index: 0;
   border-radius: 6px;
-  background: var(--green-bg);
+  background: var(--primary-900);
+  border: 1px solid var(--up);
 }
 
 /* ---------- menu ---------- */
@@ -374,6 +455,33 @@
 
 /* ---------- table ---------- */
 
+/* Ladder viewport.
+
+   13 rows plus the spot band — the height the widget had before the
+   ladder was extended, so the visible chain is unchanged and the extra
+   strikes simply run off both ends. The header sits outside this box, so
+   it stays put while the strikes move under it. */
+.oc-scroll {
+  max-height: calc(13 * 30px + 22px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--chip) transparent;
+}
+
+.oc-scroll::-webkit-scrollbar { width: 8px; }
+
+.oc-scroll::-webkit-scrollbar-thumb {
+  background: var(--chip);
+  border-radius: 8px;
+  /* Inset by a transparent border so the thumb reads as a slim bar with
+     air around it rather than a block hard against the card edge. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.oc-scroll::-webkit-scrollbar-track { background: transparent; }
+
 .oc-table {
   background: var(--band);
   border-radius: 6px;
@@ -382,9 +490,30 @@
 
 /* Six columns, sized off the reference: strike leads and everything else
    is right-aligned so the digits stack into readable columns. */
+/* Six equal columns. The old ratios were inherited from a wider column
+   set — "Chance of profit" needed the room, and back then everything was
+   right-aligned so the slack hid at the end of each column. Left-aligned,
+   uneven columns just mean uneven gaps, and no column's content is wide
+   enough to justify more room than its neighbours. */
+/* Five equal columns and a last one sized to its content.
+
+   Six equal columns left the table lopsided: every column carries ~50px
+   of slack after its figure, but only the last column's slack is visible,
+   as a gutter. The result was 6px of air inside the left edge against 50
+   inside the right.
+
+   53 is that column's content, not a guess — 5 of pill inset + the pill's
+   own 42 + the 6 every cell carries on its right. So the Ask pill now
+   ends 6 from the table's right edge, exactly as the caret begins 6 from
+   its left, and the slack goes back to the five columns that can use it.
+
+   Equal columns and a flush right edge are mutually exclusive here: the
+   pill is a fixed box, so with a 1fr column it can sit at the column's
+   left OR at the table's edge, never both. Left-aligned wins, which makes
+   the column the thing that gives. */
 .oc-grid {
   display: grid;
-  grid-template-columns: 1.05fr 1fr 1.2fr 0.85fr 0.95fr 0.95fr;
+  grid-template-columns: repeat(5, 1fr) 53px;
   align-items: center;
   width: 100%;
 }
@@ -396,49 +525,32 @@
 
 .oc-head .oc-cell { color: var(--muted); }
 
-/* Strike: the label sits over the FIGURE, not over the caret — 6px cell
-   inset + an 11px caret + the 5px gap is where "$200" begins. */
-.oc-head .oc-cell--h-start {
-  justify-content: flex-start;
-  padding-left: 22px;
-  padding-right: 0;
-}
-
-/* Plain figures: same right inset as the value cells, so label and digits
-   land on one edge. */
-.oc-head .oc-cell--h-end {
-  justify-content: flex-end;
-  padding-right: 12px;
-}
-
-/* Pill columns: centred, matching the pills below them. */
-.oc-head .oc-cell--h-center {
-  justify-content: center;
-  padding-inline: 4px;
-}
+/* The strike header sits over the FIGURE, not the caret — 6px cell inset
+   + an 11px caret + the 5px gap is where "$200" begins. Every other
+   header shares its column's own left inset. */
+.oc-head .oc-cell--strike { padding-left: 22px; }
 
 .oc-cell {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   height: 100%;
-  padding-right: 12px;
+  padding-left: 12px;
+  padding-right: 6px;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
 }
 
-/* Strike leads the row: caret, then the figure, hard left. Only the
-   header row centres (see `.oc-head .oc-cell`); the values stay put. */
+/* Strike leads the row: caret, then the figure, hard left. */
 .oc-cell--strike {
-  justify-content: flex-start;
   gap: 5px;
   padding-left: 6px;
   padding-right: 0;
 }
 
 .oc-row {
-  height: 24px;
+  height: 30px;
   text-align: left;
   border-bottom: 1px solid var(--line-row);
   transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1);
@@ -458,38 +570,45 @@
 
 /* Bid and ask are the two tradeable numbers, so both get the chip the
    builder puts on its own quote boxes — same 14% ground, same 6px radius.
-   Each pill carries its own resting ground as a custom property, which is
-   what lets one pair of flash keyframes settle correctly on either colour. */
-/* Centred value columns — IV and the two pills. Their values are all the
-   same width, so centring still stacks into one clean line, and it puts
-   them under their own centred headers. */
-.oc-cell--pill,
-.oc-cell--mid {
-  justify-content: center;
-  padding-inline: 4px;
-}
-
-/* Registered so the angle can actually be transitioned — an unregistered
-   custom property is not animatable, which is the whole trick behind the
-   metallic-badge shimmer this borrows from. */
-@property --oc-sheen {
-  syntax: "<angle>";
-  inherits: true;
-  initial-value: 0deg;
-}
+   The ground never changes: only the figure inside a pill updates. */
+/* The pill carries 7px of its own inset, so the cell contributes 5 — the
+   figure inside then starts on the same 12px edge as every other column,
+   and the header lands over the number rather than over the chip. */
+.oc-cell--pill { padding-left: 5px; }
 
 .oc-pill {
   position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 46px;
-  padding: 1px 7px;
+  justify-content: flex-end;
+  /* Fixed box, contents right-aligned.
+
+     DM Sans as served by Google Fonts has NO tabular figures — the pill
+     computes `font-variant-numeric: tabular-nums` and it changes nothing
+     ("111" measures 11.7px against "333" at 21.4px, identical with the
+     feature off). Its digits are wildly uneven: "0" is 8.07px and "1" is
+     3.89px.
+
+     That rules out equalising the digits themselves. A tabular cell has
+     to clear the widest digit, so "$24.86" would render at ~51px against
+     the 39px it takes naturally — making every number BIGGER, which is
+     the opposite of what is wanted here.
+
+     So the chip is fixed and small, and its contents hang off the right
+     edge. Every chip is the same size and every value ends on one line;
+     what cannot be fixed in this font is the ragged gap inside.
+
+     42 is the benchmark: quoted premiums are capped at $5.01 (see
+     PREMIUM_CAP in mock.ts) so every value is five characters. Sized to
+     the worst five-character string rather than to "$5.01" itself —
+     because the digits are proportional, "$0.00" is the wide one at 41px
+     while "$5.01" only needs 37. */
+  width: 42px;
+  padding: 1px 4px;
   border-radius: 6px;
   background: var(--pill-bg);
   color: var(--pill-fg);
   transition:
-    --oc-sheen 0.7s cubic-bezier(0.32, 0.72, 0.24, 1),
     transform 0.14s ease,
     opacity 0.14s ease;
 }
@@ -501,31 +620,21 @@
   opacity: 0.92;
 }
 
-/* A 1px conic ring, mask-composited so its inner radius traces the pill
-   exactly. Far quieter than the badge it comes from: the sweep is the
-   pill's own colour rather than metal, it peaks at half alpha instead of
-   solid white, the angle travels 14deg rather than 18, and there is no
-   lift — a 24px row has nowhere to rise to. */
+/* A flat 1px ring on hover and on keyboard focus.
+
+   This was a conic sweep — the metallic-badge shimmer dialled down to the
+   pill's own colour, its angle travelling 14deg under a mask composite.
+   The ring was the useful half of that: it says the chip is a target. The
+   sweep itself read as glass sliding under the number on a 30px row, so
+   only the outline is left, fading in over the same 0.22s. A plain border
+   also lets the mask machinery and the registered angle property go. */
 .oc-pill::before {
   content: "";
   position: absolute;
   inset: 0;
-  padding: 1px;
+  box-sizing: border-box;
+  border: 1px solid var(--pill-ring);
   border-radius: inherit;
-  background: conic-gradient(
-    from calc(180deg + var(--oc-sheen, 0deg)) at 50% 50%,
-    var(--sheen-lo) 0deg,
-    var(--sheen-hi) 72deg,
-    var(--sheen-lo) 148deg,
-    var(--sheen-hi) 242deg,
-    var(--sheen-lo) 318deg,
-    var(--sheen-lo) 360deg
-  );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.22s ease;
@@ -534,86 +643,59 @@
 .oc-pill:hover::before,
 .oc-row:focus-visible .oc-pill::before { opacity: 1; }
 
-.oc-pill:hover,
-.oc-row:focus-visible .oc-pill { --oc-sheen: 14deg; }
-
 .oc-pill--bid {
   --pill-bg: rgba(255, 85, 125, 0.14);
   --pill-fg: var(--down);
-  --sheen-lo: rgba(255, 85, 125, 0.1);
-  --sheen-hi: rgba(255, 85, 125, 0.5);
+  --pill-ring: rgba(255, 85, 125, 0.5);
 }
 
 .oc-pill--ask {
   --pill-bg: rgba(72, 213, 151, 0.14);
   --pill-fg: var(--up);
-  --sheen-lo: rgba(72, 213, 151, 0.1);
-  --sheen-hi: rgba(72, 213, 151, 0.5);
+  --pill-ring: rgba(72, 213, 151, 0.5);
 }
-
-@keyframes oc-flash-up {
-  from { background-color: var(--flash-up); }
-  to { background-color: var(--pill-bg); }
-}
-
-@keyframes oc-flash-down {
-  from { background-color: var(--flash-down); }
-  to { background-color: var(--pill-bg); }
-}
-
-.oc-pill[data-flash="up"] { animation: oc-flash-up 320ms ease-out; }
-.oc-pill[data-flash="down"] { animation: oc-flash-down 320ms ease-out; }
 
 /* ---------- spot line ---------- */
 
-/* The one moving thing on the table: a dotted rule with the live price
-   riding it, drawn between the two strikes that straddle spot.
+/* A dotted rule with the live price riding it, drawn between the two
+   strikes that straddle spot.
 
-   It takes NO height. It stays in flow, so it always lands at the right
-   boundary — including under an expanded row — but occupies nothing, so
-   crossing a strike moves the line alone. Previously it held a 26px band,
-   which meant every row below it jumped a full band's height each time
-   price crossed: the line looked fine, the table lurched. */
+   It holds a band again. The band was removed because crossing a strike
+   shoved every row below it by a full band's height — but the staged
+   price now walks strictly inside $170-$175, so the line never re-seats
+   and that shove can never happen. In exchange the pill gets clear space
+   instead of floating over a cell: at 94px columns the widest gap between
+   two columns is about 43px and the pill needs 60, so there was nowhere
+   left for it to hide.
+
+   If this is ever pointed at real data that crosses strikes, this is the
+   line to revisit — height 0 with the pill absolutely placed is the
+   version that moves without disturbing the table. */
 .oc-spot {
   position: relative;
-  height: 0;
-  z-index: 2;
-}
-
-/* The pill floats over the rows rather than sitting in a band, so it has
-   to land somewhere that isn't carrying a figure. Strike values are short
-   and left-aligned, volume is right-aligned, which leaves a dead column
-   between them — roughly 12% to 28% of the table. The pill sits there
-   instead of dead centre, where it covered open interest. */
-.oc-spot-inner {
-  position: absolute;
-  inset-inline: 0;
-  top: 0;
-  transform: translateY(-50%);
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding-left: 13%;
-  pointer-events: none;
+  justify-content: center;
+  height: 22px;
 }
 
-/* The rule sits on the zero-height slot itself, i.e. exactly on the seam
-   between the two strikes. */
 .oc-spot::before {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  top: 0;
+  top: 50%;
   border-top: 1px dotted #4a5354;
 }
 
+/* Same figure as the price in the header, so it is set the same way:
+   12/600 ink on the same #2c3334 chip, and the same 6 of inset every
+   other control in the widget carries. Only the radius differs — this one
+   is a marker sitting on a line rather than a field, so it stays fully
+   round. */
 .oc-spot-pill {
   position: relative;
-  padding: 2px 9px;
-  /* It now floats over the rows rather than sitting in a band of its own,
-     so it needs a ground of its own to stay legible. */
-  box-shadow: 0 0 0 3px var(--band);
+  padding: 2px 6px;
   border-radius: 999px;
   background: var(--chip);
   color: var(--ink);
@@ -666,14 +748,17 @@
 .oc-root .oc-exp-btn {
   display: inline-flex;
   align-items: center;
-  /* Fixed width, so the caret parks at the right edge the way a select
-     does rather than trailing the label at a different x per date. */
-  justify-content: space-between;
-  gap: 7px;
+  /* Hugs its label. It used to carry a 152px min-width so its right edge
+     lined up with the price box in the row above — but the two rows were
+     merged into one, so there is nothing left to line up with, and all
+     that width did was hold the chevron out at arm's length. */
+  justify-content: center;
+  gap: 2px;
   box-sizing: content-box;
-  min-width: calc(var(--ctl-2) - 2px);
   height: 20px;
-  padding-inline: 9px;
+  /* 6, the widget's one inner inset — the same 6 the search pill carries,
+     the same 6 every table cell puts before its figure. */
+  padding-inline: 6px;
   border-radius: 6px;
   border: 1px solid rgba(254, 255, 253, 0.2);
   background: none;
@@ -726,15 +811,12 @@
   .oc-head .oc-cell { padding-inline: 4px; }
   /* Open interest is the first thing to go — the ladder still reads
      without it, and the table must not start scrolling sideways. */
-  .oc-grid { grid-template-columns: 1.15fr 1fr 0fr 0.9fr 1fr 1fr; }
+  .oc-grid { grid-template-columns: repeat(2, 1fr) 0 repeat(2, 1fr) 53px; }
   .oc-grid > .oc-cell:nth-child(3) { display: none; }
   .oc-detail-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .oc-pill:hover,
-  .oc-row:focus-visible .oc-pill { --oc-sheen: 0deg; }
-
   .oc-pill:active { transform: none; }
   .oc-glow { animation: none; opacity: 0; }
 

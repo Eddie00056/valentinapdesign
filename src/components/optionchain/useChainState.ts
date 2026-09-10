@@ -3,10 +3,12 @@ import { applyTickToRow, buildChain, EXPIRIES } from "./mock";
 import { type ChainRow, type OptionSide } from "./types";
 
 /** Strikes step $5 either side of the $175 anchor, and the anchor itself
-    is a row. Eleven rows, no scroll — the whole ladder is on screen at
-    once, and the spot line rides between whichever two straddle price. */
+    is a row. Eleven each way — more than the widget shows on purpose. The
+    ladder scrolls, and the overflow is what makes it read as a real chain
+    running past both edges rather than a short fixed list. The spot line
+    rides between whichever two strikes straddle price. */
 export const STRIKE_STEP = 5;
-export const ROWS_PER_SIDE = 5;
+export const ROWS_PER_SIDE = 11;
 
 /**
  * View state for the widget: what you'd trade (call/put), when it
@@ -27,7 +29,7 @@ export function useChainState(spot: number, tick: number) {
   }, []);
 
   /**
-   * The ladder is anchored, not derived from the live price: $150 to $200
+   * The ladder is anchored, not derived from the live price: $120 to $230
    * at $5 steps, the $175 anchor included as its own row. Deriving the
    * set from a moving spot would let rows pop in and out as price crosses
    * a strike, and this table does not scroll — the rows have to hold

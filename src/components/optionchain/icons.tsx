@@ -36,10 +36,15 @@ export function ChevronUp({ size = 14 }: Props) {
   );
 }
 
+/* The horizontal pair used to be drawn 4 across by 4.5 tall while the
+   vertical pair was 4 by 4 — so a left/right chevron carried a 6% longer
+   arm than an up/down one at the same `size`, and sat half a unit off the
+   viewBox's centre. Every chevron here is now the same ±4 on both axes,
+   which is what lets two of them at the same `size` actually match. */
 export function ChevronLeft({ size = 14 }: Props) {
   return (
     <svg {...base(size)}>
-      <path d="M9.5 3.5 5.5 8l4 4.5" />
+      <path d="M10 4 6 8l4 4" />
     </svg>
   );
 }
@@ -47,7 +52,7 @@ export function ChevronLeft({ size = 14 }: Props) {
 export function ChevronRight({ size = 14 }: Props) {
   return (
     <svg {...base(size)}>
-      <path d="M6.5 3.5 10.5 8l-4 4.5" />
+      <path d="M6 4 10 8l-4 4" />
     </svg>
   );
 }
@@ -94,15 +99,6 @@ export function Check({ size = 12 }: Props) {
   return (
     <svg {...base(size)} strokeWidth={2}>
       <path d="M3.5 8.5 6.5 11.5 12.5 4.5" />
-    </svg>
-  );
-}
-
-/** The up/down pair on the expiry trigger. */
-export function Stepper({ size = 12 }: Props) {
-  return (
-    <svg {...base(size)} strokeWidth={1.7}>
-      <path d="M5 6.4 8 3.4l3 3M5 9.6l3 3 3-3" />
     </svg>
   );
 }

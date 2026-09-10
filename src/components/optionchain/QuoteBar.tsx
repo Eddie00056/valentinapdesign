@@ -2,18 +2,13 @@ import type React from "react";
 import { type Underlying } from "./types";
 import { formatCurrency, formatSignedPercent } from "./format";
 import { Search } from "./icons";
-import { Rolling } from "../shared/RollingNumber";
 
 /**
  * Symbol and price.
  *
- * The price is the options strategy builder's Bid/Ask treatment: 12px/400
- * tabular figures that odometer-roll digit by digit on a 300/30 spring,
- * from the shared `Rolling`. Same component, so the two pages tick
- * identically.
- *
- * The ladder below deliberately does NOT roll — fifty-odd figures
- * rotating at once reads as churn. One price up here does not.
+ * The price keeps the options strategy builder's Bid/Ask type — 12px/400
+ * tabular figures at zero letter-spacing — but not its odometer. Nothing
+ * on this widget rotates as it changes now; figures update in place.
  */
 export function QuoteBar({
   underlying,
@@ -34,20 +29,25 @@ export function QuoteBar({
 
   return (
     <div className="oc-quote">
-      {/* Symbol is fixed for this study — the field is shown in its
-          disabled state rather than hidden, so the chrome still reads as
-          a searchable chain. */}
-      <span className="oc-search" aria-disabled="true">
-        <Search size={12} />
-        {underlying.symbol}
-      </span>
+      {/* Symbol and price share one pill. They were two, and the seam
+          between them was doing no work: what a chain is showing and what
+          that underlying costs are one statement, read left to right. The
+          field keeps the search affordance at its head. */}
+      <span className="oc-quote-id">
+        {/* Symbol is fixed for this study — shown in its disabled state
+            rather than hidden, so the chrome still reads as a searchable
+            chain. */}
+        <span className="oc-search" aria-disabled="true">
+          <Search size={14} />
+          {underlying.symbol}
+        </span>
 
-      <span className="oc-quote-box">
-        <Rolling className="oc-quote-px" value={`$${formatCurrency(price)}`} />
-        <span className={`oc-quote-chg ${isUp ? "oc-up" : "oc-down"}`}>
-          <Rolling
-            value={`${isUp ? "+" : "−"}$${formatCurrency(Math.abs(change))} ${formatSignedPercent(changePct)}`}
-          />
+        <span className="oc-quote-box">
+          <span className="oc-quote-px oc-num">${formatCurrency(price)}</span>
+          <span className={`oc-quote-chg oc-num ${isUp ? "oc-up" : "oc-down"}`}>
+            {isUp ? "+" : "−"}${formatCurrency(Math.abs(change))}{" "}
+            {formatSignedPercent(changePct)}
+          </span>
         </span>
       </span>
 

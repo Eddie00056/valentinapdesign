@@ -1,4 +1,5 @@
 import type React from "react";
+import { useEffect, useRef } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
 import {
   type ChainRow as ChainRowData,
@@ -8,22 +9,11 @@ import {
 } from "./types";
 import { formatCount, formatCurrency, formatPercent } from "./format";
 import { DURATION, EASING, LADDER_SPRING } from "./motion";
-import { useQuoteFlash } from "./useQuoteFlash";
 import { ChevronRight } from "./icons";
 
-/* Each header takes its column's own alignment, the way Robinhood's chain
-   does: the strike reads from the left, the plain figures right-align onto
-   the same edge their digits stack on, and the two pill columns centre
-   over their pills. A header that doesn't share its values' alignment
-   stops reading as that column's label. */
-const COLUMNS = [
-  { label: "Strike", align: "start" },
-  { label: "Volume", align: "end" },
-  { label: "Open interest", align: "end" },
-  { label: "IV", align: "center" },
-  { label: "Bid", align: "center" },
-  { label: "Ask", align: "center" },
-] as const;
+/* Everything reads from the left — label and figure share one edge in
+   every column, so a header always sits directly over its own values. */
+const COLUMNS = ["Strike", "Volume", "Open int.", "IV", "Bid", "Ask"] as const;
 
 function quoteFor(row: ChainRowData, side: OptionSide): OptionQuote {
   return side === "call" ? row.call : row.put;
@@ -103,8 +93,6 @@ function Row({
   onToggle: () => void;
 }) {
   const quote = quoteFor(row, side);
-  const bidFlash = useQuoteFlash(quote.bid);
-  const askFlash = useQuoteFlash(quote.ask);
 
   return (
     <>
@@ -122,25 +110,19 @@ function Row({
         </span>
         <span className="oc-cell oc-num">{formatCount(quote.volume)}</span>
         <span className="oc-cell oc-num">{formatCount(quote.openInterest)}</span>
-        <span className="oc-cell oc-cell--mid oc-num">
+        <span className="oc-cell oc-num">
           {formatPercent(quote.iv, 2)}
         </span>
         {/* The pills are their own targets: a click on a price is a
             price action, not a request to open the row. Swallowing it
             here keeps the rest of the row expanding as before. */}
         <span className="oc-cell oc-cell--pill" onClick={swallow}>
-          <span
-            className="oc-pill oc-pill--bid oc-num"
-            data-flash={bidFlash ?? undefined}
-          >
+          <span className="oc-pill oc-pill--bid oc-num">
             ${formatCurrency(quote.bid)}
           </span>
         </span>
         <span className="oc-cell oc-cell--pill" onClick={swallow}>
-          <span
-            className="oc-pill oc-pill--ask oc-num"
-            data-flash={askFlash ?? undefined}
-          >
+          <span className="oc-pill oc-pill--ask oc-num">
             ${formatCurrency(quote.ask)}
           </span>
         </span>
@@ -183,10 +165,10 @@ interface ChainTableProps {
  * no scroll — the whole ladder is on screen at once, so the eye compares
  * strikes by position rather than by scrolling.
  *
- * Figures update in place, without a per-digit roll. Fifty-odd numbers
- * all rotating at once read as the table churning rather than as a market
- * moving; the tick flash on bid and ask carries what actually changed, and
- * tabular figures keep the columns from shivering as digits swap.
+ * Figures update in place: no per-digit roll, and no flash behind them.
+ * Fifty-odd numbers rotating or lighting up at once read as the table
+ * churning rather than as a market moving. Tabular figures keep the
+ * columns from shivering as digits swap, and that is the whole treatment.
  *
  * Nothing here remounts on a side or expiry change. The ladder is
  * anchored, so the same eleven strikes are on screen either way — only
@@ -208,6 +190,55 @@ export function ChainTable({
 }: ChainTableProps) {
   const reduce = useReducedMotion();
   const spring = reduce ? { duration: 0 } : LADDER_SPRING;
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  /* Open centred on the money. The ladder runs well past the widget in
+     both directions, and the strikes worth seeing first are the ones
+     around spot — landing at the top would show eleven strikes nobody is
+     trading. Runs once per expiry, not on every tick. */
+  useEffect(() => {
+    let frame = 0;
+    let tries = 0;
+
+    /* Deferred to a frame, and retried until it takes.
+       
+       Running straight from the effect landed on a scroller that had not
+       been laid out yet — clientHeight 0, so the delta computed to
+       nothing and the ladder opened pinned to $230 with the money 165px
+       below the fold. Waiting a frame is usually enough; the retry covers
+       the hydration order not being guaranteed. */
+    const centre = () => {
+      const box = scrollRef.current;
+      const line = box?.querySelector<HTMLElement>(".oc-spot");
+      if (!box || !line) return;
+
+      if (box.clientHeight === 0 && tries < 10) {
+        tries += 1;
+        frame = requestAnimationFrame(centre);
+        return;
+      }
+
+      /* Measured from rects, not offsetTop: the line is positioned, and
+         its offsetParent is the card rather than this scroller, so
+         offsetTop overshoots and pins the ladder to its bottom. */
+      const lineBox = line.getBoundingClientRect();
+      const viewBox = box.getBoundingClientRect();
+      const delta =
+        lineBox.top + lineBox.height / 2 - (viewBox.top + viewBox.height / 2);
+      box.scrollTop += delta;
+
+      /* A sub-pixel remainder is the spot line's own half-pixel, not a
+         failure — anything larger means the scroll did not stick, so try
+         again next frame. */
+      if (Math.abs(delta) > 1 && tries < 10) {
+        tries += 1;
+        frame = requestAnimationFrame(centre);
+      }
+    };
+
+    frame = requestAnimationFrame(centre);
+    return () => cancelAnimationFrame(frame);
+  }, [expiry.id, side]);
 
   /* Rows descend through price, so the line belongs just above the first
      strike that spot has not cleared. Crossing a strike changes this
@@ -240,14 +271,19 @@ export function ChainTable({
   return (
     <div className="oc-table">
       <div className="oc-grid oc-head" role="row">
-        {COLUMNS.map((c) => (
-          <span key={c.label} className={`oc-cell oc-cell--h-${c.align}`}>
-            {c.label}
+        {COLUMNS.map((c, i) => (
+          <span
+            key={c}
+            className={`oc-cell${i === 0 ? " oc-cell--strike" : ""}`}
+          >
+            {c}
           </span>
         ))}
       </div>
 
-      <LayoutGroup id={`ladder-${expiry.id}`}>{ladder}</LayoutGroup>
+      <div className="oc-scroll" ref={scrollRef}>
+        <LayoutGroup id={`ladder-${expiry.id}`}>{ladder}</LayoutGroup>
+      </div>
     </div>
   );
 }
@@ -270,9 +306,7 @@ function SpotLine({
 }) {
   return (
     <motion.div className="oc-spot" role="separator" layout="position" transition={spring}>
-      <span className="oc-spot-inner">
-        <span className="oc-spot-pill oc-num">${formatCurrency(spot)}</span>
-      </span>
+      <span className="oc-spot-pill oc-num">${formatCurrency(spot)}</span>
     </motion.div>
   );
 }
