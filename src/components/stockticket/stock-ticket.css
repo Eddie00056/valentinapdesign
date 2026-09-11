@@ -20,22 +20,30 @@
 
 /* ---------- where the card sits ---------- */
 
-/* Centred in the page, against .ob-stage's `start`.
+/* Centred in the page, against .ob-stage's `start`, and lifted a little
+   off that centre.
 
-   That `start` exists so a card whose height changes does not re-anchor
-   its whole position — add a leg to the options ticket and, centred,
+   `start` exists so a card whose height changes does not re-anchor its
+   whole position — add a leg to the options ticket and, centred,
    everything above it shifts too. It is the right call there. Here the
    confirmation is the taller of the two surfaces and it is centred on the
    card, so a card pinned near the top put the panel's head up against the
-   window's. Centred, the pair sits in the middle of the page and the
-   panel opens into space it already had.
+   window's.
 
-   The cost is the one that rule was written about: the card does move by
-   half its own growth when a price row or an attachment opens. Deliberate
-   — those are occasional, considered acts on this ticket, where a leg on
-   the options one is the main loop. */
+   `safe` is what makes the centring survive a card too tall for the
+   window: with it, an item that would overflow its area aligns to the
+   START instead of overflowing equally in both directions. Without it, a
+   ticket with a bracket and special instructions open on a 700px window
+   loses its head off the top of the screen — which is exactly what
+   happened.
+
+   48 of vertical padding, not .ob-stage's 96. That 96 is air around a
+   card sitting at the top of a page; this one is centred and lifted, so
+   the same 96 only narrows the box it is being centred in and brings the
+   overflow case on sooner. */
 .st-stage {
-  align-items: center;
+  align-items: safe center;
+  padding-block: 48px;
 }
 
 /* ---------- the card's own inset ---------- */
@@ -1160,17 +1168,25 @@
    trapped in it together, with the card above the thing meant to dim it. */
 .st-stage .st-deck {
   position: relative;
-  /* And lifted a fifth of the window off centre.
+  /* Lifted 12% of the window off centre — as MARGIN, not as an offset.
 
-     Centred exactly, the card sat low for what it is — a ticket is read
-     top-down and the eye starts above the middle, so dead centre leaves
-     more air above it than the composition wants. A relative offset
-     rather than a transform or a margin: it moves the card and the panel
-     anchored inside it without touching the layout, without creating the
-     stacking context that would trap the scrim, and without turning the
-     fixed scrim and toast into absolute ones the way a transform here
-     would. */
-  top: -20dvh;
+     A ticket is read top-down and the eye starts above the middle, so
+     dead centre leaves more air above the card than the composition
+     wants. This was `top: -20dvh`, which is a paint offset: the card
+     moved and its layout box did not, so on a short window a tall ticket
+     was pushed off the top of the screen with no way to scroll to it —
+     there was nothing there to scroll TO.
+
+     A bottom margin moves it the same way and is real. Grid centres an
+     item's MARGIN box, so half of this is the lift; the other half is a
+     box the stage has to make room for, which means the page grows and
+     scrolls the moment the card stops fitting. With `safe center` above,
+     the lift then gives itself up before anything is ever cut off.
+
+     Not a transform, which would move it the same way but create a
+     stacking context that trapped the scrim under the card, and turn the
+     fixed scrim and toast into absolutely positioned ones. */
+  margin-bottom: 24dvh;
 }
 
 /* Centred on the WIDGET, not on the window.
@@ -1191,7 +1207,10 @@
   inset: 0;
   z-index: 51;
   display: flex;
-  align-items: center;
+  /* `safe` again: the panel is taller than the card it is centred on, so
+     on a short window it degrades to sharing the card's top edge and
+     growing downward rather than losing its head. */
+  align-items: safe center;
   justify-content: center;
   pointer-events: none;
 }
