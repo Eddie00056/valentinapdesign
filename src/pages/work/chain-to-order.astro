@@ -1,0 +1,45 @@
+---
+import Bare from "../../layouts/Bare.astro";
+import { ChainToTicket } from "../../components/chaintoticket/ChainToTicket";
+---
+
+<Bare title="Chain to order" bg="#0b0b0d">
+  <ChainToTicket client:load />
+
+  <a class="oc-back" href="/" aria-label="Back to home">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M12.0833 15L7.08325 10L12.0833 5"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </a>
+
+  <style is:global>
+    html,
+    body {
+      /* The screen is a fixed object centred in the viewport; the page
+         behind it does not scroll. */
+      overflow: hidden !important;
+      height: 100%;
+    }
+
+    /* Clear of the workspace rail, which owns the top-left corner now. */
+    .oc-back {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 5;
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: #1a1c1f;
+      color: #e8ebe9;
+      text-decoration: none;
+    }
+  </style>
+</Bare>

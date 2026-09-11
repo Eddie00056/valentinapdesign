@@ -66,6 +66,28 @@
    4.4 below, against a padding that plainly said 4. Letting padding and
    content set the height makes the declared 4 the drawn 4. */
 .wshell-bar {
+  /* Self-contained typography, for the same reason .tpill has it.
+
+     This bar is dropped into widgets that each set their own type on the
+     shell element itself — and `.wshell` IS that element, so a rule here
+     would only tie with the host's and be decided by which stylesheet
+     loaded last. Declared on the bar instead, one level in, where it
+     always wins.
+
+     The option chain's root carries `antialiased` and a 1.3 line-height;
+     the order ticket's did not, so the same title rendered visibly
+     lighter in one than the other — which reads as a different font
+     weight, not a different smoothing mode. Everything that decides how
+     this bar's text looks is stated here, so the chrome renders
+     identically wherever it is used. */
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -77,10 +99,47 @@
   /* Only bites when something varied sits behind the card, but it costs
      nothing over a flat shell and keeps the treatment honest. */
   backdrop-filter: blur(18px) saturate(1.15);
-  -webkit-backdrop-filter: blur(18px) saturate(1.15);
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
+
+/* The grip and the title travel together at the head of the bar. */
+.wshell-lead {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+/* The drag handle.
+
+   Offset so the DOTS, not the plate, land on the card's left line. The
+   bar already insets 4; the glyph is 5.9 of ink centred in a 14 box, so
+   it carries 4.07 of bearing on that side and the plate has to start 1.93
+   further left than the line it is meeting. Same accounting the order
+   ticket's "+ Add call" uses for its plus — a filled chip's edge is its
+   ink, an icon's is not.
+
+   4 + 1.93 + 4.07 = 10, which is where the title's ink used to sit and
+   where every field in the body below still starts. */
+.wshell-grip {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  margin-left: 1.93px;
+  color: #e8ebe9;
+  opacity: 0.55;
+  cursor: grab;
+  /* A drag that starts here must not also select the title beside it. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: opacity 0.14s ease;
+}
+
+/* Quieter at rest than the pop-out and close plates opposite: those are
+   things to do, this is a place to hold. */
+.wshell-grip:hover { opacity: 0.9; }
+.wshell-grip:active { cursor: grabbing; opacity: 1; }
 
 .wshell-title {
   display: flex;

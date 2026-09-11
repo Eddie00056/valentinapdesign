@@ -19,9 +19,53 @@ function quoteFor(row: ChainRowData, side: OptionSide): OptionQuote {
   return side === "call" ? row.call : row.put;
 }
 
-/** Stops a click inside a bid/ask cell from reaching the row button. */
-function swallow(e: React.MouseEvent) {
-  e.stopPropagation();
+/**
+ * A price cell: the whole cell is the target, not the chip inside it.
+ *
+ * The chip is 42 x 20 and the cell it sits in is up to 94 x 30 — so under
+ * half of what reads as "the price" was actually clickable, and the rest
+ * was worse than inert: the cell stopped the click to keep the row from
+ * expanding, so a press a few pixels off the chip did nothing at all. It
+ * looked exactly like a click that had not registered, and the fix people
+ * reach for is to click again — which, on a quote already taken, takes it
+ * back off.
+ *
+ * The handler lives here and the chip is only paint.
+ */
+function PriceCell({
+  tone,
+  value,
+  picked,
+  onPick,
+  label,
+}: {
+  tone: "bid" | "ask";
+  value: string;
+  picked: boolean;
+  onPick?: () => void;
+  label: string;
+}) {
+  return (
+    <span
+      className="oc-cell oc-cell--pill"
+      role={onPick ? "button" : undefined}
+      aria-label={onPick ? label : undefined}
+      aria-pressed={onPick ? picked : undefined}
+      onClick={(e) => {
+        /* Always, even with nothing to pick: a click on a price is about
+           the price, and must not open the row underneath it. */
+        e.stopPropagation();
+        onPick?.();
+      }}
+    >
+      <span
+        className={`oc-pill oc-pill--${tone} oc-num`}
+        data-picked={picked || undefined}
+      >
+        {value}
+      </span>
+    </span>
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -84,13 +128,21 @@ function Detail({ label, value }: { label: string; value: string }) {
 function Row({
   row,
   side,
+  expiry,
   isOpen,
   onToggle,
+  onPick,
+  picked,
 }: {
   row: ChainRowData;
   side: OptionSide;
+  /** ISO date — travels with every pick made on this row. */
+  expiry: string;
   isOpen: boolean;
   onToggle: () => void;
+  onPick?: (pick: QuotePick) => void;
+  /** Which of THIS row's pills is on the ticket, if either. */
+  picked?: "bid" | "ask";
 }) {
   const quote = quoteFor(row, side);
 
@@ -113,19 +165,45 @@ function Row({
         <span className="oc-cell oc-num">
           {formatPercent(quote.iv, 2)}
         </span>
-        {/* The pills are their own targets: a click on a price is a
-            price action, not a request to open the row. Swallowing it
-            here keeps the rest of the row expanding as before. */}
-        <span className="oc-cell oc-cell--pill" onClick={swallow}>
-          <span className="oc-pill oc-pill--bid oc-num">
-            ${formatCurrency(quote.bid)}
-          </span>
-        </span>
-        <span className="oc-cell oc-cell--pill" onClick={swallow}>
-          <span className="oc-pill oc-pill--ask oc-num">
-            ${formatCurrency(quote.ask)}
-          </span>
-        </span>
+        {/* Each price is its own target, and the target is the whole
+            cell — see PriceCell. */}
+        <PriceCell
+          tone="bid"
+          value={`$${formatCurrency(quote.bid)}`}
+          picked={picked === "bid"}
+          label={`Sell ${row.strike} ${side} at ${formatCurrency(quote.bid)}`}
+          onPick={
+            onPick &&
+            (() =>
+              onPick({
+                strike: row.strike,
+                kind: side,
+                /* You SELL into the bid. The side a click implies is the
+                   whole point of picking a price off a chain. */
+                action: "sell",
+                price: quote.bid,
+                expiry,
+              }))
+          }
+        />
+        <PriceCell
+          tone="ask"
+          value={`$${formatCurrency(quote.ask)}`}
+          picked={picked === "ask"}
+          label={`Buy ${row.strike} ${side} at ${formatCurrency(quote.ask)}`}
+          onPick={
+            onPick &&
+            (() =>
+              onPick({
+                strike: row.strike,
+                kind: side,
+                /* And you BUY at the ask. */
+                action: "buy",
+                price: quote.ask,
+                expiry,
+              }))
+          }
+        />
       </button>
 
       <AnimatePresence initial={false}>
@@ -149,6 +227,19 @@ function Row({
 /* Table                                                               */
 /* ------------------------------------------------------------------ */
 
+/** What a click on a bid or an ask says. */
+export type QuotePick = {
+  strike: number;
+  kind: OptionSide;
+  action: "buy" | "sell";
+  price: number;
+  /* The expiry the chain is showing, as an ISO date. The chain owns which
+     contract this is — all four of strike, side, expiry and price are
+     decided here, which is what lets the ticket beside it stop offering
+     to change any of them. */
+  expiry: string;
+};
+
 interface ChainTableProps {
   rows: ChainRowData[];
   side: OptionSide;
@@ -156,6 +247,14 @@ interface ChainTableProps {
   expiry: Expiry;
   openStrike: number | null;
   onToggleStrike: (strike: number) => void;
+  /** Given, the price pills become buttons that quote into a ticket. */
+  onPick?: (pick: QuotePick) => void;
+  /**
+   * Which quotes are on the ticket, as `strike:kind:action:expiry`. Held by
+   * whoever owns the ticket rather than by the table, so the lit pills
+   * and the ticket's legs are one fact instead of two that can drift.
+   */
+  pickedKeys?: ReadonlySet<string>;
 }
 
 /**
@@ -187,10 +286,16 @@ export function ChainTable({
   expiry,
   openStrike,
   onToggleStrike,
+  onPick,
+  pickedKeys,
 }: ChainTableProps) {
   const reduce = useReducedMotion();
   const spring = reduce ? { duration: 0 } : LADDER_SPRING;
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  /* True while the effect below is still putting the ladder on the money.
+     That is a scroll the reader did not ask for, and it must not flash
+     the scrollbar on load. */
+  const centring = useRef(true);
 
   /* Open centred on the money. The ladder runs well past the widget in
      both directions, and the strikes worth seeing first are the ones
@@ -231,6 +336,7 @@ export function ChainTable({
       /* A sub-pixel remainder is the line's own half-pixel, not a miss. */
       if (Math.abs(delta) <= 1) {
         done = true;
+        centring.current = false;
         return true;
       }
 
@@ -244,7 +350,10 @@ export function ChainTable({
     }, 50);
     /* A ceiling, so a piece that never lays out cannot leave a timer
        running for the life of the page. */
-    const ceiling = setTimeout(() => clearInterval(tick), 2000);
+    const ceiling = setTimeout(() => {
+      centring.current = false;
+      clearInterval(tick);
+    }, 2000);
 
     /* A tab that was hidden through all of the above gets one more go the
        moment it is looked at. */
@@ -257,6 +366,7 @@ export function ChainTable({
        that outlived the first scroll would yank them back to the money. */
     const abandon = () => {
       abandoned = true;
+      centring.current = false;
       clearInterval(tick);
     };
     box.addEventListener("wheel", abandon, { passive: true, once: true });
@@ -272,6 +382,30 @@ export function ChainTable({
       box.removeEventListener("keydown", abandon);
     };
   }, [expiry.id, side]);
+
+  /* The scrollbar is drawn only while the ladder is being scrolled.
+
+     A flag on the element rather than React state: this fires on every
+     scroll event, and re-rendering twenty-three rows and their layout
+     projections to paint an 8px bar would be the most expensive thing on
+     the widget. The style is in the CSS, keyed on [data-scrolling]. */
+  useEffect(() => {
+    const box = scrollRef.current;
+    if (!box) return;
+    let idle: number | undefined;
+    const onScroll = () => {
+      /* Not the opening scroll-to-the-money — nobody asked for that one. */
+      if (centring.current) return;
+      box.dataset.scrolling = "";
+      window.clearTimeout(idle);
+      idle = window.setTimeout(() => delete box.dataset.scrolling, 700);
+    };
+    box.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      box.removeEventListener("scroll", onScroll);
+      window.clearTimeout(idle);
+    };
+  }, []);
 
   /* Rows descend through price, so the line belongs just above the first
      strike that spot has not cleared. Crossing a strike changes this
@@ -291,8 +425,19 @@ export function ChainTable({
         <Row
           row={row}
           side={side}
+          expiry={expiry.date}
           isOpen={openStrike === row.strike}
           onToggle={() => onToggleStrike(row.strike)}
+          onPick={onPick}
+          picked={
+            /* The bid is the sell side and the ask the buy side — see the
+               pick handlers on the pills themselves. */
+            pickedKeys?.has(`${row.strike}:${side}:sell:${expiry.date}`)
+              ? "bid"
+              : pickedKeys?.has(`${row.strike}:${side}:buy:${expiry.date}`)
+                ? "ask"
+                : undefined
+          }
         />
       </motion.div>,
     );

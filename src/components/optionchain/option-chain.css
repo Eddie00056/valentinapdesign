@@ -41,10 +41,16 @@
 
   --row-h: 20px;
 
-  /* Total control height. The bordered controls are content-box 20px + a
-     1px rim either side; the filled ones carry no rim, so they take the
-     22px directly. Either way every pill is the same height. */
-  --ctl-h: 22px;
+  /* Total control height — 20, the height every control in these widgets
+     takes, including the order ticket's.
+
+     The bordered ones are content-box 18 plus a 1px rim either side; the
+     filled ones carry no rim and take the 20 directly. It used to be 22,
+     which left the search pill — flat, and pinned to 20 to match the
+     ticket — sitting 2px shorter than the two controls beside it. */
+  --ctl-h: 20px;
+  /* What a bordered control declares, so its rim lands on --ctl-h. */
+  --ctl-inner: 18px;
   /* The symbol-and-price pill. Fixed, and measured rather than guessed:
      the widest frame the staged price walk produces is 181.1px of
      content, plus 6 of padding either side and a pixel of slack. Re-walk
@@ -199,7 +205,7 @@
      width — "Call" is wider than "Put", and a half that resized under the
      sliding plate would make the plate resize with it. */
   width: 85.6px;
-  height: 20px;
+  height: var(--ctl-inner);
   border-radius: 6px;
   border: 1px solid rgba(254, 255, 253, 0.2);
   background: none;
@@ -216,7 +222,7 @@
   justify-content: center;
   flex: 1 1 0;
   box-sizing: border-box;
-  height: 20px;
+  height: var(--ctl-inner);
   padding: 0 6px;
   border-radius: 6px;
   font-size: 12px;
@@ -290,22 +296,61 @@
    ladder was extended, so the visible chain is unchanged and the extra
    strikes simply run off both ends. The header sits outside this box, so
    it stays put while the strikes move under it. */
+/* The ladder, and the gutter its scrollbar lives in.
+
+   NO `scrollbar-width` / `scrollbar-color` here, and that is the fix: as
+   of Chrome 121 those standard properties take precedence and the
+   ::-webkit-scrollbar rules below are ignored for any element that sets
+   them. On macOS that left the ladder with the platform's OVERLAY
+   scrollbar — a bar that takes no layout space and is drawn ON TOP of
+   the content, which is why it sat over the ask prices as soon as you
+   scrolled.
+
+   Styling the webkit pseudo-elements alone opts this scroller out of
+   overlay scrollbars: the bar becomes a classic one that takes its 8px
+   out of the content box, so it can never cover anything. That 8 is the
+   whole gutter — the thumb carries 2px of transparent border of its own
+   (see below), so it already sits off the content without this element
+   holding any padding back.
+
+   The header row is not in this scroller (it sits above it, so it does
+   not scroll away), so it has to be told to hold the same 8 back — see
+   .oc-head. Change one and change the other.
+
+   Firefox, which has no webkit pseudos, falls back to its own scrollbar.
+   It also takes layout space, so nothing is covered there either; it is
+   just wider than 8. */
 .oc-scroll {
   max-height: calc(13 * 30px + 22px);
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--chip) transparent;
 }
 
 .oc-scroll::-webkit-scrollbar { width: 8px; }
 
+/* Hidden at rest, drawn while the ladder is actually being scrolled —
+   the platform's own behaviour, kept without the platform's overlay bar
+   (which drew ON TOP of the prices; see above).
+
+   The gutter stays reserved either way: the track is always 8px of
+   layout, so the columns never shift and nothing is ever covered. Only
+   the thumb comes and goes, and `[data-scrolling]` is set by the table
+   for ~700ms after the last scroll event (see ChainTable).
+
+   A hard swap, not a fade: webkit's scrollbar pseudo-elements do not
+   honour `transition`, so an opacity ramp here would be a declaration
+   that reads as intent and renders as nothing. */
 .oc-scroll::-webkit-scrollbar-thumb {
-  background: var(--chip);
+  background: transparent;
   border-radius: 8px;
   /* Inset by a transparent border so the thumb reads as a slim bar with
      air around it rather than a block hard against the card edge. */
   border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.oc-scroll[data-scrolling]::-webkit-scrollbar-thumb {
+  background: var(--chip);
   background-clip: content-box;
 }
 
@@ -347,8 +392,12 @@
   width: 100%;
 }
 
+/* The header sits outside the scroller, so it has to reserve by hand
+   exactly what the scroller loses to its bar: 8. Without it every column
+   header would sit 8px right of the figures beneath it. */
 .oc-head {
   height: 26px;
+  padding-right: 8px;
   border-bottom: 1px solid var(--line-row);
 }
 
@@ -385,7 +434,7 @@
   transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.oc-row:hover { background: var(--itm); }
+.oc-row:hover { background: #272e30; }
 
 .oc-row-caret {
   display: inline-flex;
@@ -398,18 +447,38 @@
 .oc-row[aria-expanded="true"] .oc-row-caret { transform: rotate(90deg); }
 
 /* Bid and ask are the two tradeable numbers, so both get the chip the
-   builder puts on its own quote boxes — same 14% ground, same 6px radius.
-   The ground never changes: only the figure inside a pill updates. */
+   ORDER TICKET puts on Buy and Sell: the neutral #2c3334 plate every
+   control in both widgets stands on, with the side's colour carried by
+   the figure alone.
+
+   They used to sit on a 14% tint of their own colour, which made two
+   coloured columns running the length of the table — the eye read the
+   bands before it read any number in them, and the tint was saying the
+   same thing the ink already said. On the neutral plate the colour is
+   only where the value is, and a bid here now looks like the Sell chip it
+   turns into on the ticket. The ground never changes: only the figure
+   inside a pill updates. */
 /* The pill carries 7px of its own inset, so the cell contributes 5 — the
    figure inside then starts on the same 12px edge as every other column,
    and the header lands over the number rather than over the chip. */
-.oc-cell--pill { padding-left: 5px; }
+.oc-cell--pill {
+  padding-left: 5px;
+  /* The target is this box. The chip inside it is paint — it must not
+     take the pointer away from the box that handles it, and it must not
+     be the only part of the cell that answers. */
+  cursor: pointer;
+}
+
+.oc-cell--pill:focus-visible { outline: none; }
 
 .oc-pill {
   position: relative;
   display: inline-flex;
   align-items: center;
-  justify-content: flex-end;
+  /* Left, so every value starts on one line down the column. It used to be
+     right-aligned, which lined up the last character instead — sensible
+     for a column of totals, wrong for a column you click. */
+  justify-content: flex-start;
   /* Fixed box, contents right-aligned.
 
      DM Sans as served by Google Fonts has NO tabular figures — the pill
@@ -433,7 +502,12 @@
      because the digits are proportional, "$0.00" is the wide one at 41px
      while "$5.01" only needs 37. */
   width: 42px;
-  padding: 1px 4px;
+  /* 20 tall, like every other control in this widget and the ticket — the
+     chip it is modelled on is the ticket's own Buy/Sell at that height.
+     It was content-sized at 17.6, which on a 30px row read as a label
+     rather than a target. */
+  height: 20px;
+  padding: 0 4px;
   border-radius: 6px;
   background: var(--pill-bg);
   color: var(--pill-fg);
@@ -444,7 +518,7 @@
 
 /* Press feedback, same as the title-bar icons and the glass button set's
    `.btn--mobile:active` — 0.97 / 0.92 over 0.14s. */
-.oc-pill:active {
+.oc-cell--pill:active .oc-pill {
   transform: scale(0.97);
   opacity: 0.92;
 }
@@ -469,17 +543,64 @@
   transition: opacity 0.22s ease;
 }
 
-.oc-pill:hover::before,
+.oc-cell--pill:hover .oc-pill::before,
+.oc-cell--pill:focus-visible .oc-pill::before,
 .oc-row:focus-visible .oc-pill::before { opacity: 1; }
 
+/* Picked — this quote is the one on the ticket.
+
+   The Call/Put selector's own selected recipe: an atl/primary/900 plate
+   inside a rim of the accent. The value keeps its own colour rather than
+   turning mint with the rim, because red-versus-green is what tells a bid
+   from an ask, and a picked bid is still a bid.
+
+   The rim takes `--pill-fg` — the side's own colour — for the same
+   reason: a picked bid wears red, a picked ask green. A mint rim on both
+   made the two sides' selected state identical, which is the one state
+   where telling them apart matters most: it is the leg now sitting on the
+   ticket, and that leg is a Sell or a Buy. */
+.oc-pill[data-picked] { background: var(--primary-900); }
+
+.oc-pill[data-picked]::before {
+  opacity: 1;
+  border-color: var(--pill-fg);
+}
+
+/* Hover — the quote you are about to take.
+
+   Its own accent, solid, with the label knocked out in black. `--pill-fg`
+   is already the side's colour, so one rule serves both: a bid fills red
+   and an ask green, and neither has to name a value the other doesn't.
+
+   The ring goes: against a solid fill of the same colour it is invisible
+   anyway, and the fill is a louder statement than the ring was ever
+   making. Placed after `[data-picked]` deliberately — hovering the quote
+   already on the ticket should still show what a click would take. */
+/* Keyed off the CELL, not the chip: the cell is the target now, so the
+   whole of it has to answer the pointer — a chip that only lights when
+   the cursor is over the chip itself would still be telling you the
+   target is 42px wide. */
+.oc-cell--pill:hover .oc-pill,
+.oc-cell--pill:focus-visible .oc-pill {
+  background: var(--pill-fg);
+  color: #000000;
+}
+
+.oc-cell--pill:hover .oc-pill::before,
+.oc-cell--pill:focus-visible .oc-pill::before { opacity: 0; }
+
+/* Both sides stand on the same plate — the ticket's `--chip`. Only
+   `--pill-fg` differs, and it is what the hover fill and the ring are
+   drawn from, so red-versus-green still separates a bid from an ask
+   everywhere it matters. */
 .oc-pill--bid {
-  --pill-bg: rgba(255, 85, 125, 0.14);
+  --pill-bg: #2c3334;
   --pill-fg: var(--down);
   --pill-ring: rgba(255, 85, 125, 0.5);
 }
 
 .oc-pill--ask {
-  --pill-bg: rgba(72, 213, 151, 0.14);
+  --pill-bg: #2c3334;
   --pill-fg: var(--up);
   --pill-ring: rgba(72, 213, 151, 0.5);
 }
@@ -584,7 +705,7 @@
   justify-content: center;
   gap: 2px;
   box-sizing: content-box;
-  height: 20px;
+  height: var(--ctl-inner);
   /* 6, the widget's one inner inset — the same 6 the search pill carries,
      the same 6 every table cell puts before its figure. */
   padding-inline: 6px;
@@ -646,7 +767,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .oc-pill:active { transform: none; }
+  .oc-cell--pill:active .oc-pill { transform: none; }
   .oc-glow { animation: none; opacity: 0; }
 
   .oc-root *,

@@ -130,4 +130,15 @@ export const pieces: Piece[] = [
     previewWidth: 1120,
     previewHeight: 620,
   },
+  {
+    slug: "chain-to-order",
+    href: "/work/chain-to-order",
+    title: "Chain to order",
+    /* The workspace's own 1440 x 900, so the preview frames the screen
+       exactly as the piece draws it — the shell contain-fits itself into
+       whatever it is given, and at this size it lands just under 1:1 with
+       its 40px of air still around it. */
+    previewWidth: 1440,
+    previewHeight: 900,
+  },
 ];

@@ -1,0 +1,79 @@
+/* Two widgets on one page.
+
+   Both bring their own card, their own width and their own background, so
+   this file only has to decide where they sit relative to each other. */
+
+/* The pair sits on the workspace canvas now, which owns the page's ground
+   and its own scrolling — so this is only the arrangement of the two
+   widgets on it, not a page layout. */
+.ctt {
+  min-height: 100%;
+  display: flex;
+  align-items: flex-start;
+  /* Left, not centred. The canvas is a grid and the widgets sit ON it —
+     centred, their left edge lands wherever the viewport's width happens
+     to put it, which is on a dot only by accident. From the left, the
+     padding below decides, and it is a multiple of the grid. */
+  justify-content: flex-start;
+  /* 4 — the ticket snaps to the chain's edge rather than floating near
+     it. They are not two things you happen to have open: the ticket is
+     written on the price you just clicked in the chain, and at 20 the two
+     read as separate panels that had to be related by an argument. At 4
+     the pair reads as one surface with a seam, and the seam is the same 4
+     the widget shell puts around its own title bar.
+
+     Their tops already line up — `align-items: flex-start` above, and the
+     ticket's column starts its card at the top edge — so the join runs
+     the full height of the shorter card. */
+  gap: 4px;
+  /* Both multiples of the canvas's 24px grid, so the chain's top-left
+     corner starts on a dot and everything snapped from there stays on
+     one. */
+  padding: 48px 24px;
+  box-sizing: border-box;
+}
+
+/* The ticket's column is reserved whether or not a ticket is in it.
+
+   Dismissing the ticket used to let the pair re-centre, which slid the
+   chain sideways — the widget you did not touch moving because of one you
+   did. The column holds its width instead, and the chain stays where it
+   was.
+
+   357 is .ob-shell's own width. It is restated rather than shared
+   because that number is declared inside .ob-stage, which lives in this
+   column — change one and change the other. */
+.ctt-ticket {
+  flex: 0 0 357px;
+  align-self: stretch;
+}
+
+/* The builder ships its own full-height stage — it is normally the only
+   thing on its page. Here it is a column, so that is undone. */
+.ctt-ticket .ob-stage {
+  min-height: 0;
+  padding: 0;
+  background: none;
+}
+
+/* The chain's page does the same. */
+.ctt-chain > * { margin: 0; }
+
+/* The chain's own stylesheet already makes the whole price cell the
+   target and gives it the cursor, so there is nothing left for this page
+   to say about it. */
+
+@media (max-width: 1040px) {
+  .ctt {
+    flex-direction: column;
+    align-items: center;
+    padding-top: 48px;
+  }
+
+  /* Stacked, there is no sideways drift to prevent and the reservation
+     would just be a tall empty gap. */
+  .ctt-ticket {
+    flex: 0 0 auto;
+    align-self: auto;
+  }
+}

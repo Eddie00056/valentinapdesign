@@ -3,7 +3,7 @@ import type React from "react";
 import { motion } from "motion/react";
 import { WidgetShell } from "../shared/WidgetShell";
 import { QuoteBar } from "./QuoteBar";
-import { ChainTable } from "./ChainTable";
+import { ChainTable, type QuotePick } from "./ChainTable";
 import { ExpiryPicker } from "./ExpiryPicker";
 import { useChainState } from "./useChainState";
 import { pxHub } from "../alertscreen/priceHub";
@@ -54,12 +54,42 @@ const PREV_CLOSE = SPOT_SEQ[0] - UNDERLYING.change;
    shrinking. It is the control row: symbol, price, Call/Put and the
    expiry are fixed widths that total about 550, so below this they start
    to crowd each other. */
-const MIN_W = 560;
-const MAX_W = 1100;
-const DEFAULT_W = 590;
+/* All three carry the width the ladder now holds back for its scrollbar
+   (see .oc-scroll), so the six columns keep the measure they were drawn
+   at rather than paying for the gutter out of their own width.
+
+   600 rather than the 598 that reservation strictly needs: it is 25 of
+   the workspace canvas's 24px grid units, so the card's right edge lands
+   on a dot. The spare 2 falls into the five flexible columns, 0.4px
+   each. */
+const MIN_W = 570;
+const MAX_W = 1110;
+const DEFAULT_W = 600;
 
 export interface OptionChainProps {
   onClose?: () => void;
+  /**
+   * Given, the title bar grows a drag grip and this fires when it is
+   * taken hold of. The widget does not move itself — whoever placed it on
+   * the page decides where it can go. Same contract as the order
+   * ticket's, because it is the same title bar.
+   */
+  onGrip?: (e: React.PointerEvent) => void;
+  /** Given, a click on a bid or ask quotes it into a ticket. */
+  onPick?: (pick: QuotePick) => void;
+  /** Which quotes are on that ticket — see ChainTable. */
+  pickedKeys?: ReadonlySet<string>;
+  /**
+   * The underlying this chain is showing, on every tick. Given, a ticket
+   * beside it can quote the same symbol at the same price instead of
+   * running its own.
+   */
+  onSpotChange?: (u: {
+    symbol: string;
+    price: number;
+    change: number;
+    changePct: number;
+  }) => void;
 }
 
 /**
@@ -69,7 +99,13 @@ export interface OptionChainProps {
  * (quote), what you would trade (call/put, expiry), then the strike
  * ladder.
  */
-export function OptionChain({ onClose }: OptionChainProps) {
+export function OptionChain({
+  onClose,
+  onGrip,
+  onPick,
+  pickedKeys,
+  onSpotChange,
+}: OptionChainProps) {
   const [tick, setTick] = useState(0);
   const [width, setWidth] = useState(DEFAULT_W);
   const rootRef = useRef<HTMLElement | null>(null);
@@ -91,6 +127,18 @@ export function OptionChain({ onClose }: OptionChainProps) {
   const state = useChainState(spot, tick);
 
   const change = spot - PREV_CLOSE;
+
+  /* Published on every step of the walk, so anything beside this widget
+     can show the same underlying rather than a second one. */
+  useEffect(() => {
+    onSpotChange?.({
+      symbol: UNDERLYING.symbol,
+      price: spot,
+      change,
+      changePct: change / (spot - change),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spot]);
 
   /* The widget is centred, so width is driven from the pointer's distance
      to its centre rather than from a delta. That way the edge sits under
@@ -144,6 +192,7 @@ export function OptionChain({ onClose }: OptionChainProps) {
       title="Options chain"
       className="oc-root"
       onClose={onClose}
+      onGrip={onGrip}
       innerRef={rootRef}
       style={{ width }}
     >
@@ -176,6 +225,8 @@ export function OptionChain({ onClose }: OptionChainProps) {
           expiry={state.expiry}
           openStrike={state.openStrike}
           onToggleStrike={state.toggleStrike}
+          onPick={onPick}
+          pickedKeys={pickedKeys}
         />
       </div>
 

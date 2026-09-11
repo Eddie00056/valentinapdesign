@@ -1,5 +1,10 @@
 import { useState } from "react";
-import type { CSSProperties, ReactNode, Ref } from "react";
+import type {
+  CSSProperties,
+  PointerEvent as ReactPointerEvent,
+  ReactNode,
+  Ref,
+} from "react";
 import "./widget-shell.css";
 
 /* The two glyphs the bar needs, on the same 16px grid / 1.6 stroke as the
@@ -42,6 +47,31 @@ export function Close({ size = 14 }: { size?: number }) {
   );
 }
 
+/** The drag grip: two columns of three dots.
+
+    Matched to the exported asset — 12px dots on an 18px pitch in a 72px
+    box — restated on the 16-unit grid the rest of the icon set uses:
+    72/16 = 4.5, so r 1.33 at cx 5.9/9.9 and cy 3.9/7.9/11.9, rounded onto
+    whole units where it lands within a tenth. */
+function Grip() {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden
+      focusable={false}
+    >
+      {[4, 8, 12].map((cy) =>
+        [6, 10].map((cx) => (
+          <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.35" />
+        )),
+      )}
+    </svg>
+  );
+}
+
 export interface WidgetShellProps {
   /** Shown in the bar. Also names the region for assistive tech. */
   title: string;
@@ -52,6 +82,13 @@ export interface WidgetShellProps {
   onClose?: () => void;
   /** For consumers that measure the card — the chain sizes a drag from it. */
   innerRef?: Ref<HTMLElement>;
+  /**
+   * Given, a grip appears at the head of the bar and this fires on
+   * pointerdown over it. The shell does not move anything itself — the
+   * consumer owns where its card sits, so it owns the drag; all this does
+   * is offer the handle and say when it was taken hold of.
+   */
+  onGrip?: (e: ReactPointerEvent) => void;
 }
 
 /**
@@ -70,6 +107,7 @@ export function WidgetShell({
   style,
   onClose,
   innerRef,
+  onGrip,
 }: WidgetShellProps) {
   /* Bumping this remounts the glow span, which restarts its one-shot
      keyframe — the same replay trick the order-placed animation uses. */
@@ -83,7 +121,20 @@ export function WidgetShell({
       ref={innerRef}
     >
       <header className="wshell-bar">
-        <h2 className="wshell-title">{title}</h2>
+        <div className="wshell-lead">
+          {onGrip && (
+            <span
+              className="wshell-grip"
+              role="button"
+              tabIndex={-1}
+              aria-label="Drag this widget"
+              onPointerDown={onGrip}
+            >
+              <Grip />
+            </span>
+          )}
+          <h2 className="wshell-title">{title}</h2>
+        </div>
         <div className="wshell-actions">
           <button
             type="button"

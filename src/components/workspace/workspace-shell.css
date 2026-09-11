@@ -1,0 +1,217 @@
+/* The application frame: a workspace rail and the canvas beside it.
+
+   Every number is measured off "Component - GlobalShell - Empty state"
+   exported at 3x, so the export's pixels divide by three:
+
+     rail          192 wide  -> 64,   ground rgb(27,29,30)  = #1B1D1E
+     tab plate     112 sq    -> 36,   ground rgb(36,38,39)  = #242627
+     tab radius    19.3      -> 6     (circle-fit, the house radius)
+     glyph         54        -> 18,   rgb(72,213,151)       = #48D597
+     logo          88 x 70   -> 30 x 24
+     dot pitch     72        -> 24,   rgb(31,38,40)         = #1F2628
+     rail inset    44        -> 14    (64 - 36 - 14 = 14, so: centred)
+     logo -> tabs  96        -> 32
+     tab -> tab    48        -> 16
+
+   The greens are the ones already in this codebase: the tab glyph is
+   --up (#48d597), and the mark at the top is its own darker #3da542. */
+
+/* The page the screen sits on. Deliberately a different, cooler dark than
+   anything inside the frame, so the frame reads as an object resting on a
+   surface rather than as the page's own chrome. */
+.wsp-stage {
+  /* Locked to the viewport, not `min-height`: the screen inside is laid
+     out at its full 1440x900 and only then scaled, so a stage that could
+     grow would grow to fit it and there would be nothing to scale down
+     into. */
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  /* Air around the screen at every size — the mock is `contain`-fitted
+     into whatever is left. */
+  padding: 40px;
+  box-sizing: border-box;
+  overflow: hidden;
+  /* FLAT. No gradient of any kind.
+
+     This was a radial blob of light centred above the frame, then a
+     vertical ramp — and both read as colour leaking out from behind the
+     screen rather than as light falling on a surface, because the frame
+     covers nearly the whole viewport and all you see of either gradient
+     is its brightest edge hugging the frame's own edge.
+
+     One colour, and the screen's drop shadow does the lifting. That is
+     what the shadow is for. */
+  background: #0a0b0c;
+}
+
+/* The screen.
+
+   Sized in its own logical pixels and scaled to fit (see SCREEN_W in the
+   component), so the UI inside keeps real metrics at any frame size —
+   a 20px control is 20 layout pixels whether the mock is drawn at full
+   size or a third of it.
+
+   `transform-origin: center` with the stage centring it means the scale
+   happens about the middle and the frame stays put. */
+/* The object: the screen's drawn size, its corner, its clip, its shadow. */
+.wsp-screen {
+  flex: none;
+  position: relative;
+  /* The MacBook's own display corner. The clip is what makes the corner
+     actually cut the rail and the canvas rather than rounding an outline
+     over them — and it is what keeps the scaled frame inside its box. */
+  border-radius: 20px;
+  overflow: hidden;
+  background: #1b1d1e;
+  /* Lifted off the surface: one tight contact shadow and one short soft
+     one, plus a hairline of light on the top edge where a screen's bezel
+     catches the room.
+
+     THE SOFT ONE HAS A CEILING, and it is the stage's padding: 40px.
+
+     It was `0 40px 90px -20px` — offset 40 down and blurred 90, so it
+     reached about 70px past the frame. The stage is `overflow: hidden`
+     and holds only 40px around the screen, so the shadow did not fade
+     out, it was CUT — and what you saw outside the frame was the
+     shadow's own rounded rectangle, hard-edged, sitting down and to the
+     right like a second screen behind the first. On a frame that fills
+     most of the viewport there is simply nowhere for a 90px atmosphere
+     to live.
+
+     10 + 24 - 12 puts the far edge about 22px out, comfortably inside
+     the 40. Change the stage's padding and this has to be re-checked. */
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.5),
+    0 10px 24px -12px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* The screen's own contents, laid out at full size and scaled from the
+   corner so the two boxes share an origin. */
+.wsp {
+  display: flex;
+  transform-origin: top left;
+  background: #1b1d1e;
+}
+
+/* ---------- rail ---------- */
+
+.wsp-rail {
+  flex: none;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* 14 top and bottom — the same inset that centres a 36px plate in a
+     64px rail, so the column reads as one square grid inset equally on
+     every side. */
+  padding: 14px 0;
+  background: #1b1d1e;
+}
+
+.wsp-logo {
+  display: block;
+  width: 30px;
+  height: 24px;
+  /* 32 to the first workspace: twice the 16 the tabs keep from each
+     other, so the mark reads as the app rather than as the first item in
+     the list. */
+  margin-bottom: 32px;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.wsp-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wsp-tab {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: #242627;
+  color: #48d597;
+  cursor: pointer;
+  transition:
+    background-color 0.14s ease,
+    color 0.14s ease;
+}
+
+.wsp-tab:hover { background: #2e3132; }
+.wsp-tab:active { background: #363a3b; }
+
+/* The current workspace. The asset shows both tabs filled the same, so
+   this is the one piece of state it does not answer: a rim rather than a
+   different ground, which is how every other selected thing in these
+   widgets is drawn (the chain's Call/Put, a picked quote). */
+.wsp-tab[aria-current] {
+  box-shadow: inset 0 0 0 1px #48d597;
+}
+
+/* New workspace: no plate. The two above are places that exist; this is
+   an action, and giving it the same filled square would have made it look
+   like a third workspace. */
+.wsp-tab--add {
+  background: none;
+  color: #c0c3c2;
+}
+
+.wsp-tab--add:hover { background: #242627; color: #fefffd; }
+
+/* Pinned to the foot of the rail — the account is not part of the list. */
+.wsp-avatar {
+  margin-top: auto;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: #242627;
+  color: #48d597;
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+/* ---------- canvas ---------- */
+
+.wsp-canvas {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  /* Two layers: the dot grid, then the ground under it.
+
+     The ground is FLAT — the same #070f11 every widget's card is built
+     on. It carried a second radial that lifted the top-left corner "the
+     way the asset does", and on a 1440-wide canvas that blob spans most
+     of the surface: too large to read as light, large enough to read as
+     a tint spilling across the workspace. The dot grid is what says this
+     is a surface; it does not need help.
+
+     The dots are 1px of #1F2628 on a 24 grid. `background-size` sets the
+     pitch; the radial stop makes the dot, and it stops hard at 1px rather
+     than fading, so the grid stays crisp instead of turning into noise. */
+  background-color: #070f11;
+  background-image: radial-gradient(#1f2628 1px, transparent 1px);
+  background-size: 24px 24px;
+  /* Pulled back by half a tile so each dot sits at a whole multiple of 24
+     from the canvas's own origin, rather than at the centre of a tile
+     (12, 36, 60...). The widgets are placed and snapped on multiples of
+     24, so this is what puts their edges ON the dots instead of half a
+     tile off them. */
+  background-position: -12px -12px;
+}

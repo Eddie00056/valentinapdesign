@@ -17,6 +17,24 @@
    own price walk produces and set that plus a pixel. */
 
 .tpill {
+  /* Self-contained typography.
+
+     This component is dropped into widgets that each set their own type on
+     a wrapper, and it was inheriting whatever it landed in. The option
+     chain's root carries `-webkit-font-smoothing: antialiased` and a 1.3
+     line-height; the order ticket's does not — so the same pill rendered
+     visibly lighter in one than the other, which reads as a different font
+     weight rather than a different smoothing mode.
+
+     Everything that decides how the text looks is declared here, so the
+     pill renders identically wherever it is placed. */
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
   display: flex;
   align-items: center;
   /* 7 — the same gap the price keeps from its change, so the pill holds

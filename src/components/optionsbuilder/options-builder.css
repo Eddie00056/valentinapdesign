@@ -29,6 +29,21 @@
   border: 0;
   outline: none;
   font-family: inherit;
+  /* Chrome's UA sheet DECLARES `letter-spacing: normal` and
+     `line-height: normal` on <button>, and a declared value beats an
+     inherited one — so every button here silently dropped the stage's
+     0.02em tracking and 1.3 leading while every span beside it kept them.
+     Buy, Call, Option, the expiry field and the CTA were all set slightly
+     tighter than the labels they sat next to.
+
+     The option chain's own reset already does this (`.oc-root button`,
+     `letter-spacing: inherit`), which is why its segmented control and
+     expiry trigger looked right and these did not. Restored here so the
+     two widgets' buttons match.
+
+     Font SIZE is deliberately not reset — see the note above. */
+  letter-spacing: inherit;
+  line-height: inherit;
   color: inherit;
   margin: 0;
 }
@@ -39,6 +54,11 @@
   --down: #ff557d;
   --ink: #fefffd;
   --muted: #c0c3c2;
+  /* One step quieter than --muted, for text that annotates another line
+     rather than naming it — the mark/ask under the limit field, the
+     buying power under the cost. The option chain's own --faint, so the
+     two widgets read the same thing at the same weight. */
+  --faint: #9b9f9f;
   /* Field states, sampled off the Atlas state documents (Dropdown, and
      Input field — Label as Prefix / Clickable Prefix + Quantity). One
      ramp serves both: a dropdown and an input field are the same control
@@ -62,11 +82,32 @@
   --panel: #0f1719;
   --line: #242b2c;
   /* Every picker in a leg row is this wide: Qty, expiry and strike.
-     Measured off the longest of the three — "24 May 2024" is 72.5 — plus
-     the 6 each field insets by, 4 to its chevron, and the chevron's own 8.
-     It was 103.5, the Figma's number scaled, which left 11 of dead space
-     between that date and its chevron. */
-  --field-w: 96.5px;
+     Measured off the longest of the three — the widest date the expiry
+     menu offers, "25 Sep 2026" at 71.3 — plus the 6 each field insets by,
+     4 to its chevron, and the chevron's own 8. It was 103.5, the Figma's
+     number scaled, which left 11 of dead space between the date and its
+     chevron.
+
+     98, up from 96.5 when the buttons here got their 0.02em tracking back
+     (see the .ob-stage button reset). The date is a button's label, so it
+     had been rendering 1.4 tighter than the spans beside it; at the
+     correct tracking the widest label needs 97.93 and the old box would
+     have pushed its chevron out.
+
+     Carrying the days to expiry in here as well would NOT have fitted (30
+     more), which is the other reason that number belongs to the chain —
+     see ticketExpiry. */
+  --field-w: 98px;
+  /* The three order fields — quantity, limit price, time in force — are
+     one width, so their edges line up down the card.
+
+     Measured the way --field-w is, off the longest label the control can
+     ever SHOW rather than the one it opens with: "Good till cancelled" is
+     108.98 at 12px with this stage's 0.02em, and 6 + 108.98 + 4 (to the
+     chevron) + 8 (the chevron) + 6 = 133. At --field-w's 98 the default
+     "Good for day" already needed 101.2 and wrapped onto a second line
+     inside a 20px field. */
+  --line-w: 133px;
   /* The leg divider, at 60%. It runs the full width of the ticket, so it
      carries much further than the menu's short border does at the same
      value — dropped until it separates the rows without drawing a stripe
@@ -93,6 +134,17 @@
   font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 12px;
   letter-spacing: 0.02em;
+  /* Both of these exist to MATCH .oc-root, which declares the identical
+     pair. This stage and the option chain's put shared components inside
+     them — the widget shell, the ticker pill — and anything those parts
+     do not state for themselves is inherited from here. Diverge on either
+     value and the same component renders differently in the two widgets:
+     `antialiased` paints text visibly lighter, which reads as a different
+     font weight rather than a different smoothing mode. If one of these
+     two roots ever changes, change both. */
+  line-height: 1.3;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   color: var(--ink);
 }
 
@@ -103,24 +155,25 @@
    inset of 12, and the bar contributes 4 of that, so the title container
    takes the other 8. */
 .ob-shell {
-  /* Pinned to the widest row this card ever holds — the options ticket's
-     leg row — so switching to a stock ticket, which is narrower, does not
-     resize the widget under the pointer.
+  /* 357 — 420 less 15%.
 
-     Stated as the sum rather than a magic number, so it still follows
-     --field-w the way `fit-content` did:
+     420 was the sum of the leg row's own fields back when a leg was a
+     row of them: three pickers, a Buy/Sell chip, a Call/Put chip and an
+     X. Those are gone, and what is left is text, so the card was holding
+     open a measure nothing in it needed.
 
-       34  Buy/Sell        + 34  Call/Put   + 16  remove
-       3 x --field-w       (Qty, expiry, strike)
-       5 x 4               the leg row's own gaps
-       2 x 6               the legs container's padding
-       2 x 4               the card's padding
-       2 x 1               the card's border
+     What has to fit at 357, against a content box of 335 (357 less the
+     border, the card's 4 each side and the container's 6 each side):
 
-     456 was the Figma's card spec and left ~33px of dead space after the
-     remove button; fit-content fixed that but tied the width to whichever
-     ticket was open. The cap is for narrow screens. */
-  width: calc(3 * var(--field-w) + 84px + 20px + 12px + 8px + 2px);
+       leg line   "Buy to open 11 Sep 2026 $197.50 Put"   213.3
+                  + 6 + the price's 52 + 6 + the X's 16 = 293.3
+       field row  "Limit price (debit)" 105.8 + 6 + --line-w 133 = 244.8
+       payoff     three columns of 107.7, widest figure 62.2
+
+     — all measured in DM Sans at this stage's 12px / 0.02em, so the
+     tightest line still clears by 42. Narrowing further starts to crowd
+     the leg line, which is the one that grows with the contract. */
+  width: 357px;
   max-width: 100%;
   box-sizing: border-box;
   /* No override needed any more: the shell's own 4 + 6 is exactly the
@@ -164,39 +217,6 @@
    now, so the rule holds without exception. */
 
 /* ---------- ticker ---------- */
-
-/* The underlying, above the ticket. Its own band rather than a member of
-   the strategy row: what you are trading is a different question from how
-   you are trading it, and that row is already two controls wide. */
-.ob-ticker {
-  display: flex;
-  align-items: center;
-  /* The same 4 the option chain puts between its Call/Put track and its
-     expiry trigger. */
-  gap: 4px;
-  margin-bottom: 8px;
-  /* 6, so this row starts where the fields inside the containers below
-     start. Two lines run down the ticket now, exactly as they do in the
-     chain: the container surfaces at 4, and everything you can read at
-     4 + 6. This row carries no surface, so it takes the inner line. */
-  padding-inline: 6px;
-  /* Fixed, and measured against the walk this pill actually takes. DM
-     Sans has no tabular figures, so a content-sized pill resizes on most
-     ticks — and this one runs off pxHub, the site-wide clock, so it would
-     twitch continuously.
-
-     201, not the 207 this started at. That was sized for a $188–$201
-     band, which pxHub never visits: its walk is mean-reverting (±0.17 a
-     step against a 0.14 pull toward $194.29), and 200k simulated steps
-     stay inside $193.56–$195.08. The widest frame in that range is 200.5,
-     so 207 was leaving 6.5px of dead air after the last digit — visible
-     as a right inset three times the left one. */
-  --tpill-w: 201px;
-  /* 20, not the shared default of 22. That default is sized for a bordered
-     neighbour (20 of content + a 1px rim either side); here the pill sits
-     beside the flat Option chip, which is 20 all in. */
-  --tpill-h: 20px;
-}
 
 /* ---------- instrument ---------- */
 
@@ -348,47 +368,113 @@
 }
 
 .ob-legs-panel {
-  /* 8, matching the gap above the ticker and above the control row. */
-  margin-top: 8px;
+  /* None. This was 8, holding the panel off the ticker row that used to
+     sit above it. That row is gone and this is the card's first child, so
+     the 8 stacked on the card's own 8 and put 16 between the title bar
+     and the first container — against the option chain's 8 (.oc-body's
+     top padding), and these two cards are the same object. */
+  margin-top: 0;
   /* No vertical padding: every leg row brings its own 6. */
   padding: 0 6px;
 }
 
+/* The clipping box whose height the spring drives — see AutoHeight.
+
+   `block`, not a flex column. It holds exactly one child (the measured
+   box) and, as a column flex container, that child would be a flex item
+   with the default `flex-shrink: 1` — so every frame where the animated
+   height is shorter than the content, the content SQUASHED to fit
+   instead of being clipped by it. Block flow overflows, which is the
+   entire point: `overflow: hidden` then turns the overflow into a
+   top-to-bottom reveal.
+
+   `relative` because the row on its way out is positioned absolutely
+   (AnimatePresence popLayout), and it has to be placed against this box
+   rather than against the page. */
 .ob-legs {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  /* No gap. The legs are no longer separate boxes with air between them;
-     they are rows of one list, and a 1px rule does the separating (see
-     .ob-row + .ob-row). Not to be confused with .ob-row's own gap, which
-     is the field-to-field spacing INSIDE a single leg. */
-  gap: 0;
+  display: block;
 }
 
-.ob-row {
+/* One leg, as a statement rather than a form.
+
+   Two lines of text on the left — the contract, and what you are doing
+   with it — its live price on the right, and the X that takes it off.
+   Nothing in here is a control except that X. */
+.ob-leg {
   position: relative;
   display: flex;
+  /* One line, so centred. It was flex-start, from when the leg ran to two
+     lines and the price had to sit on the first of them. */
   align-items: center;
-  /* Figma (node 2899:7651): gap-4 between fields within a leg row. */
-  gap: 4px;
+  gap: 6px;
   box-sizing: border-box;
-  /* No explicit height — the 20px-tall chips inside plus this row's own
-     4px top/bottom padding give 28px naturally. An explicit height:20px
-     here (border-box) used to squeeze the content into 12px and rely on
-     Motion overriding it with an inline height:28px during the mount
-     animation; now that rows aren't height-animated any more, the row
-     sizes itself correctly without that crutch. */
   margin: 0;
   /* No side inset. The rule spans the row edge to edge, so anything held
      6px in from it reads as indented against a line it is supposed to sit
-     on — the fields take the rule's own edge instead. */
+     on — the content takes the rule's own edge instead. */
   padding: 6px 0;
 }
 
 /* The divider, and only between legs — not above the first or below the
    last. A rule that boxed the list in would just be the container again,
    drawn thinner. */
-.ob-row + .ob-row { border-top: 1px solid var(--rule); }
+.ob-leg + .ob-leg { border-top: 1px solid var(--rule); }
+
+/* What you are doing, and the contract you are doing it to, as ONE
+   sentence — the action first.
+
+   It was two stacked lines, which is how the reference sets it, and it
+   made every leg a two-line block on a card whose other rows are all one
+   line tall. Read across instead, a stack of four legs is four lines
+   rather than eight, and every one of them opens on its own verb.
+
+   No separator between the two halves: 4 — the ticket's own smallest
+   gap, and near enough a word space at this size — plus the colour
+   change at the join, which is a harder edge than any mark would be. */
+.ob-leg-main {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  margin-right: auto;
+}
+
+.ob-leg-name {
+  font-size: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* Now at 12, with the contract it shares a line with, rather than the 11
+   of the ticket's secondary register — a fragment set a size smaller
+   mid-sentence reads as a mistake, where stacked beneath it read as a
+   second rank. The colour is what carries it, and at the head of the
+   line it is the first thing read. */
+.ob-leg-act {
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* Signed, right-aligned, and a fixed box.
+
+   DM Sans as served has no tabular figures, so a content-sized price
+   resizes on most ticks — and this one sits immediately before a button,
+   which would then move under the pointer. 44 clears "$99.99" (40.9 at
+   12px); anything wider grows rather than clips. It was 52, measured
+   against a leading minus these figures no longer carry.
+
+   No height of its own any more: the row is one line and centres it. */
+.ob-leg-px {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 44px;
+  font-size: 12px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
 
 .ob-sidebtn {
   position: relative;
@@ -626,7 +712,36 @@ button.ob-chip--strike {
   box-shadow: 0 14px 28px -12px rgba(0, 0, 0, 0.7);
 }
 
-.ob-stage .ob-dd-item {
+/* THE MENU IS PORTALLED TO <body>, so nothing in here may lean on the
+   ticket.
+
+   These rules used to read `.ob-stage .ob-dd-item { color: var(--ink) }`,
+   which is two separate failures once the node is mounted at the body:
+   the descendant selector no longer matches anything, and `--ink`,
+   `--chip` and `--up` are declared ON `.ob-stage`, so even a matching
+   rule would resolve them to nothing. What rendered was a native <button>
+   in the UA's own font — a light plate with black 13.33px system text,
+   which is what an unstyled button looks like on this platform.
+
+   So: no ancestor in any selector, no custom properties, and the panel
+   states its own typography the way every other shared part on this page
+   does. The literals are the same tokens, spelled out — a portalled
+   element cannot inherit them. */
+.ob-dd-menu,
+.ob-dd-item {
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ob-dd-item {
+  appearance: none;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -635,22 +750,20 @@ button.ob-chip--strike {
   padding: 0 10px;
   background: none;
   border: 0;
-  color: var(--ink);
-  font-size: 12px;
-  font-weight: 400;
+  color: #fefffd;          /* --ink */
   white-space: nowrap;
   cursor: pointer;
   transition: background 0.12s ease;
 }
 
-.ob-stage .ob-dd-item:hover,
-.ob-stage .ob-dd-item:focus-visible {
+.ob-dd-item:hover,
+.ob-dd-item:focus-visible {
   outline: none;
-  background: var(--chip);
+  background: #2c3334;     /* --chip */
 }
 
 /* The check is the only accent in the panel. */
-.ob-stage .ob-dd-item svg { color: var(--up); flex: none; }
+.ob-dd-item svg { color: #48d597; flex: none; }
 
 /* "Qty" is a prefix sub-box, same treatment as the Limit field's "Limit $"
    label — its own bordered box with 3px horizontal / 6px vertical padding,
@@ -831,6 +944,110 @@ button.ob-chip--strike {
   flex-wrap: wrap;
 }
 
+/* The same row box, carrying a reading instead of two buttons.
+
+   `.ob-stage` prefix required: a bare class ties `.ob-add` at (0,1,0) and
+   that rule sits above this one, so the gap below would silently lose.
+
+   10, not the row's own 8 — it is the gap the footer's readings keep from
+   each other, and these are the same readings. With `.ob-quote-k`'s -6
+   pull, a label sits 4 from its value and each pair sits 10 from the
+   next. */
+/* Six readings, each its own little column: name above, figure below.
+
+   `.ob-stage` prefix required: a bare class ties `.ob-add` at (0,1,0) and
+   that rule sits above this one, so these would silently lose.
+
+   16 across, 2 down. The inline row ran at 10, which was right when the
+   pairs were `Bid: $0.29` and the colon did the joining; stacked, each
+   column is two lines tall and needs more air beside it than the 4 that
+   sits between its own two lines, or the grid reads as rows rather than
+   columns. Wraps rather than overflows — six columns fit the card at the
+   premiums this ticket quotes, but "Unlimited" and a four-figure loss
+   together do not always. */
+.ob-stage .ob-legquote {
+  /* 14 across, 2 down: a rule sits in the middle of each horizontal gap
+     and needs air either side of it — 14 leaves 6.5 between a column's
+     box and the line. */
+  gap: 2px 14px;
+  align-items: flex-start;
+}
+
+.ob-stat {
+  display: flex;
+  flex-direction: column;
+  /* Flush left, so the labels start on one column of verticals and the
+     figures on the same one — a value that gains a digit grows only to
+     its right. Centring gave every column two ragged edges and no shared
+     line. */
+  align-items: flex-start;
+  gap: 1px;
+  flex: none;
+  position: relative;
+}
+
+/* A rule between every pair, per the reference: 1px of white at 15%,
+   running the full height of the row.
+
+   Drawn as an absolutely-positioned pseudo-element in the GAP rather than
+   as a border-left with padding. A border would have to be paid for out
+   of each column's own width — every fixed width above would become
+   "content plus 9" and stop meaning the thing it was measured against —
+   and the rule would sit hard against the next column instead of centred
+   between the two. At -7 it splits the 14px gap exactly.
+
+   White at 15%, not the leg divider's --rule: that one separates rows of
+   the same kind of thing and is deliberately faint enough to disappear;
+   these separate readings sitting side by side on one line, where the eye
+   needs the column boundary to be found rather than felt. */
+.ob-stat + .ob-stat::before {
+  content: "";
+  position: absolute;
+  left: -7px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+}
+
+/* A FIXED width, so no column can move its neighbours.
+
+   Measured at 11px, which is what both lines take now:
+
+     default  "$818.19"    37.1   ("Mid" is 17.7)          -> 38
+     --wide   "Est. total" 47.1   ("$818.19" 37.1)         -> 48
+
+   Stacked is far narrower than inline was — the label and the figure
+   share one column instead of sitting side by side — which is what lets
+   all four readings, their three rules and an 87px button hold a single
+   398px line with room left over. Est. total is the one column its LABEL
+   sizes rather than its value. */
+.ob-stat { width: 38px; }
+.ob-stat--wide { width: 48px; }
+
+/* The name, at the secondary size the row already used. */
+.ob-stat-k {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+/* The figure takes its label's colour — the whole block is one reading,
+   set in --muted at 11, and nothing in it is emphasised over anything
+   else.
+
+   This is the ticket's secondary register: things it tells you, as
+   against the fields you set, which are ink at 12. The row sits in the
+   footer beside the CTA, and ink there competed with the one control on
+   that line that is actually asking for a decision. */
+.ob-stat-v {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 .ob-add button {
   position: relative;
   appearance: none;
@@ -903,9 +1120,18 @@ button.ob-chip--strike {
 .ob-quote-read {
   display: flex;
   align-items: center;
-  /* Wider than the gap inside a label/value pair, so the readings hold
-     apart as readings rather than running into one another. */
-  gap: 10px;
+  /* Wraps rather than overflows. The three quotes and the total fit on one
+     line at the premiums an at-the-money option carries, but a deep
+     in-the-money strike marks around $24 and its total runs past $2,400 —
+     two more characters each, which pushed the row off the card's left
+     edge. */
+  flex-wrap: wrap;
+  row-gap: 2px;
+  min-width: 0;
+  /* 14, the gap these columns were designed against: a rule sits in the
+     middle of each one and needs air either side — 14 leaves 6.5 between
+     a column's box and the line. */
+  gap: 14px;
   /* Pushes the CTA to the trailing edge, where it was before this row
      existed. */
   margin-right: auto;
@@ -961,32 +1187,284 @@ button.ob-chip--strike {
 
 /* ---------- order params ---------- */
 
-/* No panel treatment any more — the legs lost theirs too. */
 .ob-params-panel {
-  /* A different question from the legs, so this one gets air between the
-     two containers rather than a rule. */
+  /* Only bites in stock mode, where the legs panel is not rendered and
+     this stands alone. Joined to the legs, the rules below take over. */
   margin-top: 8px;
   /* 6 all round: unlike the leg rows, the fields in here have no vertical
      padding of their own. */
   padding: 6px;
 }
 
+/* ---- the two halves as ONE container ---- */
+
+/* The legs and the order's details used to be two surfaces with 8 of air
+   between them — two questions, two boxes. One box with a rule across it
+   says the same thing more quietly: still two questions, but plainly
+   parts of one ticket, which is what they are. The 8 of air read as a gap
+   between unrelated panels once the card lost everything above them.
+
+   The legs panel only ever renders alongside this one, so its radius can
+   be squared off at the bottom unconditionally. */
+.ob-legs-panel { border-radius: 6px 6px 0 0; }
+
+.ob-legs-panel + .ob-params-panel {
+  margin-top: 0;
+  border-radius: 0 0 6px 6px;
+  /* The rule below supplies this half's top inset. */
+  padding-top: 0;
+}
+
+/* The divider itself, drawn on the grid rather than on the panel so it
+   lands inset by the same 6 as the rules between leg rows — a border on
+   the panel would run to the container's own edge and be the one line on
+   the card that does.
+
+   6 above it comes from the last leg row's own bottom padding and 6 below
+   from here, which is exactly how a rule between two leg rows sits. */
+.ob-legs-panel + .ob-params-panel .ob-params {
+  border-top: 1px solid var(--rule);
+  padding-top: 6px;
+}
+
+/* A list of questions, not a grid of fields.
+
+   This was two columns — order type beside limit price, duration beside
+   account — which is how you lay out four fields that are peers. There
+   are three left and they are not peers: they are the three things the
+   chain cannot decide for you, asked in the order a ticket is filled.
+   One per line, each with its name on the left, reads in a single pass
+   down the card. */
 .ob-params {
-  display: grid;
-  /* Two equal columns, wrapping into two rows: Order type + Limit price
-     on row one, Duration + Account on row two — adding the account
-     selector without widening the card, each pair filling the full
-     row width instead of a cramped third column. */
-  grid-template-columns: repeat(2, 1fr);
-  /* The card is fit-content now, so a grid of pure 1fr tracks would
-     contribute its own max-content and could set the card's width itself.
-     Pinning it to the width it is given keeps the leg row as the row that
-     decides. */
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  /* Figma (node 2899:7724): gap-4 — same inter-field gap as the leg rows,
-     not the 8px this had drifted to. */
+  /* No rules between them. The leg list above is a set of like things and
+     takes dividers; these are three different questions and the air is
+     enough — a rule under each would make the ticket a table. */
+  gap: 6px;
+}
+
+/* Label left, control right, on one shared edge.
+
+   Top-aligned, not centred. The limit price carries a sub-line and the
+   other two do not, and centring each row on its own contents put that
+   row's label and field half a line lower than the rows above and below
+   — three controls at three different rhythms. Aligned to the top, every
+   label and every field sits in the same 20px band as the control it
+   names, and the sub-line hangs beneath its own row as a caption. */
+.ob-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 20px;
+}
+
+.ob-line-k {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-right: auto;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* The label's own band: the control's 20, so the two centre on each
+   other whatever hangs below. */
+.ob-line-label {
+  display: flex;
+  align-items: center;
+  min-height: 20px;
+}
+
+/* The field, with what the market says about it directly underneath. It
+   holds --line-w as a MINIMUM rather than a width: the quote line is a
+   little wider than the field at its longest, and since the label before
+   it carries `margin-right: auto`, the extra opens to the left into space
+   the row already has. */
+.ob-line-ctl {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  /* 2 — a caption's distance from the thing it captions, not a row's
+     distance from the next row. */
+  gap: 2px;
+  min-width: var(--line-w);
+}
+
+/* What the market says about the field above it. The ticket's secondary
+   register: things it tells you, as against the fields you set. */
+.ob-line-sub {
+  display: flex;
+  align-items: center;
+  /* 8 between the two readings, against the 4 inside each — so the pairs
+     group before they separate. */
+  gap: 8px;
+  /* 12, with everything else on the card. It was 11 — the ticket's old
+     secondary register — which set the two figures you compare against
+     the limit price a size smaller than the limit price itself. The
+     colour is what holds them back now, not the size. */
+  font-size: 12px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+.ob-sub {
+  display: flex;
+  align-items: center;
   gap: 4px;
 }
+
+.ob-sub-k { flex: none; }
+
+/* A FIXED box, and the only one on the ticket that needs to be.
+
+   Mid and the ask are the two figures here that move on the clock — the
+   payoff, the cost and the limit all follow fields you set, and change
+   only when you change one. DM Sans as served has no tabular figures
+   ("$0.00" and "$1.11" are different widths), so a content-sized box
+   resizes on most ticks and shoves whatever follows it sideways.
+
+   38 clears "$19.94" at 12px (37.4); a bigger number than the model
+   produces grows the box rather than clipping. Contents left, so the
+   figure stays against the word that names it and any slack falls before
+   the NEXT one. */
+.ob-sub-v {
+  flex: none;
+  min-width: 38px;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Every control on these three lines takes the one field width the leg
+   pickers used to share, so their left edges line up down the card.
+   `button.ob-field` sets `width: 100%` for the grid it used to live in;
+   this outranks it on specificity, not on order. */
+.ob-line .ob-field {
+  flex: none;
+  width: var(--line-w);
+}
+
+/* With the label lifted out onto the row, the value has the whole field:
+   no prefix box, no divider, so it starts on the field's own 6. */
+.ob-line .ob-field input { padding-inline: 6px; }
+
+/* The currency mark, set with the figure rather than beside it: no gap,
+   and in --faint so the number stays the thing you read. The field used
+   to carry a "Limit price" prefix box and the unit was implied by it;
+   with the label out on the row, a bare "1.48" in a box is a number
+   without a kind. */
+.ob-unit {
+  color: var(--faint);
+  /* Kills the 2px the editing row keeps between its children — the mark
+     belongs against the first digit, not a space away from it. */
+  margin-right: 0;
+}
+
+.ob-line .ob-stepper-num--editing { gap: 0; }
+
+/* The value is a button at rest and an input while editing; both hold
+   their text on the same line as the unit. */
+.ob-line .ob-stepper-num {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+/* ---------- what the order comes to ---------- */
+
+/* Max profit, max loss, breakeven.
+
+   Its own surface, held off the fields above by the same 8 that separates
+   every band on this card. These are not things you set: they are what
+   the ticket above them adds up to, and all three move the moment any
+   field does — so they sit apart from the fields rather than under them
+   as a fourth row.
+
+   Three equal columns, and the figures CENTRED in them — the one place on
+   this ticket that departs from its flush-left columns. The readings are
+   a set of three comparable answers rather than a column of values you
+   scan down, the labels and figures differ in width by a lot ("Unlimited"
+   against "$329.97"), and each column is a fixed third, so nothing here
+   can shift anything else. */
+.ob-payoff {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* 4, not the 8 that separates the other bands. These three readings
+     are what the fields directly above them come to, so they sit closer
+     to that container than the footer does to them. */
+  margin-top: 4px;
+  padding: 6px;
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+.ob-payoff-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 0;
+}
+
+/* A rule between every pair, per the reference: 1px of white at 15%,
+   running the full height of the row. White rather than the leg
+   divider's --rule — that one separates rows of the same kind of thing
+   and is deliberately faint enough to disappear; this separates readings
+   sitting side by side, where the eye needs the column boundary found
+   rather than felt. */
+.ob-payoff-cell + .ob-payoff-cell {
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.ob-payoff-k {
+  font-size: 11px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* Ink, not muted. The label is the quiet half of the pair; the figure is
+   the answer, and it is the reason anyone looks at this strip. */
+.ob-payoff-v {
+  font-size: 12px;
+  color: var(--ink);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- what it costs ---------- */
+
+/* What the order costs, on the CTA's own line and pushed to the far
+   left of it — the figure and the button that spends it, at either end of
+   the last thing the card says.
+
+   It had a band of its own above the footer, which made the ticket end on
+   two rows that were both about the same act. */
+.ob-cost {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: auto;
+  min-width: 0;
+}
+
+.ob-cost-k {
+  flex: none;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* The figure the whole card is for. It is ink at 12 like every other
+   value — the weight comes from what it is, not from being set louder. */
+.ob-cost-v {
+  flex: none;
+  font-size: 12px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+
 
 .ob-field {
   position: relative;
@@ -1033,10 +1511,16 @@ button.ob-chip--strike:active,
 
 .ob-field-k {
   flex: none;
-  /* 64px was sized for "Limit $" together — now that the $ is gone, that
-     left a lot of dead space before the divider. Shrunk to fit "Limit"
-     alone plus its own 8px/8px padding. Scaled to 90% with the card. */
-  width: 43.2px;
+  /* Sized to its own label plus its 6px either side. "Limit price" is
+     61.96 at 12px, so 74 — up from the 43.2 that fit "Limit" alone, which
+     wrapped the longer label onto a second line and pushed it out through
+     the bottom of a 20px field.
+
+     The field is 197 wide and the stepper takes 20, so the number still
+     has 103 to sit in. */
+  width: 74px;
+  /* The label is a label; it does not get to wrap. */
+  white-space: nowrap;
   box-sizing: border-box;
   /* Left matches the dropdown fields' own inset (button.ob-field: 8px),
      not the 3px used on the other three sides. */
@@ -1306,8 +1790,12 @@ button.ob-chip--strike:focus-visible::after,
      ticket where that reading is absent. */
   justify-content: flex-end;
   gap: 8px;
-  /* Same inner line as the ticker row — see .ob-ticker. */
+  /* The ticket's inner line: containers sit at 4, everything readable at
+     4 + 6. This row carries no surface of its own, so it takes the inner
+     one directly. */
   padding-inline: 6px;
+  /* The reading may wrap to two lines; the CTA stays put beside it. */
+  flex-wrap: wrap;
   /* 20, the height of every control on the ticket. */
   min-height: 20px;
 }
@@ -1326,6 +1814,16 @@ button.ob-chip--strike:focus-visible::after,
   border-radius: 6px;
   background: var(--up);
   color: #000000;
+  /* The one deliberate exception to the stage's `antialiased`.
+
+     Everything else on this ticket is light ink on a dark ground, where
+     antialiasing thins strokes slightly. This is the only DARK ink on a
+     LIGHT ground, and there the same setting thins them a lot — the CTA
+     read a weight lighter than every other 12px label on the card despite
+     being identical to them in family, size, weight and tracking.
+     Subpixel rendering puts the stroke back. */
+  -webkit-font-smoothing: auto;
+  -moz-osx-font-smoothing: auto;
   font-weight: 400;
   font-size: 12px;
   cursor: pointer;
@@ -1374,7 +1872,6 @@ button.ob-chip--strike:focus-visible::after,
   color: #f2f2f8;
   background: rgba(17, 19, 23, 0.72);
   border: 1px solid #1d2328;
-  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   transition: color 0.15s ease;
@@ -1386,13 +1883,9 @@ button.ob-chip--strike:focus-visible::after,
 .ob-back:focus-visible { outline: 2px solid var(--up); outline-offset: 2px; }
 
 @media (max-width: 380px) {
-  .ob-params { grid-template-columns: 1fr; }
-  /* The ticker row is the widest fixed pair in the ticket now that the
-     strategy chip is gone — it wraps rather than overflowing. */
-  .ob-ticker { flex-wrap: wrap; }
   .ob-back { top: 12px; left: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ob-x, .ob-back svg, .ob-add button, .ob-sidebtn { transition: none; }
+  .ob-x, .ob-back svg { transition: none; }
 }

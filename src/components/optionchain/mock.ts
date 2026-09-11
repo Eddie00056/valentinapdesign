@@ -147,7 +147,7 @@ export const UNDERLYING: Underlying = {
 /* Expiries                                                            */
 /* ------------------------------------------------------------------ */
 
-const MONTH_LABELS = [
+export const MONTH_LABELS = [
   'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
 ];
