@@ -358,13 +358,14 @@
    the native thumb's own geometry here (it was a 4px bar with a 2px
    transparent border inside an 8px track).
 
-   Dim at rest, full while scrolling — not hidden. Hidden, the 8px the
-   track holds back is 8px of nothing, and a hovered row's band reads as
-   cut off rather than as ending at a bar. Standing there dim, it says
-   what the gutter is for, and the band ends where the ladder does.
+   Hidden at rest and faded in while the ladder is actually moving, the
+   platform's own behaviour and the one the native bar had here. It costs
+   nothing to hide it now: the 8 it sits in is the ROW'S padding, so a
+   hovered row's band paints through the lane whether the bar is there or
+   not, and nothing reads as cut off when it goes.
 
-   It still disappears when the ladder fits — ChainTable sets its height
-   to 0 — because a bar that fills its own track is a bar saying nothing.
+   It also disappears when the ladder fits — ChainTable sets its height to
+   0 — because a bar that fills its own track is a bar saying nothing.
 
    `opacity` and `transform` only: this moves on every scroll event, and
    both are composited. */
@@ -378,16 +379,22 @@
   border-radius: 2px 0 0 2px;
   /* Solid, and lighter than anything it crosses. A wash of white took its
      colour from whatever was under it, so the thumb changed shade as a
-     hovered band passed and read as two different bars; #454d4f is one
-     bar on the ladder's ground (#0f1719), on a shaded strike (#171f20)
-     and on a hovered row (#272e30) alike. */
-  background: #454d4f;
+     hovered band passed and read as two different bars; this is one bar
+     on the ladder's ground (#0f1719), on a shaded strike (#171f20) and on
+     a hovered row (#272e30) alike. */
+  background: #5d686a;
+  opacity: 0;
   pointer-events: none;
-  transition: background-color 160ms linear;
+  /* Out more slowly than in: the bar arriving should keep up with the
+     first turn of the wheel, where it leaving is the end of a gesture. */
+  transition: opacity 260ms linear;
   will-change: transform;
 }
 
-.oc-scrollwrap[data-scrolling] .oc-sb { background: #5d686a; }
+.oc-scrollwrap[data-scrolling] .oc-sb {
+  opacity: 1;
+  transition-duration: 90ms;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .oc-sb { transition: none; }
