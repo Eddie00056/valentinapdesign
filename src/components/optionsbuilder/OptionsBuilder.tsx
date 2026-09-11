@@ -920,15 +920,29 @@ export function OptionsBuilder({
                   <span className="ob-line-label">
                     Limit price ({debit ? "debit" : "credit"})
                   </span>
+
+                  {/* "Mid", not "Mark": the number between the bid and the
+                      ask, and the field above it is the third price in that
+                      set — so the line names all three in the same terms.
+
+                      Every figure sits in a box of its own (see the CSS):
+                      these two are the only things on the ticket that move
+                      on the clock, and a figure that resizes as it ticks
+                      drags whatever follows it sideways. */}
+                  <span className="ob-line-sub">
+                    <span className="ob-sub">
+                      <span className="ob-sub-k">Mid</span>
+                      <span className="ob-sub-v">{money(mid)}</span>
+                    </span>
+                    <span className="ob-sub">
+                      <span className="ob-sub-k">{debit ? "Ask" : "Bid"}</span>
+                      <span className="ob-sub-v">
+                        {money(debit ? mid + halfSpread : mid - halfSpread)}
+                      </span>
+                    </span>
+                  </span>
                 </span>
 
-                {/* The field and what the market says about it, in one
-                    column. The quote used to hang under the LABEL, on the
-                    far side of the row from the number it is about — so
-                    the two figures you compare, the one you are offering
-                    and the one you could have, sat 130px apart. Under the
-                    field they are one reading. */}
-                <span className="ob-line-ctl">
                 <PriceField
                   ariaLabel="Limit price"
                   /* "$" for a price you name, "Offset %" for one locked to
@@ -960,28 +974,6 @@ export function OptionsBuilder({
                   }}
                   onStep={(d) => bumpLimit(d * 0.01)}
                 />
-
-                {/* "Mid", not "Mark": the number between the bid and the
-                    ask, and the field above it is the third price in that
-                    set — so the line names all three in the same terms.
-
-                    Every figure sits in a box of its own (see the CSS):
-                    these two are the only things on the ticket that move
-                    on the clock, and a figure that resizes as it ticks
-                    drags whatever follows it sideways. */}
-                <span className="ob-line-sub">
-                  <span className="ob-sub">
-                    <span className="ob-sub-k">Mid</span>
-                    <span className="ob-sub-v">{money(mid)}</span>
-                  </span>
-                  <span className="ob-sub">
-                    <span className="ob-sub-k">{debit ? "Ask" : "Bid"}</span>
-                    <span className="ob-sub-v">
-                      {money(debit ? mid + halfSpread : mid - halfSpread)}
-                    </span>
-                  </span>
-                </span>
-                </span>
               </div>
 
               <div className="ob-line">
