@@ -563,9 +563,9 @@ export function StockTicket({
     <div className="ob-stage st-stage">
       {/* The ticket and its confirmation share one box, so the panel can
           be placed on the WIDGET rather than on the window — see
-          .st-deck. The scrim stays outside it: that one belongs to the
+          .ob-deck. The scrim stays outside it: that one belongs to the
           page. */}
-      <div className="st-deck">
+      <div className="ob-deck">
       <WidgetShell
         title={title}
         className="ob-shell st-shell"
@@ -1138,7 +1138,7 @@ export function StockTicket({
               </span>
             </span>
 
-            <div className="st-ctas">
+            <div className="ob-ctas">
               {/* Sell first, Buy last. A pair of actions puts the one you
                   are most likely to want at the trailing edge — where the
                   eye finishes the line and the pointer already is, having
@@ -1187,10 +1187,10 @@ export function StockTicket({
           touch, which is exactly its state while this is open. */}
       <AnimatePresence>
         {confirming && (
-            <div key="modal" className="st-modal-wrap">
+            <div key="modal" className="ob-modal-wrap">
             <motion.div
               ref={panelRef}
-              className="st-modal-card"
+              className="ob-modal-card"
               role="dialog"
               aria-modal="true"
               aria-label="Order confirmation"
@@ -1208,24 +1208,24 @@ export function StockTicket({
             >
               <WidgetShell
                 title="Order confirmation"
-                className="ob-shell st-modal"
+                className="ob-shell ob-modal"
                 onClose={() => setConfirming(null)}
               >
                 <div className="ob-card">
-                  <div className="st-body">
+                  <div className="ob-conf-body">
                     {/* What you are about to do, as one statement: the
                         direction as a badge, then the order in words. The
                         badge is a stadium where every control on this card
                         is a 6 — a shape nobody can mistake for something
                         to press. */}
-                    <div className="st-conf-lead">
-                      <span className="st-badge" data-side={confirming}>
+                    <div className="ob-conf-lead">
+                      <span className="ob-badge" data-side={confirming}>
                         {confirming === "buy" ? "Buy" : "Sell"}
                       </span>
-                      <span className="st-conf-order">{sentence}</span>
+                      <span className="ob-conf-order">{sentence}</span>
                     </div>
 
-                    <div className="st-conf-group">
+                    <div className="ob-conf-group">
                       <Line k="Account" v="TFSA · 12345678" />
                       <Line
                         k="Trade value"
@@ -1236,7 +1236,7 @@ export function StockTicket({
                       <Line k="Commission" v={`${total(commission)} USD`} />
                     </div>
 
-                    <div className="st-conf-group">
+                    <div className="ob-conf-group">
                       {/* Signed, because the sign is the whole reading:
                           one direction takes buying power and the other
                           gives it back, and the commission comes out of
@@ -1255,7 +1255,7 @@ export function StockTicket({
                       <Line k="Change in maintenance excess" v="N/A" />
                     </div>
 
-                    <div className="st-conf-group st-conf-fine">
+                    <div className="ob-conf-group ob-conf-fine">
                       <p>All values are estimates.</p>
                       <p>
                         *Exchange and ECN fees, SEC fees and ADRs annual
@@ -1272,8 +1272,8 @@ export function StockTicket({
                   {/* Cancel in coral and Send in mint, in that order — the
                       same reasoning as the ticket's own pair: the act you
                       are most likely to want sits at the trailing edge. */}
-                  <div className="ob-foot st-conf-foot">
-                    <div className="st-ctas">
+                  <div className="ob-foot ob-conf-foot">
+                    <div className="ob-ctas">
                       <motion.button
                         type="button"
                         className="ob-cta st-cta"
@@ -1331,7 +1331,7 @@ export function StockTicket({
 
           Draggable sideways to dismiss, at the reference's own thresholds:
           72px of travel or 520 of velocity, whichever it reaches first. */}
-      <div className="st-toast-wrap">
+      <div className="ob-toast-wrap">
         {/* Default mode, not popLayout. popLayout wraps every child in a
             measuring component so a leaver can be taken out of flow
             without the survivors jumping — which is what a STACK needs.
@@ -1347,7 +1347,7 @@ export function StockTicket({
                  with nothing to draw can be composited, where the same
                  three on the bordered, shadowed surface make every frame
                  a repaint of the whole bar AND a re-blur of its shadow. */
-              className="st-toast-item"
+              className="ob-toast-item"
               role="status"
               aria-live="polite"
               initial={
@@ -1390,7 +1390,7 @@ export function StockTicket({
                 }
               }}
             >
-              <div className="st-toast">
+              <div className="ob-toast">
                 {/* The ring draws round, then the tick draws in behind
                     it — both as stroke-dashoffset, which is the one way
                     to animate a line being DRAWN rather than revealed.
@@ -1402,21 +1402,21 @@ export function StockTicket({
                     an arc length that have to be recomputed the moment
                     anything about the drawing changes. */}
                 <svg
-                  className={`st-check${checked ? " is-done" : ""}`}
+                  className={`ob-check${checked ? " is-done" : ""}`}
                   viewBox="0 0 52 52"
                   width="16"
                   height="16"
                   aria-hidden="true"
                 >
                   <circle
-                    className="st-check-ring"
+                    className="ob-check-ring"
                     cx="26"
                     cy="26"
                     r="24"
                     pathLength={151}
                   />
                   <path
-                    className="st-check-tick"
+                    className="ob-check-tick"
                     d="M16 27l6.5 6.5L36 18.5"
                     pathLength={28}
                   />
@@ -1437,7 +1437,7 @@ export function StockTicket({
           <motion.button
             key="scrim"
             type="button"
-            className="st-scrim"
+            className="ob-scrim"
             aria-label="Close order confirmation"
             /* Out of the tab order: the focus trap above keeps Tab inside
                the panel, and this is a click target, not a stop. */
@@ -1470,9 +1470,9 @@ export function StockTicket({
     on the right, on the panel's two edges. */
 function Line({ k, v }: { k: string; v: string }) {
   return (
-    <div className="st-conf-row">
-      <span className="st-conf-k">{k}</span>
-      <span className="st-conf-v">{v}</span>
+    <div className="ob-conf-row">
+      <span className="ob-conf-k">{k}</span>
+      <span className="ob-conf-v">{v}</span>
     </div>
   );
 }

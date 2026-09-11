@@ -16,9 +16,9 @@ import { WidgetShell } from "../shared/WidgetShell";
 import {
   AutoHeight,
   Dropdown,
+  Lock,
   PriceField,
   StepperField,
-  Swap,
 } from "../shared/TicketControls";
 import {
   EXPIRIES as CHAIN_EXPIRIES,
@@ -87,6 +87,49 @@ const TIFS = ["Good for day", "Good till cancelled"] as const;
 type Tif = (typeof TIFS)[number];
 
 export const MAX_LEGS = 4;
+
+/**
+ * What the limit price IS — the Atlas clickable prefix, in the spec's own
+ * words, on the ticket the spec was drawn for.
+ *
+ * A limit is either a price you name, or one locked to a quote with an
+ * offset from it. The two "Follow" modes are the locked ones, and the
+ * padlock on their menu rows says so: the number in the field stops being
+ * a price and becomes how far off the bid or the ask you are willing to
+ * sit, with the price itself wherever that quote goes.
+ */
+const LIMIT_MODES = [
+  "Limit price",
+  "Follow bid price",
+  "Follow ask price",
+] as const;
+type LimitMode = (typeof LIMIT_MODES)[number];
+
+/**
+ * The confirmation's entrance, and the ground it opens onto — the same
+ * pair the stock ticket uses, because it is the same act.
+ */
+const MODAL_SPRING = {
+  type: "spring",
+  stiffness: 500,
+  damping: 35,
+  mass: 0.8,
+} as const;
+const MODAL_OUT = { duration: 0.14, ease: [0.22, 1, 0.36, 1] } as const;
+const BACKDROP_OFF = "blur(0px) saturate(100%)";
+const BACKDROP_ON = "blur(12px) saturate(140%)";
+const BACKDROP = { duration: 0.2, ease: [0.22, 1, 0.36, 1] } as const;
+
+/** Money that can run past a thousand — what a sized order comes to. */
+const total = (x: number) =>
+  `$${Math.abs(x).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
+/** The spec's popover, verbatim. */
+const OFFSET_HINT =
+  "Select an offset dollar amount or percentage to determine the limit price that will trigger your order";
 
 /** The underlying this ticket is written on when nothing else decides —
     the same one the alert and order-placement screens use, which is why
@@ -387,8 +430,15 @@ export function OptionsBuilder({
   const [limitPx, setLimitPx] = useState(
     incoming ? +incoming.price.toFixed(2) : 1.75,
   );
-  const [submitted, setSubmitted] = useState(false);
+  const [limitMode, setLimitMode] = useState<LimitMode>("Limit price");
+  /* How far off the followed quote the limit sits, as a percentage. */
+  const [offset, setOffset] = useState(1);
+  /* The CTA asks; the confirmation sends. */
+  const [confirming, setConfirming] = useState(false);
+  const [toast, setToast] = useState<number | null>(null);
+  const [checked, setChecked] = useState(false);
   const subT = useRef<number | undefined>(undefined);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   /* Mirrors the ticket's legs out, so a chain lighting up the quotes it
      holds is reading the ticket rather than remembering what was clicked
@@ -533,15 +583,90 @@ export function OptionsBuilder({
 
      It stops the moment the ticket becomes somebody's: a quote picked off
      the chain, or a price typed or stepped here. */
+  /* While the confirmation is open it is the only thing on the screen:
+     Escape backs out, Tab cycles inside it, the page cannot scroll under
+     it, and closing it puts the caret back where it was. */
+  useEffect(() => {
+    if (!confirming) return;
+    const opener = document.activeElement as HTMLElement | null;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusable = () =>
+      Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          'a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((el) => el.tabIndex >= 0);
+    const frame = requestAnimationFrame(() =>
+      (focusable()[0] ?? panelRef.current)?.focus(),
+    );
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setConfirming(false);
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const els = focusable();
+      if (!els.length) return;
+      const first = els[0];
+      const last = els[els.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+      opener?.focus?.();
+    };
+  }, [confirming]);
+
+  /* The check draws with CSS transitions, which only run if the element
+     is painted undrawn first. Two frames. */
+  useEffect(() => {
+    if (!toast) {
+      setChecked(false);
+      return;
+    }
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => setChecked(true));
+    });
+    return () => {
+      cancelAnimationFrame(first);
+      cancelAnimationFrame(second);
+    };
+  }, [toast]);
+
   const limitEdited = useRef(false);
   useEffect(() => {
-    if (incoming || limitEdited.current) return;
+    if (following || incoming || limitEdited.current) return;
     setLimitPx(+mid.toFixed(2));
   }, [incoming, mid]);
 
+  /* A limit that is FOLLOWING is not a price at all: the field holds an
+     offset and the price comes off whichever quote it is locked to, on
+     every tick. One that is not following is a price, and it tracks the
+     mid until somebody types over it — which is what this ticket always
+     did, now one of three modes rather than the only behaviour. */
+  const following = limitMode !== "Limit price";
+  const followed = limitMode === "Follow ask price"
+    ? mid + halfSpread
+    : mid - halfSpread;
+  const limit = following
+    ? +Math.max(0.01, followed * (1 + offset / 100)).toFixed(2)
+    : limitPx;
+
   /* What the strategy is worth at expiry, priced at the LIMIT — these
      three describe the order in the fields above them, not the market. */
-  const signedLimit = debit ? limitPx : -limitPx;
+  const signedLimit = debit ? limit : -limit;
   const profile = payoffProfile(legs, signedLimit, CONTRACT_MULTIPLIER);
   const scale = (v: number | null) => (v === null ? null : v * qty);
   const maxProfit = scale(profile.maxProfit);
@@ -560,7 +685,7 @@ export function OptionsBuilder({
   /* What the order actually costs. Quotes are per share; a contract is
      100 of them, and the figure a reader compares against their buying
      power is the price they are offering, not the market's mark. */
-  const estCost = limitPx * CONTRACT_MULTIPLIER * qty;
+  const estCost = limit * CONTRACT_MULTIPLIER * qty;
 
   function removeLeg(id: number) {
     // Never drop below one leg — there's no empty state for this widget.
@@ -572,17 +697,43 @@ export function OptionsBuilder({
     setQty((q) => Math.min(99, Math.max(1, q + delta)));
   }
 
-  function submit() {
-    if (submitted) return;
-    setSubmitted(true);
+  function send() {
+    setConfirming(false);
+    setToast(Date.now());
     window.clearTimeout(subT.current);
-    subT.current = window.setTimeout(() => setSubmitted(false), 1900);
+    subT.current = window.setTimeout(() => setToast(null), 2600);
   }
 
   function bumpLimit(delta: number) {
+    if (following) {
+      setOffset((v) => Math.min(99.99, Math.max(0, +(v + delta).toFixed(2))));
+      return;
+    }
     limitEdited.current = true;
     setLimitPx((v) => Math.min(999.99, Math.max(0.01, +(v + delta).toFixed(2))));
   }
+
+  /* Leaving a follow mode hands the absolute price it had resolved to over
+     to the price field, so the order does not jump because you changed how
+     you were expressing it. */
+  function pickLimitMode(m: LimitMode) {
+    if (m === "Limit price" && following) {
+      limitEdited.current = true;
+      setLimitPx(limit);
+    }
+    setLimitMode(m);
+  }
+
+  /* Questrade's own options schedule: $9.95 plus a dollar a contract. */
+  const contracts = qty * legs.length;
+  const commission = 9.95 + contracts;
+
+  /* The order in one line — not the fields again, but the sentence they
+     add up to. A debit is a purchase and a credit is a sale, which is the
+     only honest way to give a multi-leg order one direction. */
+  const priceClause = following
+    ? `${limitMode.toLowerCase()}, ${offset.toFixed(2)}% offset (${money(limit)})`
+    : `limit ${money(limit)} ${debit ? "debit" : "credit"}`;
 
   /* The underlying this ticket is written on — the chain's, beside a
      chain; its own otherwise. */
@@ -607,8 +758,11 @@ export function OptionsBuilder({
           legs[0].kind === "put" ? "Put" : "Call"
         }`;
 
+  const sentence = `${qty} × ${title}, ${priceClause}, ${tif.toLowerCase()}`;
+
   return (
     <div className="ob-stage">
+      <div className="ob-deck">
       <LayoutGroup>
         <WidgetShell
           title={title}
@@ -777,10 +931,30 @@ export function OptionsBuilder({
                 <span className="ob-line-ctl">
                 <PriceField
                   ariaLabel="Limit price"
-                  value={limitPx}
+                  /* "$" for a price you name, "Offset %" for one locked to
+                     a quote — the spec's two prefix labels, for the spec's
+                     two kinds of number. */
+                  prefix={limitMode}
+                  prefixLabel={following ? "Offset %" : "$"}
+                  prefixOptions={LIMIT_MODES}
+                  onPrefixSelect={(v) => pickLimitMode(v as LimitMode)}
+                  prefixIcon={(v) =>
+                    v === "Limit price" ? (
+                      <span className="ob-dd-mark">$</span>
+                    ) : (
+                      <Lock size={12} />
+                    )
+                  }
+                  prefixHint={OFFSET_HINT}
+                  prefixAria="What the limit price is"
+                  value={following ? offset : limitPx}
                   reduce={reduce}
                   spring={spring}
                   onCommit={(v) => {
+                    if (following) {
+                      setOffset(Math.min(99.99, Math.max(0, v)));
+                      return;
+                    }
                     limitEdited.current = true;
                     setLimitPx(Math.min(999.99, Math.max(0, v)));
                   }}
@@ -861,49 +1035,249 @@ export function OptionsBuilder({
               <span className="ob-cost-v">{money(estCost)}</span>
             </span>
 
+            {/* It asks now, rather than sending. The acknowledgement that
+                used to swap in here has gone with it: the snackbar says
+                the same thing a moment later, and once is enough. */}
             <motion.button
               type="button"
               className="ob-cta"
-              onClick={submit}
+              onClick={() => setConfirming(true)}
               whileTap={reduce ? undefined : { scale: 0.97 }}
               transition={spring}
             >
-              <AnimatePresence>
-                {submitted && !reduce && (
-                  <motion.span
-                    className="ob-cta-ring"
-                    initial={{ opacity: 0.85, scale: 1 }}
-                    animate={{ opacity: 0, scale: 1.3 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                  />
-                )}
-              </AnimatePresence>
               <span className="ob-cta-label">
-                <Swap k={submitted ? "done" : "idle"}>
-                  {submitted ? (
-                    <>
-                      <svg width="14" height="14" viewBox="0 0 15 15" fill="none" aria-hidden="true">
-                        <path
-                          d="M3 8l3.2 3.2L12 5"
-                          stroke="currentColor"
-                          strokeWidth="1.9"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      Order submitted
-                    </>
-                  ) : (
-                    "Submit"
-                  )}
-                </Swap>
+                <span>Submit</span>
               </span>
             </motion.button>
           </div>
         </div>
         </WidgetShell>
       </LayoutGroup>
+
+      {/* ---- the confirmation ----
+          The same panel the stock ticket wears, saying what an options
+          order says: the legs are already on the card behind it, so this
+          states the ORDER — how many of what, at what price, for how
+          long — and what it costs to place. */}
+      <AnimatePresence>
+        {confirming && (
+          <div key="modal" className="ob-modal-wrap">
+            <motion.div
+              ref={panelRef}
+              className="ob-modal-card"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Order confirmation"
+              tabIndex={-1}
+              initial={
+                reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 6 }
+              }
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={
+                reduce
+                  ? { opacity: 0, transition: MODAL_OUT }
+                  : { opacity: 0, scale: 0.96, y: 6, transition: MODAL_OUT }
+              }
+              transition={reduce ? { duration: 0.12 } : MODAL_SPRING}
+            >
+              <WidgetShell
+                title="Order confirmation"
+                className="ob-shell ob-modal"
+                onClose={() => setConfirming(false)}
+              >
+                <div className="ob-card">
+                  <div className="ob-conf-body">
+                    <div className="ob-conf-lead">
+                      {/* A debit is money leaving and a credit is money
+                          arriving — which is the one direction a
+                          multi-leg order genuinely has. */}
+                      <span
+                        className="ob-badge"
+                        data-side={debit ? "buy" : "sell"}
+                      >
+                        {debit ? "Buy" : "Sell"}
+                      </span>
+                      <span className="ob-conf-order">{sentence}</span>
+                    </div>
+
+                    <div className="ob-conf-group">
+                      <Line k="Account" v="TFSA · 12345678" />
+                      {/* The reference's own format, and it is an options
+                          format: contracts, price, and the 100 shares each
+                          one stands for. */}
+                      <Line
+                        k="Trade value"
+                        v={`${qty} × ${money(limit)} × ${CONTRACT_MULTIPLIER} = ${total(
+                          estCost,
+                        )} USD`}
+                      />
+                      <Line k="Commission" v={`${total(commission)} USD`} />
+                    </div>
+
+                    <div className="ob-conf-group">
+                      <Line
+                        k="Change in buying power"
+                        v={`${debit ? "−" : "+"}${total(
+                          debit ? estCost + commission : estCost - commission,
+                        )} USD`}
+                      />
+                      <Line k="Change in maintenance excess" v="N/A" />
+                    </div>
+
+                    <div className="ob-conf-group ob-conf-fine">
+                      <p>All values are estimates.</p>
+                      <p>
+                        *Exchange and ECN fees, SEC fees and ADRs annual
+                        custody fees may apply. Commissions may vary if your
+                        order is filled over multiple days. Borrow fees may
+                        apply if you hold a short investment overnight.{" "}
+                        <a href="#" onClick={(e) => e.preventDefault()}>
+                          Learn more
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="ob-foot ob-conf-foot">
+                    <div className="ob-ctas">
+                      <motion.button
+                        type="button"
+                        className="ob-cta"
+                        data-side="sell"
+                        onClick={() => setConfirming(false)}
+                        whileTap={reduce ? undefined : { scale: 0.97 }}
+                        transition={spring}
+                      >
+                        <span className="ob-cta-label">
+                          <span>Cancel order</span>
+                        </span>
+                      </motion.button>
+                      <motion.button
+                        type="button"
+                        className="ob-cta"
+                        data-side="buy"
+                        onClick={send}
+                        whileTap={reduce ? undefined : { scale: 0.97 }}
+                        transition={spring}
+                      >
+                        <span className="ob-cta-label">
+                          <span>Send order</span>
+                        </span>
+                      </motion.button>
+                    </div>
+                  </div>
+                </div>
+              </WidgetShell>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      </div>
+
+      <AnimatePresence>
+        {confirming && (
+          <motion.button
+            key="scrim"
+            type="button"
+            className="ob-scrim"
+            aria-label="Close order confirmation"
+            tabIndex={-1}
+            onClick={() => setConfirming(false)}
+            initial={{ opacity: 0, backdropFilter: BACKDROP_OFF }}
+            animate={{ opacity: 1, backdropFilter: BACKDROP_ON }}
+            exit={{ opacity: 0, backdropFilter: BACKDROP_OFF }}
+            transition={BACKDROP}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* ---- the order has been placed ---- */}
+      <div className="ob-toast-wrap">
+        <AnimatePresence initial={false}>
+          {toast && (
+            <motion.div
+              key={toast}
+              className="ob-toast-item"
+              role="status"
+              aria-live="polite"
+              initial={
+                reduce
+                  ? { opacity: 0 }
+                  : { opacity: 0, y: 22, scale: 0.96, filter: "blur(6px)" }
+              }
+              animate={
+                reduce
+                  ? { opacity: 1 }
+                  : { opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }
+              }
+              exit={
+                reduce
+                  ? { opacity: 0 }
+                  : {
+                      opacity: 0,
+                      x: 32,
+                      scale: 0.96,
+                      filter: "blur(5px)",
+                      transition: { duration: 0.18, ease: [0.33, 1, 0.68, 1] },
+                    }
+              }
+              transition={{
+                type: "spring",
+                stiffness: 420,
+                damping: 34,
+                mass: 0.75,
+              }}
+              drag={reduce ? false : "x"}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.18}
+              onDragEnd={(_, info) => {
+                if (
+                  Math.abs(info.offset.x) > 72 ||
+                  Math.abs(info.velocity.x) > 520
+                ) {
+                  window.clearTimeout(subT.current);
+                  setToast(null);
+                }
+              }}
+            >
+              <div className="ob-toast">
+                <svg
+                  className={`ob-check${checked ? " is-done" : ""}`}
+                  viewBox="0 0 52 52"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                >
+                  <circle
+                    className="ob-check-ring"
+                    cx="26"
+                    cy="26"
+                    r="24"
+                    pathLength={151}
+                  />
+                  <path
+                    className="ob-check-tick"
+                    d="M16 27l6.5 6.5L36 18.5"
+                    pathLength={28}
+                  />
+                </svg>
+                Your order has been placed
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+/** One reading on the confirmation: what it is on the left, what it says
+    on the right, on the panel's two edges. */
+function Line({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="ob-conf-row">
+      <span className="ob-conf-k">{k}</span>
+      <span className="ob-conf-v">{v}</span>
     </div>
   );
 }

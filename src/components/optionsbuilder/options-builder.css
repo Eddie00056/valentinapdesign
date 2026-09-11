@@ -1889,3 +1889,1114 @@ button.ob-chip--strike:focus-visible::after,
 @media (prefers-reduced-motion: reduce) {
   .ob-x, .ob-back svg { transition: none; }
 }
+
+
+/* ==================================================================== */
+/* THE CONTROL TREATMENT — shared by both tickets                       */
+/*                                                                      */
+/* Everything below was worked out on the stock order entry and belongs */
+/* to the system rather than to that card: the height a field stands    */
+/* at, what its prefix does, which of its marks are visible at rest and */
+/* what they answer to. It lives here because both cards wear this      */
+/* sheet, and a treatment kept in one card's stylesheet is a treatment  */
+/* the other one copies and then drifts from.                           */
+/*                                                                      */
+/* It is appended, so it overrides the rules above it on source order   */
+/* where the specificity is equal — which is the whole point of the     */
+/* position. Nothing above has been deleted: the original values and    */
+/* the reasoning for them are still there to read.                      */
+/* ==================================================================== */
+/* ---------- the card's own inset ---------- */
+
+/* 4 at the top, against the shared 8.
+
+   .ob-card sets 8/4: sides at 4 and the top at 8, on the argument that
+   the title bar is a band of its own and the first row needs more air
+   from that edge than from the card's. That holds on the options ticket,
+   where the first thing under the bar is a row of text. Here it is a
+   CONTAINER — a filled panel with its own ground and its own 4 inside it
+   before the pill — so the 8 was separating the bar from a box that was
+   already holding its contents clear, and the card read as though it had
+   a margin at the top and none at the sides.
+
+   At 4 the container sits the same distance from all three edges it
+   touches, and the pill's own 4 inside it does the separating. The bottom
+   stays 8: the footer is bare content rather than a surface, and at 4 the
+   CTA reads as pinned to the card's edge. */
+.ob-stage .ob-card {
+  padding-top: 4px;
+}
+
+/* ---------- and how they respond ---------- */
+
+/* The same three-step ramp every chip on this card takes — rest, one step
+   lighter under the pointer, one step darker while it is held — except
+   that a chip's steps are neutral greys and these are the accents
+   themselves.
+
+   It goes DARKER, not lighter. These two are already the brightest things
+   on a near-black card — there is very little white left to move them
+   toward, which is why the first attempt at a lighter hover was invisible
+   — and a filled accent that deepens under the pointer is the way a solid
+   button has always answered.
+
+   Equal STEPS, not equal percentages. A fixed mix ratio moves a colour by
+   an amount that depends on where it already sits, so the two accents
+   would drift apart: each is mixed toward black by whatever it takes to
+   drop 10 points of HSL lightness on hover and 13.8 on press, and the
+   pair then moves together.
+
+     mint   48d597 -> 3baf7c -> 36a072
+     coral  ff557d -> d9486a -> ca4363
+
+   13.8 is not a taste number, it is a FLOOR. The label is black, coral is
+   the darker of the two to begin with, and at 14 points down it holds
+   4.51:1 against black — a tenth past that and the press state stops
+   clearing AA for text this size. Both accents stop there so the two
+   still move as one; mint has room for much more and does not take it.
+
+   The label stays black throughout: the darkest of the four still holds
+   4.63:1 against it, which clears AA for text this size, and a label that
+   swapped colour mid-hover would flicker.
+
+   One treatment, both pairs. Buy and Sell on the ticket and Cancel and
+   Send on the confirmation are the same two buttons — same class, same
+   data-side, same rules — so nothing here is written twice or can drift.
+
+   Fill only — no lift, no glow, no shadow. Nothing else on this card
+   moves or casts anything on hover, and the CTA is already the brightest
+   thing on it; the one honest way to say "more" is more of what it
+   already is.
+
+   0.16s, the duration every other hover on these cards uses. */
+.ob-stage .ob-cta {
+  transition: background 0.16s ease;
+}
+
+.ob-stage .ob-cta[data-side="buy"]:hover {
+  background: #3baf7c;
+}
+
+.ob-stage .ob-cta[data-side="sell"]:hover {
+  background: #d9486a;
+}
+
+.ob-stage .ob-cta[data-side="buy"]:active {
+  background: #36a072;
+}
+
+.ob-stage .ob-cta[data-side="sell"]:active {
+  background: #ca4363;
+}
+
+/* And a focus ring, which these did not have: the stylesheet's button
+   reset clears `outline`, and every other control here declares its own
+   back. Ink rather than the mint the fields use — a mint ring on a mint
+   button is not a ring. */
+.ob-stage .ob-cta:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* Coral, at the same weight as the mint. Both are real acts on a share
+   ticket and neither is the safe one — a hollow Sell beside a solid Buy
+   would say that selling is the lesser half of the decision. Black ink on
+   both, as the CTA already carries, and with it the smoothing exception
+   the mint needed: see .ob-cta, where `-webkit-font-smoothing: auto` puts
+   the stroke back under dark-on-light. */
+.ob-stage .ob-cta[data-side="sell"] {
+  background: var(--down);
+}
+
+/* ---------- the menu rows, and the popover ---------- */
+
+/* THE MENU AND THE POPOVER ARE PORTALLED TO <body>, so nothing in here
+   may lean on the ticket: no ancestor in any selector, no custom
+   properties — `--ink`, `--chip` and the rest are declared on .ob-stage
+   and resolve to nothing out at the body. The literals below are those
+   same tokens, spelled out. See the note over .ob-dd-menu, which learned
+   this the hard way. */
+
+/* A row's own glyph, before its label — the spec's "$" on the limit row
+   and the padlock on the two that follow a quote. Muted, because
+   .ob-dd-item paints every svg in it mint and that accent belongs to the
+   check alone. */
+.ob-dd-label {
+  display: flex;
+  align-items: center;
+  /* 8 — far enough that the glyph reads as its own column down the menu,
+     not as a mark set against the first word. */
+  gap: 8px;
+}
+
+.ob-dd-item .ob-dd-lead {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* One column for glyphs that are not the same width: a "$" is type, a
+     padlock is a 12px icon and the share stack is 13, and their labels
+     have to start on one line regardless. 14 so the widest of them has
+     room — at 12 the stack overhung its own column. */
+  width: 14px;
+  color: #9b9f9f;          /* --faint */
+}
+
+.ob-dd-item .ob-dd-lead svg {
+  color: inherit;
+}
+
+/* The spec's "Hover with popover": what this control is for, in a small
+   panel above it. It wears the menu's own ground and rim — it is the same
+   surface, saying something instead of offering something.
+
+   Wrapped rather than one long line: at 12px the sentence runs past 400px
+   and a tooltip that wide reads as a banner. 210 sets it in four lines
+   over a 139px field, which is the shape the spec draws. */
+.ob-tip {
+  position: fixed;
+  z-index: 42;
+  max-width: 210px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #454949;
+  background: #171b1c;
+  color: #fefffd;
+  box-shadow: 0 14px 28px -12px rgba(0, 0, 0, 0.7);
+  pointer-events: none;
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  /* 11, the size this card keeps for text that annotates another control
+     rather than naming it. */
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- field height ---------- */
+
+/* 30, against the options ticket's 20.
+
+   That 20 is the Figma spec for the options card and it stays there —
+   this override is scoped to `.st-stage` so the two cards can differ on
+   exactly this and nothing else. A share ticket is a form you fill rather
+   than a manifest you read: every line here is a control, where half the
+   options ticket is text, and at 20 a row of them reads as a dense table
+   instead of a stack of things to answer.
+
+   Everything that has to move with it moves here: the row's own band and
+   the label's, so a label still centres on the control it names. */
+/* The two measurements the treatment turns on. Declared here rather than
+   in the token block far above so they sit with the rules that read them
+   — and they win over the originals up there on source order, which is
+   what appending this section is for. */
+.ob-stage {
+  --field-h: 30px;
+  /* Every control on a ticket shares one width so their edges line up,
+     and that width is whatever the widest of them needs. It was 133,
+     measured off "Good till cancelled" at 132.38 with an 8px chevron.
+     What it has to carry now is a field with a clickable prefix, at its
+     longest label, with the 12px chevron:
+
+       prefix  9.19 + "Offset %" 52.26 + 4 + chevron 12 + 7.42 + 1 = 85.87
+       value   6 + "99.99" 31 + 6                                  = 43
+       stepper 20 + .ob-stepper's own 3                            = 23
+                                                                    151.87
+
+     Next widest are a Condition menu at 146.60 and Duration at 136.38 —
+     so 152 carries every control on both cards, and a field on one lines
+     up with the same field on the other. Re-measure when a prefix's
+     longest label, or the chevron, changes. */
+  --line-w: 152px;
+}
+
+.ob-stage .ob-field {
+  height: var(--field-h);
+}
+
+.ob-stage .ob-line {
+  min-height: var(--field-h);
+}
+
+/* Centred, where the options ticket's rows are top-aligned.
+
+   There, every row is a label and a control on one line and the only
+   thing that ever hung below was the quote under the limit field, so
+   pinning the tops kept three controls on one rhythm. Here what hangs
+   below hangs on the LEFT, under the label (see the limit row), which
+   makes that column the tall one — and a 30px field pinned to the top of
+   a two-line column sits above its own question. Centred, the field
+   meets the middle of whatever names it, and a single-line row is
+   unchanged: the label centres on the control exactly as its own 30px
+   band used to make it. */
+.ob-stage .ob-line {
+  align-items: center;
+}
+
+/* So the label takes its own line height rather than the control's band
+   — the centring above now does that job, and a 30px band around a
+   15.6px line would push a caption 8 clear of the label it belongs to. */
+.ob-stage .ob-line-label {
+  min-height: 0;
+}
+
+/* A caption's distance from the thing it captions — 2, the same as the
+   options ticket keeps under its limit field. The column's own 1 was for
+   a label with nothing under it. */
+.ob-stage .ob-line-k {
+  gap: 2px;
+}
+
+/* The caret pair inside a taller field. 20 against the 16 it took at
+   20px — not the strict 24 the ratio would give, which leaves each caret
+   floating in a plate half again its own height. */
+.ob-stage .ob-stepper-btns {
+  width: 20px;
+  height: 20px;
+}
+
+/* And the carets themselves, 7 x 3.5 against the 6 x 3 they are drawn at.
+
+   That 6 x 3 was sized for a 20px field; in a 30px one, inside a 20px
+   block, it read as a mark rather than a control — two specks in a plate
+   three times their height. The glyph is a FILL spanning its whole
+   viewBox, so unlike every stroked icon on this card its box is its ink
+   and the number is the number: 10 x 5 is what you see. The shape is 2:1
+   and stays 2:1.
+
+   The block does not grow with them — it is still 20 x 20, so the field's
+   width budget and the --line-w measured against it are untouched. Each
+   caret now sits in a 20 x 9.5 half with 2.25 of air above and below it,
+   which is what closes the gap between the pair. */
+.ob-stage .ob-stepper-btns svg {
+  width: 7px;
+  height: 3.5px;
+}
+
+/* ---------- the chevron, matched to them ---------- */
+
+/* 12, against the 8 it is drawn at.
+
+   The two marks have to read as one family, and at 8 the chevron did not:
+   it is a STROKE, so its 8px box paints only 4.91 x 2.91 of ink, against
+   a caret whose box is solid fill. Beside a 9 x 4.5 triangle it looked
+   like a different control's affordance.
+
+   Matched on HEIGHT, which is what the eye compares on two wide, flat
+   marks: at 12 the chevron paints 7.37 x 4.37 (8.6 x 5.1 of its 14-unit
+   viewBox, scaled by 12/14) against the caret's 4. It out-measures the
+   triangle by a third of a pixel and is narrower than it, both on
+   purpose: a fill carries more weight than a stroke of the same size, so
+   matching them on paper would leave the arrows looking the larger pair —
+   which is what they did at 9 x 4.5. */
+.ob-stage .ob-chevron {
+  width: 12px;
+  height: 12px;
+}
+
+/* The invisible hit padding around that block, grown into the room the
+   taller field now has. Vertical only: the field's own overflow: hidden
+   clips anything past its box, and at 20 + 4 either side this is 28 of
+   the 30. Sideways it stays 2, where .ob-stepper's 3px of right padding
+   is all there is to grow into.
+
+   And the block itself is SHOWN at rest. The options ticket reveals it on
+   hover, the way it reveals a dropdown's chevron — but the spec gives the
+   suffix a state row of its own, default included, and a stepper is not a
+   chevron: a chevron says "this opens", which a field shaped like a
+   dropdown already says, while the arrows are the only thing on a number
+   field that says the number can be nudged rather than retyped. Hidden,
+   the field's right half is dead space until the pointer happens to
+   cross it. The chevrons go the same way — see below. */
+.ob-stage .ob-stepper-hit {
+  padding: 4px 2px;
+  margin: -4px -2px;
+  opacity: 1;
+}
+
+/* At rest the chevron takes --muted — the colour the row LABELS are set
+   in, one step back from the ink the values carry.
+
+   It was #d8dad9, a near-white the options ticket picked for a chevron
+   that only ever appeared under the pointer. These are on all the time
+   now and half again the size, and at that value a column of them read as
+   loud as the figures they sit beside: the marks are how you change a
+   number, not the number. Muted puts them with the words that name the
+   fields rather than with the ones that answer them — and on the prefix
+   it means the cell's label and its chevron are finally one colour. */
+.ob-stage .ob-chevron {
+  color: var(--muted);
+}
+
+/* The carets go one step further back, to --faint.
+
+   Two of them on every number field, always on, and each one a SOLID
+   FILL — the only filled glyphs on a card whose every other mark is a
+   thin stroke. At the same value as the chevron a column of them read
+   heavy, and a stepper is the quietest thing a field does: it is there
+   for when you want it, and typing over the number is the main path.
+
+   The weight is the fill, so the colour is the lever that works on it —
+   shrinking them further only makes a dark mark small rather than light.
+   Together with 7 x 3.5 they now sit under the chevron beside them, which
+   is right: a fill at the same measure as a stroke always reads bigger.
+
+   Hover still takes them to white; that brightening is the affordance,
+   and options-builder.css already owns it at a higher specificity. */
+.ob-stage .ob-stepper-btns button {
+  color: var(--faint);
+}
+
+/* And the chevrons stay too, for the same reason and at the same weight.
+
+   Revealing them on hover was the first behaviour here, and on a card
+   that is mostly text it holds: a chevron appearing is how a reader
+   learns which of a few flat chips can be opened. But every row in the
+   order's own panel IS a control, so hiding them discloses nothing except
+   which field the pointer is over, and a column of fields that all look
+   inert until touched is worse than one that says what it can do. Nothing moves either way: the glyph already holds its
+   8px of the field, and only its opacity was ever animating.
+
+   Both rest at #d8dad9 and go white under the pointer, so the chevron and
+   the stepper read as one family of affordance. */
+.ob-stage .ob-chevron {
+  opacity: 1;
+}
+
+/* ---------- what a field is showing ---------- */
+
+/* Pure white, against the --ink (#fefffd) every value on the options
+   ticket takes.
+
+   All three selectors are one thing: the number you typed, the number
+   while you are typing it, and the option a dropdown is currently
+   showing. They are the ANSWERS on this card, and they now sit a step
+   above everything around them — labels at --muted, captions and carets
+   at --faint, the prefix marks at --muted — so the eye finds what the
+   ticket says before it reads what the ticket asked.
+
+   `input:disabled` and `::placeholder` keep their own colours: those rules
+   live in the later sheet at (0,2,1), which ties this and wins, and that
+   is the right outcome — a field with nothing in it is not an answer. */
+.ob-stage button.ob-field,
+.ob-stage .ob-stepper-num,
+.ob-stage .ob-field input {
+  color: #ffffff;
+}
+
+/* ---------- clicking into a value must not move it ---------- */
+
+/* The value is a <button> at rest and an <input> while you edit it, and
+   those two were not landing in the same place. Two reasons, both real:
+
+   ONE — DOUBLE PADDING. `.ob-line .ob-field input { padding-inline: 6px }`
+   was written for the Quantity field, whose input is a direct child of
+   the field and needs the 6 itself. On a price field the input sits
+   inside .ob-stepper-num--editing, which already supplies that 6, and
+   that rule outranks the `padding: 0` the editing input is given —
+   (0,2,1) against (0,1,1) — so the number started 12 in instead of 6 and
+   shifted 6px right the moment you clicked it.
+
+   TWO — TRACKING. Chrome's UA sheet declares `letter-spacing: normal` on
+   form controls, and a declared value beats an inherited one. The button
+   keeps the stage's 0.02em; the input silently dropped it, so the digits
+   also tightened by 0.24 each — 1.4px across a price — on top of the
+   shift. This is the same UA-declaration trap options-builder.css already
+   documents for <button>; it applies to <input> too, and nothing had
+   reset it.
+
+   Specificity is why this rule names .ob-field: at (0,3,1) it clears the
+   (0,2,1) it has to beat, where a bare `.ob-stage .ob-stepper-num--editing
+   input` would only tie and lose on source order — options-builder.css is
+   the later sheet. */
+.ob-stage .ob-field .ob-stepper-num--editing input {
+  padding: 0;
+  letter-spacing: inherit;
+}
+
+/* The unit mark in the size field's prefix, pulled onto the same line the
+   "$" it alternates with sits on.
+
+   A glyph's box is not its ink, and neither is an icon's: the stack is
+   drawn 4 to 20 of its 24-unit box and painted with a 2.21 stroke, so at
+   13px it carries 1.57 of bearing either side, where the "$" carries
+   0.54. The cell's 9.19 of padding was measured against that 0.54, so
+   without this the mark would start 1.03 further in than the currency
+   mark does — and the two swap places in the same cell, where any shift
+   reads as the field moving. Re-derive it with the icon's size. */
+.ob-stage .ob-field-k > svg:not(.ob-chevron) {
+  margin-left: -1.03px;
+}
+
+/* ---------- the prefix box ---------- */
+
+/* The currency mark as a cell of the field — Atlas's "Input field — Label
+   as Prefix". It replaces the inline mark that used to sit against the
+   first digit (see PriceField): with a prefix the field says what it
+   holds before the number starts, which is what a prefix is for.
+
+   The cell takes the field's OWN fill and is divided from the value by
+   .ob-field-k's 1px --sunk hairline — the treatment the fields on this
+   card have always carried, and the user's call after seeing it both
+   ways. It was briefly filled with --sunk to make the box read as a
+   plate; that turns the field into two grounds, where it is one field
+   with a part of it set aside, and the hairline says that without
+   restating the box.
+
+   Content-sized rather than .ob-field-k's fixed 74 — that 74 was measured
+   for the words "Limit price", and a fixed box around a glyph that never
+   changes width would be padding pretending to be a measurement.
+
+   The padding is optical, and it is NOT 6. A cell's inset is 6 when the
+   cell is a line of text with room to spare; this one is a single glyph
+   in a box 30 tall, and at 6 the "$" sat in air that was 6.5 wide and 9.7
+   deep — a mark squeezed side to side in a well that was roomy top to
+   bottom. Measured rather than eyeballed, at 12px in DM Sans:
+
+     line box 15.6 centred in 30 puts the baseline at 19.09
+     "$" inks from yMax 9.49 to yMin −1.04, so 9.60 of air above it
+       and 9.86 below — call the air 9.73
+     its side bearings are 0.54 and 0.55, and the stage's 0.02em tracking
+       adds another 0.24 after it
+
+   so 9.73 − 0.54 = 9.19 on the left and 9.73 − 0.55 − 0.24 = 8.94 on the
+   right put the PAINTED edges of the glyph the same 9.73 from all four
+   sides of its cell. A glyph's box is not its ink; see the bearing rule
+   these numbers come from. Re-derive them for any other prefix.
+
+   The colour is .ob-field-k's own --muted, where the inline mark it
+   replaces took --faint. That mark sat hard against the first digit and
+   had to recede or it read as part of the number; in a cell of its own it
+   is a label like every other label on the card. */
+.ob-stage .ob-field-k {
+  width: auto;
+  /* One width for every prefix on the card.
+
+     They were content-sized, so each cell was as wide as whatever it held
+     — the share stack put Quantity's at 45.58 and a "$" put the price
+     fields' at 40.81 — and a column of fields whose first cell changes
+     width from row to row has no left edge for the values to start on.
+
+     46 is the widest of the single-mark cells, measured: 9.19 of padding
+     + the stack's 13 box less its 1.03 pull + 4 to the chevron + the
+     chevron's 12 + 7.42 + the hairline = 45.58. A MINIMUM, not a width:
+     the limit's "Offset %" is a phrase rather than a mark and runs to
+     85.87, and squeezing it into 46 would only clip it.
+
+     space-between is what makes the minimum useful — the slack opens
+     BETWEEN the mark and the chevron, so every mark starts on one line
+     and every chevron ends on another. Left-packed, the extra would have
+     fallen after the chevron and knocked the two out of column. */
+  min-width: 46px;
+  justify-content: space-between;
+  padding-block: 0;
+  padding-left: 9.19px;
+  padding-right: 8.94px;
+}
+
+/* ---------- the prefix that picks ---------- */
+
+/* Atlas draws the prefix in two states, and this is the second:
+   "Clickable Prefix". Where there is something to choose — which quote
+   the limit follows, whether the size is shares or dollars — the cell is
+   a button, it lights under the pointer, and it opens the same list every
+   other trigger on this card opens.
+
+   The reset at the top of options-builder.css strips a <button> of its
+   border and its colour (`.ob-stage button`, which outranks .ob-field-k's
+   own single class), so the cell's hairline and its --muted ink have to
+   be restated here or the picker would render as a borderless white
+   label where the plain prefix beside it is a divided grey one. */
+.ob-stage button.ob-field-k {
+  /* The focus rim below is an overlay, and this is the only box it can be
+     positioned against. */
+  position: relative;
+  /* Its own ground, and it must be declared: `appearance: none` does not
+     drop a <button>'s background, so with nothing here the UA's own
+     `buttonface` — a light plate — rendered behind this cell and the
+     prefix came out white in a dark field. The reset at the top of
+     options-builder.css cannot fix that for everyone, either:
+     `.ob-stage button { background: none }` would sit at (0,1,1) and
+     outrank .ob-sidebtn and every other single-class chip on the card,
+     stripping their fills. Same family as the native border-width/style
+     that reset does exist for; this one has to be cleared per button.
+
+     --chip rather than `none` because the cell also has to STOP the
+     field's hover fill washing through it — see the two rules below. */
+  background: var(--chip);
+  border-right: 1px solid var(--sunk);
+  color: var(--muted);
+  cursor: pointer;
+  /* 4 to the chevron — the gap every field on these cards keeps between
+     its label and its own. */
+  gap: 4px;
+  /* The trailing inset is measured to the CHEVRON's ink, not the mark's.
+     Its path spans 3.5 to 10.5 of a 14-unit box with a 1.6 stroke, so it
+     paints from 2.7 to 11.3 — 1.54 of bearing either side at the 8px it
+     is drawn at, and 2.31 at the 12 this card renders it. 9.73 − 2.31 =
+     7.42 puts its painted edge the same 9.73 off the hairline that the
+     mark sits off the field's edge. Re-derive it with the chevron. */
+  padding-right: 7.42px;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+/* A clickable prefix and the value beside it are two controls, and the
+   spec treats them as two: the state shows on the half you are on, and
+   only falls to the whole field when the prefix is NOT clickable ("when
+   there is no prefix the state will be displayed on the whole field" —
+   which is why the plain `$` on the stop and amount fields still lights
+   the whole thing).
+
+   Two rules make that true, and both are needed.
+
+   One: the cell carries its own ground — declared up in the base rule
+   above. Without it the prefix has no background of its own and simply
+   shows the field's, so the field's hover fill washed straight through it
+   and both halves lit at once.
+
+   Two: the field's own hover does not fire while the pointer is on the
+   prefix. The prefix sits INSIDE the field, so hovering it hovers both —
+   :has() is what lets the inner control veto the outer one's state.
+
+   Specificity is doing real work here: :has() takes the weight of its
+   argument, so this lands at (0,4,1) against .ob-stepper:hover's (0,2,0)
+   and wins on merit rather than on source order. */
+.ob-stage .ob-field:has(button.ob-field-k:hover) {
+  background: var(--chip);
+}
+
+/* Lights up. One step lighter than the field it sits in, which is the
+   ramp every other control here takes — and only the CELL lights: what
+   you are about to open is the unit, not the number. */
+.ob-stage button.ob-field-k:hover {
+  background: var(--chip-hover);
+  color: var(--ink);
+}
+
+.ob-stage button.ob-field-k:active {
+  background: var(--chip-press);
+}
+
+/* Selected belongs to ONE half of the field, and focus does not respect
+   halves.
+
+   .ob-stepper:focus-within gives the whole field the mint plate and the
+   mint rim, which is exactly right when the caret is in the number — that
+   IS the field being edited. But the prefix is a focusable child of the
+   same box, so clicking it lit the entire field: the value area went
+   green behind a number nobody was editing, and the rim drew around both
+   halves while the menu below belonged to one of them.
+
+   So the field's own Selected state stands down while the focus is on the
+   prefix. The prefix's [data-open] plate and rim below are then the only
+   thing showing, which is what the spec draws.
+
+   :has() again, and again the specificity is load-bearing: it carries the
+   weight of its argument, so these land at (0,4,1) against the rules they
+   have to beat at (0,2,0) and (0,2,1). */
+.ob-stage .ob-stepper:has(button.ob-field-k:focus) {
+  background: var(--chip);
+}
+
+.ob-stage .ob-stepper:has(button.ob-field-k:focus)::after {
+  content: none;
+}
+
+/* Open, and holding the Selected state — `.ob-stage [data-open]` supplies
+   the mint plate and its rim, the same as an open dropdown. The hover
+   rule above would otherwise win on the pointer that opened it. */
+.ob-stage button.ob-field-k[data-open],
+.ob-stage button.ob-field-k[data-open]:hover {
+  background: var(--chip-sel);
+  color: var(--ink);
+}
+
+/* The chevron is hidden until the field is hovered or focused, the way
+   every other trigger's is — the reveal rules in options-builder.css name
+   their own selectors, and this cell is not one of them. */
+.ob-stage button.ob-field-k:hover .ob-chevron,
+.ob-stage button.ob-field-k:focus-visible .ob-chevron {
+  opacity: 1;
+  color: #ffffff;
+}
+
+/* Focus, as the fields wear it: the mint rim, drawn as an overlay so the
+   cell's own box never changes size. */
+.ob-stage button.ob-field-k:focus-visible {
+  outline: none;
+  background: var(--chip-sel);
+}
+
+.ob-stage button.ob-field-k:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--up);
+  pointer-events: none;
+}
+
+/* The rim has to turn the field's own corner.
+
+   `.ob-stage [data-open]::after` draws it with `border-radius: inherit`,
+   which inherits from the element it sits on — and the prefix is a flat
+   cell with no radius of its own, so the rim came out a square rectangle
+   inside a field that clips at 4. The field's `overflow: hidden` then cut
+   the square corners off, which is the notch: a mint edge running to a
+   corner that is not there.
+
+   4 on the left, where the cell is flush with the field's outer edge and
+   has to follow its curve, and 0 on the right, where it stops at the
+   hairline and the value area carries on. */
+.ob-stage button.ob-field-k[data-open]::after,
+.ob-stage button.ob-field-k:focus-visible::after {
+  border-radius: 4px 0 0 4px;
+}
+
+
+
+
+/* ---------- 12 either side of the band rule ---------- */
+
+/* The options ticket's own bands, on the rhythm the stock one uses: 6
+   between two rows of the same kind, 12 either side of a rule that
+   separates two kinds.
+
+   Both numbers are painted, and only one of them is also declared. Below
+   the rule is a FIELD, whose edge is its ink, so 12 is 12. Above it is a
+   leg — a line of type — and type does not end where its box does: the
+   deepest ink on "Buy to open 11 Sep 2026 $175 Call" is the p, which
+   reaches 14.53 of a 15.6 line box and leaves 1.07 under it. With the
+   row's own 6 that is 7.07 off the panel's edge already, so the panel
+   adds the remaining 4.93. */
+.ob-legs-panel {
+  padding-bottom: 4.93px;
+}
+
+.ob-legs-panel + .ob-params-panel .ob-params {
+  padding-top: 12px;
+}
+
+
+/* ==================================================================== */
+/* THE CONFIRMATION, AND THE ORDER HAVING BEEN PLACED                   */
+/*                                                                      */
+/* Also shared. A ticket that sends an order asks first and says so      */
+/* afterwards, and neither of those is particular to what is being       */
+/* traded — only the sentence inside them is.                           */
+/*                                                                      */
+/* `position: fixed` in here resolves against the nearest transformed    */
+/* ancestor, which on the chain-to-order workspace is the simulated      */
+/* 1440x900 screen rather than the browser window. That is the right     */
+/* answer, not a compromise: the scrim covers the screen the ticket is   */
+/* on, and the snackbar sits at the foot of it.                         */
+/* ==================================================================== */
+/* ---------- the two acts ---------- */
+
+.ob-ctas {
+  display: flex;
+  align-items: center;
+  /* 4 — the gap between two halves of one control, against the 6 that
+     separates one control from the next. */
+  gap: 4px;
+}
+
+/* Buy and Sell are the same button in two directions, so they are one
+   size: "Buy" sets 21.5 at 12px and "Sell" 20.09, and a pair that
+   differed by 1.4 would read as a mistake rather than a pair. 52 is what
+   the single "Submit" measured before it (41 of label inside its 6s), so
+   the card's commitment did not get smaller when it gained a direction. */
+.ob-stage .st-cta {
+  min-width: 52px;
+}
+
+/* Black ink, which is what .ob-cta already asks for and does not get.
+
+   The stylesheet's own button reset — `.ob-stage button { color: inherit }`
+   — sits at (0,1,1) and outranks `.ob-cta { color: #000 }` at (0,1,0), so
+   the label inherited the stage's near-white and rendered white on mint.
+   The options ticket never shows it because its CTA label is wrapped by
+   Swap's motion.span, which `.ob-cta-label > span { color: #000 }` catches
+   at (0,2,0); these two buttons hold a bare word, so nothing caught them.
+
+   Stated here at (0,2,0) rather than by adding a wrapper element, because
+   the colour is a property of the button, not of whatever happens to be
+   inside it. */
+.ob-stage .st-cta {
+  color: #000000;
+  /* Everything that decides how the label looks, stated here rather than
+     inherited — the rule shared parts on this project follow, because a
+     part that leans on its host renders differently in the next host.
+     .ob-cta declares only size, weight and smoothing and takes the rest
+     from `font: inherit` plus the stage's button reset, which is three
+     places for one answer.
+
+     These are the stage's own values, so nothing moves; what changes is
+     that nothing CAN. */
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 12px;
+  /* 600, where every other label on the card is 400.
+
+     This is the weight the CTA lost when its smoothing was matched to the
+     card: `antialiased` thins dark-on-light text a lot, and these two are
+     the only dark ink on a light ground here. Putting it back as WEIGHT
+     rather than as a different rasteriser fixes the stroke without the
+     side effect that came with `auto` — glyphs that render heavy also
+     render tight, and the label read as though its tracking had changed.
+
+     600 is not new to this card either: the title bar's name and the
+     ticker pill's symbol and price all carry it. Those are the two pieces
+     of identity in a widget; this is the one commitment in a ticket, and
+     it belongs at the same strength. */
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  /* The card's own smoothing, against .ob-cta's `auto`.
+
+     That exception was made on the options ticket, where the mint CTA is
+     the only dark-on-light surface: `antialiased` thins dark-on-light
+     text a lot, so `auto` was put there to give the stroke back. It does
+     — but it gives more than the stroke. `auto` renders the glyphs
+     heavier, and heavier glyphs close the gaps between them, so at the
+     identical declared 0.02em the label reads TIGHTER than every label
+     around it. Which is what "the letter spacing seems different" is:
+     the tracking was never different, the rendering was.
+
+     Matched to the card instead, so all four buttons on this ticket and
+     every label they sit beside go through the same rasteriser. If the
+     stroke now reads light against the mint, the lever is weight, not
+     smoothing — and it is one line either way. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------- the order confirmation ---------- */
+
+/* The ticket, still readable and no longer touchable. Near-black rather
+   than a wash of white: the page's own ground is #0b0b0d, and a light
+   scrim over a dark card lifts it toward grey instead of setting it
+   back. */
+.ob-stage .ob-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  /* 5%, and no more. The page is not being dimmed, it is being taken out
+     of focus — the blur and the saturation do that, and they are animated
+     from the component so nothing may be declared for them here or the
+     static value would fight the one Motion is writing.
+
+     It was 66% of near-black with a fixed 2px blur, which hid the ticket
+     rather than softening it. What is behind a confirmation is the thing
+     being confirmed; it should stay legible enough to check. */
+  background: rgba(11, 11, 13, 0.05);
+  border: 0;
+  padding: 0;
+  /* A surface, not a control, even though it is a button — the label is
+     for assistive tech and the cursor should not promise a press. */
+  cursor: default;
+}
+
+/* The box the ticket and its confirmation share.
+
+   `position: relative` and nothing else — deliberately NOT a stacking
+   context. The scrim is a sibling at z-index 50 and has to paint over
+   the card inside here while the panel at 51 paints over the scrim; give
+   this box a z-index (or a transform, or a filter) and all three get
+   trapped in it together, with the card above the thing meant to dim it. */
+.ob-stage .ob-deck {
+  position: relative;
+}
+
+/* Centred on the WIDGET, not on the window.
+
+   The confirmation is what this ticket is doing, so it belongs where the
+   ticket is — a panel arriving in the middle of the screen while the card
+   sits near the top reads as a second thing on the page rather than the
+   next step of the first.
+
+   `inset: 0` spans the card's own box and the flex centring puts the
+   panel on its middle; being the taller of the two it overflows evenly
+   above and below, which is what makes it read as coming out of the card
+   rather than landing on it. No transform — the panel inside is animated,
+   and a transform here would both trap it in a new stacking context and
+   fight Motion for the same property. */
+.ob-stage .ob-modal-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 51;
+  display: flex;
+  /* `safe` again: the panel is taller than the card it is centred on, so
+     on a short window it degrades to sharing the card's top edge and
+     growing downward rather than losing its head. */
+  align-items: safe center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* The panel. It takes the pointer back; the wrapper stays through so a
+   click anywhere around it lands on the scrim and closes. */
+.ob-stage .ob-modal-card {
+  pointer-events: auto;
+  outline: none;
+}
+
+.ob-stage .ob-modal {
+  /* The ticket's own 357. Not because the content needs exactly that, but
+     because this is the same object: two cards of different widths
+     stacked on one screen read as two applications. Its widest line —
+     "Change in maintenance excess" against a signed figure — measures 279
+     of the 323 it has. */
+  width: 357px;
+
+}
+
+/* ---------- what it says ---------- */
+
+/* The panel's one surface. The same box a ticket's own container is —
+   --panel at radius 6, `0 6px`, no vertical padding, because every band
+   inside brings its own. Named for the confirmation rather than borrowed
+   from either card, since both cards' modals are this one. */
+.ob-conf-body {
+  padding: 0 6px;
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+/* The statement, and the direction it is in. */
+.ob-conf-lead {
+  display: flex;
+  /* Centred on each other, so the badge holds the middle of the line
+     whether the sentence runs to one line or two. */
+  align-items: center;
+  gap: 6px;
+  /* 12 above and below, so the statement sits in the middle of its own
+     band rather than against the top of it. The ticket's first band takes
+     4 at the top because a pill against the card's edge wants to be
+     close to it; this one is a sentence, and a sentence in a box reads as
+     misplaced unless the box holds it evenly. */
+  padding: 12px 0;
+}
+
+/* A stadium, where every control on this card is a 6. The shape is the
+   point: this is the one thing in the panel that looks like a chip and is
+   not a control, and a radius nothing else uses says so before the eye
+   reaches for it. */
+.ob-badge {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.ob-badge[data-side="buy"] {
+  background: var(--chip-sel);
+  color: var(--up);
+}
+
+.ob-badge[data-side="sell"] {
+  background: var(--chip-err-sel);
+  color: var(--down);
+}
+
+/* The order itself, in ink and at 12 — the one line in the panel that is
+   the ANSWER rather than a reading about it. 1.45 of leading because it
+   wraps to two lines at the orders this ticket can build, and 1.3 sets a
+   two-line run tighter than a single line wants to be read. */
+.ob-conf-order {
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+/* Each group of readings, divided from the last the way the ticket's own
+   bands are: a rule on the grid rather than on the container, 12 of air
+   either side of it. */
+.ob-conf-group {
+  border-top: 1px solid var(--rule);
+  padding: 12px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ob-conf-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  /* 12 — enough that a long label and a long figure never read as one
+     run, on the widest row this panel has. */
+  gap: 12px;
+}
+
+.ob-conf-k {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Ink, and right-aligned: these are answers, and they line up on the
+   panel's own edge the way every control on the ticket does. */
+.ob-conf-v {
+  color: #ffffff;
+  font-size: 12px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* The small print. 11, this card's annotation size, and --faint, its
+   annotation colour — the two together are what "read this if you want
+   it" looks like next to a figure you are being asked to accept. */
+.ob-conf-fine {
+  gap: 8px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--faint);
+}
+
+.ob-conf-fine p {
+  margin: 0;
+}
+
+/* The one link on the card. Mint, because that is what this palette uses
+   for the thing you may act on, and underlined because a colour alone is
+   not a link. */
+.ob-conf-fine a {
+  color: var(--up);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* The confirmation's own footer carries only its two buttons, so there is
+   no reading to push them right — they go there themselves. */
+.ob-conf-foot {
+  justify-content: flex-end;
+}
+
+/* ---------- the order has been placed ---------- */
+
+/* A fixed row at the foot of the page, centred WITHOUT a transform — the
+   bar inside it is dragged on x, and Motion writes the same property a
+   translate would use. Flex centring leaves that property free. */
+.ob-stage .ob-toast-wrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  /* 40, up from 24. A confirmation that has nothing under it reads as
+     having fallen to the bottom of the window; lifted, it sits in the
+     page rather than on its edge. */
+  bottom: 40px;
+  z-index: 60;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+/* The box that moves. Nothing to paint, so the transform, the opacity and
+   the blur can all be composited — see the note in StockTicket.tsx. */
+.ob-toast-item {
+  pointer-events: auto;
+  display: flex;
+  cursor: grab;
+  user-select: none;
+  will-change: transform, filter;
+}
+
+.ob-toast-item:active {
+  cursor: grabbing;
+}
+
+/* The surface it carries. The house green callout: a mint plate inside a
+   mint rim, in the mint itself — `--green-bg` and `--green-line` are the
+   pair this card already uses for a selected state, and this is the same
+   statement made at the size of a sentence.
+
+   600 like the CTA, and for the same reason: this is a confirmation, not
+   a caption, and it is the one line on screen when it is on screen. */
+.ob-toast {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  /* 8 from the check to the sentence — far enough that the mark reads as
+     its own thing rather than a bullet on the line. */
+  gap: 8px;
+  border-radius: 8px;
+  background: var(--green-bg);
+  border: 1px solid var(--green-line);
+  color: var(--up);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  /* Wide and soft rather than dark. It was 0.75 of black, which is a lot
+     of shadow to re-render on every frame of a blur — and on a page that
+     is already near-black, depth comes from the spread, not the density. */
+  box-shadow: 0 22px 44px -14px rgba(0, 0, 0, 0.5);
+}
+
+/* The mark that draws itself.
+
+   Kept in the coordinate system the effect was written in — a 52-unit box
+   around an r24 circle — so the dash numbers mean what they say, and
+   rendered at 16 for a 32px bar. The strokes are scaled with it: 3 and 4
+   of a 52 box paint 0.92 and 1.23 at this size, which is finer than
+   anything else on the card. 4.2 and 5.6 hold the reference's own 3:4
+   ratio and land at 1.29 and 1.72 painted — the tick a shade heavier than
+   the 600 text beside it, which is right for a lone mark.
+
+   The mint is this card's --up rather than the source's #4CD08A: they are
+   within a couple of values of each other, and two near-identical greens
+   on one bar is the kind of thing that reads as a mistake. */
+.ob-check {
+  flex: none;
+}
+
+.ob-check-ring {
+  fill: none;
+  stroke: #2a2a2e;
+  stroke-width: 4.2;
+  stroke-dasharray: 151;
+  stroke-dashoffset: 151;
+  transition: stroke-dashoffset 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.ob-check-tick {
+  fill: none;
+  stroke: var(--up);
+  stroke-width: 5.6;
+  stroke-linecap: round;
+  stroke-dasharray: 28;
+  stroke-dashoffset: 28;
+  /* Held back 0.4s: the ring is most of the way round by then, so the
+     tick reads as the answer the circle was waiting for rather than the
+     two racing. */
+  transition: stroke-dashoffset 0.3s ease-out 0.4s;
+}
+
+/* The ring's colour is NOT in either transition, so it snaps to mint on
+   the frame the class lands — which is what makes the ring appear to be
+   drawn in mint rather than to change colour once it has arrived. */
+.ob-check.is-done .ob-check-ring {
+  stroke: var(--up);
+  stroke-dashoffset: 0;
+}
+
+.ob-check.is-done .ob-check-tick {
+  stroke-dashoffset: 0;
+}
+
+/* Drawn already, for anyone who has asked not to be shown things being
+   drawn. */
+@media (prefers-reduced-motion: reduce) {
+  .ob-check-ring,
+  .ob-check-tick {
+    transition: none;
+  }
+}
