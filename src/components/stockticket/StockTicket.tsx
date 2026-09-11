@@ -327,6 +327,10 @@ export function StockTicket({
      snackbar would have said the same thing again a moment later, in a
      louder voice. */
   const [toast, setToast] = useState<number | null>(null);
+  /* The check draws itself with CSS transitions, which only run if the
+     element is painted in its undrawn state first. Two frames: one to
+     commit the initial dashoffset, one to change it. */
+  const [checked, setChecked] = useState(false);
   /* Which direction is waiting on a confirmation. The buttons no longer
      place anything: they ask, and the modal is where the order is sent. */
   const [confirming, setConfirming] = useState<Side | null>(null);
@@ -411,6 +415,21 @@ export function StockTicket({
       opener?.focus?.();
     };
   }, [confirming]);
+
+  useEffect(() => {
+    if (!toast) {
+      setChecked(false);
+      return;
+    }
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => setChecked(true));
+    });
+    return () => {
+      cancelAnimationFrame(first);
+      cancelAnimationFrame(second);
+    };
+  }, [toast]);
 
   const limitEdited = useRef(false);
   useEffect(() => {
@@ -1371,7 +1390,39 @@ export function StockTicket({
                 }
               }}
             >
-              <div className="st-toast">Your order has been placed</div>
+              <div className="st-toast">
+                {/* The ring draws round, then the tick draws in behind
+                    it — both as stroke-dashoffset, which is the one way
+                    to animate a line being DRAWN rather than revealed.
+
+                    `pathLength` normalises each path to the dash numbers
+                    the effect is written against: 151 for the ring and 28
+                    for the tick, whatever the geometry actually measures.
+                    Without it those two constants are a circumference and
+                    an arc length that have to be recomputed the moment
+                    anything about the drawing changes. */}
+                <svg
+                  className={`st-check${checked ? " is-done" : ""}`}
+                  viewBox="0 0 52 52"
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                >
+                  <circle
+                    className="st-check-ring"
+                    cx="26"
+                    cy="26"
+                    r="24"
+                    pathLength={151}
+                  />
+                  <path
+                    className="st-check-tick"
+                    d="M16 27l6.5 6.5L36 18.5"
+                    pathLength={28}
+                  />
+                </svg>
+                Your order has been placed
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

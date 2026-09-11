@@ -376,6 +376,77 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ---------- and how they respond ---------- */
+
+/* The same three-step ramp every chip on this card takes — rest, one step
+   lighter under the pointer, one step darker while it is held — except
+   that a chip's steps are neutral greys and these are the accents
+   themselves.
+
+   It goes DARKER, not lighter. These two are already the brightest things
+   on a near-black card — there is very little white left to move them
+   toward, which is why the first attempt at a lighter hover was invisible
+   — and a filled accent that deepens under the pointer is the way a solid
+   button has always answered.
+
+   Equal STEPS, not equal percentages. A fixed mix ratio moves a colour by
+   an amount that depends on where it already sits, so the two accents
+   would drift apart: each is mixed toward black by whatever it takes to
+   drop 10 points of HSL lightness on hover and 13.8 on press, and the
+   pair then moves together.
+
+     mint   48d597 -> 3baf7c -> 36a072
+     coral  ff557d -> d9486a -> ca4363
+
+   13.8 is not a taste number, it is a FLOOR. The label is black, coral is
+   the darker of the two to begin with, and at 14 points down it holds
+   4.51:1 against black — a tenth past that and the press state stops
+   clearing AA for text this size. Both accents stop there so the two
+   still move as one; mint has room for much more and does not take it.
+
+   The label stays black throughout: the darkest of the four still holds
+   4.63:1 against it, which clears AA for text this size, and a label that
+   swapped colour mid-hover would flicker.
+
+   One treatment, both pairs. Buy and Sell on the ticket and Cancel and
+   Send on the confirmation are the same two buttons — same class, same
+   data-side, same rules — so nothing here is written twice or can drift.
+
+   Fill only — no lift, no glow, no shadow. Nothing else on this card
+   moves or casts anything on hover, and the CTA is already the brightest
+   thing on it; the one honest way to say "more" is more of what it
+   already is.
+
+   0.16s, the duration every other hover on these cards uses. */
+.ob-stage .st-cta {
+  transition: background 0.16s ease;
+}
+
+.ob-stage .st-cta[data-side="buy"]:hover {
+  background: #3baf7c;
+}
+
+.ob-stage .st-cta[data-side="sell"]:hover {
+  background: #d9486a;
+}
+
+.ob-stage .st-cta[data-side="buy"]:active {
+  background: #36a072;
+}
+
+.ob-stage .st-cta[data-side="sell"]:active {
+  background: #ca4363;
+}
+
+/* And a focus ring, which these did not have: the stylesheet's button
+   reset clears `outline`, and every other control here declares its own
+   back. Ink rather than the mint the fields use — a mint ring on a mint
+   button is not a ring. */
+.ob-stage .st-cta:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
 /* Coral, at the same weight as the mint. Both are real acts on a share
    ticket and neither is the safe one — a hollow Sell beside a solid Buy
    would say that selling is the lesser half of the decision. Black ink on
@@ -1303,6 +1374,9 @@
   align-items: center;
   height: 32px;
   padding: 0 16px;
+  /* 8 from the check to the sentence — far enough that the mark reads as
+     its own thing rather than a bullet on the line. */
+  gap: 8px;
   border-radius: 8px;
   background: var(--green-bg);
   border: 1px solid var(--green-line);
@@ -1315,4 +1389,64 @@
      of shadow to re-render on every frame of a blur — and on a page that
      is already near-black, depth comes from the spread, not the density. */
   box-shadow: 0 22px 44px -14px rgba(0, 0, 0, 0.5);
+}
+
+/* The mark that draws itself.
+
+   Kept in the coordinate system the effect was written in — a 52-unit box
+   around an r24 circle — so the dash numbers mean what they say, and
+   rendered at 16 for a 32px bar. The strokes are scaled with it: 3 and 4
+   of a 52 box paint 0.92 and 1.23 at this size, which is finer than
+   anything else on the card. 4.2 and 5.6 hold the reference's own 3:4
+   ratio and land at 1.29 and 1.72 painted — the tick a shade heavier than
+   the 600 text beside it, which is right for a lone mark.
+
+   The mint is this card's --up rather than the source's #4CD08A: they are
+   within a couple of values of each other, and two near-identical greens
+   on one bar is the kind of thing that reads as a mistake. */
+.st-check {
+  flex: none;
+}
+
+.st-check-ring {
+  fill: none;
+  stroke: #2a2a2e;
+  stroke-width: 4.2;
+  stroke-dasharray: 151;
+  stroke-dashoffset: 151;
+  transition: stroke-dashoffset 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.st-check-tick {
+  fill: none;
+  stroke: var(--up);
+  stroke-width: 5.6;
+  stroke-linecap: round;
+  stroke-dasharray: 28;
+  stroke-dashoffset: 28;
+  /* Held back 0.4s: the ring is most of the way round by then, so the
+     tick reads as the answer the circle was waiting for rather than the
+     two racing. */
+  transition: stroke-dashoffset 0.3s ease-out 0.4s;
+}
+
+/* The ring's colour is NOT in either transition, so it snaps to mint on
+   the frame the class lands — which is what makes the ring appear to be
+   drawn in mint rather than to change colour once it has arrived. */
+.st-check.is-done .st-check-ring {
+  stroke: var(--up);
+  stroke-dashoffset: 0;
+}
+
+.st-check.is-done .st-check-tick {
+  stroke-dashoffset: 0;
+}
+
+/* Drawn already, for anyone who has asked not to be shown things being
+   drawn. */
+@media (prefers-reduced-motion: reduce) {
+  .st-check-ring,
+  .st-check-tick {
+    transition: none;
+  }
 }
