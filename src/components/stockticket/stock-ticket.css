@@ -41,7 +41,14 @@
    card sitting at the top of a page; this one is centred and lifted, so
    the same 96 only narrows the box it is being centred in and brings the
    overflow case on sooner. */
-.st-stage {
+/* `.ob-stage.st-stage`, not `.st-stage` — the root carries BOTH classes,
+   and `.ob-stage` states `align-items: start` and `padding: 96px 20px` at
+   the same (0,1,0). In the dev server this file is injected last and a tie
+   goes to it; in the build it is emitted FIRST and the tie goes the other
+   way, so both of these silently reverted the moment the page was built.
+   See the cascade note at the top of this file — this is the same trap
+   with a wider mouth, because the two selectors do not look alike. */
+.ob-stage.st-stage {
   align-items: safe center;
   padding-block: 48px;
 }
@@ -631,7 +638,10 @@
 
    Everything that has to move with it moves here: the row's own band and
    the label's, so a label still centres on the control it names. */
-.st-stage {
+/* Both classes again: `--line-w` is declared on `.ob-stage` too, so a
+   bare `.st-stage` lost it in the build and every field went back to the
+   options ticket's 133. */
+.ob-stage.st-stage {
   --field-h: 30px;
   /* Every control on the card shares one width so their edges line up,
      and that width is whatever the widest of them needs. The options
