@@ -138,6 +138,15 @@ export const pieces: Piece[] = [
     previewHeight: 560,
   },
   {
+    slug: "beam-ring",
+    href: "/work/beam-ring",
+    title: "Beam ring",
+    /* Tall and narrow: the piece is a column of three objects, and a
+       viewport wider than the widest of them is mostly ground. */
+    previewWidth: 640,
+    previewHeight: 620,
+  },
+  {
     slug: "chain-to-order",
     href: "/work/chain-to-order",
     title: "Chain to order",

@@ -1,0 +1,10 @@
+---
+import Bare from "../../layouts/Bare.astro";
+import { BeamDemo } from "../../components/beamring/BeamDemo";
+import "../../components/beamring/beam-ring.css";
+import "../../components/beamring/beam-demo.css";
+---
+
+<Bare title="Beam ring" bg="#070f11">
+  <BeamDemo client:load />
+</Bare>

@@ -1,0 +1,156 @@
+/* ------------------------------------------------------------------
+   Beam ring.
+
+   A border with a light running round it. The ring IS the border — not a
+   line drawn over one, and not a halo around the box — which is the whole
+   trick: three layers in the same pixel, and the one that moves is on
+   top.
+
+   How it is made, and why it is made this way:
+
+     1. The root is the outer box: its padding — `--beam-w` — is the
+        ring's thickness, and its background is the border the light
+        travels along.
+     2. `.beam-clip` rounds and clips (`overflow: hidden`), and a conic
+        gradient oversized inside it is SPUN. Spun, not angled: a conic
+        gradient can be turned by animating the angle it starts from, but
+        that repaints the gradient every frame and the angle has to be a
+        registered `@property` or it steps. A child turned with
+        `transform` is composited and costs nothing.
+     3. The face — an opaque box one `--beam-w` smaller on every side —
+        covers the middle. What is left is the border.
+
+   The clip is a child rather than the root because of the bloom: the
+   light cannot escape the box that cuts it into a ring, so the glow is a
+   second copy of the arc, blurred, and it has to sit outside that clip.
+
+   No mask, no `border-image`, no SVG. A mask has to animate the
+   gradient's own angle, which is the repaint this construction exists to
+   avoid.
+
+   The radii stay concentric on their own: the face inherits the root's
+   radius minus the inset, which is the only way a rounded ring keeps an
+   even thickness round its corners.
+------------------------------------------------------------------ */
+
+.beam {
+  /* Every knob. Set them per instance in `style`, or per context in a
+     stylesheet — the component reads them and nothing else. */
+  --beam-w: 1px;
+  --beam-r: 6px;
+  --beam-color: #48d597;
+  --beam-core: #e8f7ef;
+  --beam-bg: #2c3334;
+  --beam-duration: 5s;
+  /* The ring the light travels along, under it. A border that only exists
+     while the arc is passing is a border that flickers; this one is
+     always there and the arc brightens it. */
+  --beam-track: rgba(255, 255, 255, 0.12);
+  /* How much of the turn is lit. The tail arrives before the head — the
+     eye needs the gradient to have a direction before it reads travel
+     rather than a lit border. */
+  --beam-tail: 72%;
+  --beam-head: 90%;
+
+  position: relative;
+  display: inline-flex;
+  box-sizing: border-box;
+  padding: var(--beam-w);
+  border-radius: var(--beam-r);
+  background: var(--beam-track);
+}
+
+/* The clip. Rounds with the root and cuts the arc to it — everything the
+   ring is, except the part of it that glows. */
+.beam-clip {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+@keyframes beam-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+/* One arc: nothing, the colour, a near-white core, nothing. Tinted rather
+   than pure white — a white-hot point reads as the brightest thing on the
+   page however faint the rest of it is.
+
+   `inset: -50%` so the square gradient still covers the rounded box's
+   corners at every angle it turns through. */
+.beam-arc {
+  position: absolute;
+  inset: -50%;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 var(--beam-tail),
+    var(--beam-color) calc(var(--beam-tail) + 12%),
+    var(--beam-core) var(--beam-head),
+    transparent calc(var(--beam-head) + 6%)
+  );
+  animation: beam-turn var(--beam-duration) linear infinite;
+}
+
+/* The face, over the middle — this is what leaves a ring rather than a
+   disc. Its radius is the root's minus the inset, which keeps the two
+   curves concentric.
+
+   Painting order is DOM order here, and deliberately: halo, clip and face
+   are all positioned with `z-index: auto`, so each paints over the last
+   without a single stacking number to keep in step. */
+.beam-face {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Fills whatever the root is: content-sized when the ring is wrapped
+     round a button that brings its own size, and stretched when the
+     caller pins the root's width and height instead. `width: 100%` did
+     the first case and resolved against an auto-width parent in the
+     second, which is a circular measure the face should not depend on. */
+  flex: 1 1 auto;
+  min-width: 0;
+  border-radius: calc(var(--beam-r) - var(--beam-w));
+  background: var(--beam-bg);
+}
+
+/* The bloom, and the only part of this that is outside the box.
+
+   The ring's own light cannot escape — the clip that makes the ring is
+   what stops it — so the glow is a second copy of the arc, sitting in the
+   same box behind the whole thing and blurred. A filter is not clipped by
+   its element's own `overflow`, which is what lets a clipping box bloom
+   outward at all.
+
+   It carries no ring of its own: the face above it is opaque, so all that
+   shows is what the blur pushes past the edge. */
+.beam-halo {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  overflow: hidden;
+  filter: blur(var(--beam-glow, 3px));
+  opacity: var(--beam-glow-opacity, 0.4);
+}
+
+/* Stopped: the border stays, the light goes. A ring that depends on an
+   animation to look right is a ring that looks wrong the moment the
+   animation is not wanted — in reduced motion, or on a component whose
+   state says the light is off. */
+.beam[data-still] .beam-clip,
+.beam[data-still] .beam-halo {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beam-clip,
+  .beam-halo {
+    display: none;
+  }
+}
