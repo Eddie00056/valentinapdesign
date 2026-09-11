@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import {
   AnimatePresence,
   LayoutGroup,
@@ -12,6 +11,15 @@ import { pxHub, PX_BASE } from "../alertscreen/priceHub";
 import type { PriceState } from "../alertscreen/priceHub";
 import { UP, DOWN } from "../alertscreen/chart";
 import { WidgetShell } from "../shared/WidgetShell";
+/* The ticket's controls — shared with the stock ticket, which is the
+   same card asking a different set of questions. See TicketControls. */
+import {
+  AutoHeight,
+  Dropdown,
+  PriceField,
+  StepperField,
+  Swap,
+} from "../shared/TicketControls";
 import {
   EXPIRIES as CHAIN_EXPIRIES,
   MONTH_LABELS,
@@ -235,25 +243,6 @@ function payoffProfile(
   return { maxProfit, maxLoss, breakevens };
 }
 
-/* ---- crossfading label (Motion) ---- */
-
-function Swap({ k, children }: { k: string; children: ReactNode }) {
-  const reduce = useReducedMotion();
-  return (
-    <AnimatePresence initial={false} mode="popLayout">
-      <motion.span
-        key={k}
-        initial={{ y: reduce ? 0 : "0.7em", opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: reduce ? 0 : "-0.7em", opacity: 0 }}
-        transition={reduce ? { duration: 0 } : { duration: 0.24, ease: [0.33, 1, 0.68, 1] }}
-      >
-        {children}
-      </motion.span>
-    </AnimatePresence>
-  );
-}
-
 /** A quote handed in from elsewhere — see the chain-to-ticket page. */
 export type IncomingQuote = {
   strike: number;
@@ -398,8 +387,6 @@ export function OptionsBuilder({
   const [limitPx, setLimitPx] = useState(
     incoming ? +incoming.price.toFixed(2) : 1.75,
   );
-  const [limitEditing, setLimitEditing] = useState(false);
-  const [limitDraft, setLimitDraft] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const subT = useRef<number | undefined>(undefined);
 
@@ -596,18 +583,6 @@ export function OptionsBuilder({
     limitEdited.current = true;
     setLimitPx((v) => Math.min(999.99, Math.max(0.01, +(v + delta).toFixed(2))));
   }
-  function startEditingLimit() {
-    setLimitDraft(limitPx.toFixed(2));
-    setLimitEditing(true);
-  }
-  function commitLimit(text: string) {
-    setLimitEditing(false);
-    limitEdited.current = true;
-    const parsed = parseFloat(text);
-    if (Number.isFinite(parsed)) {
-      setLimitPx(Math.min(999.99, Math.max(0, +parsed.toFixed(2))));
-    }
-  }
 
   /* The underlying this ticket is written on — the chain's, beside a
      chain; its own otherwise. */
@@ -800,68 +775,17 @@ export function OptionsBuilder({
                     and the one you could have, sat 130px apart. Under the
                     field they are one reading. */}
                 <span className="ob-line-ctl">
-                <div className="ob-field ob-stepper">
-                  {limitEditing ? (
-                    <span className="ob-stepper-num ob-stepper-num--editing">
-                      {/* The unit, outside the editable text. It is not
-                          something you type or delete — the field holds a
-                          price, and it says so whether or not there is a
-                          number in it yet. */}
-                      <span className="ob-unit">$</span>
-                      <input
-                        type="text"
-                        inputMode="decimal"
-                        aria-label="Limit price"
-                        /* An <input> with no `size` carries a default
-                           intrinsic width of ~20 characters, which fed
-                           straight into the card's max-content pass and
-                           jumped the widget wider the moment this field
-                           was clicked into. */
-                        size={1}
-                        autoFocus
-                        value={limitDraft}
-                        onChange={(e) =>
-                          setLimitDraft(e.target.value.replace(/[^\d.]/g, "").slice(0, 7))
-                        }
-                        onBlur={(e) => commitLimit(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") commitLimit((e.target as HTMLInputElement).value);
-                          if (e.key === "Escape") setLimitEditing(false);
-                        }}
-                      />
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      className="ob-stepper-num"
-                      onClick={startEditingLimit}
-                      aria-label="Edit limit price"
-                    >
-                      <span className="ob-unit">$</span>
-                      {limitPx.toFixed(2)}
-                    </button>
-                  )}
-                  {/* Invisible padding + matching negative margin — a
-                      bigger hit target than the visible square without
-                      growing the field's own layout. */}
-                  <div className="ob-stepper-hit" onClick={(e) => e.stopPropagation()}>
-                    <div className="ob-stepper-btns">
-                      {([1, -1] as const).map((d) => (
-                        <motion.button
-                          key={d}
-                          type="button"
-                          aria-label={`${d > 0 ? "Increase" : "Decrease"} limit price`}
-                          onClick={() => bumpLimit(d * 0.01)}
-                          whileHover={reduce ? undefined : { background: "rgba(72,213,151,0.12)" }}
-                          whileTap={reduce ? undefined : { scale: 0.82 }}
-                          transition={spring}
-                        >
-                          <Caret dir={d > 0 ? "up" : "down"} />
-                        </motion.button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                <PriceField
+                  ariaLabel="Limit price"
+                  value={limitPx}
+                  reduce={reduce}
+                  spring={spring}
+                  onCommit={(v) => {
+                    limitEdited.current = true;
+                    setLimitPx(Math.min(999.99, Math.max(0, v)));
+                  }}
+                  onStep={(d) => bumpLimit(d * 0.01)}
+                />
 
                 {/* "Mid", not "Mark": the number between the bid and the
                     ask, and the field above it is the third price in that
@@ -983,70 +907,6 @@ export function OptionsBuilder({
     </div>
   );
 }
-
-/**
- * A box that springs to its content's height, clipping what has not been
- * uncovered yet.
- *
- * This is the whole add-a-leg animation. Motion's own `layout` would do
- * the same job by scaling the box and correcting its children, and that
- * is exactly what must not happen here: the type inside is 12px and any
- * scale on the way puts it through sizes it was never hinted for, which
- * reads as the text wobbling. Measuring the content and animating the
- * real `height` keeps every glyph at its natural size for the whole
- * transition; `overflow: hidden` on the outer box turns that into a
- * top-to-bottom reveal.
- *
- * It starts at `auto` so the server-rendered card is the right size
- * before any of this runs, and only ever animates between two measured
- * pixel heights after that.
- */
-function AutoHeight({
-  children,
-  className,
-  transition,
-  enabled = true,
-}: {
-  children: ReactNode;
-  className?: string;
-  transition: Transition;
-  /** Off under reduced motion: the box just takes its content's size. */
-  enabled?: boolean;
-}) {
-  const inner = useRef<HTMLDivElement>(null);
-  const [h, setH] = useState<number | "auto">("auto");
-
-  useEffect(() => {
-    const el = inner.current;
-    if (!el || !enabled) return;
-    /* A ResizeObserver, not a dependency on the rows: the height changes
-       for reasons this component cannot see — a leg arriving, a label
-       rewrapping, the card being resized — and all of them are the same
-       event as far as the box is concerned. */
-    const ro = new ResizeObserver(() => setH(el.offsetHeight));
-    ro.observe(el);
-    setH(el.offsetHeight);
-    return () => ro.disconnect();
-  }, [enabled]);
-
-  return (
-    <motion.div
-      className={className}
-      /* Never an entrance of its own — the first commit is already the
-         right height, so there is nothing to animate from. */
-      initial={false}
-      animate={{ height: enabled ? h : "auto" }}
-      transition={transition}
-      style={{ overflow: "hidden" }}
-    >
-      {/* The measured box. It must be a plain div: anything that
-          transforms it would feed its own animation back into the
-          observer. */}
-      <div ref={inner}>{children}</div>
-    </motion.div>
-  );
-}
-
 /** The leg a ticket opens with when nothing has been picked: the chain's
     front expiry, at the chain's own at-the-money strike.
 
@@ -1083,228 +943,5 @@ function Payoff({ k, v }: { k: string; v: string }) {
       <span className="ob-payoff-k">{k}</span>
       <span className="ob-payoff-v">{v}</span>
     </span>
-  );
-}
-
-/* Solid triangle, up or down — the stepper's affordance in the reference
-   asset. Measured off it: 22 x 11 at a 4x export is 5.5 x 2.75, so the
-   shape is 2:1 and drawn on an 8 x 4 grid at 6 x 3. Filled, not stroked —
-   the export shows a solid wedge, not a chevron. */
-function Caret({ dir }: { dir: "up" | "down" }) {
-  return (
-    <svg width="6" height="3" viewBox="0 0 8 4" aria-hidden="true">
-      <path d={dir === "up" ? "M4 0 8 4H0z" : "M4 4 0 0h8z"} fill="currentColor" />
-    </svg>
-  );
-}
-
-/**
- * A value and a caret stepper — the field shape the limit price takes,
- * with its label lifted out onto the row beside it.
- */
-function StepperField({
-  value,
-  onChange,
-  onStep,
-  ariaLabel,
-  reduce,
-  spring,
-}: {
-  value: string;
-  onChange: (raw: string) => void;
-  onStep: (delta: number) => void;
-  ariaLabel: string;
-  reduce: boolean | null;
-  spring: Transition;
-}) {
-  return (
-    <label className="ob-field ob-stepper">
-      <input
-        type="text"
-        inputMode="numeric"
-        aria-label={ariaLabel}
-        size={1}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-      />
-      <div className="ob-stepper-hit" onClick={(e) => e.stopPropagation()}>
-        <div className="ob-stepper-btns">
-          {([1, -1] as const).map((d) => (
-            <motion.button
-              key={d}
-              type="button"
-              aria-label={`${d > 0 ? "Increase" : "Decrease"} ${ariaLabel}`}
-              onClick={() => onStep(d)}
-              whileHover={reduce ? undefined : { background: "rgba(72,213,151,0.12)" }}
-              whileTap={reduce ? undefined : { scale: 0.82 }}
-              transition={spring}
-            >
-              <Caret dir={d > 0 ? "up" : "down"} />
-            </motion.button>
-          ))}
-        </div>
-      </div>
-    </label>
-  );
-}
-
-/** Marks the chosen row in an open menu. */
-function Check() {
-  return (
-    <svg width="10" height="8" viewBox="0 0 12 10" fill="none" aria-hidden="true">
-      <path
-        d="M1 5.2 4.4 8.6 11 1.6"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-/**
- * A field that opens a list.
- *
- * The menu is `position: fixed` and placed from the trigger's own rect,
- * rather than absolutely inside it. Both containers on this ticket clip
- * their contents to a 6px radius and the card clips to 12 — an absolutely
- * positioned menu would be cut off by whichever it opened inside. Fixed
- * escapes all three.
- */
-function Dropdown<T extends string | number>({
-  value,
-  options,
-  onSelect,
-  format = (v) => String(v),
-  className,
-  ariaLabel,
-}: {
-  value: T;
-  options: readonly T[];
-  onSelect: (v: T) => void;
-  format?: (v: T) => string;
-  className: string;
-  ariaLabel: string;
-}) {
-  const [open, setOpen] = useState(false);
-  const btnRef = useRef<HTMLButtonElement | null>(null);
-  const [at, setAt] = useState<{ top: number; left: number; minWidth: number }>({
-    top: 0,
-    left: 0,
-    minWidth: 0,
-  });
-
-  function place() {
-    const r = btnRef.current?.getBoundingClientRect();
-    if (!r) return;
-    /* 4 below the field, per the Atlas doc's own gap. */
-    setAt({ top: r.bottom + 4, left: r.left, minWidth: r.width });
-  }
-
-  return (
-    <>
-      <button
-        ref={btnRef}
-        type="button"
-        className={className}
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-label={ariaLabel}
-        data-open={open || undefined}
-        onClick={() => {
-          place();
-          setOpen((o) => !o);
-        }}
-      >
-        {format(value)}
-        <Chevron />
-      </button>
-
-      {/* Portalled to <body>, not left in place.
-
-          The menu is `position: fixed` at coordinates read off the
-          trigger's viewport rect. That only holds while no ancestor is
-          transformed — and this ticket can be dragged, which puts a
-          transform on a wrapper above it and turns `fixed` into
-          `absolute` against that wrapper. The menu would then be offset
-          by exactly however far the card had been moved. Out at the body
-          there is no such ancestor and the viewport coordinates mean what
-          they say. */}
-      {portal(
-      <AnimatePresence>
-        {open && (
-          <>
-            {/* Catches the click that closes it, and any scroll under it —
-                the menu is placed once, so it must not outlive a scroll. */}
-            <div
-              className="ob-dd-scrim"
-              onClick={() => setOpen(false)}
-              onWheel={() => setOpen(false)}
-            />
-            <motion.div
-              className="ob-dd-menu"
-              role="listbox"
-              style={{ top: at.top, left: at.left, minWidth: at.minWidth }}
-              initial={{ opacity: 0, y: -4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: 0.14, ease: [0.33, 1, 0.68, 1] }}
-            >
-              {options.map((o) => (
-                <button
-                  key={String(o)}
-                  type="button"
-                  role="option"
-                  aria-selected={o === value}
-                  className="ob-dd-item"
-                  onClick={() => {
-                    onSelect(o);
-                    setOpen(false);
-                  }}
-                >
-                  <span>{format(o)}</span>
-                  {o === value && <Check />}
-                </button>
-              ))}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>,
-      )}
-    </>
-  );
-}
-
-/**
- * Render into <body>, or nowhere until the client has it.
- *
- * These widgets are server-rendered by Astro before they hydrate, so
- * `document` does not exist on the first pass. Nothing here is visible
- * until a menu is opened, which cannot happen before hydration, so
- * skipping the portal server-side costs nothing.
- */
-function portal(node: ReactNode): ReactNode {
-  return typeof document === "undefined" ? null : createPortal(node, document.body);
-}
-
-function Chevron() {
-  return (
-    <svg
-      className="ob-chevron"
-      width="8"
-      height="8"
-      viewBox="0 0 14 14"
-      fill="none"
-      aria-hidden="true"
-    >
-      <path
-        d="M3.5 5.25 7 8.75l3.5-3.5"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

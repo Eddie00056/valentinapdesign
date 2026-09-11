@@ -86,6 +86,56 @@ export function FractionalIcon() {
   );
 }
 
+/**
+ * A stack — "Share quantity" on the mobile order screen, and the unit
+ * mark on the stock ticket's size field.
+ *
+ * Drawn on a 24-unit grid, so `stroke` is in those units: at 16 it paints
+ * 1.2, and anywhere else it has to be scaled to hold that weight. The
+ * ticket renders it at 12 with a 2.4 stroke for exactly that reason.
+ */
+export function StackIcon({
+  size = 16,
+  stroke = 1.8,
+}: {
+  size?: number;
+  stroke?: number;
+}) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <ellipse cx="12" cy="6" rx="8" ry="3.2" stroke="currentColor" strokeWidth={stroke} />
+      <path
+        d="M4 6v6c0 1.77 3.58 3.2 8 3.2s8-1.43 8-3.2V6M4 12v6c0 1.77 3.58 3.2 8 3.2s8-1.43 8-3.2v-6"
+        stroke="currentColor"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** Its pair — "Dollar amount" on the same screen. Same grid, same rule. */
+export function DollarIcon({
+  size = 16,
+  stroke = 1.8,
+}: {
+  size?: number;
+  stroke?: number;
+}) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12 2v20M17 6.5c0-1.93-2.24-3.5-5-3.5s-5 1.57-5 3.5S9.24 10 12 10s5 1.57 5 3.5-2.24 3.5-5 3.5-5-1.57-5-3.5"
+        stroke="currentColor"
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 /* Material Symbols "arrow_back" (opsz24, wght400). */
 export function ArrowBackIcon() {
   return (

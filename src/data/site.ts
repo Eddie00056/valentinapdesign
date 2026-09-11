@@ -131,6 +131,13 @@ export const pieces: Piece[] = [
     previewHeight: 620,
   },
   {
+    slug: "stock-order-entry",
+    href: "/work/stock-order-entry",
+    title: "Stock order entry",
+    previewWidth: 860,
+    previewHeight: 560,
+  },
+  {
     slug: "chain-to-order",
     href: "/work/chain-to-order",
     title: "Chain to order",

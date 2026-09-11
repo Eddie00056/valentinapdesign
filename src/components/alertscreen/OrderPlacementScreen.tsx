@@ -5,6 +5,9 @@ import { pxHub, PX_BASE } from "./priceHub";
 import type { PriceState } from "./priceHub";
 import { UP, DOWN } from "./chart";
 import { FractionalIcon, GlassButton } from "../glasslab/GlassButton";
+/* Shared with the stock order ticket, which uses the same two marks for
+   the same two units — see glasslab/icons. */
+import { DollarIcon, StackIcon } from "../glasslab/icons";
 import "../glasslab/glass-button.css";
 // pulls in the rollUpA/B + rollDownA/B keyframes the price roll below uses
 // (ported verbatim from the quote screen).
@@ -514,34 +517,7 @@ function ChevronRightIcon() {
   );
 }
 
-function DollarIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path
-        d="M12 2v20M17 6.5c0-1.93-2.24-3.5-5-3.5s-5 1.57-5 3.5S9.24 10 12 10s5 1.57 5 3.5-2.24 3.5-5 3.5-5-1.57-5-3.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
-function StackIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <ellipse cx="12" cy="6" rx="8" ry="3.2" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M4 6v6c0 1.77 3.58 3.2 8 3.2s8-1.43 8-3.2V6M4 12v6c0 1.77 3.58 3.2 8 3.2s8-1.43 8-3.2v-6"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 function CheckIcon() {
   return (
