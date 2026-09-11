@@ -36,18 +36,26 @@ function PriceCell({
   tone,
   value,
   picked,
+  beamed,
+  onHover,
   onPick,
   label,
 }: {
   tone: "bid" | "ask";
   value: string;
   picked: boolean;
+  /** This quote is the one a leg on the ticket is being hovered over. */
+  beamed?: boolean;
+  /** Fires true while the pointer is on this quote, false when it goes. */
+  onHover?: (on: boolean) => void;
   onPick?: () => void;
   label: string;
 }) {
   return (
     <span
       className="oc-cell oc-cell--pill"
+      onPointerEnter={() => onHover?.(true)}
+      onPointerLeave={() => onHover?.(false)}
       role={onPick ? "button" : undefined}
       aria-label={onPick ? label : undefined}
       aria-pressed={onPick ? picked : undefined}
@@ -58,11 +66,30 @@ function PriceCell({
         onPick?.();
       }}
     >
+      {/* The bloom. A second copy of the same arc, behind the chip and
+          blurred — the rim's own light cannot escape the pill, because
+          the pill is the clip that makes the rim. Mounted in the same
+          commit as the one inside, so the two turn together. */}
+      {beamed && (
+        <span className="oc-halo" aria-hidden="true">
+          <span className={`oc-beam oc-beam--${tone}`} />
+        </span>
+      )}
       <span
         className={`oc-pill oc-pill--${tone} oc-num`}
         data-picked={picked || undefined}
+        data-beam={beamed || undefined}
       >
-        {value}
+        {/* The rotating light. It lives IN the chip's own rim: the pill
+            clips it and the pill's fill, laid back over the middle, is
+            what leaves a 1px ring — so the border the chip already wears
+            is the thing that beams, rather than a second line outside it.
+
+            Spun as a node, not masked: a mask has to animate the
+            gradient's own angle, which repaints it every frame, where a
+            child turned with `transform` is composited. */}
+        {beamed && <span className={`oc-beam oc-beam--${tone}`} aria-hidden="true" />}
+        <span className="oc-pill-v">{value}</span>
       </span>
     </span>
   );
@@ -132,7 +159,9 @@ function Row({
   isOpen,
   onToggle,
   onPick,
+  onHoverQuote,
   picked,
+  beam,
 }: {
   row: ChainRowData;
   side: OptionSide;
@@ -141,8 +170,12 @@ function Row({
   isOpen: boolean;
   onToggle: () => void;
   onPick?: (pick: QuotePick) => void;
+  /** Which quote the pointer is on, so a ticket beside this chain can
+      light the leg that came from it. The link runs both ways. */
+  onHoverQuote?: (q: HoveredQuote | null) => void;
   /** Which of THIS row's pills is on the ticket, if either. */
   picked?: "bid" | "ask";
+  beam?: "bid" | "ask";
 }) {
   const quote = quoteFor(row, side);
 
@@ -151,6 +184,10 @@ function Row({
       <button
         type="button"
         className="oc-grid oc-row"
+        /* The row a beamed quote sits in reads as hovered, so the link
+           lands on the same shape at both ends: a lit row over here, a
+           lit row over there, and the beam to say which quote in it. */
+        data-lit={beam ? true : undefined}
         aria-expanded={isOpen}
         onClick={onToggle}
       >
@@ -169,9 +206,17 @@ function Row({
             cell — see PriceCell. */}
         <PriceCell
           tone="bid"
+          beamed={beam === "bid"}
           value={`$${formatCurrency(quote.bid)}`}
           picked={picked === "bid"}
           label={`Sell ${row.strike} ${side} at ${formatCurrency(quote.bid)}`}
+          onHover={(on) =>
+            onHoverQuote?.(
+              on
+                ? { strike: row.strike, kind: side, action: "sell", expiry }
+                : null,
+            )
+          }
           onPick={
             onPick &&
             (() =>
@@ -188,9 +233,17 @@ function Row({
         />
         <PriceCell
           tone="ask"
+          beamed={beam === "ask"}
           value={`$${formatCurrency(quote.ask)}`}
           picked={picked === "ask"}
           label={`Buy ${row.strike} ${side} at ${formatCurrency(quote.ask)}`}
+          onHover={(on) =>
+            onHoverQuote?.(
+              on
+                ? { strike: row.strike, kind: side, action: "buy", expiry }
+                : null,
+            )
+          }
           onPick={
             onPick &&
             (() =>
@@ -228,6 +281,15 @@ function Row({
 /* ------------------------------------------------------------------ */
 
 /** What a click on a bid or an ask says. */
+/** A quote named, without its price — enough to point at the leg it
+    would become. */
+export type HoveredQuote = {
+  strike: number;
+  kind: OptionSide;
+  action: "buy" | "sell";
+  expiry: string;
+};
+
 export type QuotePick = {
   strike: number;
   kind: OptionSide;
@@ -255,6 +317,13 @@ interface ChainTableProps {
    * and the ticket's legs are one fact instead of two that can drift.
    */
   pickedKeys?: ReadonlySet<string>;
+  /**
+   * The one quote to run a beam around: the key of whichever leg the
+   * ticket beside this chain is being hovered over. Same key shape as
+   * `pickedKeys`, and null the rest of the time.
+   */
+  beamKey?: string | null;
+  onHoverQuote?: (q: HoveredQuote | null) => void;
 }
 
 /**
@@ -288,10 +357,14 @@ export function ChainTable({
   onToggleStrike,
   onPick,
   pickedKeys,
+  beamKey,
+  onHoverQuote,
 }: ChainTableProps) {
   const reduce = useReducedMotion();
   const spring = reduce ? { duration: 0 } : LADDER_SPRING;
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const wrapRef = useRef<HTMLDivElement | null>(null);
+  const barRef = useRef<HTMLSpanElement | null>(null);
   /* True while the effect below is still putting the ladder on the money.
      That is a scroll the reader did not ask for, and it must not flash
      the scrollbar on load. */
@@ -383,29 +456,63 @@ export function ChainTable({
     };
   }, [expiry.id, side]);
 
-  /* The scrollbar is drawn only while the ladder is being scrolled.
+  /* The scrollbar, drawn.
 
-     A flag on the element rather than React state: this fires on every
-     scroll event, and re-rendering twenty-three rows and their layout
-     projections to paint an 8px bar would be the most expensive thing on
-     the widget. The style is in the CSS, keyed on [data-scrolling]. */
+     The native one is out of the layout (see the CSS): a classic bar
+     takes its width out of the content box, which is 8px every row would
+     be short of the card and 8px a hovered row's band could never reach.
+     So the ladder keeps the full width and the bar is painted over it.
+
+     Written straight to the element, not through state: this runs on
+     every scroll event, and re-rendering twenty-three rows and their
+     layout projections to move a 4px bar would be the most expensive
+     thing on the widget. Same reason the visibility is an attribute on
+     the wrapper and the fade lives in CSS.
+
+     Hidden when there is nothing to scroll — a bar that fills its own
+     track is a bar saying nothing. */
   useEffect(() => {
     const box = scrollRef.current;
-    if (!box) return;
+    const wrap = wrapRef.current;
+    const bar = barRef.current;
+    if (!box || !wrap || !bar) return;
     let idle: number | undefined;
+
+    const draw = () => {
+      const { scrollHeight, clientHeight, scrollTop } = box;
+      if (scrollHeight <= clientHeight + 1) {
+        bar.style.height = "0px";
+        return;
+      }
+      /* A floor, so a long ladder still leaves something to see. */
+      const h = Math.max(24, (clientHeight / scrollHeight) * clientHeight);
+      const y = (scrollTop / (scrollHeight - clientHeight)) * (clientHeight - h);
+      bar.style.height = `${h}px`;
+      bar.style.transform = `translateY(${y}px)`;
+    };
+
     const onScroll = () => {
+      draw();
       /* Not the opening scroll-to-the-money — nobody asked for that one. */
       if (centring.current) return;
-      box.dataset.scrolling = "";
+      wrap.dataset.scrolling = "";
       window.clearTimeout(idle);
-      idle = window.setTimeout(() => delete box.dataset.scrolling, 700);
+      idle = window.setTimeout(() => delete wrap.dataset.scrolling, 700);
     };
+
+    draw();
     box.addEventListener("scroll", onScroll, { passive: true });
+    const ro = new ResizeObserver(draw);
+    ro.observe(box);
     return () => {
       box.removeEventListener("scroll", onScroll);
+      ro.disconnect();
       window.clearTimeout(idle);
     };
-  }, []);
+    /* Re-measured whenever the ladder itself changes height — a strike
+       opening adds rows under it, and the thumb is a fraction of a total
+       that just moved. */
+  }, [expiry.id, side, openStrike]);
 
   /* Rows descend through price, so the line belongs just above the first
      strike that spot has not cleared. Crossing a strike changes this
@@ -429,12 +536,20 @@ export function ChainTable({
           isOpen={openStrike === row.strike}
           onToggle={() => onToggleStrike(row.strike)}
           onPick={onPick}
+          onHoverQuote={onHoverQuote}
           picked={
             /* The bid is the sell side and the ask the buy side — see the
                pick handlers on the pills themselves. */
             pickedKeys?.has(`${row.strike}:${side}:sell:${expiry.date}`)
               ? "bid"
               : pickedKeys?.has(`${row.strike}:${side}:buy:${expiry.date}`)
+                ? "ask"
+                : undefined
+          }
+          beam={
+            beamKey === `${row.strike}:${side}:sell:${expiry.date}`
+              ? "bid"
+              : beamKey === `${row.strike}:${side}:buy:${expiry.date}`
                 ? "ask"
                 : undefined
           }
@@ -459,8 +574,13 @@ export function ChainTable({
         ))}
       </div>
 
-      <div className="oc-scroll" ref={scrollRef}>
-        <LayoutGroup id={`ladder-${expiry.id}`}>{ladder}</LayoutGroup>
+      <div className="oc-scrollwrap" ref={wrapRef}>
+        <div className="oc-scroll" ref={scrollRef}>
+          <LayoutGroup id={`ladder-${expiry.id}`}>{ladder}</LayoutGroup>
+        </div>
+        <span className="oc-sbtrack" aria-hidden="true">
+          <span className="oc-sb" ref={barRef} />
+        </span>
       </div>
     </div>
   );

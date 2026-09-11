@@ -166,6 +166,14 @@ export function ChainToTicket() {
   /* Derived from the ticket, not from the clicks — see onLegsChange. A
      leg removed with the row's own X unlights its pill too. */
   const [pickedKeys, setPickedKeys] = useState<ReadonlySet<string>>(new Set());
+  /* The one quote to run a beam around: whichever leg on the ticket the
+     pointer is over. The two widgets already agree about which quotes are
+     HELD; this is the same fact narrowed to one, so hovering a leg says
+     where it came from. */
+  const [beamKey, setBeamKey] = useState<string | null>(null);
+  /* And the other direction: the quote the pointer is on in the chain,
+     as the leg it would be. */
+  const [litLeg, setLitLeg] = useState<LegSummary | null>(null);
 
   /* Whether the reader has chosen anything yet. Not derivable from
      `pickedKeys`: the ticket opens holding a default leg, so that set is
@@ -216,6 +224,19 @@ export function ChainToTicket() {
         <OptionChain
           onPick={pick}
           pickedKeys={pickedKeys}
+          beamKey={beamKey}
+          onHoverQuote={(q) =>
+            setLitLeg(
+              q
+                ? {
+                    strike: q.strike,
+                    kind: q.kind,
+                    side: q.action,
+                    expiry: q.expiry,
+                  }
+                : null,
+            )
+          }
           onSpotChange={setUnderlying}
           onGrip={chainDrag.start}
         />
@@ -301,6 +322,10 @@ export function ChainToTicket() {
                 underlying={underlying}
                 incoming={incoming}
                 onGrip={ticketDrag.start}
+                litLeg={litLeg}
+                onLegHover={(leg: LegSummary | null) =>
+                  setBeamKey(leg ? keyOf(leg) : null)
+                }
                 onLegsChange={(legs: LegSummary[]) =>
                   setPickedKeys(new Set(legs.map(keyOf)))
                 }

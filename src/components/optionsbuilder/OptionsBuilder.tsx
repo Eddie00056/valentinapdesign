@@ -16,7 +16,6 @@ import { WidgetShell } from "../shared/WidgetShell";
 import {
   AutoHeight,
   Dropdown,
-  Lock,
   PriceField,
   StepperField,
 } from "../shared/TicketControls";
@@ -89,23 +88,6 @@ type Tif = (typeof TIFS)[number];
 export const MAX_LEGS = 4;
 
 /**
- * What the limit price IS — the Atlas clickable prefix, in the spec's own
- * words, on the ticket the spec was drawn for.
- *
- * A limit is either a price you name, or one locked to a quote with an
- * offset from it. The two "Follow" modes are the locked ones, and the
- * padlock on their menu rows says so: the number in the field stops being
- * a price and becomes how far off the bid or the ask you are willing to
- * sit, with the price itself wherever that quote goes.
- */
-const LIMIT_MODES = [
-  "Limit price",
-  "Follow bid price",
-  "Follow ask price",
-] as const;
-type LimitMode = (typeof LIMIT_MODES)[number];
-
-/**
  * The confirmation's entrance, and the ground it opens onto — the same
  * pair the stock ticket uses, because it is the same act.
  */
@@ -117,7 +99,7 @@ const MODAL_SPRING = {
 } as const;
 const MODAL_OUT = { duration: 0.14, ease: [0.22, 1, 0.36, 1] } as const;
 const BACKDROP_OFF = "blur(0px) saturate(100%)";
-const BACKDROP_ON = "blur(12px) saturate(140%)";
+const BACKDROP_ON = "blur(2px) saturate(100%)";
 const BACKDROP = { duration: 0.2, ease: [0.22, 1, 0.36, 1] } as const;
 
 /** Money that can run past a thousand — what a sized order comes to. */
@@ -128,9 +110,6 @@ const total = (x: number) =>
   })}`;
 
 /** The spec's popover, verbatim. */
-const OFFSET_HINT =
-  "Select an offset dollar amount or percentage to determine the limit price that will trigger your order";
-
 /** The underlying this ticket is written on when nothing else decides —
     the same one the alert and order-placement screens use, which is why
     it shares their pxHub clock. */
@@ -324,12 +303,27 @@ export type Underlying = {
 export function OptionsBuilder({
   incoming,
   onLegsChange,
+  onLegHover,
+  litLeg,
   onClose,
   onGrip,
   underlying,
 }: {
   incoming?: IncomingQuote;
   onLegsChange?: (legs: LegSummary[]) => void;
+  /**
+   * Fires with a leg while the pointer is over its row, and with null
+   * when it leaves. Given, whoever placed this ticket can say which
+   * quote that leg came from — see the chain beside it.
+   */
+  onLegHover?: (leg: LegSummary | null) => void;
+  /**
+   * The leg to light without the pointer being on it — given when
+   * something else is pointing at the quote it came from. The link runs
+   * both ways: hovering a leg beams its quote in the chain, and hovering
+   * that quote lights this row.
+   */
+  litLeg?: LegSummary | null;
   /** Given, the title bar's X and the ticket's Cancel dismiss it. */
   onClose?: () => void;
   /**
@@ -430,9 +424,6 @@ export function OptionsBuilder({
   const [limitPx, setLimitPx] = useState(
     incoming ? +incoming.price.toFixed(2) : 1.75,
   );
-  const [limitMode, setLimitMode] = useState<LimitMode>("Limit price");
-  /* How far off the followed quote the limit sits, as a percentage. */
-  const [offset, setOffset] = useState(1);
   /* The CTA asks; the confirmation sends. */
   const [confirming, setConfirming] = useState(false);
   const [toast, setToast] = useState<number | null>(null);
@@ -647,26 +638,13 @@ export function OptionsBuilder({
 
   const limitEdited = useRef(false);
   useEffect(() => {
-    if (following || incoming || limitEdited.current) return;
+    if (incoming || limitEdited.current) return;
     setLimitPx(+mid.toFixed(2));
   }, [incoming, mid]);
 
-  /* A limit that is FOLLOWING is not a price at all: the field holds an
-     offset and the price comes off whichever quote it is locked to, on
-     every tick. One that is not following is a price, and it tracks the
-     mid until somebody types over it — which is what this ticket always
-     did, now one of three modes rather than the only behaviour. */
-  const following = limitMode !== "Limit price";
-  const followed = limitMode === "Follow ask price"
-    ? mid + halfSpread
-    : mid - halfSpread;
-  const limit = following
-    ? +Math.max(0.01, followed * (1 + offset / 100)).toFixed(2)
-    : limitPx;
-
   /* What the strategy is worth at expiry, priced at the LIMIT — these
      three describe the order in the fields above them, not the market. */
-  const signedLimit = debit ? limit : -limit;
+  const signedLimit = debit ? limitPx : -limitPx;
   const profile = payoffProfile(legs, signedLimit, CONTRACT_MULTIPLIER);
   const scale = (v: number | null) => (v === null ? null : v * qty);
   const maxProfit = scale(profile.maxProfit);
@@ -685,7 +663,7 @@ export function OptionsBuilder({
   /* What the order actually costs. Quotes are per share; a contract is
      100 of them, and the figure a reader compares against their buying
      power is the price they are offering, not the market's mark. */
-  const estCost = limit * CONTRACT_MULTIPLIER * qty;
+  const estCost = limitPx * CONTRACT_MULTIPLIER * qty;
 
   function removeLeg(id: number) {
     // Never drop below one leg — there's no empty state for this widget.
@@ -705,23 +683,8 @@ export function OptionsBuilder({
   }
 
   function bumpLimit(delta: number) {
-    if (following) {
-      setOffset((v) => Math.min(99.99, Math.max(0, +(v + delta).toFixed(2))));
-      return;
-    }
     limitEdited.current = true;
     setLimitPx((v) => Math.min(999.99, Math.max(0.01, +(v + delta).toFixed(2))));
-  }
-
-  /* Leaving a follow mode hands the absolute price it had resolved to over
-     to the price field, so the order does not jump because you changed how
-     you were expressing it. */
-  function pickLimitMode(m: LimitMode) {
-    if (m === "Limit price" && following) {
-      limitEdited.current = true;
-      setLimitPx(limit);
-    }
-    setLimitMode(m);
   }
 
   /* Questrade's own options schedule: $9.95 plus a dollar a contract. */
@@ -731,9 +694,7 @@ export function OptionsBuilder({
   /* The order in one line — not the fields again, but the sentence they
      add up to. A debit is a purchase and a credit is a sale, which is the
      only honest way to give a multi-leg order one direction. */
-  const priceClause = following
-    ? `${limitMode.toLowerCase()}, ${offset.toFixed(2)}% offset (${money(limit)})`
-    : `limit ${money(limit)} ${debit ? "debit" : "credit"}`;
+  const priceClause = `limit ${money(limitPx)} ${debit ? "debit" : "credit"}`;
 
   /* The underlying this ticket is written on — the chain's, beside a
      chain; its own otherwise. */
@@ -791,6 +752,27 @@ export function OptionsBuilder({
                 <motion.div
                   key={l.id}
                   className="ob-leg"
+                  /* Pointer, not mouse: the same event either way here,
+                     and it is the one a pen or a trackpad also sends. */
+                  onPointerEnter={() =>
+                    onLegHover?.({
+                      strike: l.strike,
+                      kind: l.kind,
+                      side: l.side,
+                      expiry: l.date,
+                    })
+                  }
+                  onPointerLeave={() => onLegHover?.(null)}
+                  data-linked={onLegHover ? true : undefined}
+                  data-lit={
+                    litLeg &&
+                    litLeg.strike === l.strike &&
+                    litLeg.kind === l.kind &&
+                    litLeg.side === l.side &&
+                    litLeg.expiry === l.date
+                      ? true
+                      : undefined
+                  }
                   /* No `layout`. The row holds still: the container's
                      height carries the movement, and a row that also
                      animated its own position would be the same change
@@ -945,30 +927,10 @@ export function OptionsBuilder({
 
                 <PriceField
                   ariaLabel="Limit price"
-                  /* "$" for a price you name, "Offset %" for one locked to
-                     a quote — the spec's two prefix labels, for the spec's
-                     two kinds of number. */
-                  prefix={limitMode}
-                  prefixLabel={following ? "Offset %" : "$"}
-                  prefixOptions={LIMIT_MODES}
-                  onPrefixSelect={(v) => pickLimitMode(v as LimitMode)}
-                  prefixIcon={(v) =>
-                    v === "Limit price" ? (
-                      <span className="ob-dd-mark">$</span>
-                    ) : (
-                      <Lock size={12} />
-                    )
-                  }
-                  prefixHint={OFFSET_HINT}
-                  prefixAria="What the limit price is"
-                  value={following ? offset : limitPx}
+                  value={limitPx}
                   reduce={reduce}
                   spring={spring}
                   onCommit={(v) => {
-                    if (following) {
-                      setOffset(Math.min(99.99, Math.max(0, v)));
-                      return;
-                    }
                     limitEdited.current = true;
                     setLimitPx(Math.min(999.99, Math.max(0, v)));
                   }}
@@ -1099,7 +1061,7 @@ export function OptionsBuilder({
                           one stands for. */}
                       <Line
                         k="Trade value"
-                        v={`${qty} × ${money(limit)} × ${CONTRACT_MULTIPLIER} = ${total(
+                        v={`${qty} × ${money(limitPx)} × ${CONTRACT_MULTIPLIER} = ${total(
                           estCost,
                         )} USD`}
                       />

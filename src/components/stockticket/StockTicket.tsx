@@ -187,14 +187,34 @@ const MODAL_OUT = { duration: 0.14, ease: [0.22, 1, 0.36, 1] } as const;
 /**
  * And the ground it opens onto.
  *
- * The page is not dimmed so much as taken out of focus: 5% of overlay and
- * the rest is the filter — 12px of blur with the saturation pushed to
- * 140, which keeps the colour in what is behind it while removing every
- * edge you could read. Nothing under it moves; only its appearance
+ * 2px of blur over a 10% film, and the saturation left alone.
+ *
+ * It was pushed to 140, which is right when the film is 5%: at that
+ * weight the background needs its colour kept or the blur just washes it
+ * out. Against a 40% film the two pull opposite ways — the film takes the
+ * page back, the saturation pushes its accents forward — and a mint leg
+ * behind the scrim composited BRIGHTER with the boost than without it
+ * (#148e5b against #2e8661). The film is doing the work now, so the
+ * filter only has to remove the edges.
+ *
+ * 3px, against the 12 the reference gives, and the number is the whole
+ * argument. Blur does not dim a surface, it SPREADS it — and what is
+ * behind this one is thin light type on a near-black ground, so the light
+ * it spreads lands in black and the page falls toward the ground colour.
+ * A 1px stroke keeps 6.6% of its own brightness at 12px, 13.2% at 6, 26%
+ * at 3 and 38% at 2. Every bit of the darkness that read as a heavy overlay came
+ * from that, not from the film, which has been 10% throughout.
+ *
+ * At 2 the page behind stays itself — recognisable, still lit, plainly
+ * not the thing being asked about. The reference's 12 assumes a light app
+ * background, where spreading light into light costs nothing.
+ *
+ * Both states still name saturate() so the two strings interpolate as the
+ * same function list. Nothing under it moves; only its appearance
  * changes.
  */
 const BACKDROP_OFF = "blur(0px) saturate(100%)";
-const BACKDROP_ON = "blur(12px) saturate(140%)";
+const BACKDROP_ON = "blur(2px) saturate(100%)";
 const BACKDROP = { duration: 0.2, ease: [0.22, 1, 0.36, 1] } as const;
 
 /** The spec's popover, verbatim. */

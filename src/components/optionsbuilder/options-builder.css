@@ -412,8 +412,11 @@
   margin: 0;
   /* No side inset. The rule spans the row edge to edge, so anything held
      6px in from it reads as indented against a line it is supposed to sit
-     on — the content takes the rule's own edge instead. */
-  padding: 6px 0;
+     on — the content takes the rule's own edge instead.
+
+     8 top and bottom, which with the X's 16px — the tallest thing on the
+     line, above the 15.6 the type occupies — makes every leg row 32. */
+  padding: 8px 0;
 }
 
 /* The divider, and only between legs — not above the first or below the
@@ -1357,9 +1360,14 @@ button.ob-chip--strike {
    without a kind. */
 .ob-unit {
   color: var(--faint);
-  /* Kills the 2px the editing row keeps between its children — the mark
-     belongs against the first digit, not a space away from it. */
-  margin-right: 0;
+  /* A hair space, not a word space: 1px here puts 2.3px of clear ground
+     between the mark's ink and the 8's, since the two glyphs bring 1.3 of
+     bearing with them. Set solid the pair reads as one glyph; at 1.5 the
+     mark floats off the figure. Declared here rather than as the editing
+     row's `gap` so BOTH states measure the same — the resting value is a
+     button and the editing one an input, and a number that shifts when
+     you click into it is the one thing this field must never do. */
+  margin-right: 1px;
 }
 
 .ob-line .ob-stepper-num--editing { gap: 0; }
@@ -2569,11 +2577,10 @@ button.ob-chip--strike:focus-visible::after,
    leg — a line of type — and type does not end where its box does: the
    deepest ink on "Buy to open 11 Sep 2026 $175 Call" is the p, which
    reaches 14.53 of a 15.6 line box and leaves 1.07 under it. With the
-   row's own 6 that is 7.07 off the panel's edge already, so the panel
-   adds the remaining 4.93. */
-.ob-legs-panel {
-  padding-bottom: 4.93px;
-}
+   row's own 6 that is 7.07 off the panel's edge already, so the remaining
+   4.93 is added — to the LAST ROW rather than to the panel (see the end
+   of this file), because a leg row draws a band when it is pointed at,
+   and anything the panel holds is 5px that band cannot reach. */
 
 .ob-legs-panel + .ob-params-panel .ob-params {
   padding-top: 12px;
@@ -2683,15 +2690,19 @@ button.ob-chip--strike:focus-visible::after,
   position: fixed;
   inset: 0;
   z-index: 50;
-  /* 5%, and no more. The page is not being dimmed, it is being taken out
-     of focus — the blur and the saturation do that, and they are animated
-     from the component so nothing may be declared for them here or the
-     static value would fight the one Motion is writing.
+  /* #070f11 at 10% — the card's OWN ground, not the page's.
 
-     It was 66% of near-black with a fixed 2px blur, which hid the ticket
-     rather than softening it. What is behind a confirmation is the thing
-     being confirmed; it should stay legible enough to check. */
-  background: rgba(11, 11, 13, 0.05);
+     A film this light only works because the saturation boost came out of
+     the filter beside it: at 140 the accents behind the scrim composited
+     brighter than they started, so the overlay had to fight its own blur
+     and 40% still read as barely dimmed. With the filter only blurring,
+     10% is enough to say the page is behind something, and the blur is
+     what makes it unreadable.
+
+     Nothing may be declared for the blur here — it is animated from the
+     component, and a static value would fight the one Motion writes each
+     frame. */
+  background: rgba(7, 15, 17, 0.1);
   border: 0;
   padding: 0;
   /* A surface, not a control, even though it is a button — the label is
@@ -2710,29 +2721,33 @@ button.ob-chip--strike:focus-visible::after,
   position: relative;
 }
 
-/* Centred on the WIDGET, not on the window.
+/* Centred on the page, not on the card.
 
-   The confirmation is what this ticket is doing, so it belongs where the
-   ticket is — a panel arriving in the middle of the screen while the card
-   sits near the top reads as a second thing on the page rather than the
-   next step of the first.
+   It was anchored to the widget — `absolute` inside the deck, centred on
+   the card's own box — which read well while the card was the taller of
+   the two. It is not: a confirmation runs about 340 and an options ticket
+   with one leg is nearer 300, so the panel hung out of the card at both
+   ends, and on the chain-to-order workspace the canvas it hangs into
+   scrolls (`overflow: auto`) and cut the bottom off mid-sentence.
 
-   `inset: 0` spans the card's own box and the flex centring puts the
-   panel on its middle; being the taller of the two it overflows evenly
-   above and below, which is what makes it read as coming out of the card
-   rather than landing on it. No transform — the panel inside is animated,
-   and a transform here would both trap it in a new stacking context and
-   fight Motion for the same property. */
+   `fixed` puts it in the middle of whatever it is on. On its own page
+   that is the window; inside the workspace it is the simulated 1440x900
+   screen, because a transform makes that the containing block — which is
+   the right answer there, not a compromise.
+
+   `safe center` so a panel taller than its space aligns to the top rather
+   than overflowing equally in both directions, and 20 of padding so it
+   never reaches the edges. No transform for the centring: the panel
+   inside is animated and Motion writes the same property. */
 .ob-stage .ob-modal-wrap {
-  position: absolute;
+  position: fixed;
   inset: 0;
   z-index: 51;
   display: flex;
-  /* `safe` again: the panel is taller than the card it is centred on, so
-     on a short window it degrades to sharing the card's top edge and
-     growing downward rather than losing its head. */
   align-items: safe center;
   justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
   pointer-events: none;
 }
 
@@ -2755,13 +2770,20 @@ button.ob-chip--strike:focus-visible::after,
 
 /* ---------- what it says ---------- */
 
-/* The panel's one surface. The same box a ticket's own container is —
-   --panel at radius 6, `0 6px`, no vertical padding, because every band
-   inside brings its own. Named for the confirmation rather than borrowed
-   from either card, since both cards' modals are this one. */
+/* The panel's one surface — --panel, `0 6px`, no vertical padding,
+   because every band inside brings its own. Named for the confirmation
+   rather than borrowed from either card, since both cards' modals are
+   this one.
+
+   Radius 8, not the 6 a ticket's containers take. Two rounded boxes only
+   nest if their corners are CONCENTRIC, which means the inner radius has
+   to be the outer one less the inset between them: the shell rounds at 12
+   and the card holds this 4 inside it, so 12 − 4 = 8. At 6 the inner
+   curve is tighter than the space it sits in and the two corners read as
+   fighting each other — which is the "weird corner". */
 .ob-conf-body {
   padding: 0 6px;
-  border-radius: 6px;
+  border-radius: 8px;
   background: var(--panel);
 }
 
@@ -3000,3 +3022,131 @@ button.ob-chip--strike:focus-visible::after,
     transition: none;
   }
 }
+
+
+/* ---------- the leg at either end of the link ---------- */
+
+/* #272e30 — the chain's own row hover, not a tint of the accent. The two
+   widgets are showing one thing from two sides, so the row in question
+   should read the same on both: a neutral step up from the ground, with
+   colour saved for the light that connects them.
+
+   `data-linked` is set only when an onLegHover was given, so a ticket on
+   its own page does not light rows that connect to nothing. */
+/* The 6 moves from the panel to the rows.
+
+   A negative margin was the obvious way to make a row fill the band, and
+   it does not work here: the legs sit inside AutoHeight's measured box,
+   which is `overflow: hidden` so it can reveal a row by opening its
+   height — and that clip cuts the bleed off at exactly the width the
+   panel's padding left. So the padding goes where it can be part of the
+   row instead. Nothing moves: the content sits on the same line it always
+   did, and the row's BOX now reaches the panel's edges. */
+.ob-legs-panel {
+  padding-inline: 0;
+}
+
+.ob-leg {
+  padding-inline: 6px;
+}
+
+.ob-leg[data-linked] {
+  border-radius: 4px;
+  transition: background 0.16s ease;
+}
+
+/* Which leaves the divider, because it would now run to the container's
+   edge — the one line on these cards that never does. Drawn as a
+   pseudo-element inset by the same 6 instead. */
+.ob-leg[data-linked] + .ob-leg[data-linked] {
+  border-top: 0;
+}
+
+.ob-leg[data-linked] + .ob-leg[data-linked]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 6px;
+  right: 6px;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* Pointed at from here, or pointed at from the chain — the same row,
+   lit the same way. The ticket's end of the link is the plain highlight
+   and the chain's end is the beam: one of them is being READ and the
+   other is being FOUND, in a table of forty near-identical cells, and
+   only the second needs a light to travel round it. */
+.ob-leg[data-linked]:hover,
+.ob-leg[data-lit] {
+  background: #272e30;
+}
+
+
+/* ---------- the verb, with a light passing through it ---------- */
+
+/* A light travelling along "Buy to open" or "Sell to open" — on the row
+   being pointed at, and only that one. Every row shimmering at once is a
+   card that will not sit still; on one row it is the thing you are
+   looking at, answering. It runs for a hover here and for a lit row too,
+   because those are the same state reached from two directions: the
+   pointer on this row, or the pointer on the quote it came from.
+
+   TWO LAYERS, not one gradient. The band has to be nearly invisible,
+   which means a low alpha — and a translucent stop in a single
+   background-clip gradient makes the GLYPH translucent there, so the row
+   shows through and the letter goes darker rather than lighter. So the
+   ink is its own opaque layer underneath and the band floats over it.
+   Only the top layer moves; the keyframe names both positions so the ink
+   stays where it is.
+
+   It also means the text can never disappear. A single-gradient version
+   is one invalid value away from painting nothing at all, which is
+   exactly what `-webkit-text-fill-color: transparent` leaves behind.
+
+   `-webkit-text-fill-color` rather than `color: transparent`: the fill
+   property takes the ink away while `color` is left alone, so
+   `currentColor` still resolves to the side's own accent, which is set
+   inline per leg. One rule, mint on a buy and coral on a sell. */
+@keyframes ob-sheen {
+  to {
+    background-position: -200% center, 0 0;
+  }
+}
+
+.ob-leg[data-linked]:hover .ob-leg-act,
+.ob-leg[data-lit] .ob-leg-act {
+  background-image:
+    linear-gradient(
+      100deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.34) 50%,
+      transparent 62%
+    ),
+    linear-gradient(currentColor, currentColor);
+  background-size: 200% auto, auto;
+  background-position: 180% center, 0 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: ob-sheen 3s linear infinite;
+}
+
+/* Back to ink, and still. A word painted from a background is a word that
+   depends on an animation to look right. */
+@media (prefers-reduced-motion: reduce) {
+  .ob-leg[data-linked]:hover .ob-leg-act,
+  .ob-leg[data-lit] .ob-leg-act {
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+    animation: none;
+  }
+}
+
+/* Every leg row is the same 32: 8 + the X's 16 + 8. The last one used to
+   carry 10.93 underneath, to leave the rule the 12 of optical air the
+   band rhythm asks for — a line of type does not end where its box does,
+   so its own padding could not supply all of it. Uniform rows win: the
+   rule now sits 9.27 above (8, plus the 1.27 the p leaves under it) and
+   12 below, and nothing in the stack is a different height from its
+   neighbours. */

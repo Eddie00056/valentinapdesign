@@ -296,65 +296,104 @@
    ladder was extended, so the visible chain is unchanged and the extra
    strikes simply run off both ends. The header sits outside this box, so
    it stays put while the strikes move under it. */
-/* The ladder, and the gutter its scrollbar lives in.
+/* The ladder, and a bar that is drawn rather than reserved.
 
-   NO `scrollbar-width` / `scrollbar-color` here, and that is the fix: as
-   of Chrome 121 those standard properties take precedence and the
-   ::-webkit-scrollbar rules below are ignored for any element that sets
-   them. On macOS that left the ladder with the platform's OVERLAY
-   scrollbar — a bar that takes no layout space and is drawn ON TOP of
-   the content, which is why it sat over the ask prices as soon as you
-   scrolled.
+   The native bar is gone from the layout, and that is the point. A
+   classic scrollbar sits in the padding box, OUTSIDE the scrollport:
+   8px that every row is short, that the header has to reserve by hand,
+   and that nothing inside the scroller can ever paint into. The hovered
+   row tried, with a strip drawn past its own right edge, and all that did
+   was give the scroller 8px of horizontal overflow — a second scrollbar
+   appearing the moment you hovered a row, with the UA's white corner
+   square where the two bars met.
 
-   Styling the webkit pseudo-elements alone opts this scroller out of
-   overlay scrollbars: the bar becomes a classic one that takes its 8px
-   out of the content box, so it can never cover anything. That 8 is the
-   whole gutter — the thumb carries 2px of transparent border of its own
-   (see below), so it already sits off the content without this element
-   holding any padding back.
+   So the rows take the full width and the bar is drawn on top of them:
+   `.oc-sb`, positioned by ChainTable from the scroller's own numbers and
+   faded in while the ladder is actually moving, exactly as the native one
+   was. It takes no layout, which is what lets a hovered row run edge to
+   edge, and it is the same chip grey in every browser rather than the
+   OS's own bar on some and ours on others.
 
-   The header row is not in this scroller (it sits above it, so it does
-   not scroll away), so it has to be told to hold the same 8 back — see
-   .oc-head. Change one and change the other.
+   `scrollbar-width: none` hides the native bar on Chrome 121+ and
+   Firefox; the webkit pseudo says the same thing for anything older,
+   which reads the pseudo and ignores the property. */
+/* The ladder, with the bar drawn over its right edge.
 
-   Firefox, which has no webkit pseudos, falls back to its own scrollbar.
-   It also takes layout space, so nothing is covered there either; it is
-   just wider than 8. */
+   The 8px the bar needs is held open by .oc-grid's padding, not by a
+   column beside the ladder. Padding is inside the row's own box, so the
+   BACKGROUND still runs the full width of the card — a hovered row's band
+   reaches the edge — while every figure stops 8 short and nothing but
+   that band ever passes under the bar. A column would have cost the band
+   those 8, and a row that stops short of the card edge reads as cut off.
+
+   The track is the padding; .oc-sbtrack only positions the thumb in it. */
+.oc-scrollwrap {
+  position: relative;
+}
+
+.oc-sbtrack {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 8px;
+  pointer-events: none;
+  /* Above the ladder unconditionally. The rows carry Motion's layout
+     projections, which put transforms — and stacking contexts — on things
+     that have none in the stylesheet. */
+  z-index: 2;
+}
+
 .oc-scroll {
   max-height: calc(13 * 30px + 22px);
   overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
+  scrollbar-width: none;
 }
 
-.oc-scroll::-webkit-scrollbar { width: 8px; }
+.oc-scroll::-webkit-scrollbar { width: 0; height: 0; }
 
-/* Hidden at rest, drawn while the ladder is actually being scrolled —
-   the platform's own behaviour, kept without the platform's overlay bar
-   (which drew ON TOP of the prices; see above).
+/* The thumb, centred in that track: 4px wide with 2 either side, which is
+   the native thumb's own geometry here (it was a 4px bar with a 2px
+   transparent border inside an 8px track).
 
-   The gutter stays reserved either way: the track is always 8px of
-   layout, so the columns never shift and nothing is ever covered. Only
-   the thumb comes and goes, and `[data-scrolling]` is set by the table
-   for ~700ms after the last scroll event (see ChainTable).
+   Dim at rest, full while scrolling — not hidden. Hidden, the 8px the
+   track holds back is 8px of nothing, and a hovered row's band reads as
+   cut off rather than as ending at a bar. Standing there dim, it says
+   what the gutter is for, and the band ends where the ladder does.
 
-   A hard swap, not a fade: webkit's scrollbar pseudo-elements do not
-   honour `transition`, so an opacity ramp here would be a declaration
-   that reads as intent and renders as nothing. */
-.oc-scroll::-webkit-scrollbar-thumb {
-  background: transparent;
-  border-radius: 8px;
-  /* Inset by a transparent border so the thumb reads as a slim bar with
-     air around it rather than a block hard against the card edge. */
-  border: 2px solid transparent;
-  background-clip: content-box;
+   It still disappears when the ladder fits — ChainTable sets its height
+   to 0 — because a bar that fills its own track is a bar saying nothing.
+
+   `opacity` and `transform` only: this moves on every scroll event, and
+   both are composited. */
+.oc-sb {
+  position: absolute;
+  top: 0;
+  /* Against the table's own edge. Rounded on the inside only — a radius
+     on the flush side would leave a sliver of ground at each corner. */
+  right: 0;
+  width: 4px;
+  border-radius: 2px 0 0 2px;
+  /* Solid, and lighter than anything it crosses. A wash of white took its
+     colour from whatever was under it, so the thumb changed shade as a
+     hovered band passed and read as two different bars; #454d4f is one
+     bar on the ladder's ground (#0f1719), on a shaded strike (#171f20)
+     and on a hovered row (#272e30) alike. */
+  background: #454d4f;
+  pointer-events: none;
+  transition: background-color 160ms linear;
+  will-change: transform;
 }
 
-.oc-scroll[data-scrolling]::-webkit-scrollbar-thumb {
-  background: var(--chip);
-  background-clip: content-box;
+.oc-scrollwrap[data-scrolling] .oc-sb { background: #5d686a; }
+
+@media (prefers-reduced-motion: reduce) {
+  .oc-sb { transition: none; }
 }
 
-.oc-scroll::-webkit-scrollbar-track { background: transparent; }
+
 
 .oc-table {
   background: var(--band);
@@ -392,12 +431,22 @@
   width: 100%;
 }
 
-/* The header sits outside the scroller, so it has to reserve by hand
-   exactly what the scroller loses to its bar: 8. Without it every column
-   header would sit 8px right of the figures beneath it. */
+/* The bar's 8px, kept clear of every figure. On the rows this is the
+   padding the bar is drawn over; on the header it is the same reserve, so
+   the two stay aligned — both boxes are .oc-grid, which is what stops the
+   pair from drifting.
+
+   `.oc-root` is load-bearing: a row is a <button>, and the reset at the
+   top of this file is `.oc-root button { padding: 0 }` at (0,1,1), which
+   beats a bare `.oc-grid` at (0,1,0). Declared there, the reserve reached
+   the header (a div) and not the rows — so the figures ran the full width
+   and the bar sat on the ask pill, while the header alone shifted 8. */
+.oc-root .oc-grid {
+  padding-right: 8px;
+}
+
 .oc-head {
   height: 26px;
-  padding-right: 8px;
   border-bottom: 1px solid var(--line-row);
 }
 
@@ -434,7 +483,10 @@
   transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.oc-row:hover { background: #272e30; }
+/* A hovered row fills the table, edge to edge — there is no gutter left
+   for it to stop short of. */
+.oc-row:hover,
+.oc-row[data-lit] { background: #272e30; }
 
 .oc-row-caret {
   display: inline-flex;
@@ -463,6 +515,11 @@
    and the header lands over the number rather than over the chip. */
 .oc-cell--pill {
   padding-left: 5px;
+  /* The halo is positioned against this cell, and has to be able to
+     spill: the cell is `overflow: hidden` by default and holds nothing
+     but the pill. */
+  position: relative;
+  overflow: visible;
   /* The target is this box. The chip inside it is paint — it must not
      take the pointer away from the box that handles it, and it must not
      be the only part of the cell that answers. */
@@ -776,5 +833,160 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+
+/* ---------- the beam ---------- */
+
+/* Hover a leg on the ticket beside this chain and the quote it came from
+   runs a light around its own edge.
+
+   The row it sits in lights at the same moment, the way a hovered row
+   does — so the beam is not what finds the quote, it is what says WHICH
+   of the two prices in a row you have already been shown. That is why
+   there is no glow here any more: it had a tight halo, a wide one, a
+   blurred copy of the arc and a bloom filling the ring, and all four
+   existed to carry a job the row highlight now does.
+
+   IN the chip's own rim, and the rim is all of it.
+
+   The reference makes its ring out of a padded clip with a flat inner
+   box: the gradient fills the outer, the inner covers the middle, and
+   what is left is the border — the BUTTON'S border, moving. Not a second
+   line laid over it, and not a halo around it.
+
+   Here the pill is the outer box and the clip: the gradient is oversized
+   inside it and spun, and the pill's own fill — `background: inherit`, so
+   it tracks whatever the chip is at the time, at rest, picked or hovered
+   — is laid back over the middle 1px in. What is left is the 1px rim the
+   chip already wears, with the light travelling round it.
+
+   The static rim STAYS, and the light runs over it: the rim paints first,
+   the arc paints on top of it, and the fill knocks out the middle above
+   both — so the chip keeps its border and the border is what beams. The
+   two only read as one thick stroke when they sit side by side; in the
+   same pixel the arc simply brightens the stroke as it passes.
+
+   Spun rather than angled: a conic gradient can be turned by animating
+   the angle it starts from, but that repaints the gradient every frame
+   and the angle has to be a registered property or it steps. A child
+   rotated by `transform` is composited. */
+@keyframes oc-beam-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.oc-pill[data-beam] {
+  overflow: hidden;
+}
+
+/* The bloom, and the only part of this that is outside the chip.
+
+   The rim's light cannot escape the pill — the pill is the clip that
+   makes the rim — so the glow is a second copy of the arc, sitting in the
+   chip's own box 1px proud and blurred. It paints before the pill and the
+   pill is opaque, so all that shows is what the blur pushes past the
+   edge: a soft tail following the bright one, in the side's colour.
+
+   A filter is not clipped by its element's own overflow, which is what
+   lets a box with `overflow: hidden` bloom outward at all.
+
+   Low and soft on purpose. The row highlight is what says which quote
+   this is; the glow only has to make the light look like light. */
+.oc-halo {
+  position: absolute;
+  left: 4px;
+  top: 50%;
+  width: 44px;
+  height: 22px;
+  margin-top: -11px;
+  border-radius: 7px;
+  overflow: hidden;
+  pointer-events: none;
+  filter: blur(3px);
+  opacity: 0.4;
+}
+
+/* One arc: nothing, the quote's own colour, a near-white core, nothing.
+   Tinted rather than pure white — a white-hot point reads as the
+   brightest thing on the widget however faint the rest of it is.
+
+   Oversized, so the square gradient still covers the pill's corners at
+   every angle it turns through. */
+.oc-beam {
+  position: absolute;
+  inset: -50%;
+  z-index: 0;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 72%,
+    var(--up) 84%,
+    #e8f7ef 90%,
+    transparent 96%
+  );
+  animation: oc-beam-turn 5s linear infinite;
+}
+
+/* A bid is the sell side, and the light that runs round it is that side's
+   colour. Stated as its own rule so nothing about the ask's gradient can
+   be edited out from under it. */
+.oc-beam--bid {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0 72%,
+    var(--down) 84%,
+    #ffe4ea 90%,
+    transparent 96%
+  );
+}
+
+/* The chip's fill, back over the middle — this is what leaves a rim
+   rather than a disc. 1px in, rounding at 5 to stay concentric with the
+   pill's 6. */
+.oc-pill[data-beam]::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 5px;
+  background: inherit;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Above both, because a positioned sibling paints over in-flow text. */
+.oc-pill-v {
+  position: relative;
+  z-index: 2;
+}
+
+/* The chip's static rim, ON for as long as the light is running,
+   whatever else would have hidden it — there has to be a stroke there for
+   the beam to travel along. It keeps its own colour: `--pill-ring` at
+   rest, the side's accent once picked.
+
+   It paints below the arc without a z-index of its own: a pseudo comes
+   before its element's children in tree order, and the arc's `z-index: 0`
+   puts it on the same level, so tree order decides.
+
+   `.oc-root` and the full chain because the rim is switched from several
+   places: [data-picked] at (0,2,1), hover and focus at (0,3,1). This
+   lands at (0,4,1) and at the end of the file, so it wins on both counts
+   rather than by luck of order. */
+.oc-root .oc-cell--pill .oc-pill[data-beam]::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oc-beam {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oc-beam::before {
+    animation: none;
   }
 }

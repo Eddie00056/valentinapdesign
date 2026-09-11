@@ -3,7 +3,11 @@ import type React from "react";
 import { motion } from "motion/react";
 import { WidgetShell } from "../shared/WidgetShell";
 import { QuoteBar } from "./QuoteBar";
-import { ChainTable, type QuotePick } from "./ChainTable";
+import {
+  ChainTable,
+  type HoveredQuote,
+  type QuotePick,
+} from "./ChainTable";
 import { ExpiryPicker } from "./ExpiryPicker";
 import { useChainState } from "./useChainState";
 import { pxHub } from "../alertscreen/priceHub";
@@ -79,6 +83,10 @@ export interface OptionChainProps {
   onPick?: (pick: QuotePick) => void;
   /** Which quotes are on that ticket — see ChainTable. */
   pickedKeys?: ReadonlySet<string>;
+  /** Passed through to the table — see ChainTableProps.beamKey. */
+  beamKey?: string | null;
+  /** Which quote the pointer is on — see ChainTableProps. */
+  onHoverQuote?: (q: HoveredQuote | null) => void;
   /**
    * The underlying this chain is showing, on every tick. Given, a ticket
    * beside it can quote the same symbol at the same price instead of
@@ -104,6 +112,8 @@ export function OptionChain({
   onGrip,
   onPick,
   pickedKeys,
+  beamKey,
+  onHoverQuote,
   onSpotChange,
 }: OptionChainProps) {
   const [tick, setTick] = useState(0);
@@ -227,6 +237,8 @@ export function OptionChain({
           onToggleStrike={state.toggleStrike}
           onPick={onPick}
           pickedKeys={pickedKeys}
+          beamKey={beamKey}
+          onHoverQuote={onHoverQuote}
         />
       </div>
 
