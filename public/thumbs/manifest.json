@@ -63,5 +63,10 @@
     "w": 1200,
     "h": 796,
     "seconds": 6
+  },
+  "holdings-empty-state": {
+    "w": 1200,
+    "h": 1200,
+    "seconds": 6
   }
 }

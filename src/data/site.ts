@@ -161,6 +161,15 @@ export const pieces: Piece[] = [
     previewWidth: 1440,
     previewHeight: 900,
   },
+  {
+    slug: "holdings-empty-state",
+    href: "/work/holdings-empty-state",
+    title: "Holdings magnifier",
+    /* A 240px card: a viewport close to it so the card reads at about the
+       size the small pieces do. */
+    previewWidth: 560,
+    previewHeight: 520,
+  },
 ];
 
 /* How each piece is recorded for its gallery thumbnail (scripts/record.mjs).
@@ -241,6 +250,13 @@ export const THUMBS: Record<
       { "wait": 1500 }, { "click": "[aria-label^=\"Buy 175 call\"]" },
       { "wait": 1800 }, { "click": "[aria-label^=\"Buy 185 call\"]" }
     ]
+  },
+  /* The glass tours all four logos — Meta, Microsoft, Apple, Google — and
+     returns to where it rests, driven by pointer events so it moves exactly
+     as a drag does. */
+  "holdings-empty-state": {
+    "focus": ".he-card", "fill": 0.55, "pad": 0, "seconds": 6,
+    "script": [{ "wait": 500 }, { "eval": "(async()=>{const L=document.querySelector('.he-lens'),C=document.querySelector('.he-card').getBoundingClientRect(),b=L.getBoundingClientRect();const home=[b.left+b.width/2-C.left,b.top+b.height/2-C.top];const P=[home,[143,97],[97,97],[97,143],[143,143],home];const sl=ms=>new Promise(r=>setTimeout(r,ms));const fire=(t,x,y,tgt)=>(tgt||window).dispatchEvent(new PointerEvent(t,{bubbles:true,cancelable:true,composed:true,pointerId:1,isPrimary:true,pointerType:'mouse',button:0,buttons:t==='pointerup'?0:1,clientX:C.left+x,clientY:C.top+y}));fire('pointerdown',home[0],home[1],L);for(let i=1;i<P.length;i++){const[a,c]=[P[i-1],P[i]];const t0=performance.now();for(;;){const u=Math.min(1,(performance.now()-t0)/520);const e=u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2;fire('pointermove',a[0]+(c[0]-a[0])*e,a[1]+(c[1]-a[1])*e);if(u>=1)break;await sl(16);}if(i<P.length-1)await sl(420);}fire('pointerup',home[0],home[1]);})()" }]
   }
 };
 
