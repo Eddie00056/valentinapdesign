@@ -20,5 +20,17 @@
       "orig": "The current order placement is slow, in\nparticular for option traders.",
       "text": "The current order placement is slow,\nparticularly for option traders."
     }
+  },
+  "26": {
+    "gd-metrics-t:0": {
+      "ta": "center"
+    },
+    "gd-metrics-t:1": {
+      "ta": "center"
+    },
+    "t.gd-metrics-t:1": {
+      "orig": "Reduce number of\nclicks by 30%",
+      "text": "Reduce number\nclicks by 30%"
+    }
   }
 }
