@@ -2,23 +2,28 @@
 /**
  * GUSTO portfolio deck — rebuilt in-house.
  *
- * Each slide is either a native `kind` (real HTML type on a 1920×1080 canvas
- * that scales to fit) or a pixel-faithful 3× raster of the Figma slide while
- * that slide is still being ported. Nothing regresses mid-migration.
- * Slide data + copy live in `src/data/gustoDeck.json`.
+ * Every slide is native HTML on a 1920×1080 canvas that scales to fit: real
+ * type, screenshots re-rendered from the source PDF at 4× and placed at the
+ * rect they were cut from, and — wherever a slide shows UI that exists in
+ * the gallery — the live prototype itself, mounted in an iframe (`live`).
+ * A handful of pure-image slides stay rasters.
+ *
+ * Slide data lives in `src/data/gustoDeck.json` (generated — see gen4.py).
  */
 import deck from "../../../data/gustoDeck.json";
-import { FractionalOrderFlow } from "../../fractionalflow/FractionalOrderFlow";
+import Shot from "./DeckShot.astro";
 
 type Slide = Record<string, any>;
 const slides = deck as Slide[];
 const COUNT = slides.length;
+const W = 1920;
+const H = 1080;
 const IMG = "/website/case/gusto/slides/";
+const OWN = "/website/case/gusto/own/";
 
-const nums = (a: any): number[] | "all" =>
-  a === "all" ? "all" : Array.isArray(a) ? a : [];
 const isOn = (active: any, i: number) =>
   active === "all" || (Array.isArray(active) && active.includes(i));
+const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
 ---
 
 <section class="gd w-wrap">
@@ -47,6 +52,13 @@ const isOn = (active: any, i: number) =>
                 data-n={s.n}
                 hidden
               >
+                {(s.panels || []).map((p: any) => (
+                  <div
+                    class="gd-panel"
+                    style={`left:${p.x}%;width:${p.w}%;top:${p.y}%;background:${p.c}`}
+                  />
+                ))}
+                {s.corner && <p class="gd-corner">{s.corner}</p>}
                 {s.raster ? (
                   <img
                     class="gd-raster"
@@ -69,30 +81,23 @@ const isOn = (active: any, i: number) =>
                       s.tone ? `tone-${s.tone}` : null,
                     ]}
                   >
-                    <span>{s.text}</span>
+                    <span style={fs(s)}>{s.text}</span>
                   </div>
                 ) : s.kind === "titlecard" ? (
                   <>
                     <div class="gd-titlecard">
                       {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
-                      <h2>{s.title}</h2>
+                      <h2 style={fs(s)}>{s.title}</h2>
                     </div>
-                    {s.shot && (
-                      <img
-                        class="gd-media-shot"
-                        src={`${IMG}../shots/${s.shot.src}.webp`}
-                        alt=""
-                        style={`left:${s.shot.x}%;top:${s.shot.y}%;width:${s.shot.w}%`}
-                      />
-                    )}
+                    {s.shot && <Shot {...s.shot} />}
                   </>
                 ) : s.kind === "statement" || s.kind === "quote" ? (
                   <div class:list={["gd-statement", { "is-quote": s.kind === "quote" }]}>
                     {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
-                    <p class="gd-statement-t">{s.text}</p>
+                    <p class="gd-statement-t" style={[fs(s), s.fw && `font-weight:${s.fw}`].filter(Boolean).join(";") || undefined}>{s.text}</p>
                   </div>
                 ) : s.kind === "numbered" ? (
-                  <div class="gd-numbered">
+                  <div class:list={["gd-numbered", s.size && `is-${s.size}`]}>
                     {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
                     <ol>
                       {s.items.map((it: string, i: number) => (
@@ -102,14 +107,15 @@ const isOn = (active: any, i: number) =>
                         </li>
                       ))}
                     </ol>
-                    {s.shot && (
-                      <img
-                        class="gd-media-shot"
-                        src={`${IMG}../shots/${s.shot.src}.webp`}
-                        alt=""
-                        style={`left:${s.shot.x}%;top:${s.shot.y}%;width:${s.shot.w}%`}
-                      />
-                    )}
+                    {s.shot && <Shot {...s.shot} />}
+                  </div>
+                ) : s.kind === "metrics" ? (
+                  <div class="gd-metrics">
+                    <p class="gd-kicker">{s.kicker}</p>
+                    <Shot {...s.icon} cls="gd-metrics-icon" />
+                    {s.items.map((m: any) => (
+                      <p class="gd-metrics-t" style={`left:${m.x}%`}>{m.text}</p>
+                    ))}
                   </div>
                 ) : s.kind === "checklist" ? (
                   <div class="gd-checklist">
@@ -133,22 +139,14 @@ const isOn = (active: any, i: number) =>
                       ))}
                     </div>
                   </div>
-                ) : s.kind === "twocard" ? (
-                  <div class="gd-twocard">
-                    {s.heading && <p class="gd-media-h">{s.heading}</p>}
-                    <div class="gd-tc-row">
-                      {s.cards.map((c: any) => (
-                        <div class="gd-tc-card">
-                          <p class="gd-tc-title">{c.title}</p>
-                          {c.points.map((pt: string) => (
-                            <p class="gd-tc-pt">{pt}</p>
-                          ))}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
                 ) : s.kind === "figures" ? (
-                  <div class:list={["gd-figures", `tone-${s.tone}`]}>
+                  <div
+                    class:list={[
+                      "gd-figures",
+                      `tone-${s.tone}`,
+                      { "is-split": s.split, "is-top": s.layout === "top" },
+                    ]}
+                  >
                     <div class="gd-figrow">
                       {s.items.map(([n, l]: [string, string]) => (
                         <div class="gd-fig">
@@ -157,7 +155,12 @@ const isOn = (active: any, i: number) =>
                         </div>
                       ))}
                     </div>
-                    {s.note && <p class="gd-fig-note">{s.note}</p>}
+                    {s.award && (
+                      <div class="gd-award">
+                        <span class="gd-award-t">{s.award[0]}</span>
+                        <span class="gd-award-s">{s.award[1]}</span>
+                      </div>
+                    )}
                   </div>
                 ) : s.kind === "journey" ? (
                   <div class="gd-journey">
@@ -167,7 +170,10 @@ const isOn = (active: any, i: number) =>
                         <>
                           {i > 0 && <span class="gd-arrow" aria-hidden="true" />}
                           <span
-                            class:list={["gd-step", { "is-active": s.active === i }]}
+                            class:list={[
+                              "gd-step",
+                              { "is-active": s.active === i, "is-dim": s.active >= 0 && s.active !== i },
+                            ]}
                           >
                             {st}
                           </span>
@@ -180,49 +186,6 @@ const isOn = (active: any, i: number) =>
                     <span>{s.left}</span>
                     <span>{s.right}</span>
                   </div>
-                ) : s.kind === "livefractional" ? (
-                  <div class="gd-proto-wrap">
-                    <FractionalOrderFlow client:visible bgOpacity={0.25} />
-                  </div>
-                ) : s.kind === "photobuild" ? (
-                  <div class="gd-pb">
-                    <div class="gd-pb-row">
-                      <div class="gd-pb-item">
-                        <p class="gd-pb-k">This is me</p>
-                        <div class="gd-pb-card gd-pb-card--me">
-                          <img src={`${IMG}../portrait.jpg`} alt="" />
-                        </div>
-                      </div>
-                      {s.reveal >= 2 && (
-                        <div class="gd-pb-item">
-                          <p class="gd-pb-k">This is where I&rsquo;m from</p>
-                          <div class="gd-pb-card gd-pb-card--map">
-                            <img src={`${IMG}../shots/worldmap.webp`} alt="" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    {s.reveal >= 3 && (
-                      <div class="gd-pb-hobbies-wrap">
-                        <p class="gd-pb-k">This is what I like</p>
-                        <div class="gd-pb-hobbies">
-                          {[
-                            "shots/hobby-dance",
-                            "hobby-cake",
-                            "hobby-calligraphy",
-                            "hobby-jitsu",
-                            "hobby-flowers",
-                          ].map((f) => (
-                            <img
-                              class="gd-pb-hobby"
-                              src={`${IMG}../${f}.${f.startsWith("shots/") ? "webp" : "jpg"}`}
-                              alt=""
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
                 ) : s.kind === "role" ? (
                   <div class="gd-role">
                     <div class="gd-role-col">
@@ -233,14 +196,7 @@ const isOn = (active: any, i: number) =>
                         </div>
                       ))}
                     </div>
-                    {s.shot && (
-                      <img
-                        class="gd-role-shot"
-                        src={`${IMG}../shots/${s.shot.src}.webp`}
-                        alt=""
-                        style={`left:${s.shot.x}%;top:${s.shot.y}%;width:${s.shot.w}%`}
-                      />
-                    )}
+                    {s.shot && <Shot {...s.shot} />}
                   </div>
                 ) : s.kind === "media" ? (
                   <div class="gd-media">
@@ -252,16 +208,20 @@ const isOn = (active: any, i: number) =>
                       </p>
                     )}
                     {(s.labels || []).map((l: any) => (
-                      <p class="gd-media-l" style={`left:${l.x}%;top:${l.y ?? 19}%`}>
+                      <p
+                        class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`]}
+                        style={`left:${l.x}%;top:${l.y ?? 19}%`}
+                      >
                         {l.text}
+                        {l.accent && <span class="gd-media-l-accent">{l.accent}</span>}
                       </p>
                     ))}
-                    {(s.shots || []).map((sh: any) => (
-                      <img
-                        class="gd-media-shot"
-                        src={`${IMG}../shots/${sh.src}.webp`}
-                        alt=""
-                        style={`left:${sh.x}%;top:${sh.y}%;width:${sh.w}%`}
+                    {(s.shots || []).map((sh: any) => <Shot {...sh} />)}
+                    {(s.marks || []).map((m: any) => (
+                      <span
+                        class="gd-mark"
+                        aria-hidden="true"
+                        style={`left:${m.x}%;top:${m.y}%;width:${m.w}%;height:${m.h}%`}
                       />
                     ))}
                   </div>
@@ -288,11 +248,11 @@ const isOn = (active: any, i: number) =>
                     {s.reveal >= 3 && (
                       <div class="gd-own-icons">
                         <div class="gd-own-card gd-own-icon">
-                          <img src={`${IMG}../own/adv-charting.webp`} alt="" />
+                          <img src={`${OWN}adv-charting.webp`} alt="" />
                           <span>Advanced charting</span>
                         </div>
                         <div class="gd-own-card gd-own-icon">
-                          <img src={`${IMG}../own/sym-alerts.webp`} alt="" />
+                          <img src={`${OWN}sym-alerts.webp`} alt="" />
                           <span>Symbol alerts</span>
                         </div>
                       </div>
@@ -306,11 +266,11 @@ const isOn = (active: any, i: number) =>
                     {s.reveal >= 5 && (
                       <div class="gd-own-icons">
                         <div class="gd-own-card gd-own-icon">
-                          <img src={`${IMG}../own/rt-chip.webp`} alt="" class="is-chip" />
+                          <img src={`${OWN}rt-chip.webp`} alt="" class="is-chip" />
                           <span>Real time streaming</span>
                         </div>
                         <div class="gd-own-card gd-own-icon">
-                          <img src={`${IMG}../own/frac-trading.webp`} alt="" />
+                          <img src={`${OWN}frac-trading.webp`} alt="" />
                           <span>Fractional trading</span>
                         </div>
                       </div>
@@ -318,11 +278,11 @@ const isOn = (active: any, i: number) =>
                     {s.reveal >= 6 && (
                       <div class="gd-own-icons">
                         <div class="gd-own-card gd-own-icon">
-                          <img src={`${IMG}../own/questrade-pro.webp`} alt="" />
+                          <img src={`${OWN}questrade-pro.webp`} alt="" />
                           <span>Questrade Pro</span>
                         </div>
                         <div class="gd-own-card gd-own-icon">
-                          <img src={`${IMG}../own/edge-mobile.webp`} alt="" />
+                          <img src={`${OWN}edge-mobile.webp`} alt="" />
                           <span>Edge Mobile</span>
                         </div>
                       </div>
@@ -340,6 +300,31 @@ const isOn = (active: any, i: number) =>
                     )}
                   </div>
                 ) : null}
+                {(s.live || []).map((l: any) => {
+                  const bw = (l.w / 100) * W;
+                  const bh = (l.h / 100) * H;
+                  const k = bw / l.vw;
+                  const vh = l.fit ? l.vh : Math.round(bh / k);
+                  return (
+                    <div
+                      class:list={["gd-live", { "is-clip": l.clip }]}
+                      style={`left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%`}
+                    >
+                      <iframe
+                        title={l.page}
+                        data-src={`/work/${l.page}`}
+                        data-css={l.css || ""}
+                        data-fit={l.fit || ""}
+                        data-pad={l.pad || 0}
+                        data-clip={l.clip ? "1" : ""}
+                        data-bw={bw}
+                        data-bh={bh}
+                        tabindex="-1"
+                        style={`width:${l.vw}px;height:${vh}px;zoom:${k.toFixed(5)}`}
+                      />
+                    </div>
+                  );
+                })}
               </article>
             ))
           }
@@ -394,13 +379,14 @@ const isOn = (active: any, i: number) =>
 
     const fit = () => {
       const fs = document.fullscreenElement === stage;
-      const bw = fs ? window.innerWidth : frame.clientWidth;
-      const bh = fs ? window.innerHeight : frame.clientWidth * (H / W);
+      const solo = stage.classList.contains("is-solo");
+      const bw = fs || solo ? window.innerWidth : frame.clientWidth;
+      const bh = fs || solo ? window.innerHeight : frame.clientWidth * (H / W);
       const s = Math.min(bw / W, bh / H);
       canvas.style.transform = `translate(${(bw - W * s) / 2}px, ${
         (bh - H * s) / 2
       }px) scale(${s})`;
-      frame.style.height = fs ? "100%" : `${bw * (H / W)}px`;
+      frame.style.height = fs || solo ? "100%" : `${bw * (H / W)}px`;
     };
 
     const warm = (n: number) => {
@@ -409,31 +395,167 @@ const isOn = (active: any, i: number) =>
         .forEach((img) => (img.loading = "eager"));
     };
 
+    /* Keys pressed inside a live prototype still drive the deck — unless
+       the viewer is typing into one of its fields. */
+    const NAV = new Set(["ArrowRight", "ArrowLeft", "PageDown", "PageUp", "Home", "End", " ", "f", "F"]);
+    const typing = (t: EventTarget | null) => {
+      const el = t as HTMLElement | null;
+      return !!el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable);
+    };
+
+    /* Live prototypes are real pages. They only exist while their slide is
+       on screen or one step away, so a deck of them never has more than a
+       few ticking at once. Each is re-grounded to transparent so the work
+       sits on the slide rather than on its gallery tile. */
+    const mount = (f: HTMLIFrameElement) => {
+      if (f.getAttribute("src")) return;
+      f.addEventListener(
+        "load",
+        () => {
+          try {
+            const d = f.contentDocument!;
+            const st = d.createElement("style");
+            st.textContent =
+              "html,body,html[data-embed],html[data-embed] body{background:transparent!important}" +
+              (f.dataset.css || "");
+            d.head.appendChild(st);
+            f.contentWindow!.addEventListener("keydown", (e) => {
+              if (!NAV.has(e.key) || typing(e.target)) return;
+              e.preventDefault();
+              stage.focus();
+              stage.dispatchEvent(new KeyboardEvent("keydown", { key: e.key }));
+            });
+          } catch {
+            /* cross-origin never happens here; the page just keeps its ground */
+          }
+          f.dataset.loaded = "1";
+          place(f).then(() => f.classList.add("is-in"));
+        },
+        { once: true },
+      );
+      f.src = f.dataset.src!;
+    };
+    /* A `fit` prototype is measured, not guessed: once the page has laid
+       out, its component (the ticket's card, the phone's frame) is scaled
+       and centred onto the slide rect it replaces. Measured once — a card
+       that later grows (a bracket order opening) grows from there rather
+       than rescaling under the pointer. */
+    const place = async (f: HTMLIFrameElement) => {
+      const sel = f.dataset.fit;
+      const wrap = f.parentElement as HTMLElement;
+      const d = f.contentDocument;
+      if (!d) return;
+      const bw = parseFloat(f.dataset.bw!);
+      const bh = parseFloat(f.dataset.bh!);
+      if (!sel) {
+        wrap.style.clipPath = "";
+        return;
+      }
+      // the union of every match — "the chain AND its ticket" is one target
+      const measure = () => {
+        const rs = Array.from(d.querySelectorAll(sel))
+          .map((e) => e.getBoundingClientRect())
+          .filter((q) => q.width > 0 && q.height > 0);
+        if (!rs.length) return null;
+        const l = Math.min(...rs.map((q) => q.left));
+        const t = Math.min(...rs.map((q) => q.top));
+        return {
+          left: l,
+          top: t,
+          width: Math.max(...rs.map((q) => q.right)) - l,
+          height: Math.max(...rs.map((q) => q.bottom)) - t,
+        };
+      };
+      let r = measure();
+      for (let n = 0; n < 50 && !r; n++) {
+        await new Promise((res) => setTimeout(res, 100));
+        r = measure();
+      }
+      if (!r) return;
+      await new Promise((res) => setTimeout(res, 150)); // let entry springs settle
+      r = measure() || r;
+      const pad = parseFloat(f.dataset.pad || "0");
+      const k = Math.min((bw - 2 * pad) / r.width, (bh - 2 * pad) / r.height);
+      const ox = bw / 2 - (r.left + r.width / 2) * k;
+      const oy = bh / 2 - (r.top + r.height / 2) * k;
+      /* `zoom`, not `transform: scale()`. A transformed iframe is a GPU layer
+         rasterized once and then stretched, so shrinking a 1440px page onto
+         the slide read soft on real displays. Zoom lays the page out at its
+         final size, so its text is drawn crisp. Zoom also scales the
+         element's own left/top, hence the division. */
+      f.style.zoom = String(k);
+      f.style.left = `${ox / k}px`;
+      f.style.top = `${oy / k}px`;
+      /* The iframe is a whole page, mostly transparent and far wider than
+         the work — left unclipped it swallows clicks meant for whatever sits
+         beside it. Clip (clip-path clips hit-testing too) to the card's
+         column only: vertically it stays open, so a card that grows after
+         it was measured — an entry spring, a bracket order opening, a
+         dropdown — is never cut. */
+      if (f.dataset.clip) {
+        wrap.style.clipPath = "";
+        return;
+      }
+      const cw = r.width * k;
+      const cl = (bw - cw) / 2;
+      const m = 20;
+      wrap.style.clipPath = `inset(-2000px ${bw - cl - cw - m}px -2000px ${cl - m}px)`;
+    };
+    const unmount = (f: HTMLIFrameElement) => {
+      if (!f.getAttribute("src")) return;
+      f.classList.remove("is-in");
+      delete f.dataset.loaded;
+      f.removeAttribute("src");
+    };
+    const syncLive = () => {
+      slides.forEach((el, k) => {
+        const near = Math.abs(k + 1 - i) <= 1;
+        el.querySelectorAll<HTMLIFrameElement>(".gd-live iframe").forEach((f) =>
+          near ? mount(f) : unmount(f),
+        );
+      });
+    };
+
     const show = (n: number) => {
       i = Math.min(count, Math.max(1, n));
-      slides.forEach(
-        (el) => (el.hidden = parseInt(el.dataset.n || "0", 10) !== i),
-      );
+      /* The slides either side stay laid out but invisible, so their
+         prototypes load AND get measured before you arrive — no pop-in, no
+         jump when a slide appears. Everything further away is display:none. */
+      slides.forEach((el) => {
+        const d = Math.abs(parseInt(el.dataset.n || "0", 10) - i);
+        el.hidden = d > 1;
+        el.classList.toggle("is-near", d === 1);
+      });
       warm(i);
       warm(i + 1);
       warm(i + 2);
       warm(i - 1);
+      syncLive();
+      // backstop: anything that finished loading without being placed
+      slides[i - 1]
+        ?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe")
+        .forEach((f) => {
+          if (f.dataset.loaded && !f.classList.contains("is-in")) {
+            place(f).then(() => f.classList.add("is-in"));
+          }
+        });
       countEl.textContent = `${i} / ${count}`;
       bar.style.transform = `scaleX(${i / count})`;
+      if (started) history.replaceState(null, "", `#slide-${i}`);
     };
 
-    const startShow = () => {
+    const startShow = (n = 1) => {
       if (started) return;
       started = true;
       play.hidden = true;
       viewer.hidden = false;
       stage.setAttribute("tabindex", "0");
       fit();
-      show(1);
-      stage.focus();
+      show(n);
+      stage.focus({ preventScroll: true });
     };
 
-    play.addEventListener("click", startShow);
+    play.addEventListener("click", () => startShow());
     prevBtn.addEventListener("click", () => show(i - 1));
     nextBtn.addEventListener("click", () => show(i + 1));
     fsBtn.addEventListener("click", () => {
@@ -464,6 +586,13 @@ const isOn = (active: any, i: number) =>
         fsBtn.click();
       }
     });
+
+    /* Deep links: #slide-24 opens the deck on that slide; ?solo makes the
+       deck the whole window (a presenter view you can open in its own tab). */
+    const params = new URLSearchParams(location.search);
+    if (params.has("solo")) stage.classList.add("is-solo");
+    const m = /^#slide-(\d+)$/.exec(location.hash);
+    if (m || params.has("solo")) startShow(m ? parseInt(m[1], 10) : 1);
   }
 </script>
 
@@ -494,6 +623,26 @@ const isOn = (active: any, i: number) =>
     border: 0;
     border-radius: 0;
     background: #000;
+  }
+
+  /* ?solo — the deck is the whole window */
+  .gd-stage.is-solo {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    aspect-ratio: auto;
+    border: 0;
+    border-radius: 0;
+    background: #000;
+  }
+  .gd-stage.is-solo .gd-bar,
+  .gd-stage.is-solo .gd-progress {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .gd-stage.is-solo:hover .gd-bar,
+  .gd-stage.is-solo:hover .gd-progress {
+    opacity: 1;
   }
 
   .gd-viewer {
@@ -529,6 +678,18 @@ const isOn = (active: any, i: number) =>
     background: #fff;
     color: #0b0b0b;
   }
+  .gd-slide--canvas {
+    background: #f6f4f5;
+    color: #0b0b0b;
+  }
+
+  .gd-slide.is-near {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .gd-slide.is-near * {
+    visibility: hidden !important;
+  }
 
   .gd-raster {
     position: absolute;
@@ -543,9 +704,9 @@ const isOn = (active: any, i: number) =>
   /* ---- shared bits ---- */
   .gd-kicker {
     margin: 0 0 26px;
-    font-size: 21px;
+    font-size: 18px;
     font-weight: 500;
-    letter-spacing: 0.19em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.62);
   }
@@ -631,19 +792,18 @@ const isOn = (active: any, i: number) =>
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 0 9%;
+    padding: 0 4%;
+  }
+  .gd-statement .gd-kicker {
+    margin-bottom: 16px;
   }
   .gd-statement-t {
     margin: 0;
-    font-size: 52px;
+    font-size: 73px;
     font-weight: 400;
-    line-height: 1.28;
+    line-height: 1.1;
     letter-spacing: -0.02em;
     white-space: pre-line;
-    text-wrap: balance;
-  }
-  .gd-statement.is-quote .gd-statement-t {
-    font-size: 46px;
   }
 
   /* ---- numbered ---- */
@@ -673,6 +833,15 @@ const isOn = (active: any, i: number) =>
     font-weight: 400;
     letter-spacing: -0.02em;
     line-height: 1;
+  }
+  .gd-numbered.is-lg {
+    padding-left: 6.7%;
+  }
+  .gd-numbered.is-lg ol {
+    gap: 34px;
+  }
+  .gd-numbered.is-lg li {
+    font-size: 72px;
   }
   .gd-numbered li.is-dim {
     color: rgba(255, 255, 255, 0.32);
@@ -724,6 +893,14 @@ const isOn = (active: any, i: number) =>
   .tone-green .gd-fig-n {
     color: #0a5a1e;
   }
+  .gd-figures.is-split .gd-figrow {
+    width: 100%;
+    gap: 0;
+  }
+  .gd-figures.is-split .gd-fig {
+    flex: 1;
+    max-width: none;
+  }
   .gd-fig-l {
     font-size: 30px;
     font-weight: 400;
@@ -731,6 +908,49 @@ const isOn = (active: any, i: number) =>
     color: #fff;
   }
   .gd-slide--white .gd-fig-l {
+    color: #0b0b0b;
+  }
+  /* top-anchored figures (95, 96): the numbers sit high so the award
+     line can take the lower half at the same display size */
+  .gd-figures.is-top {
+    justify-content: flex-start;
+    padding-top: 12%;
+    gap: 0;
+  }
+  .gd-figures.is-top .gd-figrow {
+    display: grid;
+    grid-template-columns: 560px 560px;
+    gap: 0;
+  }
+  .gd-figures.is-top .gd-fig {
+    gap: 10px;
+    max-width: none;
+  }
+  .gd-figures.is-top .gd-fig-n {
+    font-size: 150px;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+  }
+  .gd-figures.is-top .gd-fig-l {
+    font-size: 26px;
+    white-space: nowrap;
+  }
+  .gd-award {
+    margin-top: 96px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .gd-award-t {
+    font-size: 150px;
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    line-height: 0.9;
+    color: #0a5a1e;
+  }
+  .gd-award-s {
+    font-size: 26px;
     color: #0b0b0b;
   }
   .gd-fig-note {
@@ -756,20 +976,23 @@ const isOn = (active: any, i: number) =>
   .gd-journey-row {
     display: flex;
     align-items: center;
-    gap: 34px;
+    gap: 8px;
   }
   .gd-step {
-    font-size: 38px;
+    font-size: 54px;
     font-weight: 400;
     letter-spacing: -0.02em;
     color: rgba(255, 255, 255, 0.9);
   }
   .gd-step.is-active {
-    font-weight: 600;
+    font-weight: 500;
     color: #fff;
   }
+  .gd-step.is-dim {
+    color: rgba(255, 255, 255, 0.36);
+  }
   .gd-arrow {
-    width: 90px;
+    width: 44px;
     height: 2px;
     background: currentColor;
     position: relative;
@@ -788,53 +1011,64 @@ const isOn = (active: any, i: number) =>
     transform: translateY(-50%) rotate(45deg);
   }
 
-  /* ---- checklist (69, 70) ---- */
+  /* ---- checklist (70, 71): one column of scope cards per half ---- */
   .gd-checklist {
     position: absolute;
     inset: 0;
   }
   .gd-cl-cols {
     position: absolute;
-    left: 12%;
-    right: 8%;
-    top: 13%;
-    display: flex;
-    gap: 8%;
+    left: 0;
+    right: 0;
+    top: 14%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
   }
   .gd-cl-col {
-    flex: 1;
+    justify-self: center;
+    width: 437px;
   }
   .gd-cl-title {
-    margin: 0 0 22px;
-    font-size: 30px;
+    margin: 0 0 12px;
+    text-align: center;
+    font-size: 32px;
     font-weight: 600;
     letter-spacing: -0.02em;
     color: #0b0b0b;
   }
   .gd-cl-sec {
-    margin-bottom: 16px;
+    margin-bottom: 9px;
+    border-radius: 8px;
+    background: #fff;
+    padding-bottom: 8px;
+  }
+  .gd-cl-col:nth-child(2) .gd-cl-sec {
+    background: #f4f4f4;
   }
   .gd-cl-label {
-    margin: 0 0 8px;
+    margin: 0 0 10px;
+    padding: 20px 18px 18px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
     font-size: 19px;
     font-weight: 600;
     letter-spacing: -0.01em;
     color: #232528;
   }
   .gd-cl-item {
-    margin: 0 0 5px;
+    margin: 0;
+    padding: 15px 18px;
     font-size: 16px;
     color: #555965;
     display: flex;
-    gap: 9px;
+    gap: 12px;
     align-items: baseline;
   }
   .gd-cl-mark {
-    color: #1f9d4d;
+    color: #1a7f37;
     font-weight: 600;
   }
   .gd-cl-item.no .gd-cl-mark {
-    color: #c0473d;
+    color: #d1242f;
   }
 
   /* ---- twocard (68) ---- */
@@ -868,82 +1102,79 @@ const isOn = (active: any, i: number) =>
     max-width: 30ch;
   }
 
-  /* ---- live prototype embed (89–91: FractionalOrderFlow) ---- */
-  .gd-proto-wrap {
+  /* ---- live prototypes (real gallery pages, iframed) ---- */
+  /* The iframe is a whole page, mostly transparent, and larger than the work
+     it shows — unclipped it would swallow clicks meant for whatever sits
+     beside it. Clip (which also clips hit-testing) to the slide rect plus a
+     bleed that leaves room for the prototype's own dropdowns and toasts. */
+  .gd-live {
     position: absolute;
-    inset: 0;
-    overflow: hidden;
   }
-  .gd-proto-wrap :global(.fof-stage) {
-    min-height: 100% !important;
-    height: 100%;
-    /* the component's frame is 440.55×909.3px; that already reads clearly
-       at the deck's 1920×1080 canvas size, so keep it near 1:1 and just
-       nudge it slightly down to leave a hair of margin top/bottom */
-    transform: scale(0.95);
+  .gd-live.is-clip {
+    overflow: hidden;
+    border-radius: 6px;
+  }
+  .gd-live iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 0;
+    background: transparent;
+    color-scheme: normal;
+    opacity: 0;
+  }
+  .gd-live iframe.is-in {
+    opacity: 1;
   }
 
-  /* ---- photobuild (2, 3, 4) ---- */
-  .gd-pb {
+  /* ---- panels + corner kicker ---- */
+  .gd-panel {
+    position: absolute;
+    bottom: 0;
+  }
+  .gd-corner {
+    position: absolute;
+    left: 5.2%;
+    top: 7.2%;
+    margin: 0;
+    font-size: 25px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.55);
+    z-index: 1;
+  }
+  .gd-slide--black .gd-corner {
+    color: rgba(255, 255, 255, 0.62);
+  }
+
+  /* ---- metrics (26) ---- */
+  .gd-metrics {
     position: absolute;
     inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 34px;
   }
-  .gd-pb-row {
-    display: flex;
-    gap: 26px;
-    align-items: flex-start;
-  }
-  .gd-pb-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .gd-pb-k {
-    margin: 0 0 12px;
+  .gd-metrics .gd-kicker {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 25.2%;
     text-align: center;
-    font-size: 15px;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.6);
+    margin: 0;
   }
-  .gd-pb-card {
-    background: #fff;
-    padding: 9px 9px 9px;
-    border-radius: 3px;
+  .gd-slide :global(.gd-metrics-icon) {
+    position: absolute;
+    height: auto;
+    border-radius: 2px;
   }
-  .gd-pb-card--me img {
-    width: 300px;
-    aspect-ratio: 3 / 4;
-  }
-  .gd-pb-card--map img {
-    width: 340px;
-    aspect-ratio: 16 / 10;
-  }
-  .gd-pb-card img {
-    display: block;
-    object-fit: cover;
-    border-radius: 1px;
-  }
-  .gd-pb-hobbies-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .gd-pb-hobbies {
-    display: flex;
-    gap: 14px;
-  }
-  .gd-pb-hobby {
-    width: 148px;
-    height: 148px;
-    object-fit: cover;
-    border-radius: 4px;
+  .gd-metrics-t {
+    position: absolute;
+    top: 43.2%;
+    margin: 0;
+    font-size: 52px;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    white-space: pre-line;
   }
 
   /* ---- role (slides 20, 61) ---- */
@@ -971,11 +1202,6 @@ const isOn = (active: any, i: number) =>
     line-height: 1.28;
     white-space: pre-line;
   }
-  .gd-role-shot {
-    position: absolute;
-    height: auto;
-    border-radius: 4px;
-  }
 
   /* ---- media (heading + screenshot crops) ---- */
   .gd-media {
@@ -991,7 +1217,8 @@ const isOn = (active: any, i: number) =>
     font-weight: 500;
     letter-spacing: -0.02em;
   }
-  .gd-slide--white .gd-media-h {
+  .gd-slide--white .gd-media-h,
+  .gd-slide--canvas .gd-media-h {
     color: #0b0b0b;
   }
   .gd-media-big {
@@ -1015,12 +1242,31 @@ const isOn = (active: any, i: number) =>
     font-size: 15px;
     font-weight: 500;
     letter-spacing: 0.02em;
+    white-space: nowrap;
     color: rgba(255, 255, 255, 0.82);
+    z-index: 1;
   }
-  .gd-slide--white .gd-media-l {
-    color: rgba(0, 0, 0, 0.7);
+  .gd-slide--white .gd-media-l,
+  .gd-slide--canvas .gd-media-l,
+  .gd-media-l.tone-dark {
+    color: rgba(0, 0, 0, 0.72);
   }
-  .gd-media-shot {
+  .gd-media-l.is-lg {
+    font-size: 21px;
+    letter-spacing: 0;
+  }
+  .gd-media-l-accent {
+    color: #e5484d;
+  }
+  .gd-mark {
+    position: absolute;
+    box-sizing: border-box;
+    border: 5px solid #d8362f;
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+  }
+  .gd-slide :global(.gd-media-shot) {
     position: absolute;
     height: auto;
     border-radius: 4px;
@@ -1137,14 +1383,13 @@ const isOn = (active: any, i: number) =>
   .gd-twocol {
     position: absolute;
     inset: 0;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
-    justify-content: center;
-    gap: 8%;
-    padding: 0 8%;
+    justify-items: center;
   }
   .gd-twocol span {
-    font-size: 46px;
+    font-size: 52px;
     font-weight: 400;
     letter-spacing: -0.02em;
   }
@@ -1154,7 +1399,9 @@ const isOn = (active: any, i: number) =>
     position: absolute;
     top: 0;
     bottom: 2.75rem;
-    width: 33%;
+    /* slim strips: a third of the slide would sit on top of any prototype
+       near the edge and eat its clicks */
+    width: 4.5rem;
     display: flex;
     align-items: center;
     padding: 0 1.25rem;
@@ -1183,6 +1430,19 @@ const isOn = (active: any, i: number) =>
   .gd-edge:hover {
     opacity: 0.9 !important;
   }
+  /* The edges are invisible third-of-the-slide hit areas; a focus ring on
+     one draws a big box across the slide. Ring the chevron instead, and
+     only for keyboard focus. */
+  .gd-edge:focus,
+  .gd-stage:focus,
+  .gd-fs:focus {
+    outline: none;
+  }
+  .gd-edge:focus-visible span,
+  .gd-fs:focus-visible {
+    outline: 2px solid var(--w-accent);
+    outline-offset: 2px;
+  }
   .gd-edge span {
     display: grid;
     place-items: center;
@@ -1203,7 +1463,7 @@ const isOn = (active: any, i: number) =>
     align-items: center;
     justify-content: space-between;
     padding: 0 0.9rem;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.55), transparent);
+    /* no scrim: a dark gradient smudges the white slides */
     z-index: 3;
   }
   .gd-count {

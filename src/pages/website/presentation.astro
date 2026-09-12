@@ -2,15 +2,11 @@
 import Website from "../../layouts/Website.astro";
 import SiteHeader from "../../components/website/SiteHeader.astro";
 import { Reveal } from "../../components/website/Reveal";
+import GustoDeck from "../../components/website/deck/GustoDeck.astro";
 
 const V = "/website/case/gusto";
 const FILE_KEY = "8Mdlm1c4YU0ecxJ4B5p3vi";
 const DECK = `https://www.figma.com/slides/${FILE_KEY}/Case-study-presentation--GUSTO-`;
-
-// Self-hosted deck viewer — every slide exported to WebP, played back with
-// its own prev/next, keyboard nav and fullscreen. No Figma dependency.
-const DECK_BASE = `${V}/deck/`;
-const DECK_COUNT = 100;
 
 const hobbies = [
   { src: `${V}/hobby-cake.jpg`, alt: "A hand-decorated Spider-Man layer cake" },
@@ -25,16 +21,20 @@ const chapters = [
     title: "Order entry modernization",
     blocks: [
       {
+        label: "Background",
+        body: "Questrade was seeing slower growth among active traders. The answer was a new, modernized trading platform — and its highest-impact workflow was order entry, the one feature clients told us not to touch because nobody complained about it.",
+      },
+      {
         label: "Problem",
-        body: "Questrade was seeing slower growth among active traders. The desktop platform was a legacy build with no cohesive design system, and placing an order was slow enough to limit trade efficiency and trader confidence.",
+        body: "Research with active traders across the full journey — idea generation, conviction building, execution, monitoring — showed order placement was slow, in particular for option traders. Options are 80% of Questrade’s revenue and the most complex experience in the industry, and the path from finding an option to trading it was broken.",
+      },
+      {
+        label: "Goal",
+        body: "Make trade submission fast, frictionless and the best in Canada. Success meant cutting time to trade by 15% and the number of clicks by 30%.",
       },
       {
         label: "Solution",
-        body: "Modernize the legacy desktop platform, starting with its highest-impact workflow: order entry. Research with active traders — 150+ trades a quarter — reframed the work around the full trading journey rather than the widget alone.",
-      },
-      {
-        label: "Principles",
-        body: "Reduce time to trade. Standardize order-type configurations across stocks, single-leg options and multi-leg strategies. Innovate while respecting the past — traders told us plainly not to break the one feature nobody complains about.",
+        body: "Tailor the order ticket to the security type. We audited what data the legacy widget showed and how — fields repeated or redundant — then rebuilt it: a lean stock ticket, an options ticket that takes its contract from the chain, and a workspace where a price becomes an order.",
       },
     ],
     meta: [
@@ -53,15 +53,15 @@ const chapters = [
     blocks: [
       {
         label: "Goal",
-        body: "On the back of $0 commission trades, win more active traders and streamline trading. Fractional shares were the most-requested feature on the community forum — and no other Canadian broker offered them.",
+        body: "Win more active traders and streamline the trading experience. Traders were asking for affordable, flexible ways to trade — research on the community forums was full of requests for fractional shares.",
       },
       {
-        label: "The framing",
-        body: "One feature, two platforms, two personas. How might we make fractional investing accessible to new investors without disrupting the speed advanced traders depend on? A north-star scope was mapped against a realistic MVP across symbol availability, order types and order management.",
+        label: "The challenge",
+        body: "One feature, two personas, two design languages. How might we make investing accessible to new investors without slowing down advanced traders? A north-star scope was mapped against a realistic MVP across symbol availability, order types, actions and order management.",
       },
       {
         label: "Design process",
-        body: "Two questions drove the work: how do I find the right symbol, and how do I place a fractional trade? Beyond the happy path, the hard part was the edge cases — fractional quantities only clear on market orders, so the UI had to guide traders out of limit-order and duration conflicts without dead ends.",
+        body: "Two goals drove the work: help traders find fractional symbols, and let them place a fractional trade seamlessly. Symbol discovery went from original design to beta to public release; the multi-page order wizard became a single screen, and the edge cases — fractional quantities only clear on market orders — guide traders out of limit-order and duration conflicts without dead ends.",
       },
     ],
     meta: [
@@ -128,48 +128,7 @@ const chapters = [
     </header>
 
     <!-- ----------------------------------------------------------- deck player -->
-    <section class="gp-deck w-wrap">
-      <div
-        class="gp-deck-stage"
-        data-base={DECK_BASE}
-        data-count={DECK_COUNT}
-      >
-        <button type="button" class="gp-deck-play">
-          <span class="gp-deck-play-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
-              <path d="M8 5v14l11-7z"></path>
-            </svg>
-          </span>
-          <span class="gp-deck-play-text">
-            <span class="gp-deck-play-label">Play the presentation</span>
-            <span class="gp-deck-play-sub">{DECK_COUNT} slides · ← → to move · ⤢ for fullscreen</span>
-          </span>
-        </button>
-
-        <div class="gp-deck-viewer" hidden>
-          <img class="gp-deck-img" alt="" draggable="false" />
-          <button class="gp-deck-edge gp-deck-edge--prev" type="button" aria-label="Previous slide">
-            <span aria-hidden="true">‹</span>
-          </button>
-          <button class="gp-deck-edge gp-deck-edge--next" type="button" aria-label="Next slide">
-            <span aria-hidden="true">›</span>
-          </button>
-          <div class="gp-deck-bar">
-            <span class="gp-deck-count" aria-live="polite">1 / {DECK_COUNT}</span>
-            <button class="gp-deck-fs" type="button" aria-label="Toggle fullscreen">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M8 3H4v4M16 3h4v4M8 21H4v-4M16 21h4v-4"></path>
-              </svg>
-            </button>
-          </div>
-          <div class="gp-deck-progress"><span></span></div>
-        </div>
-      </div>
-      <p class="gp-deck-note">
-        <kbd>←</kbd> <kbd>→</kbd> or click the edges to move ·
-        <a href={DECK} target="_blank" rel="noopener">open in Figma&nbsp;↗</a>
-      </p>
-    </section>
+    <GustoDeck />
 
     <!-- ------------------------------------------------------------- portrait -->
     <figure class="gp-portrait w-wrap">
@@ -298,88 +257,6 @@ const chapters = [
       </section>
     </Reveal>
   </main>
-
-  <script>
-    // Self-hosted slide viewer: one <img> swapped between exported WebP
-    // slides, with prev/next, keyboard nav, edge-click and fullscreen.
-    const stage = document.querySelector<HTMLElement>(".gp-deck-stage");
-    if (stage) {
-      const base = stage.dataset.base!;
-      const count = parseInt(stage.dataset.count || "0", 10);
-      const play = stage.querySelector<HTMLButtonElement>(".gp-deck-play")!;
-      const viewer = stage.querySelector<HTMLElement>(".gp-deck-viewer")!;
-      const img = stage.querySelector<HTMLImageElement>(".gp-deck-img")!;
-      const countEl = stage.querySelector<HTMLElement>(".gp-deck-count")!;
-      const bar = stage.querySelector<HTMLElement>(".gp-deck-progress span")!;
-      const fsBtn = stage.querySelector<HTMLButtonElement>(".gp-deck-fs")!;
-      const prevBtn = stage.querySelector<HTMLButtonElement>(".gp-deck-edge--prev")!;
-      const nextBtn = stage.querySelector<HTMLButtonElement>(".gp-deck-edge--next")!;
-
-      const src = (n: number) =>
-        `${base}${String(n).padStart(3, "0")}.webp`;
-      let i = 1;
-      let started = false;
-
-      const preload = (n: number) => {
-        if (n < 1 || n > count) return;
-        const p = new Image();
-        p.src = src(n);
-      };
-
-      const show = (n: number) => {
-        i = Math.min(count, Math.max(1, n));
-        img.src = src(i);
-        img.alt = `Slide ${i} of ${count}`;
-        countEl.textContent = `${i} / ${count}`;
-        bar.style.transform = `scaleX(${i / count})`;
-        preload(i + 1);
-        preload(i + 2);
-        preload(i - 1);
-      };
-
-      const start = () => {
-        if (started) return;
-        started = true;
-        play.hidden = true;
-        viewer.hidden = false;
-        stage.setAttribute("tabindex", "0");
-        stage.focus();
-        show(1);
-      };
-
-      play.addEventListener("click", start);
-      prevBtn.addEventListener("click", () => show(i - 1));
-      nextBtn.addEventListener("click", () => show(i + 1));
-
-      fsBtn.addEventListener("click", () => {
-        if (document.fullscreenElement) document.exitFullscreen();
-        else stage.requestFullscreen?.();
-      });
-      document.addEventListener("fullscreenchange", () => {
-        stage.classList.toggle("is-fs", document.fullscreenElement === stage);
-      });
-
-      stage.addEventListener("keydown", (e) => {
-        if (!started) return;
-        const k = e.key;
-        if (k === "ArrowRight" || k === "PageDown" || k === " ") {
-          e.preventDefault();
-          show(i + 1);
-        } else if (k === "ArrowLeft" || k === "PageUp") {
-          e.preventDefault();
-          show(i - 1);
-        } else if (k === "Home") {
-          e.preventDefault();
-          show(1);
-        } else if (k === "End") {
-          e.preventDefault();
-          show(count);
-        } else if (k === "f" || k === "F") {
-          fsBtn.click();
-        }
-      });
-    }
-  </script>
 </Website>
 
 <style>
@@ -440,247 +317,6 @@ const chapters = [
 
   .gp-link:hover {
     opacity: 0.68;
-  }
-
-  /* ---- deck player ------------------------------------------- */
-  .gp-deck {
-    padding-top: clamp(1.5rem, 3vw, 2.5rem);
-  }
-
-  .gp-deck-stage {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    border: 1px solid var(--w-line);
-    border-radius: 14px;
-    overflow: hidden;
-    background:
-      radial-gradient(
-        120% 90% at 50% 0%,
-        color-mix(in srgb, var(--w-accent) 9%, #0a0a0a) 0%,
-        #070707 62%
-      );
-  }
-
-  /* fullscreen: let the stage fill the screen, image stays contained */
-  .gp-deck-stage:fullscreen {
-    aspect-ratio: auto;
-    border: 0;
-    border-radius: 0;
-    background: #000;
-    display: flex;
-  }
-
-  /* ---- viewer ---------------------------------------------------- */
-  .gp-deck-viewer {
-    position: absolute;
-    inset: 0;
-  }
-
-  .gp-deck-img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: #000;
-    user-select: none;
-    -webkit-user-drag: none;
-  }
-
-  /* invisible left / right hit zones with a chevron that shows on hover */
-  .gp-deck-edge {
-    position: absolute;
-    top: 0;
-    bottom: 2.75rem;
-    width: 33%;
-    display: flex;
-    align-items: center;
-    padding: 0 1.25rem;
-    border: 0;
-    background: none;
-    color: #fff;
-    font-size: 2rem;
-    line-height: 1;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s ease;
-  }
-
-  .gp-deck-edge--prev {
-    left: 0;
-    justify-content: flex-start;
-  }
-
-  .gp-deck-edge--next {
-    right: 0;
-    justify-content: flex-end;
-  }
-
-  .gp-deck-stage:hover .gp-deck-edge,
-  .gp-deck-stage:focus-within .gp-deck-edge {
-    opacity: 0.35;
-  }
-
-  .gp-deck-edge:hover {
-    opacity: 0.9 !important;
-  }
-
-  .gp-deck-edge span {
-    display: grid;
-    place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(4px);
-  }
-
-  /* bottom control bar */
-  .gp-deck-bar {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 2.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 0.9rem;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
-  }
-
-  .gp-deck-count {
-    font-family: var(--w-font-alt);
-    font-size: 0.8125rem;
-    color: rgba(255, 255, 255, 0.8);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .gp-deck-fs {
-    display: grid;
-    place-items: center;
-    width: 1.9rem;
-    height: 1.9rem;
-    border: 0;
-    border-radius: 7px;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-
-  .gp-deck-fs:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  .gp-deck-progress {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 2px;
-    background: rgba(255, 255, 255, 0.12);
-  }
-
-  .gp-deck-progress span {
-    display: block;
-    height: 100%;
-    background: var(--w-accent);
-    transform-origin: left;
-    transform: scaleX(0);
-    transition: transform 0.25s ease;
-  }
-
-  /* click-to-load facade */
-  .gp-deck-play {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: none;
-    border: 0;
-    color: var(--w-ink);
-    font: inherit;
-    cursor: pointer;
-    transition: background 0.2s ease;
-  }
-
-  .gp-deck-play:hover {
-    background: rgba(255, 255, 255, 0.02);
-  }
-
-  .gp-deck-play-icon {
-    flex: none;
-    display: grid;
-    place-items: center;
-    width: 3.25rem;
-    height: 3.25rem;
-    border-radius: 50%;
-    background: var(--w-accent);
-    color: #04160e;
-    transition: transform 0.2s ease;
-  }
-
-  .gp-deck-play:hover .gp-deck-play-icon {
-    transform: scale(1.06);
-  }
-
-  .gp-deck-play-icon svg {
-    margin-left: 2px;
-  }
-
-  .gp-deck-play-text {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    text-align: left;
-  }
-
-  .gp-deck-play-label {
-    font-size: 1.0625rem;
-    letter-spacing: -0.01em;
-  }
-
-  .gp-deck-play-sub {
-    font-family: var(--w-font-alt);
-    font-size: 0.8125rem;
-    color: var(--w-ink-soft);
-  }
-
-  .gp-deck-note {
-    margin: 0.9rem 0 0;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    color: var(--w-ink-soft);
-  }
-
-  .gp-deck-note a {
-    color: var(--w-accent);
-  }
-
-  .gp-deck-note kbd {
-    font: inherit;
-    padding: 0.05em 0.4em;
-    border: 1px solid var(--w-line);
-    border-radius: 5px;
-    color: var(--w-ink);
-  }
-
-  @media (max-width: 560px) {
-    .gp-deck-play {
-      flex-direction: column;
-      gap: 0.9rem;
-    }
-
-    .gp-deck-play-text {
-      text-align: center;
-      align-items: center;
-    }
   }
 
   /* ---- portrait ----------------------------------------------- */

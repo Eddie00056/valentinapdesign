@@ -1,0 +1,20 @@
+---
+/** A screenshot crop, placed on the 1920×1080 canvas at the rect it was cut from. */
+interface Props {
+  src: string;
+  x: number;
+  y: number;
+  w: number;
+  cls?: string;
+}
+const { src, x, y, w, cls = "gd-media-shot" } = Astro.props;
+---
+
+<img
+  class={cls}
+  src={`/website/case/gusto/v2/${src}.webp`}
+  alt=""
+  loading="lazy"
+  draggable="false"
+  style={`left:${x}%;top:${y}%;width:${w}%`}
+/>

@@ -1,0 +1,1855 @@
+[
+ {
+  "n": 1,
+  "kind": "cover",
+  "bg": "black",
+  "title": "Valentina Padure",
+  "sub": "Portfolio presentation"
+ },
+ {
+  "n": 2,
+  "kind": "divider",
+  "bg": "black",
+  "text": "I’m a Product Designer",
+  "size": "md",
+  "fs": 94
+ },
+ {
+  "n": 3,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 1
+ },
+ {
+  "n": 4,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 2
+ },
+ {
+  "n": 5,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 3
+ },
+ {
+  "n": 6,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 4
+ },
+ {
+  "n": 7,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 5
+ },
+ {
+  "n": 8,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 6
+ },
+ {
+  "n": 9,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 7
+ },
+ {
+  "n": 10,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 8
+ },
+ {
+  "n": 11,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 8,
+  "dim": true
+ },
+ {
+  "n": 12,
+  "kind": "titlecard",
+  "bg": "black",
+  "kicker": "Case study",
+  "title": "Order entry\nmodernization",
+  "fs": 120
+ },
+ {
+  "n": 13,
+  "kind": "divider",
+  "bg": "black",
+  "text": "Background",
+  "size": "lg"
+ },
+ {
+  "n": 14,
+  "kind": "media",
+  "bg": "black",
+  "panels": [
+   {
+    "x": 0,
+    "w": 50,
+    "y": 0,
+    "c": "#f2f2f2"
+   }
+  ],
+  "labels": [
+   {
+    "text": "Regular trading platforms",
+    "x": 26.5,
+    "y": 22.3,
+    "tone": "dark"
+   },
+   {
+    "text": "Advanced trading platforms",
+    "x": 77.05,
+    "y": 22.3
+   }
+  ],
+  "shots": [
+   {
+    "src": "014a",
+    "x": 3,
+    "y": 24.3,
+    "w": 44
+   },
+   {
+    "src": "014b",
+    "x": 51.4,
+    "y": 24.3,
+    "w": 46.6
+   }
+  ]
+ },
+ {
+  "n": 15,
+  "kind": "statement",
+  "bg": "black",
+  "text": "Questrade was experiencing slower\ngrowth among the active traders."
+ },
+ {
+  "n": 16,
+  "kind": "statement",
+  "bg": "black",
+  "text": "Launch a new, modernized trading platform",
+  "kicker": "Solution"
+ },
+ {
+  "n": 17,
+  "bg": "black",
+  "raster": "017.webp"
+ },
+ {
+  "n": 18,
+  "kind": "role",
+  "bg": "black",
+  "rows": [
+   [
+    "My role",
+    "Lead Designer for the order entry widget"
+   ],
+   [
+    "Design Timeline",
+    "6 months"
+   ],
+   [
+    "Team",
+    "2 Engineering teams\n1 UX Researcher"
+   ]
+  ],
+  "live": [
+   {
+    "page": "stock-order-entry",
+    "x": 55,
+    "y": 22,
+    "w": 36,
+    "h": 60,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}",
+    "fit": ".wshell",
+    "vh": 960
+   }
+  ]
+ },
+ {
+  "n": 19,
+  "kind": "divider",
+  "bg": "black",
+  "text": "The journey",
+  "size": "lg"
+ },
+ {
+  "n": 20,
+  "kind": "quote",
+  "bg": "black",
+  "kicker": "Existing client sentiment",
+  "text": "“Don’t change order entry. It’s the only\nfeature no one complains about.”"
+ },
+ {
+  "n": 21,
+  "kind": "statement",
+  "bg": "black",
+  "text": "Led foundational research with active traders\nto evaluate the full trading journey.",
+  "kicker": "Pivoting the research"
+ },
+ {
+  "n": 22,
+  "kind": "journey",
+  "bg": "black",
+  "kicker": "User journey",
+  "steps": [
+   "Idea generation",
+   "Conviction building",
+   "Execution",
+   "Monitoring"
+  ],
+  "active": -1
+ },
+ {
+  "n": 23,
+  "kind": "journey",
+  "bg": "black",
+  "kicker": "User journey",
+  "steps": [
+   "Idea generation",
+   "Conviction building",
+   "Execution",
+   "Monitoring"
+  ],
+  "active": 2
+ },
+ {
+  "n": 24,
+  "kind": "statement",
+  "bg": "black",
+  "text": "The current order placement is slow, in\nparticular for option traders.",
+  "kicker": "The problem"
+ },
+ {
+  "n": 25,
+  "kind": "statement",
+  "bg": "black",
+  "text": "Make trade submission fast and frictionless\nand best in Canada.",
+  "kicker": "The goal"
+ },
+ {
+  "n": 26,
+  "kind": "metrics",
+  "bg": "black",
+  "kicker": "Success metrics",
+  "icon": {
+   "src": "026a",
+   "x": 20.8,
+   "y": 31.5,
+   "w": 6.2
+  },
+  "items": [
+   {
+    "text": "Reduce time to\ntrade by 15%",
+    "x": 20.8
+   },
+   {
+    "text": "Reduce number of\nclicks by 30%",
+    "x": 55.7
+   }
+  ]
+ },
+ {
+  "n": 27,
+  "kind": "divider",
+  "bg": "black",
+  "text": "How?",
+  "size": "lg"
+ },
+ {
+  "n": 28,
+  "kind": "statement",
+  "bg": "black",
+  "text": "What data do we show and how?",
+  "kicker": "Reducing time to trade"
+ },
+ {
+  "n": 29,
+  "kind": "media",
+  "bg": "black",
+  "heading": "How do we show the data?",
+  "labels": [
+   {
+    "text": "Current widget layout",
+    "x": 50,
+    "y": 21.5
+   }
+  ],
+  "shots": [
+   {
+    "src": "029a",
+    "x": 21,
+    "y": 25.5,
+    "w": 58
+   }
+  ]
+ },
+ {
+  "n": 30,
+  "kind": "media",
+  "bg": "black",
+  "heading": "How do we show the data?",
+  "labels": [
+   {
+    "text": "Current widget layout",
+    "x": 50,
+    "y": 21.5
+   }
+  ],
+  "shots": [
+   {
+    "src": "030a",
+    "x": 20.5,
+    "y": 25.5,
+    "w": 59
+   }
+  ]
+ },
+ {
+  "n": 31,
+  "kind": "media",
+  "bg": "black",
+  "heading": "What data do we show?",
+  "labels": [
+   {
+    "text": "Current widget layout: ",
+    "accent": "repeated and redundant fields",
+    "x": 50,
+    "y": 21.5
+   }
+  ],
+  "shots": [
+   {
+    "src": "031a",
+    "x": 21,
+    "y": 25.5,
+    "w": 58
+   }
+  ],
+  "marks": [
+   {
+    "x": 21.464,
+    "y": 41.648,
+    "w": 19.952,
+    "h": 8.125
+   },
+   {
+    "x": 28.424,
+    "y": 54.039,
+    "w": 17.98,
+    "h": 13.711
+   },
+   {
+    "x": 56.96,
+    "y": 54.039,
+    "w": 20.416,
+    "h": 13.711
+   }
+  ]
+ },
+ {
+  "n": 32,
+  "kind": "media",
+  "bg": "black",
+  "heading": "What data do we show?",
+  "panels": [
+   {
+    "x": 0,
+    "w": 50,
+    "y": 16,
+    "c": "#0e0e0e"
+   }
+  ],
+  "labels": [
+   {
+    "text": "Current widget design",
+    "x": 25,
+    "y": 22.6
+   },
+   {
+    "text": "Updated widget design",
+    "x": 75,
+    "y": 22.6
+   }
+  ],
+  "shots": [
+   {
+    "src": "032a",
+    "x": 4,
+    "y": 38.558,
+    "w": 42
+   }
+  ],
+  "live": [
+   {
+    "page": "stock-order-entry",
+    "x": 55,
+    "y": 30,
+    "w": 40,
+    "h": 54,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}",
+    "fit": ".wshell",
+    "vh": 960
+   }
+  ]
+ },
+ {
+  "n": 33,
+  "kind": "statement",
+  "bg": "black",
+  "text": "How do we make the option trade\nexperience faster?",
+  "kicker": "Reducing time to trade"
+ },
+ {
+  "n": 34,
+  "kind": "statement",
+  "bg": "black",
+  "text": "What are options?"
+ },
+ {
+  "n": 35,
+  "kind": "twocol",
+  "bg": "black",
+  "panels": [
+   {
+    "x": 0,
+    "w": 50,
+    "y": 0,
+    "c": "#111116"
+   }
+  ],
+  "left": "Single-leg / Option = 🍔",
+  "right": "Multi-leg / Strategy = 🍔🥤🍟"
+ },
+ {
+  "n": 36,
+  "kind": "journey",
+  "bg": "black",
+  "kicker": "User journey",
+  "steps": [
+   "Idea generation",
+   "Conviction building",
+   "Execution",
+   "Monitoring"
+  ],
+  "active": 2
+ },
+ {
+  "n": 37,
+  "kind": "statement",
+  "bg": "black",
+  "text": "The journey between finding an option and\nplacing an option trade was broken",
+  "kicker": "Reducing time to trade"
+ },
+ {
+  "n": 38,
+  "kind": "statement",
+  "bg": "black",
+  "text": "80% of Questrade’s revenue = the most complex\nindustry experience",
+  "kicker": "The problem"
+ },
+ {
+  "n": 39,
+  "kind": "media",
+  "bg": "black",
+  "heading": "Reduce time to trade",
+  "shots": [
+   {
+    "src": "039a",
+    "x": 10.4,
+    "y": 13.2,
+    "w": 79.2
+   }
+  ]
+ },
+ {
+  "n": 40,
+  "kind": "media",
+  "bg": "black",
+  "heading": "Reduce time to trade",
+  "shots": [
+   {
+    "src": "040a",
+    "x": 17,
+    "y": 33.332,
+    "w": 66
+   }
+  ]
+ },
+ {
+  "n": 41,
+  "kind": "statement",
+  "bg": "black",
+  "text": "Tailor the order placement experience\nto each security type",
+  "kicker": "The solution"
+ },
+ {
+  "n": 42,
+  "kind": "media",
+  "bg": "black",
+  "heading": "Reduce time to trade: Options",
+  "panels": [
+   {
+    "x": 0,
+    "w": 50,
+    "y": 0,
+    "c": "#111116"
+   }
+  ],
+  "shots": [
+   {
+    "src": "042a",
+    "x": 3,
+    "y": 40.686,
+    "w": 44
+   }
+  ]
+ },
+ {
+  "n": 43,
+  "kind": "media",
+  "bg": "black",
+  "heading": "Reduce time to trade: Options",
+  "panels": [
+   {
+    "x": 0,
+    "w": 33,
+    "y": 0,
+    "c": "#111116"
+   }
+  ],
+  "shots": [
+   {
+    "src": "043a",
+    "x": 1.5,
+    "y": 45.24,
+    "w": 30
+   }
+  ],
+  "live": [
+   {
+    "page": "stock-order-entry",
+    "x": 35,
+    "y": 25,
+    "w": 29.5,
+    "h": 60,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}",
+    "fit": ".wshell",
+    "vh": 960
+   },
+   {
+    "page": "options-strategy-builder",
+    "x": 66.5,
+    "y": 20,
+    "w": 30.5,
+    "h": 70,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}",
+    "fit": ".wshell",
+    "vh": 960
+   }
+  ]
+ },
+ {
+  "n": 44,
+  "kind": "media",
+  "bg": "black",
+  "heading": "Reduce time to trade: Options",
+  "live": [
+   {
+    "page": "chain-to-order",
+    "x": 8,
+    "y": 15,
+    "w": 84,
+    "h": 80,
+    "vw": 1440,
+    "css": "",
+    "pad": 18,
+    "clip": true,
+    "fit": ".ctt .wshell",
+    "vh": 900
+   }
+  ]
+ },
+ {
+  "n": 45,
+  "kind": "media",
+  "bg": "black",
+  "live": [
+   {
+    "page": "options-strategy-builder",
+    "x": 26,
+    "y": 12,
+    "w": 48,
+    "h": 76,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}",
+    "fit": ".wshell",
+    "vh": 960
+   }
+  ]
+ },
+ {
+  "n": 46,
+  "kind": "media",
+  "bg": "black",
+  "live": [
+   {
+    "page": "options-strategy-builder",
+    "x": 5,
+    "y": 16,
+    "w": 44,
+    "h": 70,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}",
+    "fit": ".wshell",
+    "vh": 960
+   }
+  ]
+ },
+ {
+  "n": 47,
+  "kind": "numbered",
+  "bg": "black",
+  "items": [
+   "Reduce time to trade",
+   "Standardize",
+   "Innovate while respecting the past"
+  ],
+  "active": [
+   0,
+   1
+  ]
+ },
+ {
+  "n": 48,
+  "kind": "numbered",
+  "bg": "black",
+  "items": [
+   "Reduce time to trade",
+   "Standardize",
+   "Innovate while respecting the past"
+  ],
+  "active": [
+   0,
+   1
+  ]
+ },
+ {
+  "n": 49,
+  "kind": "media",
+  "bg": "black",
+  "heading": "Maximizing widget and workspace efficiency",
+  "panels": [
+   {
+    "x": 0,
+    "w": 50.1,
+    "y": 16,
+    "c": "#111116"
+   }
+  ],
+  "labels": [
+   {
+    "text": "Screenshot of a client’s workspace",
+    "x": 25,
+    "y": 22.6
+   },
+   {
+    "text": "Redesigned workspace layout",
+    "x": 75,
+    "y": 22.6
+   }
+  ],
+  "shots": [
+   {
+    "src": "049a",
+    "x": 2.2,
+    "y": 27.1,
+    "w": 45.8
+   }
+  ],
+  "live": [
+   {
+    "page": "chain-to-order",
+    "x": 52.2,
+    "y": 26,
+    "w": 45.6,
+    "h": 50,
+    "vw": 1440,
+    "css": "",
+    "clip": true,
+    "fit": ".wsp-screen",
+    "vh": 900
+   }
+  ]
+ },
+ {
+  "n": 50,
+  "kind": "media",
+  "bg": "black",
+  "heading": "Maximizing widget and workspace efficiency",
+  "panels": [
+   {
+    "x": 0,
+    "w": 63,
+    "y": 16,
+    "c": "#111116"
+   }
+  ],
+  "labels": [
+   {
+    "text": "Initial design",
+    "x": 31.5,
+    "y": 21.2
+   },
+   {
+    "text": "Updated design",
+    "x": 81.5,
+    "y": 21.2
+   }
+  ],
+  "shots": [
+   {
+    "src": "050a",
+    "x": 3,
+    "y": 26,
+    "w": 28.5
+   },
+   {
+    "src": "050b",
+    "x": 33.5,
+    "y": 26,
+    "w": 26.5
+   },
+   {
+    "src": "050c",
+    "x": 67,
+    "y": 26,
+    "w": 29
+   }
+  ]
+ },
+ {
+  "n": 51,
+  "kind": "divider",
+  "bg": "black",
+  "text": "Final designs",
+  "size": "lg"
+ },
+ {
+  "n": 52,
+  "kind": "media",
+  "bg": "black",
+  "bigTitle": "Then vs ",
+  "bigAccent": "Now",
+  "panels": [
+   {
+    "x": 0,
+    "w": 50.1,
+    "y": 23,
+    "c": "#111116"
+   }
+  ],
+  "shots": [
+   {
+    "src": "052a",
+    "x": 4,
+    "y": 40.971,
+    "w": 42
+   }
+  ],
+  "live": [
+   {
+    "page": "stock-order-entry",
+    "x": 55,
+    "y": 22,
+    "w": 40,
+    "h": 33,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}",
+    "fit": ".wshell",
+    "vh": 960
+   },
+   {
+    "page": "options-strategy-builder",
+    "x": 55,
+    "y": 57,
+    "w": 40,
+    "h": 39,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}",
+    "fit": ".wshell",
+    "vh": 960
+   }
+  ]
+ },
+ {
+  "n": 53,
+  "bg": "black",
+  "raster": "053.webp",
+  "live": [
+   {
+    "page": "chain-to-order",
+    "x": 12.2,
+    "y": 8.3,
+    "w": 75.3,
+    "h": 83.6,
+    "vw": 1440,
+    "css": "",
+    "clip": true,
+    "fit": ".wsp-screen",
+    "vh": 900
+   }
+  ]
+ },
+ {
+  "n": 54,
+  "kind": "divider",
+  "bg": "black",
+  "text": "Impact",
+  "size": "lg"
+ },
+ {
+  "n": 55,
+  "kind": "figures",
+  "bg": "black",
+  "tone": "mint",
+  "panels": [
+   {
+    "x": 0,
+    "w": 50,
+    "y": 0,
+    "c": "#111116"
+   }
+  ],
+  "split": true,
+  "items": [
+   [
+    "60%",
+    "faster to place trades"
+   ],
+   [
+    "85%",
+    "Satisfaction score during the closed beta"
+   ]
+  ]
+ },
+ {
+  "n": 56,
+  "kind": "divider",
+  "bg": "black",
+  "text": "Reflections",
+  "size": "lg"
+ },
+ {
+  "n": 57,
+  "kind": "titlecard",
+  "bg": "white",
+  "kicker": "Case study",
+  "title": "Fractional\nshares",
+  "fs": 84,
+  "shot": {
+   "src": "057a",
+   "x": 46.7,
+   "y": 4.9,
+   "w": 51.6
+  }
+ },
+ {
+  "n": 58,
+  "kind": "numbered",
+  "bg": "white",
+  "corner": "Company goal",
+  "size": "lg",
+  "items": [
+   "Win more active traders",
+   "Streamline the trading experience"
+  ],
+  "active": "all"
+ },
+ {
+  "n": 59,
+  "kind": "statement",
+  "bg": "white",
+  "text": "Introduce fractional trading",
+  "corner": "Solution"
+ },
+ {
+  "n": 60,
+  "kind": "statement",
+  "bg": "white",
+  "text": "What is that?",
+  "corner": "Solution"
+ },
+ {
+  "n": 61,
+  "kind": "media",
+  "bg": "white",
+  "corner": "Solution",
+  "shots": [
+   {
+    "src": "061a",
+    "x": 15.5,
+    "y": 19.5,
+    "w": 64.5
+   }
+  ]
+ },
+ {
+  "n": 62,
+  "kind": "role",
+  "bg": "white",
+  "corner": "My contribution",
+  "rows": [
+   [
+    "My role",
+    "Product Designer"
+   ],
+   [
+    "Design Timeline",
+    "4 months"
+   ],
+   [
+    "Team",
+    "4 Engineering teams\n1 UX Researcher\n3 Product Managers"
+   ]
+  ],
+  "shot": {
+   "src": "062a",
+   "x": 58.4,
+   "y": 9.0,
+   "w": 29.3
+  }
+ },
+ {
+  "n": 63,
+  "kind": "media",
+  "bg": "white",
+  "corner": "Research",
+  "shots": [
+   {
+    "src": "063a",
+    "x": 31.6,
+    "y": 20.2,
+    "w": 37.2
+   }
+  ]
+ },
+ {
+  "n": 64,
+  "kind": "statement",
+  "bg": "white",
+  "text": "Traders need affordable and flexible ways\nto trade.",
+  "fw": 600,
+  "corner": "Problem"
+ },
+ {
+  "n": 65,
+  "kind": "statement",
+  "bg": "white",
+  "text": "1 Feature.",
+  "fw": 600,
+  "corner": "Design challenge"
+ },
+ {
+  "n": 66,
+  "kind": "statement",
+  "bg": "white",
+  "text": "1 Feature. 2 Personas.",
+  "fw": 600,
+  "corner": "Design challenge"
+ },
+ {
+  "n": 67,
+  "kind": "statement",
+  "bg": "white",
+  "text": "1 Feature. 2 Personas. 2 Design languages",
+  "fw": 600,
+  "corner": "Design challenge"
+ },
+ {
+  "n": 68,
+  "kind": "media",
+  "bg": "white",
+  "corner": "2 Personas = 2 mental models",
+  "panels": [
+   {
+    "x": 50,
+    "w": 50,
+    "y": 0,
+    "c": "#f2f2f2"
+   }
+  ],
+  "labels": [
+   {
+    "text": "Regular trader",
+    "x": 25.9,
+    "y": 27.6
+   },
+   {
+    "text": "Advanced trader",
+    "x": 75,
+    "y": 27.6
+   }
+  ],
+  "shots": [
+   {
+    "src": "068a",
+    "x": 10.2,
+    "y": 31.3,
+    "w": 31.4
+   },
+   {
+    "src": "068b",
+    "x": 56.9,
+    "y": 31.3,
+    "w": 36.1
+   }
+  ]
+ },
+ {
+  "n": 69,
+  "kind": "media",
+  "bg": "white",
+  "corner": "2 Platforms = 2 Design languages",
+  "panels": [
+   {
+    "x": 50,
+    "w": 50,
+    "y": 0,
+    "c": "#f2f2f2"
+   }
+  ],
+  "labels": [
+   {
+    "text": "Regular trading platforms",
+    "x": 25,
+    "y": 24.8
+   },
+   {
+    "text": "Advanced trading platforms",
+    "x": 75,
+    "y": 24.8
+   }
+  ],
+  "shots": [
+   {
+    "src": "069a",
+    "x": 11.5,
+    "y": 28,
+    "w": 27.0
+   },
+   {
+    "src": "069b",
+    "x": 63,
+    "y": 28,
+    "w": 26.5
+   }
+  ]
+ },
+ {
+  "n": 70,
+  "kind": "checklist",
+  "bg": "white",
+  "corner": "Project scope",
+  "panels": [
+   {
+    "x": 0,
+    "w": 50,
+    "y": 0,
+    "c": "#f2f2f2"
+   }
+  ],
+  "cols": [
+   {
+    "title": "North star",
+    "sections": [
+     {
+      "label": "Symbol availability",
+      "items": [
+       [
+        "US symbols",
+        true
+       ],
+       [
+        "CAD symbols",
+        true
+       ]
+      ]
+     },
+     {
+      "label": "Supported order types",
+      "items": [
+       [
+        "Market orders",
+        true
+       ],
+       [
+        "Limit orders",
+        true
+       ]
+      ]
+     },
+     {
+      "label": "Supported action types",
+      "items": [
+       [
+        "Buy orders",
+        true
+       ],
+       [
+        "Sell orders",
+        true
+       ]
+      ]
+     },
+     {
+      "label": "Order management",
+      "items": [
+       [
+        "Order placement",
+        true
+       ],
+       [
+        "Order modification",
+        true
+       ]
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "n": 71,
+  "kind": "checklist",
+  "bg": "white",
+  "corner": "Project scope",
+  "panels": [
+   {
+    "x": 0,
+    "w": 50,
+    "y": 0,
+    "c": "#f2f2f2"
+   }
+  ],
+  "cols": [
+   {
+    "title": "North star",
+    "sections": [
+     {
+      "label": "Symbol availability",
+      "items": [
+       [
+        "US symbols",
+        true
+       ],
+       [
+        "CAD symbols",
+        true
+       ]
+      ]
+     },
+     {
+      "label": "Supported order types",
+      "items": [
+       [
+        "Market orders",
+        true
+       ],
+       [
+        "Limit orders",
+        true
+       ]
+      ]
+     },
+     {
+      "label": "Supported action types",
+      "items": [
+       [
+        "Buy orders",
+        true
+       ],
+       [
+        "Sell orders",
+        true
+       ]
+      ]
+     },
+     {
+      "label": "Order management",
+      "items": [
+       [
+        "Order placement",
+        true
+       ],
+       [
+        "Order modification",
+        true
+       ]
+      ]
+     }
+    ]
+   },
+   {
+    "title": "MVP scope",
+    "sections": [
+     {
+      "label": "Symbol availability",
+      "items": [
+       [
+        "US symbols",
+        true
+       ],
+       [
+        "CAD symbols",
+        true
+       ]
+      ]
+     },
+     {
+      "label": "Supported order types",
+      "items": [
+       [
+        "Market orders",
+        true
+       ],
+       [
+        "Limit orders",
+        false
+       ]
+      ]
+     },
+     {
+      "label": "Supported action types",
+      "items": [
+       [
+        "Buy orders",
+        true
+       ],
+       [
+        "Sell orders",
+        false
+       ]
+      ]
+     },
+     {
+      "label": "Order management",
+      "items": [
+       [
+        "Order placement",
+        true
+       ],
+       [
+        "Order modification",
+        false
+       ]
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "n": 72,
+  "kind": "statement",
+  "bg": "white",
+  "text": "How might we make investing\naccessible to new investors without\nslowing down advanced traders?",
+  "fw": 600,
+  "corner": "The challenge"
+ },
+ {
+  "n": 73,
+  "kind": "divider",
+  "bg": "white",
+  "text": "Design process",
+  "size": "lg",
+  "tone": "green",
+  "fs": 125
+ },
+ {
+  "n": 74,
+  "kind": "numbered",
+  "bg": "white",
+  "corner": "Goal",
+  "items": [
+   "Help traders find fractional symbols",
+   "Allow traders to seamlessly place a fractional trade"
+  ],
+  "active": "all"
+ },
+ {
+  "n": 75,
+  "kind": "numbered",
+  "bg": "white",
+  "corner": "Goal",
+  "items": [
+   "Help traders find fractional symbols",
+   "Allow traders to seamlessly place a fractional trade"
+  ],
+  "active": [
+   0
+  ]
+ },
+ {
+  "n": 76,
+  "kind": "media",
+  "bg": "white",
+  "corner": "How do I find the right symbol?",
+  "labels": [
+   {
+    "text": "Original design",
+    "x": 18.3,
+    "y": 80.4,
+    "size": "lg"
+   },
+   {
+    "text": "Beta release",
+    "x": 50,
+    "y": 80.4,
+    "size": "lg"
+   },
+   {
+    "text": "Public release",
+    "x": 81.6,
+    "y": 80.4,
+    "size": "lg"
+   }
+  ],
+  "shots": [
+   {
+    "src": "076a",
+    "x": 3.9,
+    "y": 23.3,
+    "w": 29.1
+   },
+   {
+    "src": "076b",
+    "x": 35.5,
+    "y": 23.3,
+    "w": 29.0
+   },
+   {
+    "src": "076c",
+    "x": 67.0,
+    "y": 23.3,
+    "w": 29.2
+   }
+  ]
+ },
+ {
+  "n": 77,
+  "kind": "media",
+  "bg": "white",
+  "corner": "How do I find the right symbol?",
+  "live": [
+   {
+    "page": "fractional-shares-banner",
+    "x": 20,
+    "y": 30,
+    "w": 60,
+    "h": 40,
+    "vw": 420,
+    "css": ""
+   }
+  ]
+ },
+ {
+  "n": 78,
+  "kind": "media",
+  "bg": "white",
+  "corner": "How do I find the right symbol?",
+  "live": [
+   {
+    "page": "alert-creation",
+    "x": 30,
+    "y": 14,
+    "w": 40,
+    "h": 84,
+    "vw": 1280,
+    "css": ".acs-root{background:none!important}",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
+   }
+  ]
+ },
+ {
+  "n": 79,
+  "kind": "numbered",
+  "bg": "white",
+  "corner": "Goal",
+  "items": [
+   "Help traders find fractional symbols",
+   "Allow traders to seamlessly place a fractional trade"
+  ],
+  "active": [
+   1
+  ]
+ },
+ {
+  "n": 80,
+  "kind": "media",
+  "bg": "canvas",
+  "heading": "Original design",
+  "labels": [
+   {
+    "text": "Original multi page wizard order entry",
+    "x": 47.3,
+    "y": 89.2,
+    "size": "lg"
+   }
+  ],
+  "shots": [
+   {
+    "src": "080a",
+    "x": 9.8,
+    "y": 21.6,
+    "w": 75.2
+   }
+  ]
+ },
+ {
+  "n": 81,
+  "kind": "media",
+  "bg": "white",
+  "heading": "How does a novice trader place an order?",
+  "labels": [
+   {
+    "text": "Old design",
+    "x": 26.3,
+    "y": 13.2
+   },
+   {
+    "text": "Updated design",
+    "x": 72.5,
+    "y": 13.2
+   }
+  ],
+  "shots": [
+   {
+    "src": "081a",
+    "x": 15.8,
+    "y": 16.8,
+    "w": 21.0
+   }
+  ],
+  "live": [
+   {
+    "page": "fractional-order-flow",
+    "x": 58,
+    "y": 16.5,
+    "w": 29,
+    "h": 77,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "fit": ".fof-frame",
+    "vh": 1000
+   }
+  ]
+ },
+ {
+  "n": 82,
+  "kind": "media",
+  "bg": "white",
+  "heading": "How does an advanced trader place an order?",
+  "panels": [
+   {
+    "x": 50,
+    "w": 50,
+    "y": 0,
+    "c": "#f2f2f2"
+   }
+  ],
+  "labels": [
+   {
+    "text": "Old design",
+    "x": 26,
+    "y": 13.2
+   }
+  ],
+  "shots": [
+   {
+    "src": "082a",
+    "x": 15.6,
+    "y": 16.6,
+    "w": 21.8
+   }
+  ]
+ },
+ {
+  "n": 83,
+  "kind": "media",
+  "bg": "white",
+  "heading": "Happy path",
+  "panels": [
+   {
+    "x": 50,
+    "w": 50,
+    "y": 0,
+    "c": "#f2f2f2"
+   }
+  ],
+  "labels": [
+   {
+    "text": "Old design",
+    "x": 26,
+    "y": 13.2
+   },
+   {
+    "text": "Updated design",
+    "x": 75,
+    "y": 13.2
+   }
+  ],
+  "shots": [
+   {
+    "src": "083a",
+    "x": 15.6,
+    "y": 16.6,
+    "w": 21.8
+   },
+   {
+    "src": "083b",
+    "x": 64.0,
+    "y": 16.9,
+    "w": 22.1
+   }
+  ]
+ },
+ {
+  "n": 84,
+  "kind": "numbered",
+  "bg": "white",
+  "kicker": "Design process",
+  "items": [
+   "Happy path design",
+   "Order type navigation",
+   "Symbol discoverability"
+  ],
+  "active": [
+   1
+  ]
+ },
+ {
+  "n": 85,
+  "kind": "media",
+  "bg": "white",
+  "heading": "Navigating edge cases",
+  "shots": [
+   {
+    "src": "085a",
+    "x": 33.7,
+    "y": 28.5,
+    "w": 32.5
+   }
+  ]
+ },
+ {
+  "n": 86,
+  "kind": "media",
+  "bg": "white",
+  "heading": "Navigating edge cases",
+  "labels": [
+   {
+    "text": "V1",
+    "x": 30.85,
+    "y": 34.4
+   },
+   {
+    "text": "V2",
+    "x": 72.55,
+    "y": 34.4
+   }
+  ],
+  "shots": [
+   {
+    "src": "086a",
+    "x": 14.1,
+    "y": 37.4,
+    "w": 33.5
+   },
+   {
+    "src": "086b",
+    "x": 55.8,
+    "y": 37.4,
+    "w": 33.5
+   }
+  ]
+ },
+ {
+  "n": 87,
+  "kind": "media",
+  "bg": "white",
+  "heading": "Navigating edge cases",
+  "shots": [
+   {
+    "src": "087a",
+    "x": 32.5,
+    "y": 25.2,
+    "w": 34.0
+   }
+  ]
+ },
+ {
+  "n": 88,
+  "kind": "media",
+  "bg": "white",
+  "heading": "Navigating edge cases",
+  "panels": [
+   {
+    "x": 50,
+    "w": 50,
+    "y": 0,
+    "c": "#f2f2f2"
+   }
+  ],
+  "shots": [
+   {
+    "src": "088a",
+    "x": 14.0,
+    "y": 16.8,
+    "w": 22.3
+   },
+   {
+    "src": "088b",
+    "x": 59.5,
+    "y": 22.5,
+    "w": 31.5
+   }
+  ]
+ },
+ {
+  "n": 89,
+  "kind": "divider",
+  "bg": "white",
+  "text": "Final designs",
+  "size": "lg",
+  "tone": "green"
+ },
+ {
+  "n": 90,
+  "kind": "media",
+  "bg": "white",
+  "labels": [
+   {
+    "text": "Market non-fractional",
+    "x": 17.05,
+    "y": 26.6
+   },
+   {
+    "text": "Market fractional",
+    "x": 48.95,
+    "y": 26.6
+   },
+   {
+    "text": "Limit non-fractional",
+    "x": 80.85,
+    "y": 26.6
+   }
+  ],
+  "shots": [
+   {
+    "src": "090a",
+    "x": 2.0,
+    "y": 29.6,
+    "w": 30.1
+   }
+  ]
+ },
+ {
+  "n": 91,
+  "kind": "media",
+  "bg": "white",
+  "labels": [
+   {
+    "text": "Market non-fractional",
+    "x": 17.05,
+    "y": 26.6
+   },
+   {
+    "text": "Market fractional",
+    "x": 48.95,
+    "y": 26.6
+   },
+   {
+    "text": "Limit non-fractional",
+    "x": 80.85,
+    "y": 26.6
+   }
+  ],
+  "shots": [
+   {
+    "src": "091a",
+    "x": 2.0,
+    "y": 29.6,
+    "w": 30.1
+   },
+   {
+    "src": "091b",
+    "x": 33.9,
+    "y": 29.6,
+    "w": 30.1
+   }
+  ]
+ },
+ {
+  "n": 92,
+  "kind": "media",
+  "bg": "white",
+  "labels": [
+   {
+    "text": "Market non-fractional",
+    "x": 17.05,
+    "y": 26.6
+   },
+   {
+    "text": "Market fractional",
+    "x": 48.95,
+    "y": 26.6
+   },
+   {
+    "text": "Limit non-fractional",
+    "x": 80.85,
+    "y": 26.6
+   }
+  ],
+  "shots": [
+   {
+    "src": "092a",
+    "x": 2.0,
+    "y": 29.6,
+    "w": 30.1
+   },
+   {
+    "src": "092b",
+    "x": 33.9,
+    "y": 29.6,
+    "w": 30.1
+   },
+   {
+    "src": "092c",
+    "x": 65.8,
+    "y": 29.6,
+    "w": 30.1
+   }
+  ]
+ },
+ {
+  "n": 93,
+  "kind": "media",
+  "bg": "white",
+  "shots": [
+   {
+    "src": "093a",
+    "x": 39.0,
+    "y": 15.0,
+    "w": 22.0
+   }
+  ]
+ },
+ {
+  "n": 94,
+  "kind": "divider",
+  "bg": "white",
+  "text": "Impact",
+  "size": "lg",
+  "tone": "green"
+ },
+ {
+  "n": 95,
+  "kind": "figures",
+  "bg": "white",
+  "tone": "green",
+  "layout": "top",
+  "items": [
+   [
+    "60K",
+    "increase in trading volume"
+   ],
+   [
+    "$33M",
+    "total value traded"
+   ]
+  ]
+ },
+ {
+  "n": 96,
+  "kind": "figures",
+  "bg": "white",
+  "tone": "green",
+  "layout": "top",
+  "award": [
+   "UX Design Awards",
+   "Fall 2025 Nominee"
+  ],
+  "items": [
+   [
+    "60K",
+    "increase in trading volume"
+   ],
+   [
+    "$33M",
+    "total value traded"
+   ]
+  ]
+ },
+ {
+  "n": 97,
+  "kind": "divider",
+  "bg": "white",
+  "text": "Reflections",
+  "size": "lg",
+  "tone": "green"
+ },
+ {
+  "n": 98,
+  "kind": "numbered",
+  "bg": "black",
+  "kicker": "Questrade Goal",
+  "items": [
+   "Win more active traders",
+   "Streamline trading"
+  ],
+  "active": "all",
+  "shot": {
+   "src": "098a",
+   "x": 52.8,
+   "y": 14.3,
+   "w": 42.9
+  }
+ },
+ {
+  "n": 99,
+  "kind": "divider",
+  "bg": "black",
+  "text": "",
+  "size": "lg"
+ },
+ {
+  "n": 100,
+  "bg": "black",
+  "raster": "100.webp"
+ },
+ {
+  "n": 101,
+  "bg": "black",
+  "raster": "101.webp"
+ },
+ {
+  "n": 102,
+  "kind": "divider",
+  "bg": "black",
+  "text": "",
+  "size": "lg"
+ }
+]
