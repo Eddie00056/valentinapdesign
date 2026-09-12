@@ -1460,18 +1460,23 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     position: absolute;
     inset: 0;
   }
+  /* Title, variation 2 — for slides with images: the slide title's type
+     (.gd-kicker: size, weight, tracking, caps, colour) at the top-left
+     heading position. Keep the type in step with .gd-kicker. */
   .gd-media-h {
     position: absolute;
     left: 3.4%;
     top: 6%;
     margin: 0;
-    font-size: 32px;
+    font-size: 18px;
     font-weight: 500;
-    letter-spacing: -0.02em;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.62);
   }
   .gd-slide--white .gd-media-h,
   .gd-slide--canvas .gd-media-h {
-    color: #0b0b0b;
+    color: rgba(0, 0, 0, 0.5);
   }
   .gd-media-big {
     position: absolute;
