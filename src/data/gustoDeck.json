@@ -676,7 +676,20 @@
     "fit": ".wshell",
     "vh": 960
    }
-  ]
+  ],
+  "enter": {
+   "from": 43,
+   "morph": [
+    ".gd-panel",
+    ".gd-media-shot"
+   ],
+   "split": {
+    "from": ".gd-media-shot",
+    "items": [
+     ".gd-live"
+    ]
+   }
+  }
  },
  {
   "n": 45,

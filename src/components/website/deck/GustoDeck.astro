@@ -53,6 +53,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                 class:list={["gd-slide", `gd-slide--${s.bg}`]}
                 data-n={s.n}
                 data-steps={s.steps || undefined}
+                data-enter={s.enter ? JSON.stringify(s.enter) : undefined}
                 hidden
               >
                 {(s.panels || []).map((p: any) => (
@@ -757,6 +758,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       const guard = (stage as any).__beforeShow as ((n: number) => boolean) | undefined;
       if (started && next !== i && guard && !guard(next)) return;
       const arrived = next !== i || !started;
+      const from = i;
       i = next;
       if (arrived) setBuild(i, nextBuild ?? 0);
       nextBuild = null;
@@ -787,6 +789,61 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       countEl.textContent = `${at + 1} / ${o.length}`;
       bar.style.transform = `scaleX(${(at + 1) / o.length})`;
       if (started) history.replaceState(null, "", `#slide-${i}`);
+      if (arrived && started) enter(from, i);
+    };
+
+    /* Entrance transitions between two slides (data-enter on the arriving
+       slide, only when coming forward from the slide it names):
+         morph — elements matched by the same selector on both slides fly
+                 from where they were to where they are (FLIP);
+         split — items grow out of the source element's old position.
+       The previous slide stays laid out (is-near), so its rects are real. */
+    const enter = (fromN: number, toN: number) => {
+      const to = slides[toN - 1];
+      const spec = to?.dataset.enter ? JSON.parse(to.dataset.enter) : null;
+      if (!spec || spec.from !== fromN) return;
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches || stage.classList.contains("gd-edit")) return;
+      const src = slides[fromN - 1];
+      const k = canvas.getBoundingClientRect().width / W;
+      const scaleOf = (el: HTMLElement) => parseFloat(el.style.scale || "1") || 1;
+      const flip = (el: HTMLElement, r0: DOMRect, opts: KeyframeAnimationOptions, extra: Keyframe = {}) => {
+        const r1 = el.getBoundingClientRect();
+        if (!r1.width || !r1.height) return;
+        const s = scaleOf(el);
+        const tx = (r0.left + r0.width / 2 - (r1.left + r1.width / 2)) / (k * s);
+        const ty = (r0.top + r0.height / 2 - (r1.top + r1.height / 2)) / (k * s);
+        el.animate(
+          [
+            { transform: `translate(${tx}px, ${ty}px) scale(${r0.width / r1.width}, ${r0.height / r1.height})`, ...extra },
+            { transform: "none", opacity: 1 },
+          ],
+          { fill: "backwards", ...opts },
+        );
+      };
+      requestAnimationFrame(() => {
+        for (const sel of spec.morph || []) {
+          const a = src.querySelector<HTMLElement>(sel);
+          const b = to.querySelector<HTMLElement>(sel);
+          if (a && b) flip(b, a.getBoundingClientRect(), { duration: 750, easing: "cubic-bezier(.65,0,.25,1)" });
+        }
+        if (spec.split) {
+          const origin = src.querySelector<HTMLElement>(spec.split.from)?.getBoundingClientRect();
+          if (!origin) return;
+          const items = spec.split.items.flatMap((sel: string) => [...to.querySelectorAll<HTMLElement>(sel)]);
+          items.forEach((el: HTMLElement, n: number) => {
+            const r1 = el.getBoundingClientRect();
+            // start centred on the old widget, at a size that fits inside it
+            const f = Math.min(origin.width / r1.width, origin.height / r1.height) * 0.9;
+            const r0 = new DOMRect(
+              origin.left + origin.width / 2 - (r1.width * f) / 2,
+              origin.top + origin.height / 2 - (r1.height * f) / 2,
+              r1.width * f,
+              r1.height * f,
+            );
+            flip(el, r0, { duration: 900, delay: 420 + n * 140, easing: "cubic-bezier(.2,.85,.25,1)" }, { opacity: 0 });
+          });
+        }
+      });
     };
 
     const startShow = (n = 1) => {

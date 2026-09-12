@@ -326,7 +326,12 @@ N[44] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Optio
          "panels": [P(0, 33, DARK_PANEL)],
          "shots": [cardimg(44, 'a', 2644, 1.5, 30, cy=55, radius=0)],
          "live": [live("stock-order-entry", 35, 25, 29.5, 60, css=TICKET_BG, fit=CARD),
-                  live("options-strategy-builder", 66.5, 20, 30.5, 70, css=TICKET_BG, fit=CARD)]}
+                  live("options-strategy-builder", 66.5, 20, 30.5, 70, css=TICKET_BG, fit=CARD)],
+         # arriving from 43: the one legacy widget shrinks aside, and the two
+         # security-specific tickets split out of where it stood
+         "enter": {"from": 43,
+                   "morph": [".gd-panel", ".gd-media-shot"],
+                   "split": {"from": ".gd-media-shot", "items": [".gd-live"]}}}
 N[45] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Options",
          "live": [live("chain-to-order", 8, 15, 84, 80, 1440, fit=".ctt .wshell", vh=900, clip=True, pad=18)]}
 N[46] = {"kind": "media", "bg": "black",
