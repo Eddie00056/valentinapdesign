@@ -166,7 +166,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                 ) : s.kind === "journey" ? (
                   <div class="gd-journey">
                     {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
-                    <div class="gd-journey-row">
+                    <div class:list={["gd-journey-row", { "has-active": s.active >= 0 }]}>
                       {s.steps.map((st: string, i: number) => (
                         <>
                           {i > 0 && <span class="gd-arrow" aria-hidden="true" />}
@@ -1123,12 +1123,18 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     letter-spacing: -0.02em;
     color: rgba(255, 255, 255, 0.9);
   }
+  /* the highlighted step keeps the same weight as the plain row (slide 22),
+     it only gets brighter */
   .gd-step.is-active {
-    font-weight: 500;
     color: #fff;
   }
   .gd-step.is-dim {
     color: rgba(255, 255, 255, 0.36);
+  }
+  /* with a step highlighted, the arrows recede with the dimmed steps */
+  .has-active .gd-arrow {
+    color: rgba(255, 255, 255, 0.36);
+    opacity: 1;
   }
   .gd-arrow {
     width: 44px;
