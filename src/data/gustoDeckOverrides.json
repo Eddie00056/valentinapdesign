@@ -103,5 +103,11 @@
       "orig": "Reduce time to trade: Options",
       "text": "REDUCE TIME TO TRADE"
     }
+  },
+  "46": {
+    "gd-live:0": {
+      "sc": 0.551,
+      "dy": -90
+    }
   }
 }
