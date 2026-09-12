@@ -50,6 +50,9 @@
     "gd-media-shot:0": {
       "sc": 0.81,
       "dy": -23
+    },
+    "gd-media-l:0": {
+      "dy": 54
     }
   }
 }
