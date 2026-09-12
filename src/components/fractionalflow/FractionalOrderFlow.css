@@ -187,3 +187,30 @@
     animation: none !important;
   }
 }
+
+/* Order-type menu + the limit field's Bid / Ask chips. */
+.fof-screen .fof-menu-item {
+  background: transparent;
+  transition: background 0.12s ease;
+}
+.fof-screen .fof-menu-item:hover {
+  background: #f4f4f4;
+}
+.fof-screen .fof-menu-item:active {
+  background: #ebebeb;
+}
+.fof-screen .fof-quote-chip {
+  transition: transform 0.14s ease, background 0.12s ease;
+}
+.fof-screen .fof-quote-chip:active {
+  transform: scale(0.96);
+  background: #e4e4e4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .fof-screen .fof-quote-chip {
+    transition: none;
+  }
+  .fof-screen .fof-quote-chip:active {
+    transform: none;
+  }
+}

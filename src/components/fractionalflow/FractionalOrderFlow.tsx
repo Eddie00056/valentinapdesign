@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import "./FractionalOrderFlow.css";
 
 /* Fractional Order Flow — a four-screen fractional-share order ticket
@@ -10,6 +11,10 @@ import "./FractionalOrderFlow.css";
      rate is LOCKED at $300, so the share count never twitches mid-entry.
    - Tapping "Total amount" raises an iOS decimal pad that also takes
      physical-keyboard input; the primary CTA rides above it.
+   - The order-type pill opens a menu. A limit order adds a Limit price
+     field that shares the same pad (Bid / Ask fill it from the quote);
+     its price is seeded once from the quote and never tracks it, so —
+     like the market rate — the share count only moves when you move it.
    - Every pixel value below is straight from the artboard's 402 x 871
      screen box inside the 440.55 x 909.3 device frame. */
 
@@ -17,6 +22,24 @@ const P = "/prototypes/uploads";
 const RATE = 300; // locked $/share conversion for the order
 
 type Screen = "entry" | "review" | "sending" | "done";
+type OrderType = "Market" | "Limit";
+type Focus = "amount" | "limit";
+
+const ORDER_TYPES: Array<{ id: OrderType; label: string; hint: Record<"Buy" | "Sell", string> }> = [
+  {
+    id: "Market",
+    label: "Market order",
+    hint: { Buy: "Fills now at the best available price", Sell: "Fills now at the best available price" },
+  },
+  {
+    id: "Limit",
+    label: "Limit order",
+    hint: { Buy: "Fills only at your price or lower", Sell: "Fills only at your price or higher" },
+  },
+];
+
+/* One spring for everything that moves because of a choice you made. */
+const SPRING = { type: "spring", visualDuration: 0.3, bounce: 0 } as const;
 
 type Props = {
   /** Photo behind the phone: 0 = washed white, 1 = full strength. */
@@ -239,6 +262,46 @@ const Close = ({ fill = "#262D33" }: { fill?: string }) => (
   </svg>
 );
 
+/* Field edge: hairline at rest, brand green while the pad is typing into it. */
+const ring = (active: boolean) =>
+  active
+    ? "0 0 0 1px #227C20, 0px 4px 26px 0px rgba(0,0,0,0.05)"
+    : "0 0 0 1px #E4E4E4, 0px 4px 26px 0px rgba(0,0,0,0.05)";
+
+/* "$" + the typed figure + a blinking caret. `selected` tints the figure as
+   a select-all, meaning the next key replaces it. */
+function FieldValue({ value, caret, selected = false }: { value: string; caret: boolean; selected?: boolean }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", height: 24, cursor: "text" }}>
+      <span style={{ fontWeight: 400, fontSize: 16, lineHeight: "24px", color: "#262D33" }}>$</span>
+      <span
+        style={{
+          fontWeight: 600,
+          fontSize: 16,
+          lineHeight: "24px",
+          color: "#262D33",
+          borderRadius: 2,
+          background: selected ? "rgba(34,124,32,0.18)" : "transparent",
+        }}
+      >
+        {value}
+      </span>
+      {caret && !selected && (
+        <span
+          style={{
+            display: "inline-block",
+            width: 2,
+            height: 19,
+            marginLeft: 1,
+            background: "#227C20",
+            animation: "fof-blink 1.06s step-end infinite",
+          }}
+        />
+      )}
+    </div>
+  );
+}
+
 export function FractionalOrderFlow({
   bgOpacity = 0.3,
   livePrice = true,
@@ -249,6 +312,15 @@ export function FractionalOrderFlow({
   const [side, setSide] = useState<"Buy" | "Sell">("Buy");
   const [amount, setAmount] = useState("");
   const [keyboard, setKeyboard] = useState(false);
+  const [orderType, setOrderType] = useState<OrderType>("Market");
+  const [menu, setMenu] = useState(false);
+  const [limit, setLimit] = useState("");
+  const [focus, setFocus] = useState<Focus>("amount");
+  /* A field you have just tapped into is "selected": the first key
+     replaces it rather than appending, as iOS does with a select-all. */
+  const [fresh, setFresh] = useState(false);
+  const reduced = useReducedMotion();
+  const spring = reduced ? { duration: 0 } : SPRING;
   const [pressed, setPressed] = useState<string | null>(null);
   const [price, setPrice] = useState(300);
   const [spread, setSpread] = useState(0.04);
@@ -256,6 +328,10 @@ export function FractionalOrderFlow({
 
   const screenRef = useRef(screen);
   screenRef.current = screen;
+  const focusRef = useRef(focus);
+  focusRef.current = focus;
+  const freshRef = useRef(fresh);
+  freshRef.current = fresh;
   const timers = useRef<number[]>([]);
   const pressTimer = useRef<number | undefined>(undefined);
 
@@ -284,12 +360,20 @@ export function FractionalOrderFlow({
   }, [livePrice, priceInterval]);
 
   const tap = (ch: string) => {
-    setAmount((a) => {
+    const onLimit = focusRef.current === "limit";
+    const replace = freshRef.current;
+    const edit = (a: string) => {
+      if (replace) a = "";
       if (ch === "del") return a.slice(0, -1);
       if (ch === "." && a.includes(".")) return a;
-      if (a.replace(".", "").length > 8) return a;
-      return a + ch;
-    });
+      if (a.replace(".", "").length > (onLimit ? 6 : 8)) return a;
+      /* a price has cents, not fractions of them */
+      if (onLimit && a.includes(".") && a.split(".")[1].length >= 2) return a;
+      return (a === "" && ch === "." ? "0" : "") + a + ch;
+    };
+    if (onLimit) setLimit(edit);
+    else setAmount(edit);
+    setFresh(false);
     setPressed(ch);
     window.clearTimeout(pressTimer.current);
     pressTimer.current = window.setTimeout(() => setPressed(null), 130);
@@ -297,11 +381,14 @@ export function FractionalOrderFlow({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (screenRef.current !== "entry" || !keyboard) return;
-      if (e.key >= "0" && e.key <= "9") tap(e.key);
+      if (screenRef.current !== "entry") return;
+      if (e.key === "Escape") {
+        setMenu(false);
+        closePad();
+      } else if (!keyboard) return;
+      else if (e.key >= "0" && e.key <= "9") tap(e.key);
       else if (e.key === ".") tap(".");
       else if (e.key === "Backspace") tap("del");
-      else if (e.key === "Escape") setKeyboard(false);
       else return;
       e.preventDefault();
     };
@@ -319,7 +406,14 @@ export function FractionalOrderFlow({
   );
 
   const amt = num(amount);
-  const shares = amt / RATE;
+  const isLimit = orderType === "Limit";
+  const limitPx = num(limit);
+  /* the price the order converts at: locked market rate, or your limit */
+  const rate = isLimit ? limitPx : RATE;
+  const shares = rate > 0 ? amt / rate : 0;
+  const ready = amt > 0 && rate > 0;
+  const bid = price - spread;
+  const ask = price + spreadUp;
   const isEntry = screen === "entry";
   const isReview = screen === "review";
   const isSending = screen === "sending";
@@ -327,17 +421,55 @@ export function FractionalOrderFlow({
   const shellBg = isDone || isSending ? "#EBF7EB" : "#F9F9F9";
   const veil = 1 - bgOpacity;
 
+  /* Leaving the limit field tidies it to cents ("299.5" -> "299.50"). */
+  const settleLimit = () => setLimit((l) => (num(l) > 0 ? num(l).toFixed(2) : ""));
+  const closePad = () => {
+    setKeyboard(false);
+    setFresh(false);
+    settleLimit();
+  };
+  const focusField = (f: Focus) => {
+    if (f !== focusRef.current) settleLimit();
+    setFocus(f);
+    setKeyboard(true);
+    setMenu(false);
+    /* a filled price is replaced by the next key; an amount is appended to */
+    setFresh(f === "limit" && limit !== "");
+  };
+  const pickOrderType = (t: OrderType) => {
+    setMenu(false);
+    if (t === orderType) return;
+    setOrderType(t);
+    if (t === "Limit") {
+      /* seed once from the side of the book you would trade against */
+      if (!limit) setLimit((side === "Buy" ? ask : bid).toFixed(2));
+    } else if (focus === "limit") {
+      setFocus("amount");
+      setFresh(false);
+    }
+  };
+  const fillFromQuote = (px: number) => {
+    setLimit(px.toFixed(2));
+    setFocus("limit");
+    setFresh(true);
+  };
+
   const goEntry = () => {
     clearTimers();
     setScreen("entry");
     setAmount("");
     setKeyboard(false);
+    setMenu(false);
+    setFocus("amount");
+    setFresh(false);
     setPressed(null);
   };
   const goReview = () => {
-    if (amt > 0) {
+    if (ready) {
       setScreen("review");
       setKeyboard(false);
+      setMenu(false);
+      settleLimit();
     }
   };
   const sendOrder = () => {
@@ -392,6 +524,8 @@ export function FractionalOrderFlow({
   const fieldValue: CSSProperties = { fontWeight: 600, fontSize: 16, lineHeight: "24px", color: "#262D33" };
 
   const rows: Array<[string, string]> = [
+    ["Order type", isLimit ? "Limit" : "Market"],
+    ...(isLimit ? ([["Limit price", money(limitPx)]] as Array<[string, string]>) : []),
     ["Order duration", "Until cancelled"],
     ["Account", "Margin - 12345678"],
     ["Total share quantity", shares.toFixed(3)],
@@ -400,7 +534,8 @@ export function FractionalOrderFlow({
     side +
     " " +
     (amt % 1 === 0 ? "$" + amt.toLocaleString("en-US") : money(amt)) +
-    " of AAPL \n@ Market";
+    " of AAPL \n@ " +
+    (isLimit ? "Limit " + money(limitPx) : "Market");
   const summaryCell: CSSProperties = {
     background: "#F9F9F9",
     padding: "8px 24px",
@@ -530,6 +665,7 @@ export function FractionalOrderFlow({
                   width: 402,
                   height: 56,
                   background: "#F9F9F9",
+                  zIndex: 14,
                   display: "flex",
                   padding: "6px 23px",
                   justifyContent: "space-between",
@@ -556,24 +692,105 @@ export function FractionalOrderFlow({
                     <span style={{ fontWeight: 600, fontSize: 12, lineHeight: "16px", color: "#262D33" }}>{side}</span>
                     <Chevron />
                   </button>
-                  <button
-                    style={{
-                      height: 32,
-                      boxSizing: "border-box",
-                      borderRadius: 100,
-                      background: "#EFEFEF",
-                      boxShadow: "0px 1px 4px 0px #FFFFFF, inset 0px -0.5px 0px 0px rgba(0,0,0,0.1)",
-                      display: "flex",
-                      gap: 4,
-                      padding: "5px 8px 5px 12px",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      cursor: "pointer",
-                    }}
-                  >
-                    <span style={{ fontWeight: 600, fontSize: 12, lineHeight: "16px", color: "#262D33" }}>Market order</span>
-                    <Chevron />
-                  </button>
+                  <div style={{ position: "relative" }}>
+                    <motion.button
+                      layout
+                      transition={spring}
+                      onClick={() => {
+                        if (!menu) closePad();
+                        setMenu((m) => !m);
+                      }}
+                      aria-haspopup="menu"
+                      aria-expanded={menu}
+                      style={{
+                        height: 32,
+                        boxSizing: "border-box",
+                        borderRadius: 100,
+                        background: "#EFEFEF",
+                        boxShadow: "0px 1px 4px 0px #FFFFFF, inset 0px -0.5px 0px 0px rgba(0,0,0,0.1)",
+                        display: "flex",
+                        gap: 4,
+                        padding: "5px 8px 5px 12px",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <motion.span
+                        layout="position"
+                        transition={spring}
+                        style={{ fontWeight: 600, fontSize: 12, lineHeight: "16px", color: "#262D33", whiteSpace: "pre" }}
+                      >
+                        {isLimit ? "Limit order" : "Market order"}
+                      </motion.span>
+                      <motion.span
+                        layout="position"
+                        transition={spring}
+                        style={{ display: "block", rotate: menu ? 180 : 0, transition: reduced ? "none" : "rotate 0.24s cubic-bezier(0.22,1,0.36,1)" }}
+                      >
+                        <Chevron />
+                      </motion.span>
+                    </motion.button>
+
+                    <AnimatePresence>
+                      {menu && (
+                        <motion.div
+                          role="menu"
+                          aria-label="Order type"
+                          initial={{ opacity: 0, scale: 0.96, y: -4 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.96, y: -4 }}
+                          transition={reduced ? { duration: 0 } : { type: "spring", visualDuration: 0.22, bounce: 0 }}
+                          style={{
+                            position: "absolute",
+                            left: 0,
+                            top: 38,
+                            width: 256,
+                            padding: 4,
+                            boxSizing: "border-box",
+                            borderRadius: 16,
+                            background: "#fff",
+                            boxShadow: "0 0 0 1px #E4E4E4, 0px 12px 32px 0px rgba(0,0,0,0.10)",
+                            transformOrigin: "16px 0px",
+                            zIndex: 2,
+                          }}
+                        >
+                          {ORDER_TYPES.map((t) => {
+                            const on = t.id === orderType;
+                            return (
+                              <button
+                                key={t.id}
+                                role="menuitemradio"
+                                aria-checked={on}
+                                onClick={() => pickOrderType(t.id)}
+                                className="fof-menu-item"
+                                style={{
+                                  width: "100%",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  gap: 12,
+                                  padding: "8px 12px",
+                                  boxSizing: "border-box",
+                                  borderRadius: 12,
+                                  textAlign: "left",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <span style={{ display: "flex", flexDirection: "column" }}>
+                                  <span style={{ fontWeight: 600, fontSize: 14, lineHeight: "22px", color: "#262D33" }}>{t.label}</span>
+                                  <span style={{ fontSize: 12, lineHeight: "18px", color: "#5E6D83" }}>{t.hint[side]}</span>
+                                </span>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0, opacity: on ? 1 : 0 }}>
+                                  <path d="M 3.5 8.25 L 6.5 11.25 L 12.5 4.75" stroke="#227C20" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              </button>
+                            );
+                          })}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
                 <div
                   style={{
@@ -639,47 +856,123 @@ export function FractionalOrderFlow({
                 </div>
               </div>
 
+              {/* a tap anywhere outside the open menu closes it */}
+              {menu && <div onClick={() => setMenu(false)} style={{ position: "absolute", inset: 0, zIndex: 13 }} />}
+
               {/* fields */}
               <div style={{ position: "absolute", left: 24, top: 186, width: 354, display: "flex", flexDirection: "column", gap: 8 }}>
-                <div
-                  onClick={() => setKeyboard(true)}
-                  style={{
-                    ...fieldBase,
-                    boxShadow: keyboard
-                      ? "0 0 0 1px #227C20, 0px 4px 26px 0px rgba(0,0,0,0.05)"
-                      : "0 0 0 1px #E4E4E4, 0px 4px 26px 0px rgba(0,0,0,0.05)",
-                    transition: "box-shadow 0.18s ease",
-                    cursor: "text",
-                    zIndex: 4,
-                  }}
-                >
-                  <span style={fieldLabel}>Total amount</span>
-                  <div style={{ display: "flex", alignItems: "center", height: 24, cursor: "text" }}>
-                    <span style={{ fontWeight: 400, fontSize: 16, lineHeight: "24px", color: "#262D33" }}>$</span>
-                    <span style={fieldValue}>{amount}</span>
-                    {keyboard && (
-                      <span
-                        style={{
-                          display: "inline-block",
-                          width: 2,
-                          height: 19,
-                          marginLeft: 1,
-                          background: "#227C20",
-                          animation: "fof-blink 1.06s step-end infinite",
-                        }}
-                      />
+                <AnimatePresence initial={false} mode="popLayout">
+                  {isLimit && (
+                    <motion.div
+                      key="limit"
+                      onClick={() => focusField("limit")}
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={spring}
+                      style={{
+                        ...fieldBase,
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        boxShadow: ring(keyboard && focus === "limit"),
+                        transition: "box-shadow 0.18s ease",
+                        cursor: "text",
+                        zIndex: 5,
+                      }}
+                    >
+                      <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-start" }}>
+                        <span style={fieldLabel}>Limit price</span>
+                        <FieldValue value={limit} caret={keyboard && focus === "limit"} selected={keyboard && focus === "limit" && fresh} />
+                      </div>
+                      <div style={{ display: "flex", gap: 6 }}>
+                        {([["Bid", bid], ["Ask", ask]] as const).map(([label, px]) => (
+                          <button
+                            key={label}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              fillFromQuote(px);
+                              setKeyboard(true);
+                            }}
+                            aria-label={`Set limit to the ${label.toLowerCase()}, ${px.toFixed(2)}`}
+                            className="fof-quote-chip"
+                            style={{
+                              height: 28,
+                              boxSizing: "border-box",
+                              borderRadius: 100,
+                              background: "#EFEFEF",
+                              boxShadow: "0px 1px 4px 0px #FFFFFF, inset 0px -0.5px 0px 0px rgba(0,0,0,0.1)",
+                              padding: "0 10px",
+                              fontWeight: 600,
+                              fontSize: 12,
+                              lineHeight: "16px",
+                              color: "#262D33",
+                              cursor: "pointer",
+                            }}
+                          >
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* amount + quantity travel as one block, with the swap between them */}
+                <motion.div layout="position" transition={spring} style={{ position: "relative", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div
+                    onClick={() => focusField("amount")}
+                    style={{
+                      ...fieldBase,
+                      boxShadow: ring(keyboard && focus === "amount"),
+                      transition: "box-shadow 0.18s ease",
+                      cursor: "text",
+                      zIndex: 4,
+                    }}
+                  >
+                    <span style={fieldLabel}>Total amount</span>
+                    <FieldValue value={amount} caret={keyboard && focus === "amount"} />
+                  </div>
+
+                  <div style={{ ...fieldBase, boxShadow: "0 0 0 1px #E4E4E4, 0px 4px 26px 0px rgba(0,0,0,0.05)" }}>
+                    <span style={fieldLabel}>Share quantity</span>
+                    <div style={{ display: "flex", alignItems: "center", height: 24 }}>
+                      <span style={fieldValue}>{amt ? shares.toFixed(3) : ""}</span>
+                    </div>
+                  </div>
+
+                  <div
+                    onClick={() => (keyboard ? closePad() : focusField("amount"))}
+                    style={{
+                      position: "absolute",
+                      left: 298,
+                      top: 45.3,
+                      width: 41.399,
+                      height: 41.399,
+                      zIndex: 9,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      cursor: "pointer",
+                      borderRadius: "50%",
+                    }}
+                  >
+                    <img
+                      src={`${P}/fof-swap.png`}
+                      alt="Swap amount and quantity"
+                      style={{ position: "absolute", left: -4.01, top: -4.14, width: 49.68, height: 49.68, display: "block", pointerEvents: "none" }}
+                    />
+                    {keyboard && focus === "amount" && (
+                      <svg width="43.399" height="43.399" viewBox="-1 -1 43.399 43.399" fill="none" style={{ position: "absolute", left: -1, top: -1, overflow: "visible" }} aria-hidden="true">
+                        <path d="M 0.39 16.7 A 20.7 20.7 0 0 1 41.01 16.7" stroke="#227C20" strokeWidth="1" fill="none" />
+                      </svg>
                     )}
                   </div>
-                </div>
+                </motion.div>
 
-                <div style={{ ...fieldBase, boxShadow: "0 0 0 1px #E4E4E4, 0px 4px 26px 0px rgba(0,0,0,0.05)" }}>
-                  <span style={fieldLabel}>Share quantity</span>
-                  <div style={{ display: "flex", alignItems: "center", height: 24 }}>
-                    <span style={fieldValue}>{amt ? shares.toFixed(3) : ""}</span>
-                  </div>
-                </div>
-
-                <div
+                <motion.div
+                  layout="position"
+                  transition={spring}
                   style={{
                     ...fieldBase,
                     flexDirection: "row",
@@ -698,35 +991,7 @@ export function FractionalOrderFlow({
                       <path d="M 7.41 1.41 L 6 0 L 0 6 L 6 12 L 7.41 10.59 L 2.83 6 L 7.41 1.41 Z" />
                     </svg>
                   </div>
-                </div>
-
-                <div
-                  onClick={() => setKeyboard((k) => !k)}
-                  style={{
-                    position: "absolute",
-                    left: 298,
-                    top: 45.3,
-                    width: 41.399,
-                    height: 41.399,
-                    zIndex: 9,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: "pointer",
-                    borderRadius: "50%",
-                  }}
-                >
-                  <img
-                    src={`${P}/fof-swap.png`}
-                    alt="Swap amount and quantity"
-                    style={{ position: "absolute", left: -4.01, top: -4.14, width: 49.68, height: 49.68, display: "block", pointerEvents: "none" }}
-                  />
-                  {keyboard && (
-                    <svg width="43.399" height="43.399" viewBox="-1 -1 43.399 43.399" fill="none" style={{ position: "absolute", left: -1, top: -1, overflow: "visible" }} aria-hidden="true">
-                      <path d="M 0.39 16.7 A 20.7 20.7 0 0 1 41.01 16.7" stroke="#227C20" strokeWidth="1" fill="none" />
-                    </svg>
-                  )}
-                </div>
+                </motion.div>
               </div>
 
               {/* primary CTA — rides above the keyboard */}
@@ -751,7 +1016,7 @@ export function FractionalOrderFlow({
                     width: 352.523,
                     height: 44,
                     borderRadius: 100,
-                    background: amt > 0 ? "#227C20" : "#A9C3A8",
+                    background: ready ? "#227C20" : "#A9C3A8",
                     color: "#fff",
                     fontWeight: 600,
                     fontSize: 16,
@@ -857,7 +1122,7 @@ export function FractionalOrderFlow({
                   <div style={{ position: "relative", height: 40 }}>
                     <span style={{ position: "absolute", left: 0, top: 0, fontSize: 12, lineHeight: "18px", color: "#262D33" }}>Estimated total</span>
                     <span style={{ position: "absolute", left: 0, top: 22, fontSize: 12, lineHeight: "18px", color: "#5E6D83" }}>
-                      {shares.toFixed(3) + " @ " + money(RATE)}
+                      {shares.toFixed(3) + " @ " + money(rate)}
                     </span>
                     <div style={{ position: "absolute", right: 0, top: 11, display: "flex", gap: 4, alignItems: "baseline" }}>
                       <span style={{ fontWeight: 600, fontSize: 12, lineHeight: "18px", textAlign: "right", color: "#262D33" }}>{money(amt)}</span>
