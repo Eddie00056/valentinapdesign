@@ -387,12 +387,12 @@ export function FractionalOrderFlow({
   const tap = (ch: string) => {
     const f = focusRef.current;
     const replace = freshRef.current;
-    /* a price has cents; a quantity goes to the thousandth the ticket shows */
-    const places = f === "limit" ? 2 : f === "qty" ? 3 : Infinity;
+    /* a price has cents; a limit is placed in whole shares */
+    const places = f === "limit" ? 2 : f === "qty" ? 0 : Infinity;
     const edit = (a: string) => {
       if (replace) a = "";
       if (ch === "del") return a.slice(0, -1);
-      if (ch === "." && a.includes(".")) return a;
+      if (ch === "." && (a.includes(".") || places === 0)) return a;
       if (a.replace(".", "").length > (f === "amount" ? 8 : 6)) return a;
       if (ch !== "." && a.includes(".") && a.split(".")[1].length >= places) return a;
       return (a === "" && ch === "." ? "0" : "") + a + ch;
@@ -454,6 +454,8 @@ export function FractionalOrderFlow({
   const shares = isLimit ? num(qty) : num(amount) / RATE;
   const amt = isLimit ? shares * limitPx : num(amount);
   const ready = amt > 0;
+  /* a limit's quantity is whole shares, so the pad's "." has nothing to do */
+  const wholeShares = isLimit && focus === "qty";
   const isEntry = screen === "entry";
   const isReview = screen === "review";
   const isSending = screen === "sending";
@@ -572,13 +574,13 @@ export function FractionalOrderFlow({
     ...(isLimit ? ([["Limit price", money(limitPx)]] as Array<[string, string]>) : []),
     ["Order duration", "Until cancelled"],
     ["Account", "Margin - 12345678"],
-    ["Total share quantity", shares.toFixed(3)],
+    ["Total share quantity", isLimit ? String(shares) : shares.toFixed(3)],
   ];
   const reviewTitle =
     side +
     " " +
     (isLimit
-      ? +shares.toFixed(3) + (shares === 1 ? " share" : " shares") + " of AAPL \n@ Limit " + money(limitPx)
+      ? shares + (shares === 1 ? " share" : " shares") + " of AAPL \n@ Limit " + money(limitPx)
       : (amt % 1 === 0 ? "$" + amt.toLocaleString("en-US") : money(amt)) + " of AAPL \n@ Market");
   const summaryCell: CSSProperties = {
     background: "#F9F9F9",
@@ -1093,7 +1095,12 @@ export function FractionalOrderFlow({
               >
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "11px 6px" }}>
                   {keys.map((k) => (
-                    <button key={k.id} onClick={() => tap(k.id)} style={keyStyle(k.id)}>
+                    <button
+                      key={k.id}
+                      onClick={() => tap(k.id)}
+                      disabled={k.id === "." && wholeShares}
+                      style={{ ...keyStyle(k.id), ...(k.id === "." && wholeShares ? { opacity: 0.3, cursor: "default" } : null) }}
+                    >
                       {k.id === "del" ? (
                         <svg width="26" height="19" viewBox="0 0 26 19" fill="none" aria-hidden="true">
                           <path
@@ -1170,7 +1177,7 @@ export function FractionalOrderFlow({
                   <div style={{ position: "relative", height: 40 }}>
                     <span style={{ position: "absolute", left: 0, top: 0, fontSize: 12, lineHeight: "18px", color: "#262D33" }}>Estimated total</span>
                     <span style={{ position: "absolute", left: 0, top: 22, fontSize: 12, lineHeight: "18px", color: "#5E6D83" }}>
-                      {shares.toFixed(3) + " @ " + money(rate)}
+                      {(isLimit ? String(shares) : shares.toFixed(3)) + " @ " + money(rate)}
                     </span>
                     <div style={{ position: "absolute", right: 0, top: 11, display: "flex", gap: 4, alignItems: "baseline" }}>
                       <span style={{ fontWeight: 600, fontSize: 12, lineHeight: "18px", textAlign: "right", color: "#262D33" }}>{money(amt)}</span>
