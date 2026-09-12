@@ -707,9 +707,13 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
           .ob-stage .ob-modal-wrap { inset: auto !important; left: ${u.l}px !important; top: ${u.t}px !important;
             width: ${u.r - u.l}px !important; height: ${u.b - u.t}px !important; padding: 0 !important; overflow: visible; }
           .ob-stage .ob-toast-wrap { left: ${u.l}px !important; right: auto !important; width: ${u.r - u.l}px !important;
-            bottom: auto !important; top: ${u.b - 96}px !important; }
+            bottom: auto !important; top: ${u.b - 56}px !important; }
         `;
         d.head.appendChild(st);
+        /* the order placed toast stays a second longer here: the ticket
+           dismisses it after 2600ms; stretch that one timer to 3600 */
+        const st0 = w.setTimeout.bind(w);
+        w.setTimeout = ((fn: any, ms?: number, ...a: any[]) => st0(fn, ms === 2600 ? 3600 : ms, ...a)) as any;
         // the chain keeps its place; the ticket opens beside it
         // close the ticket: picking a price in the chain brings it back
         const close = d.querySelector<HTMLElement>(".ctt-ticket .wshell-actions .wshell-btn:not(.wshell-linkout)");
