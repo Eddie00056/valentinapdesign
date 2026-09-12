@@ -12,9 +12,8 @@ import "./FractionalOrderFlow.css";
    - Tapping "Total amount" raises an iOS decimal pad that also takes
      physical-keyboard input; the primary CTA rides above it.
    - The order-type pill opens a menu. A limit order is placed in SHARES:
-     Limit price + Share quantity on the same pad, and the dollar figure is
-     the Estimated total that closes the list. The limit is seeded once from
-     the quote and never tracks it, so the total only moves when you do.
+     Limit price + Share quantity on the same pad; the dollar figure is left
+     to review. The limit is seeded once from the quote and never tracks it.
    - Every pixel value below is straight from the artboard's 402 x 871
      screen box inside the 440.55 x 909.3 device frame. */
 
@@ -886,7 +885,7 @@ export function FractionalOrderFlow({
               {menu && <div onClick={() => setMenu(false)} style={{ position: "absolute", inset: 0, zIndex: 13 }} />}
 
               {/* fields — Market: amount (+ swap) / quantity. Limit: price /
-                  quantity / the total they come to. Rows that stay slide on layout. */}
+                  quantity. Rows that stay slide on layout. */}
               <div style={{ position: "absolute", left: 24, top: 186, width: 354, display: "flex", flexDirection: "column", gap: 8 }}>
                 <AnimatePresence initial={false} mode="popLayout">
                   {isLimit && (
@@ -1006,24 +1005,6 @@ export function FractionalOrderFlow({
                       </svg>
                     </div>
                   </motion.div>
-
-                  {isLimit && (
-                    <motion.div
-                      key="total"
-                      layout="position"
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 8 }}
-                      transition={spring}
-                      style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 16px 0" }}
-                    >
-                      <span style={{ fontSize: 12, lineHeight: "18px", color: "#262D33" }}>Estimated total</span>
-                      <div style={{ display: "flex", gap: 4, alignItems: "baseline" }}>
-                        <span style={{ fontWeight: 600, fontSize: 16, lineHeight: "24px", color: "#262D33" }}>{money(amt)}</span>
-                        <span style={{ fontSize: 12, lineHeight: "18px", color: "#5E6D83" }}>USD</span>
-                      </div>
-                    </motion.div>
-                  )}
                 </AnimatePresence>
               </div>
 
