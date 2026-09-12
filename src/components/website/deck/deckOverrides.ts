@@ -16,6 +16,8 @@ export type Override = {
   ta?: "left" | "center" | "right";
   text?: string;
   orig?: string;
+  /** on the "_slide" key only: leave this slide out of the show */
+  hidden?: boolean;
 };
 export type Overrides = Record<string, Record<string, Override>>;
 
@@ -76,8 +78,10 @@ export function applyOverrides(stage: HTMLElement, ov: Overrides) {
   stage.querySelectorAll<HTMLElement>(".gd-slide").forEach((slide) => {
     keyElements(slide);
     const mine = ov[slide.dataset.n || ""];
+    slide.dataset.skip = mine?._slide?.hidden ? "1" : "";
     if (!mine) return;
     for (const [k, o] of Object.entries(mine)) {
+      if (k === "_slide") continue;
       if (k.startsWith("t.")) {
         const el = slide.querySelector<HTMLElement>(`[data-tk="${k}"]`);
         if (el) applyText(el, o);

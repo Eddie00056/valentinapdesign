@@ -445,6 +445,22 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       frame.style.height = fs || solo ? "100%" : `${bw * (H / W)}px`;
     };
 
+    /* Hidden slides (toggled in ?edit) drop out of the show: arrows skip
+       them and the counter doesn't count them. Edit mode still shows them. */
+    const editing = import.meta.env.DEV && new URLSearchParams(location.search).has("edit");
+    const skipped = (n: number) => !editing && slides[n - 1]?.dataset.skip === "1";
+    const order = () => slides.map((el) => parseInt(el.dataset.n || "0", 10)).filter((n) => !skipped(n));
+    const nearest = (n: number) => {
+      const o = order();
+      return o.find((x) => x >= n) ?? o[o.length - 1] ?? 1;
+    };
+    const step = (dir: number) => {
+      const o = order();
+      const at = o.indexOf(i);
+      const idx = at < 0 ? o.findIndex((x) => x > i) - (dir > 0 ? 0 : 1) : at + dir;
+      show(o[Math.max(0, Math.min(o.length - 1, idx))] ?? i);
+    };
+
     const warm = (n: number) => {
       slides[n - 1]
         ?.querySelectorAll<HTMLImageElement>("img[loading='lazy']")
@@ -600,9 +616,10 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       delete f.dataset.inited;
       f.removeAttribute("src");
     };
+    let neighbours = new Set<number>();
     const syncLive = () => {
       slides.forEach((el, k) => {
-        const near = Math.abs(k + 1 - i) <= 1;
+        const near = k + 1 === i || neighbours.has(k + 1);
         el.querySelectorAll<HTMLIFrameElement>(".gd-live iframe").forEach((f) =>
           near ? mount(f) : unmount(f),
         );
@@ -610,7 +627,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     };
 
     const show = (n: number) => {
-      const next = Math.min(count, Math.max(1, n));
+      const next = nearest(Math.min(count, Math.max(1, n)));
       // ?edit can hold a slide change (unsaved edits) and resume it later
       const guard = (stage as any).__beforeShow as ((n: number) => boolean) | undefined;
       if (started && next !== i && guard && !guard(next)) return;
@@ -618,10 +635,13 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       /* The slides either side stay laid out but invisible, so their
          prototypes load AND get measured before you arrive — no pop-in, no
          jump when a slide appears. Everything further away is display:none. */
+      const o = order();
+      const at = o.indexOf(i);
+      neighbours = new Set([o[at - 1], o[at + 1]].filter(Boolean));
       slides.forEach((el) => {
-        const d = Math.abs(parseInt(el.dataset.n || "0", 10) - i);
-        el.hidden = d > 1;
-        el.classList.toggle("is-near", d === 1);
+        const n = parseInt(el.dataset.n || "0", 10);
+        el.hidden = n !== i && !neighbours.has(n);
+        el.classList.toggle("is-near", neighbours.has(n));
       });
       warm(i);
       warm(i + 1);
@@ -636,8 +656,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
             reveal(f);
           }
         });
-      countEl.textContent = `${i} / ${count}`;
-      bar.style.transform = `scaleX(${i / count})`;
+      countEl.textContent = `${at + 1} / ${o.length}`;
+      bar.style.transform = `scaleX(${(at + 1) / o.length})`;
       if (started) history.replaceState(null, "", `#slide-${i}`);
     };
 
@@ -653,8 +673,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     };
 
     play.addEventListener("click", () => startShow());
-    prevBtn.addEventListener("click", () => show(i - 1));
-    nextBtn.addEventListener("click", () => show(i + 1));
+    prevBtn.addEventListener("click", () => step(-1));
+    nextBtn.addEventListener("click", () => step(1));
     fsBtn.addEventListener("click", () => {
       if (document.fullscreenElement) document.exitFullscreen();
       else stage.requestFullscreen?.();
@@ -669,16 +689,16 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       const k = e.key;
       if (k === "ArrowRight" || k === "PageDown" || k === " ") {
         e.preventDefault();
-        show(i + 1);
+        step(1);
       } else if (k === "ArrowLeft" || k === "PageUp") {
         e.preventDefault();
-        show(i - 1);
+        step(-1);
       } else if (k === "Home") {
         e.preventDefault();
-        show(1);
+        show(order()[0] ?? 1);
       } else if (k === "End") {
         e.preventDefault();
-        show(count);
+        show(order()[order().length - 1] ?? count);
       } else if (k === "f" || k === "F") {
         fsBtn.click();
       }
@@ -693,6 +713,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     if (m || params.has("solo") || edit) startShow(m ? parseInt(m[1], 10) : 1);
     // ?edit — local dev server only; the import is dropped from production builds
     (stage as any).__show = show;
+    (stage as any).__step = step;
     if (edit) import("./deckEdit").then((mod) => mod.startEdit(stage, overrides));
   }
 </script>
@@ -790,6 +811,23 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
   }
   .gd-slide.is-near * {
     visibility: hidden !important;
+  }
+
+  /* a slide hidden from the show, as edit mode displays it */
+  .gd-slide.is-skipped::after {
+    content: "Hidden";
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 70;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font: 600 18px/1 -apple-system, system-ui, sans-serif;
+    color: #fff;
+    background: rgba(255, 69, 58, 0.92);
+  }
+  .gd-slide.is-skipped > * {
+    opacity: 0.35;
   }
 
   .gd-raster {

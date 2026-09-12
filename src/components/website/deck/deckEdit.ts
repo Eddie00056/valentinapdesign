@@ -22,6 +22,8 @@ import { applyBox, applyText, isLeafText } from "./deckOverrides";
 const W = 1920;
 const H = 1080;
 const SNAP = 8;
+const EYE = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Z"/><circle cx="8" cy="8" r="2"/></svg>`;
+const EYE_OFF = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.2 3.8A6.6 6.6 0 0 1 8 3.5C12 3.5 14.5 8 14.5 8a11 11 0 0 1-1.8 2.3M9.9 10.1a2 2 0 0 1-2.8-2.8M4.2 4.9C2.5 6 1.5 8 1.5 8S4 12.5 8 12.5c1 0 2-.3 2.8-.7M2 2l12 12"/></svg>`;
 const MARGIN = 100; // the deck's own edge margin (corner kickers sit at 5.2% = 100px)
 
 const ico = (d: string) =>
@@ -105,6 +107,8 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     .gd-ask button:hover { background: rgba(255,255,255,.18); }
     .gd-ask button.primary { background: #0a84ff; }
     .gd-ask button.danger { color: #ff6b6b; }
+    .gd-editbar button.ico { padding: 5px 7px; display: grid; place-items: center; }
+    .gd-editbar button.ico.on { background: rgba(255,69,58,.85); }
     .gd-editbar .grp { display: flex; gap: 2px; padding: 2px; border-radius: 9px; background: rgba(255,255,255,.06); }
     .gd-editbar .grp button { background: none; padding: 5px 6px; display: grid; place-items: center; }
     .gd-editbar .grp button:hover { background: rgba(255,255,255,.14); }
@@ -147,6 +151,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
       .map((a) => `<button data-a="${a}" title="${ICONS[a][1]}">${ICONS[a][0]}</button>`).join("")}</span>
     <span class="grp" data-g="text">${["ta-left", "ta-center", "ta-right", "fs-down", "fs-up"]
       .map((a) => `<button data-a="${a}" title="${ICONS[a][1]}">${ICONS[a][0]}</button>`).join("")}</span>
+    <button data-a="hide" class="ico" title="Hide this slide from the presentation"></button>
     <button data-a="undo">Undo</button><button data-a="resetbox">Reset box</button><button data-a="reset">Reset slide</button>
     <button data-a="save" class="save">Save</button><span class="pub" data-r="pub"></span>
     <span class="help">double-click to edit text</span>`;
@@ -172,6 +177,11 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     btn("save").textContent = dirty ? "Save & publish" : "Saved";
     btn("undo").disabled = !history.length;
     btn("resetbox").disabled = !sel;
+    const hidden = !!(s && ov[s.dataset.n!]?._slide?.hidden);
+    btn("hide").classList.toggle("on", hidden);
+    btn("hide").innerHTML = hidden ? EYE_OFF : EYE;
+    btn("hide").title = hidden ? "Hidden — click to show this slide again" : "Hide this slide from the presentation";
+    s?.classList.toggle("is-skipped", hidden);
     bar.querySelectorAll<HTMLButtonElement>(".grp button").forEach((b) => (b.disabled = !sel));
     (["left", "center", "right"] as const).forEach((t) =>
       btn(`ta-${t}`).classList.toggle("on", !!sel && (o?.ta ?? getComputedStyle(sel).textAlign) === t),
@@ -205,6 +215,11 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     refresh();
   };
   const reapplyAll = () => {
+    stage.querySelectorAll<HTMLElement>(".gd-slide").forEach((sl) => {
+      const h = !!ov[sl.dataset.n!]?._slide?.hidden;
+      sl.dataset.skip = h ? "1" : "";
+      sl.classList.toggle("is-skipped", h);
+    });
     stage.querySelectorAll<HTMLElement>("[data-tk]").forEach((el) => applyText(el, get(el, el.dataset.tk!)));
     stage.querySelectorAll<HTMLElement>("[data-bk]").forEach((el) => applyBox(el, get(el)));
   };
@@ -392,7 +407,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
         if (to !== null) {
           e.preventDefault();
           e.stopPropagation();
-          (stage as any).__show(to);
+          (stage as any).__step(to - n);
         }
         return;
       }
@@ -474,6 +489,18 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     reapplyAll();
     refresh();
   };
+  const toggleHidden = () => {
+    const s = current();
+    if (!s) return;
+    const n = s.dataset.n!;
+    snapshot();
+    ov[n] = { ...(ov[n] || {}) };
+    if (ov[n]._slide?.hidden) delete ov[n]._slide;
+    else ov[n]._slide = { hidden: true };
+    if (!Object.keys(ov[n]).length) delete ov[n];
+    s.dataset.skip = ov[n]?._slide?.hidden ? "1" : "";
+    refresh();
+  };
   const resetSlide = () => {
     const s = current();
     if (!s || !ov[s.dataset.n!]) return;
@@ -525,6 +552,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     if (a === "undo") undo();
     if (a === "reset") resetSlide();
     if (a === "resetbox") resetBox();
+    if (a === "hide") toggleHidden();
     if (a && /^(al|ta|fs)-/.test(a)) align(a);
     if (a === "save") save();
   });
