@@ -13,7 +13,8 @@ import "./FractionalOrderFlow.css";
      physical-keyboard input; the primary CTA rides above it.
    - The order-type pill opens a menu. A limit order is placed in SHARES:
      Limit price + Share quantity on the same pad; the dollar figure is left
-     to review. The limit is seeded once from the quote and never tracks it.
+     to review. Until you type a price, the limit follows the bid/ask mid,
+     moving on the quote's own tick with the quote's own digit roll.
    - Every pixel value below is straight from the artboard's 402 x 871
      screen box inside the 440.55 x 909.3 device frame. */
 
@@ -67,11 +68,24 @@ const SLAB: CSSProperties = {
   whiteSpace: "pre-line",
 };
 
-/* The quote number: each glyph sits in its own clipped cell over a "0"
-   ghost, so the width never shifts; changed digits roll out/in in the
-   direction of the move. */
+/* A live figure: each glyph sits in its own clipped cell over a "0" ghost,
+   so the width never shifts; changed digits roll out/in in the direction of
+   the move. The quote uses it, and so does a limit that follows the mid —
+   one component, so the two move identically. */
+const SLAB_GLYPH: CSSProperties = {
+  fontFamily: "'Roboto Slab', serif",
+  fontWeight: 400,
+  fontSize: 22,
+  lineHeight: "30px",
+  color: "#262D33",
+};
+
 function RollingPrice({ price }: { price: number }) {
-  const txt = "$" + price.toFixed(2);
+  return <RollingFigure text={"$" + price.toFixed(2)} glyph={SLAB_GLYPH} height={30} />;
+}
+
+function RollingFigure({ text: txt, glyph: face, height }: { text: string; glyph: CSSProperties; height: number }) {
+  const price = parseFloat(txt.replace(/[^0-9.]/g, "")) || 0;
   const prevRef = useRef(txt);
   const bumpRef = useRef(0);
   const prev = prevRef.current;
@@ -84,14 +98,10 @@ function RollingPrice({ price }: { price: number }) {
   });
 
   const glyph: CSSProperties = {
-    fontFamily: "'Roboto Slab', serif",
-    fontWeight: 400,
-    fontSize: 22,
-    lineHeight: "30px",
+    ...face,
     whiteSpace: "pre",
     fontVariantNumeric: "tabular-nums",
     fontFeatureSettings: "'tnum' 1",
-    color: "#262D33",
   };
   const up = dir >= 0;
   const animIn = up ? "fof-digitInUp" : "fof-digitInDown";
@@ -103,10 +113,9 @@ function RollingPrice({ price }: { price: number }) {
       style={{
         display: "flex",
         alignItems: "flex-start",
-        height: 30,
-        minHeight: 30,
-        maxHeight: 30,
-        lineHeight: "30px",
+        height,
+        minHeight: height,
+        maxHeight: height,
         flex: "0 0 auto",
         contain: "layout paint style",
       }}
@@ -120,9 +129,9 @@ function RollingPrice({ price }: { price: number }) {
               position: "relative",
               display: "block",
               overflow: "hidden",
-              height: 30,
-              minHeight: 30,
-              maxHeight: 30,
+              height,
+              minHeight: height,
+              maxHeight: height,
               flex: "0 0 auto",
               contain: "layout paint style",
             }}
@@ -261,6 +270,8 @@ const Close = ({ fill = "#262D33" }: { fill?: string }) => (
   </svg>
 );
 
+const FIELD_GLYPH: CSSProperties = { fontWeight: 600, fontSize: 16, lineHeight: "24px", color: "#262D33" };
+
 /* Field edge: hairline at rest, brand green while the pad is typing into it. */
 const ring = (active: boolean) =>
   active
@@ -274,26 +285,27 @@ function FieldValue({
   caret,
   selected = false,
   prefix = "$",
+  roll = false,
 }: {
   value: string;
   caret: boolean;
   selected?: boolean;
   prefix?: string;
+  /** roll changed digits like the quote does (a value that moves on its own) */
+  roll?: boolean;
 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", height: 24, cursor: "text" }}>
       {prefix && <span style={{ fontWeight: 400, fontSize: 16, lineHeight: "24px", color: "#262D33" }}>{prefix}</span>}
       <span
         style={{
-          fontWeight: 600,
-          fontSize: 16,
-          lineHeight: "24px",
-          color: "#262D33",
+          ...FIELD_GLYPH,
+          display: "inline-flex",
           borderRadius: 2,
           background: selected ? "rgba(34,124,32,0.18)" : "transparent",
         }}
       >
-        {value}
+        {roll ? <RollingFigure text={value} glyph={FIELD_GLYPH} height={24} /> : value}
       </span>
       {caret && !selected && (
         <span
@@ -324,6 +336,8 @@ export function FractionalOrderFlow({
   const [orderType, setOrderType] = useState<OrderType>("Market");
   const [menu, setMenu] = useState(false);
   const [limit, setLimit] = useState("");
+  /* false = the limit follows the mid; the first key typed into it pins it */
+  const [limitEdited, setLimitEdited] = useState(false);
   const [qty, setQty] = useState("");
   const [focus, setFocus] = useState<Focus>("amount");
   /* A field you have just tapped into is "selected": the first key
@@ -346,6 +360,11 @@ export function FractionalOrderFlow({
   focusRef.current = focus;
   const freshRef = useRef(fresh);
   freshRef.current = fresh;
+  const midRef = useRef(0);
+  const limitRef = useRef(limit);
+  limitRef.current = limit;
+  const limitEditedRef = useRef(limitEdited);
+  limitEditedRef.current = limitEdited;
   const timers = useRef<number[]>([]);
   const pressTimer = useRef<number | undefined>(undefined);
 
@@ -386,9 +405,18 @@ export function FractionalOrderFlow({
       if (ch !== "." && a.includes(".") && a.split(".")[1].length >= places) return a;
       return (a === "" && ch === "." ? "0" : "") + a + ch;
     };
-    if (f === "limit") setLimit(edit);
+    if (f === "limit") {
+      /* typing takes the price over from the mid, starting from what it
+         showed. Refs move now, so keys landing before a re-render stack. */
+      const next = edit(limitEditedRef.current ? limitRef.current : midRef.current.toFixed(2));
+      limitRef.current = next;
+      limitEditedRef.current = true;
+      setLimit(next);
+      setLimitEdited(true);
+    }
     else if (f === "qty") setQty(edit);
     else setAmount(edit);
+    freshRef.current = false;
     setFresh(false);
     setPressed(ch);
     window.clearTimeout(pressTimer.current);
@@ -421,16 +449,19 @@ export function FractionalOrderFlow({
     [],
   );
 
+  const bid = price - spread;
+  const ask = price + spreadUp;
+  const mid = Math.round(((bid + ask) / 2) * 100) / 100;
+  midRef.current = mid;
+  const limitText = limitEdited ? limit : mid.toFixed(2);
   const isLimit = orderType === "Limit";
-  const limitPx = num(limit);
+  const limitPx = num(limitText);
   /* Market: dollars in, shares out at the locked rate.
      Limit: shares in, dollars out at your price. */
   const rate = isLimit ? limitPx : RATE;
   const shares = isLimit ? num(qty) : num(amount) / RATE;
   const amt = isLimit ? shares * limitPx : num(amount);
   const ready = amt > 0;
-  const bid = price - spread;
-  const ask = price + spreadUp;
   const isEntry = screen === "entry";
   const isReview = screen === "review";
   const isSending = screen === "sending";
@@ -438,8 +469,14 @@ export function FractionalOrderFlow({
   const shellBg = isDone || isSending ? "#EBF7EB" : "#F9F9F9";
   const veil = 1 - bgOpacity;
 
-  /* Leaving the limit field tidies it to cents ("299.5" -> "299.50"). */
-  const settleLimit = () => setLimit((l) => (num(l) > 0 ? num(l).toFixed(2) : ""));
+  /* Leaving the limit field tidies a typed price to cents ("299.5" ->
+     "299.50"); a price cleared to nothing hands the field back to the mid. */
+  const settleLimit = () => {
+    if (!limitEditedRef.current) return;
+    const px = num(limitRef.current);
+    setLimit(px > 0 ? px.toFixed(2) : "");
+    if (!(px > 0)) setLimitEdited(false);
+  };
   const closePad = () => {
     setKeyboard(false);
     setFresh(false);
@@ -451,7 +488,7 @@ export function FractionalOrderFlow({
     setKeyboard(true);
     setMenu(false);
     /* a filled price is replaced by the next key; an amount is appended to */
-    setFresh(f === "limit" && limit !== "");
+    setFresh(f === "limit");
   };
   const pickOrderType = (t: OrderType) => {
     setMenu(false);
@@ -459,8 +496,6 @@ export function FractionalOrderFlow({
     setOrderType(t);
     setFresh(false);
     if (t === "Limit") {
-      /* seed once from the side of the book you would trade against */
-      if (!limit) setLimit((side === "Buy" ? ask : bid).toFixed(2));
       if (focus === "amount") setFocus("qty");
     } else if (focus !== "amount") {
       settleLimit();
@@ -473,6 +508,8 @@ export function FractionalOrderFlow({
     setScreen("entry");
     setAmount("");
     setQty("");
+    setLimit("");
+    setLimitEdited(false);
     setKeyboard(false);
     setMenu(false);
     setFocus(orderType === "Limit" ? "qty" : "amount");
@@ -904,7 +941,12 @@ export function FractionalOrderFlow({
                       }}
                     >
                       <span style={fieldLabel}>Limit price</span>
-                      <FieldValue value={limit} caret={keyboard && focus === "limit"} selected={keyboard && focus === "limit" && fresh} />
+                      <FieldValue
+                        value={limitText}
+                        roll={!limitEdited}
+                        caret={keyboard && focus === "limit"}
+                        selected={keyboard && focus === "limit" && fresh}
+                      />
                     </motion.div>
                   )}
 
