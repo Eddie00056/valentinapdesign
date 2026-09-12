@@ -77,7 +77,7 @@
   },
   "38": {
     "t.gd-statement-t:0": {
-      "orig": "80% of Questrade’s revenue = the most complex\nindustry experience",
+      "orig": "80% of Questrade\u2019s revenue = the most complex\nindustry experience",
       "text": "The biggest revenue product had the worst industry experience"
     }
   },
@@ -119,6 +119,13 @@
   "49": {
     "_slide": {
       "hidden": true
+    }
+  },
+  "44": {
+    "gd-media-shot:0": {
+      "dy": -72,
+      "sc": 0.866,
+      "dx": 1
     }
   }
 }
