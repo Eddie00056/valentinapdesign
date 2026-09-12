@@ -27,6 +27,10 @@
   "24": {
     "gd-kicker:0": {
       "dy": 10
+    },
+    "t.gd-statement-t:0": {
+      "orig": "The current order placement is slow, in\nparticular for option traders.",
+      "text": "The current order placement is slow,\nparticularly for option traders."
     }
   }
 }
