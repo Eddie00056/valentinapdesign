@@ -610,7 +610,11 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     };
 
     const show = (n: number) => {
-      i = Math.min(count, Math.max(1, n));
+      const next = Math.min(count, Math.max(1, n));
+      // ?edit can hold a slide change (unsaved edits) and resume it later
+      const guard = (stage as any).__beforeShow as ((n: number) => boolean) | undefined;
+      if (started && next !== i && guard && !guard(next)) return;
+      i = next;
       /* The slides either side stay laid out but invisible, so their
          prototypes load AND get measured before you arrive — no pop-in, no
          jump when a slide appears. Everything further away is display:none. */
@@ -688,6 +692,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     const m = /^#slide-(\d+)$/.exec(location.hash);
     if (m || params.has("solo") || edit) startShow(m ? parseInt(m[1], 10) : 1);
     // ?edit — local dev server only; the import is dropped from production builds
+    (stage as any).__show = show;
     if (edit) import("./deckEdit").then((mod) => mod.startEdit(stage, overrides));
   }
 </script>

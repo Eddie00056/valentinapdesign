@@ -86,6 +86,20 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     .gd-editbar button.save { background: #0a84ff; }
     .gd-editbar button:disabled { opacity: .4; cursor: default; }
     .gd-editbar .help { color: #7c7c82; font-weight: 400; }
+    .gd-ask { position: fixed; inset: 0; z-index: 3000; display: grid; place-items: center;
+      background: rgba(0,0,0,.35); backdrop-filter: blur(2px); }
+    .gd-ask[hidden] { display: none; }
+    .gd-ask > div { width: 340px; padding: 20px 20px 16px; border-radius: 14px; background: #1c1c1e;
+      color: #f2f2f2; font: 400 13px/1.45 -apple-system, system-ui, sans-serif;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5), inset 0 0 0 1px rgba(255,255,255,.08); }
+    .gd-ask h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+    .gd-ask p { margin: 0 0 16px; color: #a1a1a6; }
+    .gd-ask .row { display: flex; gap: 8px; justify-content: flex-end; }
+    .gd-ask button { font: 500 13px/1 -apple-system, system-ui, sans-serif; color: #f2f2f2; border: 0;
+      border-radius: 8px; padding: 8px 12px; background: rgba(255,255,255,.1); cursor: pointer; }
+    .gd-ask button:hover { background: rgba(255,255,255,.18); }
+    .gd-ask button.primary { background: #0a84ff; }
+    .gd-ask button.danger { color: #ff6b6b; }
     .gd-editbar .grp { display: flex; gap: 2px; padding: 2px; border-radius: 9px; background: rgba(255,255,255,.06); }
     .gd-editbar .grp button { background: none; padding: 5px 6px; display: grid; place-items: center; }
     .gd-editbar .grp button:hover { background: rgba(255,255,255,.14); }
@@ -328,6 +342,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   window.addEventListener(
     "keydown",
     (e) => {
+      if (!ask.hidden) return; // the save/discard dialog has the keyboard
       const mod = e.metaKey || e.ctrlKey;
       if (mod && e.key.toLowerCase() === "s") {
         e.preventDefault();
@@ -361,7 +376,21 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
         select(d.el);
         return;
       }
-      if (!sel) return;
+      if (!sel) {
+        /* nothing selected: the arrows etc. change slide — handled here
+           because clicks in edit mode never give the deck keyboard focus */
+        const n = parseInt(current()?.dataset.n || "1", 10);
+        const to =
+          e.key === "ArrowRight" || e.key === "PageDown" || e.key === " " ? n + 1
+          : e.key === "ArrowLeft" || e.key === "PageUp" ? n - 1
+          : null;
+        if (to !== null) {
+          e.preventDefault();
+          e.stopPropagation();
+          (stage as any).__show(to);
+        }
+        return;
+      }
       const box = sel;
       const ALT: Record<string, string> = {
         KeyA: "al-left", KeyH: "al-hcenter", KeyD: "al-right",
@@ -472,6 +501,71 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     if (JSON.stringify(ov) !== saved) e.preventDefault();
   });
   window.addEventListener("resize", () => refresh());
+
+  /* ---- leaving a slide with unsaved edits -------------------------- */
+  const ask = document.createElement("div");
+  ask.className = "gd-ask";
+  ask.hidden = true;
+  ask.innerHTML = `<div role="dialog" aria-modal="true">
+      <h3>Save your changes?</h3>
+      <p data-r="msg"></p>
+      <div class="row">
+        <button data-q="stay">Keep editing</button>
+        <button data-q="discard" class="danger">Discard</button>
+        <button data-q="save" class="primary">Save</button>
+      </div></div>`;
+  document.body.appendChild(ask);
+  let pending: number | null = null;
+  const dirty = () => JSON.stringify(ov) !== saved;
+  const closeAsk = () => {
+    ask.hidden = true;
+    pending = null;
+  };
+  const go = (n: number) => {
+    closeAsk();
+    (stage as any).__show(n);
+  };
+  (stage as any).__beforeShow = (n: number) => {
+    commitText();
+    if (!dirty()) return true;
+    pending = n;
+    const slide = current()?.dataset.n;
+    ask.querySelector<HTMLElement>('[data-r="msg"]')!.textContent =
+      `You have unsaved edits on slide ${slide}. Save them before going to slide ${n}?`;
+    ask.hidden = false;
+    ask.querySelector<HTMLButtonElement>('[data-q="save"]')!.focus();
+    return false;
+  };
+  ask.addEventListener("click", async (e) => {
+    const q = (e.target as HTMLElement).closest<HTMLElement>("button")?.dataset.q;
+    if (!q && e.target === ask) return closeAsk(); // click outside = keep editing
+    const n = pending;
+    if (q === "stay" || n === null) return closeAsk();
+    if (q === "save") {
+      await save();
+      if (dirty()) return; // save failed; stay put
+    }
+    if (q === "discard") {
+      ov = JSON.parse(saved);
+      history.length = 0;
+      reapplyAll();
+      select(null);
+    }
+    go(n);
+  });
+  // the dialog owns the keyboard while it is open
+  window.addEventListener(
+    "keydown",
+    (e) => {
+      if (ask.hidden) return;
+      e.stopPropagation();
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeAsk();
+      }
+    },
+    true,
+  );
   new MutationObserver(() => {
     if (sel && !current()?.contains(sel)) select(null);
     hoverUI.style.display = "none";
