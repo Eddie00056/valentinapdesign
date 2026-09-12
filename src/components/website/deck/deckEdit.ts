@@ -86,6 +86,11 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     .gd-editbar button.save { background: #0a84ff; }
     .gd-editbar button:disabled { opacity: .4; cursor: default; }
     .gd-editbar .help { color: #7c7c82; font-weight: 400; }
+    .gd-editbar .pub:empty { display: none; }
+    .gd-editbar .pub { font-weight: 500; }
+    .gd-editbar .pub[data-tone="busy"] { color: #ffd60a; }
+    .gd-editbar .pub[data-tone="ok"] { color: #30d158; }
+    .gd-editbar .pub[data-tone="err"] { color: #ff6b6b; cursor: help; }
     .gd-ask { position: fixed; inset: 0; z-index: 3000; display: grid; place-items: center;
       background: rgba(0,0,0,.35); backdrop-filter: blur(2px); }
     .gd-ask[hidden] { display: none; }
@@ -143,7 +148,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     <span class="grp" data-g="text">${["ta-left", "ta-center", "ta-right", "fs-down", "fs-up"]
       .map((a) => `<button data-a="${a}" title="${ICONS[a][1]}">${ICONS[a][0]}</button>`).join("")}</span>
     <button data-a="undo">Undo</button><button data-a="resetbox">Reset box</button><button data-a="reset">Reset slide</button>
-    <button data-a="save" class="save">Save</button>
+    <button data-a="save" class="save">Save</button><span class="pub" data-r="pub"></span>
     <span class="help">double-click to edit text</span>`;
   document.body.appendChild(bar);
   const r = (k: string) => bar.querySelector<HTMLElement>(`[data-r="${k}"]`)!;
@@ -164,7 +169,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
         (o?.fsd ? ` · type ${o.fsd > 0 ? "+" : ""}${o.fsd}px` : "")
       : "";
     btn("save").disabled = !dirty;
-    btn("save").textContent = dirty ? "Save" : "Saved";
+    btn("save").textContent = dirty ? "Save & publish" : "Saved";
     btn("undo").disabled = !history.length;
     btn("resetbox").disabled = !sel;
     bar.querySelectorAll<HTMLButtonElement>(".grp button").forEach((b) => (b.disabled = !sel));
@@ -477,6 +482,31 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     reapplyAll();
     refresh();
   };
+  /* Save writes the overrides file, then publishes it (commit + deploy via
+     scripts/ship-deck.sh) in the background — editing can carry on meanwhile. */
+  let publishing = false;
+  const status = (text: string, tone: "" | "ok" | "busy" | "err" = "") => {
+    const el = r("pub");
+    el.textContent = text;
+    el.dataset.tone = tone;
+  };
+  const publish = async () => {
+    publishing = true;
+    status("Publishing…", "busy");
+    try {
+      const res = await fetch("/__deck/publish", { method: "POST" });
+      const out = await res.json().catch(() => ({}));
+      if (res.ok) status("Live ✓", "ok");
+      else {
+        status("Publish failed", "err");
+        r("pub").title = out.log || "";
+        console.error("[deck publish]", out.log);
+      }
+    } catch {
+      status("Publish failed", "err");
+    }
+    publishing = false;
+  };
   const save = async () => {
     const body = JSON.stringify(ov);
     if (body === saved) return;
@@ -485,6 +515,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     if (res.ok) {
       saved = body;
       refresh();
+      publish();
     } else {
       btn("save").textContent = "Save failed";
     }
@@ -498,7 +529,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     if (a === "save") save();
   });
   window.addEventListener("beforeunload", (e) => {
-    if (JSON.stringify(ov) !== saved) e.preventDefault();
+    if (JSON.stringify(ov) !== saved || publishing) e.preventDefault();
   });
   window.addEventListener("resize", () => refresh());
 
@@ -507,12 +538,12 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   ask.className = "gd-ask";
   ask.hidden = true;
   ask.innerHTML = `<div role="dialog" aria-modal="true">
-      <h3>Save your changes?</h3>
+      <h3>Save and publish your changes?</h3>
       <p data-r="msg"></p>
       <div class="row">
         <button data-q="stay">Keep editing</button>
         <button data-q="discard" class="danger">Discard</button>
-        <button data-q="save" class="primary">Save</button>
+        <button data-q="save" class="primary">Save &amp; publish</button>
       </div></div>`;
   document.body.appendChild(ask);
   let pending: number | null = null;
