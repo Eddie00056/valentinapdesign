@@ -74,5 +74,11 @@
       "sc": 0.78,
       "dx": 5
     }
+  },
+  "38": {
+    "t.gd-statement-t:0": {
+      "orig": "80% of Questrade’s revenue = the most complex\nindustry experience",
+      "text": "The biggest revenue product had the worst industry experience"
+    }
   }
 }
