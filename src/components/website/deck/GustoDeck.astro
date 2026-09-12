@@ -289,7 +289,13 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                         >
                           <img class="gd-annot-img" src={`/website/case/gusto/v2/${sh.src}.webp`} alt="" draggable="false" />
                           <svg viewBox={`0 0 ${sh.annot.w} ${sh.annot.h}`} aria-hidden="true">
-                            {sh.annot.points.slice(1).map((pt: any, k: number) => (
+                            {(sh.annot.boxes || []).map(([x, y, w, h]: number[]) => (
+                              <rect class="gd-annot-box" x={x} y={y} width={w} height={h} stroke={sh.annot.line} />
+                            ))}
+                            {(sh.annot.lines || []).map((pts: number[]) => (
+                              <polyline class="gd-annot-box" points={pts.join(" ")} stroke={sh.annot.line} />
+                            ))}
+                            {(sh.annot.points || []).slice(1).map((pt: any, k: number) => (
                               <line
                                 class="gd-annot-line"
                                 data-s={k + 1}
@@ -301,7 +307,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                                 pathLength="1"
                               />
                             ))}
-                            {sh.annot.points.map((pt: any, k: number) => (
+                            {(sh.annot.points || []).map((pt: any, k: number) => (
                               <g class="gd-annot-dot" data-s={k} transform={`translate(${pt.at[0]} ${pt.at[1]})`}>
                                 <g class="gd-annot-pop">
                                   <circle r="8" fill={pt.c} />
@@ -310,6 +316,14 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                               </g>
                             ))}
                           </svg>
+                          {(sh.annot.notes || []).map((nt: any) => (
+                            <p
+                              class:list={["gd-annot-note", `is-${nt.anchor}`]}
+                              style={`left:${(nt.at[0] / sh.annot.w) * 100}%;top:${(nt.at[1] / sh.annot.h) * 100}%`}
+                            >
+                              {nt.text}
+                            </p>
+                          ))}
                         </div>
                       ) : (
                         <Shot {...sh} />
@@ -1594,6 +1608,28 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     height: 100%;
     overflow: visible;
     pointer-events: none;
+  }
+  .gd-annot-box {
+    fill: none;
+    stroke-width: 2;
+  }
+  .gd-annot-note {
+    position: absolute;
+    margin: 0;
+    white-space: pre;
+    font-size: 18.5px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    color: #fff;
+  }
+  .gd-annot-note.is-right {
+    translate: -100% -50%;
+    text-align: right;
+  }
+  .gd-annot-note.is-top {
+    translate: -50% 0;
+    text-align: center;
   }
   .gd-annot-line {
     stroke-width: 1.1;

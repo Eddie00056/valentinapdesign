@@ -360,38 +360,84 @@
   "heading": "What data do we show?",
   "labels": [
    {
-    "text": "Current widget layout: ",
-    "accent": "repeated and redundant fields",
+    "text": "Current widget layout",
     "x": 50,
     "y": 21.5
    }
   ],
   "shots": [
    {
-    "src": "031a",
+    "src": "029a",
     "x": 21,
     "y": 25.5,
-    "w": 58
-   }
-  ],
-  "marks": [
-   {
-    "x": 21.464,
-    "y": 41.648,
-    "w": 19.952,
-    "h": 8.125
-   },
-   {
-    "x": 28.424,
-    "y": 54.039,
-    "w": 17.98,
-    "h": 13.711
-   },
-   {
-    "x": 56.96,
-    "y": 54.039,
-    "w": 20.416,
-    "h": 13.711
+    "w": 58,
+    "annot": {
+     "w": 609.41,
+     "h": 297.96,
+     "line": "#D02A2A",
+     "boxes": [
+      [
+       23.38,
+       93.74,
+       194.58,
+       48.14
+      ],
+      [
+       169.81,
+       163.94,
+       102.3,
+       83.25
+      ],
+      [
+       373.41,
+       163.94,
+       204.6,
+       83.25
+      ]
+     ],
+     "lines": [
+      [
+       4.33,
+       117.31,
+       23.38,
+       117.31
+      ],
+      [
+       218.96,
+       248.19,
+       218.96,
+       303.85,
+       500.28,
+       303.85,
+       500.28,
+       248.19
+      ],
+      [
+       356.86,
+       303.85,
+       356.86,
+       316.39
+      ]
+     ],
+     "notes": [
+      {
+       "at": [
+        -0.69,
+        117.81
+       ],
+       "anchor": "right",
+       "text": "Only 12 clients can actually use these fields"
+      },
+      {
+       "at": [
+        355.36,
+        320.4
+       ],
+       "anchor": "top",
+       "text": "These values cannot be changed\nand interacted with"
+      }
+     ]
+    }
    }
   ]
  },

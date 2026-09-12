@@ -266,26 +266,36 @@ N[30] = {"kind": "media", "bg": "black", "heading": "How do we show the data?",
          # 29's image, with the reading-order path drawn by the deck and
          # revealed one line per click (see the "annot" block in GustoDeck)
          "shots": [dict(widget(29, 34.93, 34.815, 65.07, 61.204), annot=WIDGET_PATH)]}
-# 31: the PDF's red boxes don't line up with the fields once the widget is
-# enlarged, so the widget comes from the clean embedded bitmap and the marks
-# are drawn by the deck, positioned in the image's own coordinates.
-_w31 = cardimg(31, 'a', 2226, 21, 58, y=25.5, radius=0, key=False)
+# 31 (Figma update, 2026-09-12): same widget and placement as 29/30, with
+# three red callout boxes, a leader to "Only 12 clients…" on the left and a
+# bracket under the exit fields to "These values cannot be changed…".
+# Measured off the Figma frame (widget at 671,414, 577px wide) and mapped
+# into 29's crop coordinates like WIDGET_PATH.
+_F = 578.7 / 577
+_fq = lambda x, y: [round((x - 671) * _F + _PAD[0], 2), round((y - 414) * _F + _PAD[1], 2)]
 
 
-def marks(shot, rects, aspect):
-    """rects in fractions of the shot (x0, y0, x1, y1) -> slide-% boxes."""
-    h = shot["w"] * 19.2 / aspect / 10.8
-    return [{"x": round(shot["x"] + a * shot["w"], 3), "y": round(shot["y"] + b * h, 3),
-             "w": round((c - a) * shot["w"], 3), "h": round((d - b) * h, 3)} for a, b, c, d in rects]
+def _frect(x0, y0, x1, y1):
+    a, b = _fq(x0, y0), _fq(x1, y1)
+    return [a[0], a[1], round(b[0] - a[0], 2), round(b[1] - a[1], 2)]
 
 
+WIDGET_CALLOUTS = {
+    "w": WIDGET_PATH["w"], "h": WIDGET_PATH["h"], "line": "#D02A2A",
+    "boxes": [_frect(679, 501, 873, 549), _frect(825, 571, 927, 654), _frect(1028, 571, 1232, 654)],
+    "lines": [
+        [*_fq(660, 524.5), *_fq(679, 524.5)],                                   # leader to note 1
+        [*_fq(874, 655), *_fq(874, 710.5), *_fq(1154.5, 710.5), *_fq(1154.5, 655)],  # bracket
+        [*_fq(1011.5, 710.5), *_fq(1011.5, 723)],                               # bracket tick
+    ],
+    "notes": [
+        {"at": _fq(655, 525), "anchor": "right", "text": "Only 12 clients can actually use these fields"},
+        {"at": _fq(1010, 727), "anchor": "top", "text": "These values cannot be changed\nand interacted with"},
+    ],
+}
 N[31] = {"kind": "media", "bg": "black", "heading": "What data do we show?",
-         "labels": [{"text": "Current widget layout: ", "accent": "repeated and redundant fields", "x": 50, "y": 21.5}],
-         "shots": [_w31],
-         "marks": marks(_w31, [(0.008, 0.318, 0.352, 0.478),    # Route + Sub-route
-                               (0.128, 0.562, 0.438, 0.832),    # exit order type + qty
-                               (0.620, 0.562, 0.972, 0.832)],   # exit limit + duration
-                        1064 / 524)}
+         "labels": [{"text": "Current widget layout", "x": 50, "y": 21.5}],
+         "shots": [dict(widget(29, 34.93, 34.815, 65.07, 61.204), annot=WIDGET_CALLOUTS)]}
 N[32] = {"kind": "media", "bg": "black", "heading": "What data do we show?",
          "panels": [P(0, 50, "#0e0e0e", 16)],
          "labels": [{"text": "Current widget design", "x": 25, "y": 22.6},
@@ -513,7 +523,8 @@ N[103] = raster(103)
 for e in N.values():  # slides with a step-by-step build
     for sh in e.get("shots", []):
         if sh.get("annot"):
-            e["steps"] = len(sh["annot"]["points"]) - 1
+            if sh["annot"].get("points"):
+                e["steps"] = len(sh["annot"]["points"]) - 1
 assert sorted(N) == list(range(1, 104)), set(range(1, 104)) - set(N)
 out = []
 for n in range(1, 104):
