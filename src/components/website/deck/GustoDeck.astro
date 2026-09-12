@@ -13,6 +13,7 @@
 import deck from "../../../data/gustoDeck.json";
 import overrides from "../../../data/gustoDeckOverrides.json";
 import Shot from "./DeckShot.astro";
+import { InlineClock } from "./InlineClock";
 
 type Slide = Record<string, any>;
 const slides = deck as Slide[];
@@ -113,10 +114,21 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                 ) : s.kind === "metrics" ? (
                   <div class="gd-metrics">
                     <p class="gd-kicker">{s.kicker}</p>
-                    <Shot {...s.icon} cls="gd-metrics-icon" />
-                    {s.items.map((m: any) => (
-                      <p class="gd-metrics-t" style={`left:${m.x}%`}>{m.text}</p>
-                    ))}
+                    {/* the live clock sits between the two metrics — it's about both */}
+                    <div class="gd-metrics-row">
+                      <p class="gd-metrics-t">{s.items[0].text}</p>
+                      <div class="gd-metrics-clock">
+                        <InlineClock
+                          client:visible
+                          size={240}
+                          borderColor="rgba(255,255,255,0.14)"
+                          handColor="#fff"
+                          dotColor="#010101"
+                          dotBorder="#fff"
+                        />
+                      </div>
+                      <p class="gd-metrics-t">{s.items[1].text}</p>
+                    </div>
                   </div>
                 ) : s.kind === "checklist" ? (
                   <div class="gd-checklist">
@@ -1376,34 +1388,37 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
   .gd-metrics {
     position: absolute;
     inset: 0;
-    translate: 0 calc(var(--gd-title-y) - 272px);
-  }
-  /* icon + metrics start the same 9px under the title as the other slides */
-  .gd-metrics > :global(:not(.gd-kicker)) {
-    margin-top: -32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: var(--gd-title-y);
   }
   .gd-metrics .gd-kicker {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 25.2%;
-    text-align: center;
-    margin: 0;
+    margin: 0 0 9px;
   }
-  .gd-slide :global(.gd-metrics-icon) {
-    position: absolute;
-    height: auto;
-    border-radius: 2px;
+  .gd-metrics-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 72px;
+    width: 1500px;
+    margin-top: 24px;
+  }
+  .gd-metrics-clock {
+    display: grid;
+    place-items: center;
   }
   .gd-metrics-t {
-    position: absolute;
-    top: 43.2%;
     margin: 0;
     font-size: 52px;
     font-weight: 400;
     line-height: 1.25;
     letter-spacing: -0.02em;
     white-space: pre-line;
+  }
+  /* the two metrics face the clock */
+  .gd-metrics-t:first-child {
+    text-align: right;
   }
 
   /* ---- role (slides 20, 61) ---- */

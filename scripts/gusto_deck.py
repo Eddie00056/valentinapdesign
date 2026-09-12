@@ -226,9 +226,9 @@ N[22] = {"kind": "journey", "bg": "black", "kicker": "User journey", "steps": JO
 N[23] = {"kind": "journey", "bg": "black", "kicker": "User journey", "steps": JOURNEY, "active": 2}
 N[24] = S("The current order placement is slow, in\nparticular for option traders.", "The problem")
 N[25] = S("Make trade submission fast and frictionless\nand best in Canada.", "The goal")
+# the PDF's clock icon is replaced by a live clock (InlineClock) between the two metrics
 N[26] = {"kind": "metrics", "bg": "black", "kicker": "Success metrics",
-         "icon": crop(26, 'a', 20.8, 31.5, 27.0, 43.5),
-         "items": [{"text": "Reduce time to\ntrade by 15%", "x": 20.8}, {"text": "Reduce number of\nclicks by 30%", "x": 55.7}]}
+         "items": [{"text": "Reduce time to\ntrade by 15%"}, {"text": "Reduce number of\nclicks by 30%"}]}
 N[27] = D("How?")
 N[28] = S("What data do we show and how?", "Reducing time to trade")
 N[29] = {"kind": "media", "bg": "black", "heading": "How do we show the data?",

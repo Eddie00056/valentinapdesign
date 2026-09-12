@@ -240,20 +240,12 @@
   "kind": "metrics",
   "bg": "black",
   "kicker": "Success metrics",
-  "icon": {
-   "src": "026a",
-   "x": 20.8,
-   "y": 31.5,
-   "w": 6.2
-  },
   "items": [
    {
-    "text": "Reduce time to\ntrade by 15%",
-    "x": 20.8
+    "text": "Reduce time to\ntrade by 15%"
    },
    {
-    "text": "Reduce number of\nclicks by 30%",
-    "x": 55.7
+    "text": "Reduce number of\nclicks by 30%"
    }
   ]
  },
