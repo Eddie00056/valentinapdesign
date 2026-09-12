@@ -162,3 +162,85 @@ export const pieces: Piece[] = [
     previewHeight: 900,
   },
 ];
+
+/* How each piece is recorded for its gallery thumbnail (scripts/record.mjs).
+   A piece that moves on its own is just filmed; one that only moves when
+   touched gets a short script. Every script returns the piece to the state
+   it started in by the end of the clip, so the loop has no visible jump.
+   `fill` is the share of the card the component takes (default 0.62): cards
+   sit their component inside the frame with room around it, as
+   tcosta.com/wspoc's do. Phone screens frame the whole device.
+   `focus` is a selector for what the thumbnail frames — the component, not the
+   page, the way tcosta.com/wspoc frames its cards; it defaults to the
+   `[data-thumb]` markers placed inside a piece. `pad` is CSS px around it, or
+   [x, y]: a phone screen whose marked content already runs edge to edge
+   (a full-bleed chart) pads x 0, one whose content sits in the screen's 24px
+   column pads x 24 to give that inset back.
+   Steps: {"wait": ms} | {"label": "aria-label or text"} | {"click": "selector"}
+   (prefer an aria-label *prefix* selector when the label carries a live price)
+   | {"eval": "js"}. `maxH` keeps only the top of a component too tall to read.
+   Kept as plain JSON so the recorder can read it without a TS toolchain. */
+export const THUMBS: Record<
+  string,
+  {
+    focus?: string;
+    fill?: number;
+    pad?: number | [number, number];
+    maxH?: number;
+    seconds?: number;
+    script?: Record<string, string | number>[];
+  }
+> = {
+  "stock-option-toggle": {
+    "fill": 0.55, "focus": "button.lbl", "pad": 0, "seconds": 5,
+    "script": [{ "wait": 500 }, { "label": "Option" }, { "wait": 2100 }, { "label": "Stock" }]
+  },
+  "limit-order-error": {
+    "fill": 0.45, "focus": "[aria-label=\"Trigger limit order error\"]", "pad": 0, "seconds": 5,
+    "script": [
+      { "wait": 500 }, { "label": "Trigger limit order error" },
+      { "wait": 2600 }, { "eval": "document.activeElement && document.activeElement.blur()" }
+    ]
+  },
+  "fractional-shares-banner": {
+    "fill": 0.6, "focus": "[aria-label=\"Expand fractional shares banner\"], [aria-label=\"Collapse banner\"]", "pad": 0, "seconds": 5,
+    "script": [{ "wait": 500 }, { "label": "Expand fractional shares banner" }, { "wait": 2200 }, { "label": "Collapse banner" }]
+  },
+  "alert-creation": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
+  "order-placement-boxed": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
+  "order-placed-animation": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
+  "fractional-order-flow": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
+  "options-strategy-builder": {
+    "fill": 0.82, "focus": ".wshell", "pad": 20, "seconds": 6,
+    "script": [
+      { "wait": 700 }, { "label": "Increase Quantity" }, { "wait": 450 }, { "label": "Increase Quantity" },
+      { "wait": 1900 }, { "label": "Decrease Quantity" }, { "wait": 450 }, { "label": "Decrease Quantity" }
+    ]
+  },
+  "option-chain": {
+    "fill": 0.85, "focus": ".oc-root", "pad": 16, "maxH": 300, "seconds": 6,
+    "script": [{ "wait": 900 }, { "label": "Put" }, { "wait": 2600 }, { "label": "Call" }]
+  },
+  "stock-order-entry": {
+    "fill": 0.82, "focus": ".wshell", "pad": 20, "seconds": 6,
+    "script": [
+      { "wait": 700 }, { "label": "Increase Quantity" }, { "wait": 450 }, { "label": "Increase Quantity" },
+      { "wait": 1900 }, { "label": "Decrease Quantity" }, { "wait": 450 }, { "label": "Decrease Quantity" }
+    ]
+  },
+  "beam-ring": { "focus": ".bd-cta", "fill": 0.45, "pad": 0 },
+  "notive-quote": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
+  /* The ticket opens on the $175 call. A price click replaces that leg,
+     the next adds a second leg, and clicking a selected price removes it —
+     so 185, +175, -185 shows all three and ends where it began. */
+  "chain-to-order": {
+    "fill": 0.84, "focus": ".ob-shell, [aria-label^=\"Buy 18\"], [aria-label^=\"Buy 17\"], [aria-label^=\"Sell 18\"], [aria-label^=\"Sell 17\"]",
+    "pad": 18, "seconds": 6,
+    "script": [
+      { "wait": 700 }, { "click": "[aria-label^=\"Buy 185 call\"]" },
+      { "wait": 1500 }, { "click": "[aria-label^=\"Buy 175 call\"]" },
+      { "wait": 1800 }, { "click": "[aria-label^=\"Buy 185 call\"]" }
+    ]
+  }
+};
+

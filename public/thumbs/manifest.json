@@ -1,0 +1,67 @@
+{
+  "stock-option-toggle": {
+    "w": 1200,
+    "h": 660,
+    "seconds": 5
+  },
+  "limit-order-error": {
+    "w": 1200,
+    "h": 660,
+    "seconds": 5
+  },
+  "fractional-shares-banner": {
+    "w": 1200,
+    "h": 640,
+    "seconds": 5
+  },
+  "alert-creation": {
+    "w": 1200,
+    "h": 1912,
+    "seconds": 6
+  },
+  "order-placement-boxed": {
+    "w": 1200,
+    "h": 1912,
+    "seconds": 6
+  },
+  "order-placed-animation": {
+    "w": 1200,
+    "h": 1916,
+    "seconds": 6
+  },
+  "fractional-order-flow": {
+    "w": 1200,
+    "h": 1982,
+    "seconds": 6
+  },
+  "options-strategy-builder": {
+    "w": 1200,
+    "h": 944,
+    "seconds": 6
+  },
+  "option-chain": {
+    "w": 1200,
+    "h": 660,
+    "seconds": 6
+  },
+  "stock-order-entry": {
+    "w": 1200,
+    "h": 892,
+    "seconds": 6
+  },
+  "beam-ring": {
+    "w": 1200,
+    "h": 658,
+    "seconds": 6
+  },
+  "notive-quote": {
+    "w": 1200,
+    "h": 2042,
+    "seconds": 6
+  },
+  "chain-to-order": {
+    "w": 1200,
+    "h": 796,
+    "seconds": 6
+  }
+}

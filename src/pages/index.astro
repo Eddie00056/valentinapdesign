@@ -1,360 +1,603 @@
 ---
 import Base from "../layouts/Base.astro";
 import { site, pieces } from "../data/site";
+import manifest from "../../public/thumbs/manifest.json";
 
-/* Gallery zoom, expressed as column COUNT rather than column width. A
-   width-based slider wastes steps: two different widths often resolve to
-   the same number of columns, and the widest drops to a single column.
-   Counts always change what you see. `column-width` still rides along as
-   a floor, so narrow viewports quietly use fewer than asked. */
-const ZOOM_STEPS = [5, 4, 3, 2];
-/* Second step from the zoomed-out end: four columns, dropping to fewer on
-   narrower viewports once the 260px floor bites. */
-const ZOOM_DEFAULT = 1;
+/* The gallery, rebuilt on tcosta.com/wspoc's model.
+
+   Every card is a short muted looping MP4 of the piece's component — not the
+   whole prototype page — with a poster, `preload="none"`, played only while
+   it is on screen. The grid therefore paints from posters at once and still
+   moves, and a video that is scrolled away costs nothing. Clips, posters and
+   their sizes come from scripts/record.mjs (public/thumbs/manifest.json).
+
+   Layout is his masonry: a CSS grid with 1px auto rows, each card spanning as
+   many rows as its thumbnail is tall, so cards keep their real aspect ratio
+   and DOM order is preserved while columns pack. Density is 3-5 columns. */
+
+type Thumb = { w: number; h: number };
+const thumbs = manifest as Record<string, Thumb>;
+const cards = pieces
+  .filter((p) => thumbs[p.slug])
+  .map((p) => ({ ...p, thumb: thumbs[p.slug] }));
 ---
 
 <Base>
-  <div class="page" style={`--cols: ${ZOOM_STEPS[ZOOM_DEFAULT]}`}>
-    <header>
-      <div class="head-left">
-        <h1>{site.name}</h1>
-        <p class="mono links-row">
+  <main class="vp-container">
+    <header class="vp-header">
+      <div class="vp-header-left">
+        <h1 class="vp-title">{site.name}</h1>
+        <p class="mono vp-links">
           <a class="link-underline" href="/website">Website ↗</a>
-          <span class="sep" aria-hidden="true">·</span>
+          <span class="vp-sep" aria-hidden="true">·</span>
           <a class="link-underline" href="/website/presentation">Presentation ↗</a>
         </p>
       </div>
 
-      <div class="zoom">
-        <svg class="zoom-i" viewBox="0 0 16 16" aria-hidden="true">
-          <circle cx="7" cy="7" r="4.2"></circle>
-          <path d="M10.2 10.2 13.4 13.4"></path>
-        </svg>
-        <input
-          id="zoom"
-          type="range"
-          min="0"
-          max={ZOOM_STEPS.length - 1}
-          step="1"
-          value={ZOOM_DEFAULT}
-          aria-label="Thumbnail size"
-        />
-        <svg class="zoom-i zoom-i--lg" viewBox="0 0 16 16" aria-hidden="true">
-          <circle cx="7" cy="7" r="4.2"></circle>
-          <path d="M10.2 10.2 13.4 13.4M7 5.1v3.8M5.1 7h3.8"></path>
-        </svg>
+      <div class="vp-header-right">
+        <div class="vp-zoom" role="group" aria-label="Grid density">
+          <button type="button" class="vp-zoom-btn" data-step="-1" aria-label="Zoom in — fewer, larger cards">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M2 7.33A5.33 5.33 0 0 1 7.33 2a5.33 5.33 0 0 1 4.21 8.6l2.26 2.26a.67.67 0 1 1-.94.94l-2.26-2.26A5.33 5.33 0 0 1 2 7.33Zm6-2a.67.67 0 0 0-1.33 0v1.34H5.33a.67.67 0 0 0 0 1.33h1.34v1.33a.67.67 0 0 0 1.33 0V8h1.33a.67.67 0 0 0 0-1.33H8V5.33Z"
+                fill="currentColor"></path>
+            </svg>
+          </button>
+          <div
+            class="vp-zoom-track"
+            role="slider"
+            tabindex="0"
+            aria-label="Columns"
+            aria-valuemin="3"
+            aria-valuemax="5"
+            aria-valuenow="3"
+          >
+            <span class="vp-zoom-line" aria-hidden="true"></span>
+            <span class="vp-zoom-dot" style="left:6px" aria-hidden="true"></span>
+            <span class="vp-zoom-dot" style="left:34px" aria-hidden="true"></span>
+            <span class="vp-zoom-dot" style="left:62px" aria-hidden="true"></span>
+            <span class="vp-zoom-knob" aria-hidden="true"></span>
+          </div>
+          <button type="button" class="vp-zoom-btn" data-step="1" aria-label="Zoom out — more, smaller cards">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M7.33 2a5.33 5.33 0 1 0 3.27 9.55l2.26 2.26a.67.67 0 1 0 .94-.94l-2.26-2.26A5.33 5.33 0 0 0 7.33 2ZM10 7.33a.67.67 0 0 1-.67.67h-4a.67.67 0 0 1 0-1.33h4c.37 0 .67.3.67.66Z"
+                fill="currentColor"></path>
+            </svg>
+          </button>
+        </div>
       </div>
     </header>
 
-    {/* `is-waiting` holds every poster invisible until all of them have
-        decoded, then the script lifts it in one fade — so the grid arrives
-        as a set instead of tile by tile. The noscript rule means a visitor
-        without JS still sees them. */}
-    <noscript><style>.grid.is-waiting .poster{opacity:1 !important}</style></noscript>
-    <ul class="grid is-waiting">
+    <div class="vp-grid">
       {
-        pieces.map((p, i) => (
-          <li>
-            <a href={p.href} aria-label={p.title}>
-              <span
-                class="thumb"
-                data-src={p.href}
-                data-title={p.title}
-                style={`aspect-ratio: ${p.previewWidth} / ${p.previewHeight}; --vw: ${p.previewWidth}; --vh: ${p.previewHeight}`}
-              >
-                {/* The poster IS the tile. It is a static capture of the
-                    piece (scripts/thumbs.py) and paints with the page — no
-                    React, no Motion, no fonts, no phone PNG to decode. The
-                    live piece only mounts on hover; see the script below.
-                    All eager, not lazy: the whole set is ~400 KB, and lazy
-                    loading is exactly what made the lower tiles trickle in
-                    after the fold. */}
-                <img
-                  class="poster"
-                  src={`/thumbs/${p.slug}.webp`}
-                  alt=""
-                  width={p.previewWidth}
-                  height={p.previewHeight}
-                  decoding="async"
-                  loading="eager"
-                  fetchpriority="high"
-                />
-              </span>
-            </a>
-          </li>
+        cards.map((c) => (
+          <a href={c.href} class="vp-card">
+            <div class="vp-card-thumb" style={`--ar:${c.thumb.w} / ${c.thumb.h}`}>
+              <video
+                class="vp-card-video"
+                src={`/thumbs/${c.slug}.mp4`}
+                poster={`/thumbs/${c.slug}.webp`}
+                width={c.thumb.w}
+                height={c.thumb.h}
+                muted
+                loop
+                playsinline
+                preload="none"
+                aria-label={c.title}
+              />
+              <div class="vp-card-overlay">
+                <span class="vp-card-title">
+                  <span>{c.title}</span>
+                </span>
+                <span class="vp-card-lang">tsx</span>
+              </div>
+            </div>
+          </a>
         ))
       }
-    </ul>
-  </div>
+    </div>
+  </main>
 </Base>
 
-<script data-zoom-steps={JSON.stringify(ZOOM_STEPS)} is:inline define:vars={{ ZOOM_STEPS }}>
-  const page = document.querySelector(".page");
-  const slider = document.getElementById("zoom");
+<script is:inline>
+  (function () {
+    const SCROLL_KEY = "vp-gallery-scroll";
+    const STORE_KEY = "vp-gallery-cols";
+    const MIN = 3;
+    const MAX = 5;
 
-  slider?.addEventListener("input", () => {
-    page.style.setProperty("--cols", String(ZOOM_STEPS[+slider.value]));
-  });
-
-  /* Each tile renders its page at that piece's own viewport width and
-     scales it to the tile's measured width. Measuring beats computing it
-     from the column count: a multi-column layout stretches its columns to
-     fill the container, so the rendered width is never predictable. */
-  const fit = (el) => {
-    const w = el.getBoundingClientRect().width;
-    const vw = Number(getComputedStyle(el).getPropertyValue("--vw")) || 1280;
-    if (w) el.style.setProperty("--s", String(w / vw));
-  };
-
-  const thumbs = [...document.querySelectorAll(".thumb")];
-  thumbs.forEach(fit);
-
-  /* Reveal the posters together. `decode()` resolves once an image is
-     decoded and ready to paint, so waiting on all of them is what makes the
-     grid appear in one beat rather than as each file lands. A failed image
-     must not hold the rest back, and a slow network gets 3s before the grid
-     shows whatever is ready. */
-  const grid = document.querySelector(".grid");
-  const reveal = () => grid.classList.remove("is-waiting");
-  Promise.all(
-    [...document.querySelectorAll(".poster")].map((img) => img.decode().catch(() => {})),
-  ).then(reveal);
-  setTimeout(reveal, 3000);
-
-  /* Live on hover. Every tile used to be an iframe booting its whole piece
-     at load, a dozen React apps at once, and the grid sat black until they
-     arrived. Now the poster shows immediately and the real piece is mounted
-     only when the pointer asks for it — and only on a device that has a
-     pointer that hovers, so touch never pays for it. It stays hidden until
-     its own load event, then fades in over the matching poster, so there is
-     never a blank frame between the two. Once mounted it is kept. */
-  if (matchMedia("(hover: hover)").matches) {
-    const mount = (t) => {
-      if (t.querySelector("iframe")) return;
-      const f = document.createElement("iframe");
-      f.src = t.dataset.src;
-      f.title = t.dataset.title;
-      f.tabIndex = -1;
-      f.setAttribute("aria-hidden", "true");
-      f.setAttribute("scrolling", "no");
-      f.style.width = getComputedStyle(t).getPropertyValue("--vw") + "px";
-      f.style.height = getComputedStyle(t).getPropertyValue("--vh") + "px";
-      f.addEventListener("load", () => {
-        // one more frame so the piece's own first paint has landed
-        setTimeout(() => t.classList.add("is-live"), 250);
-      });
-      t.appendChild(f);
-    };
-    thumbs.forEach((t) =>
-      t.closest("a").addEventListener("pointerenter", () => mount(t), { passive: true }),
-    );
-  }
-
-  if ("ResizeObserver" in window) {
-    const ro = new ResizeObserver((entries) => {
-      for (const e of entries) fit(e.target);
+    /* Come back from a piece to where you were. Saved on the way out and
+       restored once the masonry has real height — the browser's own
+       restoration runs before layout and lands in the wrong place. */
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    addEventListener("pagehide", () => {
+      try {
+        sessionStorage.setItem(SCROLL_KEY, String(scrollY));
+      } catch (e) {}
     });
-    thumbs.forEach((t) => ro.observe(t));
-  } else {
-    addEventListener("resize", () => thumbs.forEach(fit));
-  }
+    function restoreScroll() {
+      let fromPiece = false;
+      let navType = "";
+      try {
+        fromPiece = /\/work\/[^/]+/.test(document.referrer || "");
+      } catch (e) {}
+      try {
+        navType = (performance.getEntriesByType("navigation")[0] || {}).type || "";
+      } catch (e) {}
+      if (!fromPiece && navType !== "back_forward") return;
+      let y = null;
+      try {
+        y = sessionStorage.getItem(SCROLL_KEY);
+      } catch (e) {}
+      if (y !== null) scrollTo(0, parseInt(y, 10) || 0);
+    }
+
+    const grid = document.querySelector(".vp-grid");
+    if (!grid) return;
+
+    /* Posters decode before the grid is shown, so every card appears in the
+       same beat instead of one by one. They are small (the whole set is
+       well under a megabyte) and capped at 2s on a slow connection. */
+    const posters = [...grid.querySelectorAll("video")].map((v) => {
+      const img = new Image();
+      img.src = v.getAttribute("poster");
+      return img.decode ? img.decode().catch(() => {}) : Promise.resolve();
+    });
+    const postersReady = Promise.race([
+      Promise.all(posters),
+      new Promise((r) => setTimeout(r, 2000)),
+    ]);
+
+    let lastWidth = -1;
+    let raf = 0;
+    let revealed = false;
+
+    /* Masonry. Each card spans ceil((thumb height + gap) / row unit) rows of
+       the 1px grid, so cards keep their true height and pack. */
+    const layout = () => {
+      const s = getComputedStyle(grid);
+      const unit = parseFloat(s.gridAutoRows) || 1;
+      const gap = parseFloat(s.columnGap) || 0;
+      grid.querySelectorAll(".vp-card").forEach((card) => {
+        const thumb = card.querySelector(".vp-card-thumb");
+        const h = thumb && thumb.getBoundingClientRect().height;
+        if (h) card.style.gridRowEnd = "span " + Math.ceil((h + gap) / unit);
+      });
+      if (!revealed) {
+        revealed = true;
+        postersReady.then(() => {
+          restoreScroll();
+          grid.classList.add("is-ready");
+        });
+      }
+    };
+
+    const schedule = (force) => {
+      /* Only relayout when the width changed: our own span writes change the
+         grid's height, and reacting to that would loop the ResizeObserver.
+         A column change alters card widths without the grid's, so it forces. */
+      const w = grid.clientWidth;
+      if (!force && w === lastWidth) return;
+      lastWidth = w;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(layout);
+    };
+
+    /* Density: 3-5 columns. Zoom in = fewer, larger. */
+    const zoom = document.querySelector(".vp-zoom");
+    const track = zoom && zoom.querySelector(".vp-zoom-track");
+    let cols = 0;
+    const setCols = (n, persist) => {
+      n = Math.max(MIN, Math.min(MAX, n | 0));
+      if (n === cols) return;
+      cols = n;
+      grid.style.setProperty("--vp-cols", String(n));
+      if (zoom) zoom.style.setProperty("--zoom-pos", String(n - MIN));
+      if (track) track.setAttribute("aria-valuenow", String(n));
+      if (persist) {
+        try {
+          localStorage.setItem(STORE_KEY, String(n));
+        } catch (e) {}
+      }
+      schedule(true);
+    };
+
+    if (zoom) {
+      zoom.querySelectorAll(".vp-zoom-btn").forEach((b) => {
+        b.addEventListener("click", () => setCols(cols + Number(b.dataset.step), true));
+      });
+    }
+    if (track) {
+      // nearest of the three stops; the line is inset 6px at each end
+      const stopFromX = (clientX) => {
+        const r = track.getBoundingClientRect();
+        const t = Math.max(0, Math.min(1, (clientX - r.left - 6) / (r.width - 12)));
+        return MIN + Math.round(t * (MAX - MIN));
+      };
+      let dragging = false;
+      track.addEventListener("pointerdown", (e) => {
+        dragging = true;
+        track.setPointerCapture(e.pointerId);
+        setCols(stopFromX(e.clientX), true);
+      });
+      track.addEventListener("pointermove", (e) => {
+        if (dragging) setCols(stopFromX(e.clientX), true);
+      });
+      const end = (e) => {
+        dragging = false;
+        try {
+          track.releasePointerCapture(e.pointerId);
+        } catch (x) {}
+      };
+      track.addEventListener("pointerup", end);
+      track.addEventListener("pointercancel", end);
+      track.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+          e.preventDefault();
+          setCols(cols + 1, true);
+        } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+          e.preventDefault();
+          setCols(cols - 1, true);
+        }
+      });
+    }
+
+    let initial = 3;
+    try {
+      const saved = parseInt(localStorage.getItem(STORE_KEY) || "", 10);
+      if (saved >= MIN && saved <= MAX) initial = saved;
+    } catch (e) {}
+    setCols(initial, false);
+
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(() => schedule(false)).observe(grid);
+    } else {
+      schedule(true);
+      addEventListener("resize", () => schedule(true));
+    }
+
+    /* Play only what is on screen. With preload="none" an MP4 isn't fetched
+       until its first play(), so everything below the fold is free until it
+       scrolls near. Reduced motion keeps the posters and never plays. */
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const v = entry.target;
+          if (entry.isIntersecting) {
+            const p = v.play();
+            if (p && p.catch) p.catch(() => {});
+          } else {
+            v.pause();
+          }
+        });
+      },
+      { rootMargin: "200px 0px" },
+    );
+    grid.querySelectorAll("video").forEach((v) => io.observe(v));
+  })();
 </script>
 
 <style>
-  /* Dark gallery, after tcosta.com/wspoc: a black page, near-black cards at
-     an 8px radius, and each prototype rendered live inside its own card so
-     the page's own background becomes the tile's margin. Nothing is
-     cropped to fit and nothing is scaled up to fill — the UI floats. */
-  .page {
+  /* Values follow tcosta.com/wspoc's gallery stylesheet; the type is ours. */
+  .vp-container {
+    max-width: 1920px;
     min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    gap: clamp(1.5rem, 1rem + 4vw, 3rem);
-    padding: clamp(1.25rem, 1rem + 2vw, 2rem);
+    margin: 0 auto;
+    padding: calc(40px + env(safe-area-inset-top, 0px)) 40px 80px;
     background: #000;
     color: #f2f2f2;
   }
 
-  header {
+  .vp-header {
     display: flex;
-    align-items: flex-start;
     justify-content: space-between;
-    gap: 1.5rem;
-    flex-wrap: wrap;
+    align-items: center;
+    margin-block-end: 40px;
+    gap: 16px;
   }
 
-  .head-left {
+  .vp-header-left {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px 16px;
   }
 
-  h1 {
+  .vp-title {
+    margin: 0;
     font-family: var(--font-display);
     font-weight: 400;
-    font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
+    font-size: 24px;
     letter-spacing: -0.01em;
-    margin: 0;
-    color: #f2f2f2;
+    color: #fff;
   }
 
-  header .mono a {
+  .vp-links {
+    display: flex;
+    gap: 0.6rem;
+    margin: 0;
+  }
+  .vp-links a {
     color: #8a8a8a;
   }
-
-  header .mono a:hover {
+  .vp-links a:hover {
     color: #f2f2f2;
   }
-
-  header .links-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.6rem;
-  }
-
-  header .links-row .sep {
+  .vp-sep {
     color: #4a4a4a;
   }
 
-  /* ---------- zoom ---------- */
-
-  .zoom {
+  .vp-header-right {
     display: flex;
     align-items: center;
+    gap: 12px;
+  }
+
+  /* ---- density control ---- */
+  .vp-zoom {
+    --zoom-pos: 0;
+    display: inline-flex;
+    align-items: center;
     gap: 10px;
-    padding: 7px 11px;
-    border-radius: 999px;
-    background: #141414;
-    border: 1px solid #232323;
+    padding: 6px 10px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 0.5px solid rgba(255, 255, 255, 0.12);
   }
-
-  .zoom-i {
-    width: 13px;
-    height: 13px;
-    flex: none;
-    fill: none;
-    stroke: #8a8a8a;
-    stroke-width: 1.5;
-    stroke-linecap: round;
-  }
-
-  .zoom-i--lg {
-    width: 16px;
-    height: 16px;
-  }
-
-  #zoom {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 104px;
-    height: 3px;
-    border-radius: 3px;
-    background: #333;
-    cursor: pointer;
-  }
-
-  #zoom::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background: #f2f2f2;
-    transition: transform 0.18s cubic-bezier(0.3, 1.9, 0.4, 1);
-  }
-
-  #zoom:hover::-webkit-slider-thumb,
-  #zoom:active::-webkit-slider-thumb {
-    transform: scale(1.25);
-  }
-
-  #zoom::-moz-range-thumb {
-    width: 11px;
-    height: 11px;
-    border: 0;
-    border-radius: 50%;
-    background: #f2f2f2;
-  }
-
-  /* ---------- grid ---------- */
-
-  .grid {
-    list-style: none;
-    margin: 0;
+  .vp-zoom-btn {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
     padding: 0;
-    column-count: var(--cols);
-    /* Floor, so a narrow viewport uses fewer columns than asked rather
-       than squeezing five unreadable ones in. */
-    column-width: 260px;
-    column-gap: 20px;
+    border: none;
+    background: none;
+    color: #c6c6c6;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color 0.15s;
   }
-
-  .grid li {
-    break-inside: avoid;
-    margin-bottom: 20px;
+  .vp-zoom-btn:hover {
+    color: #e6e6e6;
   }
-
-  .thumb {
+  .vp-zoom-btn svg {
     display: block;
+  }
+  .vp-zoom-track {
     position: relative;
+    width: 68px;
+    height: 16px;
+    cursor: pointer;
+    touch-action: none;
+  }
+  .vp-zoom-track:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.4);
+    outline-offset: 4px;
+    border-radius: 100px;
+  }
+  .vp-zoom-line {
+    position: absolute;
+    top: 50%;
+    left: 6px;
+    right: 6px;
+    height: 1.5px;
+    border-radius: 2px;
+    background: #444;
+    transform: translateY(-50%);
+  }
+  .vp-zoom-dot {
+    position: absolute;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #444;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  .vp-zoom-knob {
+    position: absolute;
+    top: 50%;
+    left: calc(6px + var(--zoom-pos, 0) * 28px);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #c6c6c6;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition: left 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* ---- grid ---- */
+  .vp-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--vp-cols, 3), 1fr);
+    grid-auto-rows: 1px;
+    gap: 0 20px;
+    opacity: 0;
+  }
+  .vp-grid.is-ready {
+    opacity: 1;
+    transition: opacity 0.25s;
+  }
+  @media (scripting: none) {
+    .vp-grid {
+      opacity: 1;
+    }
+  }
+
+  /* ---- card ---- */
+  .vp-card {
+    position: relative;
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.5s cubic-bezier(0.3, 1.9, 0.4, 1);
+  }
+  @media (hover: hover) {
+    .vp-card {
+      will-change: transform;
+      backface-visibility: hidden;
+      transform: translateZ(0);
+    }
+    .vp-card:hover {
+      z-index: 2;
+      transform: scale(1.01) translateZ(0);
+      transition: transform 0.3s cubic-bezier(0.34, 1.5, 0.64, 1);
+    }
+  }
+
+  .vp-card-thumb {
+    position: relative;
+    width: 100%;
+    aspect-ratio: var(--ar, 3 / 2);
     overflow: hidden;
     border-radius: 8px;
     background: #141414;
-    /* Tiago's springy curve — it overshoots a touch, which is what makes
-       the lift read as a nudge rather than a fade. */
-    transition: transform 0.5s cubic-bezier(0.3, 1.9, 0.4, 1);
   }
-
-  a:hover .thumb {
-    transform: scale(1.015);
-  }
-
-  .poster {
+  /* the hairline rim */
+  .vp-card-thumb::after {
+    content: "";
     position: absolute;
     inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(
+      336.4deg,
+      rgba(62, 63, 64, 0.5) 14.76%,
+      rgba(62, 63, 64, 0.15) 51.14%,
+      rgba(62, 63, 64, 0.5) 93.14%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+
+  .vp-card-video {
+    display: block;
     width: 100%;
     height: 100%;
-    display: block;
-    transition: opacity 0.32s ease;
+    object-fit: cover;
   }
 
-  /* The card itself (its #141414 ground and exact aspect ratio) is on screen
-     from the first paint, so the layout never shifts; only the image waits. */
-  .grid.is-waiting .poster {
-    opacity: 0;
-  }
-
-  /* The page renders at its own --vw and is scaled to the tile by --s,
-     set from the tile's measured width by the script above. It sits over the
-     poster fully transparent until it has loaded. */
-  .thumb :global(iframe) {
-    opacity: 0;
-    transition: opacity 0.35s ease;
-  }
-
-  .thumb.is-live :global(iframe) {
-    opacity: 1;
-  }
-
-  .thumb :global(iframe) {
+  /* name bottom-left, stack bottom-right — both rise in on hover */
+  .vp-card-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    border: 0;
-    transform: scale(var(--s, 0.34));
-    transform-origin: top left;
+    inset: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 12px;
     pointer-events: none;
+  }
+  .vp-card-title {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    height: 30px;
+    padding: 0 13px;
+    border-radius: 100px;
+    background: rgba(20, 20, 20, 0.36);
+    border: 0.5px solid rgba(255, 255, 255, 0.14);
+    -webkit-backdrop-filter: blur(12px) saturate(1.3);
+    backdrop-filter: blur(12px) saturate(1.3);
+    opacity: 0;
+    transform: translateY(4px);
+    will-change: opacity, transform;
+    transition:
+      opacity 0.2s,
+      transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .vp-card-title span {
+    position: relative;
+    top: -0.5px;
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .vp-card-lang {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    height: 30px;
+    padding: 0 10px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.8);
+    border: 0.5px solid rgba(0, 0, 0, 0.1);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    color: #333;
+    font-family: "SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace;
+    font-size: 10.5px;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: translateY(4px);
+    will-change: opacity, transform;
+    transition:
+      opacity 0.2s,
+      transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .vp-card:hover .vp-card-title,
+  .vp-card:hover .vp-card-lang,
+  .vp-card:focus-visible .vp-card-title,
+  .vp-card:focus-visible .vp-card-lang {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .vp-card:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 3px;
+    border-radius: 10px;
+  }
+  @media (hover: none) {
+    .vp-card-overlay {
+      display: none;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .poster,
-    .thumb,
-    #zoom::-webkit-slider-thumb {
+    .vp-card {
+      will-change: auto;
       transition: none;
-    }
-
-    a:hover .thumb {
       transform: none;
+    }
+    .vp-card:hover {
+      transform: none;
+    }
+  }
+
+  @media (width <= 768px) {
+    .vp-container {
+      padding: calc(40px + env(safe-area-inset-top, 0px)) 16px 60px;
+    }
+    .vp-grid {
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 12px;
+    }
+    .vp-zoom {
+      display: none;
     }
   }
 </style>
