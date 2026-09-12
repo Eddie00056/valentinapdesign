@@ -98,6 +98,10 @@
     "gd-live:0": {
       "sc": 0.896,
       "dy": -35
+    },
+    "t.gd-media-h:0": {
+      "orig": "Reduce time to trade: Options",
+      "text": "REDUCE TIME TO TRADE"
     }
   }
 }
