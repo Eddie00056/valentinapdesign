@@ -133,7 +133,12 @@ def raster(n):
 # lays out at; the box (x/y/w/h, % of canvas) decides the scale. Pages are
 # re-grounded to transparent so they sit on the slide, not on a tile.
 TICKET_BG = ".ob-stage{background:none!important}"
-NO_HEADER = ".wshell-bar{display:none!important}"  # the widget without its title bar
+NO_HEADER = ".wshell-bar{display:none!important}"
+# slide 44's tickets, pared down: no estimate, no bracket/special-instructions
+# adders, and every CTA label in the same type (Submit was 400, Sell/Buy 600)
+LEAN = (".ob-cost,.st-attach-stack{display:none!important}"
+        ".ob-foot{justify-content:flex-end!important}"
+        ".ob-cta-label{font-weight:600!important}")  # the widget without its title bar
 FOF_BG = ".fof-stage{background:none!important}"
 ACS_BG = ".acs-root{background:none!important}"
 PHONE_BG = ".phone-stage{background:none!important}"
@@ -328,7 +333,7 @@ N[43] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Optio
 # measures x 115-847, y 388-656 in canvas px; ticket heights at 600px wide
 # measure ~431 and ~459.)
 _TW, _TX, _GAP = 600, 1260, 40
-_H = (431, 459)
+_H = (369, 458)  # with the estimate and adders hidden
 _T1 = round((1080 - (_H[0] + _GAP + _H[1])) / 2)
 _T2 = _T1 + _H[0] + _GAP
 _M = (_T1 + _H[0] // 2, _T2 + _H[1] // 2)       # ticket middles
@@ -341,8 +346,8 @@ N[44] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Optio
                     for t, m in (("Stocks", _M[0]), ("Options", _M[1]))],
          "connectors": [{"s": 1, "points": [[871, 522], [_SPINE, 522]]},
                         {"s": 1, "points": [[_CAPX - 70, _M[0]], [_SPINE, _M[0]], [_SPINE, _M[1]], [_CAPX - 70, _M[1]]]}],
-         "live": [dict(live("stock-order-entry", _TX / 19.2, _T1 / 10.8, _TW / 19.2, 45, css=TICKET_BG, fit=CARD, mode="width"), s=1),
-                  dict(live("options-strategy-builder", _TX / 19.2, _T2 / 10.8, _TW / 19.2, 45, css=TICKET_BG, fit=CARD, mode="width"), s=1)]}
+         "live": [dict(live("stock-order-entry", _TX / 19.2, _T1 / 10.8, _TW / 19.2, 45, css=TICKET_BG + LEAN, fit=CARD, mode="width", init="freeze"), s=1),
+                  dict(live("options-strategy-builder", _TX / 19.2, _T2 / 10.8, _TW / 19.2, 45, css=TICKET_BG + LEAN, fit=CARD, mode="width", init="freeze"), s=1)]}
 N[45] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Options",
          "live": [live("chain-to-order", 8, 15, 84, 80, 1440, fit=".ctt .wshell", vh=900, clip=True, pad=18)]}
 N[46] = {"kind": "media", "bg": "black",

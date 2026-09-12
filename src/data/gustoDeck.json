@@ -665,7 +665,7 @@
    {
     "text": "Options",
     "x": 61.354,
-    "y": 70.556,
+    "y": 67.685,
     "size": "lg",
     "s": 1
    }
@@ -697,11 +697,11 @@
      ],
      [
       935,
-      775
+      744
      ],
      [
       1108,
-      775
+      744
      ]
     ]
    }
@@ -710,12 +710,13 @@
    {
     "page": "stock-order-entry",
     "x": 65.625,
-    "y": 6.944444444444444,
+    "y": 9.814814814814815,
     "w": 31.25,
     "h": 45,
     "vw": 1280,
-    "css": ".ob-stage{background:none!important}",
+    "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}",
     "mode": "width",
+    "init": "freeze",
     "fit": ".wshell",
     "vh": 960,
     "s": 1
@@ -723,12 +724,13 @@
    {
     "page": "options-strategy-builder",
     "x": 65.625,
-    "y": 50.55555555555555,
+    "y": 47.68518518518518,
     "w": 31.25,
     "h": 45,
     "vw": 1280,
-    "css": ".ob-stage{background:none!important}",
+    "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}",
     "mode": "width",
+    "init": "freeze",
     "fit": ".wshell",
     "vh": 960,
     "s": 1

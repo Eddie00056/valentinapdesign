@@ -684,6 +684,11 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
         d.querySelector<HTMLElement>('[aria-label="Fractional shares"]')?.click(),
       // the order-placed animation chimes when its check lands; a deck is
       // no place for a sound nobody asked for
+      // stop the live price walk: the quote holds still on this slide
+      freeze: (w) => {
+        const hub = w.__pxHub;
+        if (hub) w.clearInterval(hub.timer); // the frame's own clearInterval: timer ids are per window
+      },
       mute: (w) => {
         w.AudioContext = undefined;
         w.webkitAudioContext = undefined;
