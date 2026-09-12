@@ -10,6 +10,8 @@
  *   Backspace/⌘Z   undo the last change          ⌘S save
  *   Esc            cancel (a text edit, a drag in progress) · otherwise deselect
  *   Alt-click      select the smaller box inside (e.g. one line of a card)
+ *   double-click a prototype   use it (click through it as in the show);
+ *                  Esc or a click outside it goes back to editing
  *   corner handle  drag to resize the selected box (scales from its centre)
  *   ⌥A ⌥H ⌥D       align the box left / centre / right on the slide
  *   ⌥W ⌥V ⌥S       align it top / middle / bottom (edges sit at the deck's 100px margin)
@@ -61,7 +63,12 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   css.textContent = `
     .gd-edit .gd-slide * { cursor: default; }
     .gd-edit .gd-slide [contenteditable] { cursor: text; outline: none; caret-color: #0a84ff; }
-    .gd-edit .gd-live::after { content: ""; position: absolute; inset: 0; z-index: 5; }
+    .gd-edit .gd-live:not(.is-using)::after { content: ""; position: absolute; inset: 0; z-index: 5; }
+    .gd-frame-ui.using { border: 2px solid #30d158; }
+    .gd-frame-ui.using i { display: none; }
+    .gd-frame-ui.using::before { content: "Using prototype — Esc to edit"; position: absolute; left: 0; top: -30px;
+      padding: 5px 9px; border-radius: 6px; background: #30d158; color: #04160e;
+      font: 600 13px/1 -apple-system, system-ui, sans-serif; white-space: nowrap; }
     .gd-frame-ui { position: absolute; z-index: 60; pointer-events: none; box-sizing: border-box; display: none; }
     .gd-frame-ui.hover { border: 1.5px solid rgba(10,132,255,.55); }
     .gd-frame-ui.sel { border: 2px solid #0a84ff; }
@@ -281,6 +288,10 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
       const t = e.target as HTMLElement;
       if (bar.contains(t)) return;
       if (editing && editing.contains(t)) return; // placing the caret
+      if (using) {
+        if (using.contains(t)) return; // clicks go to the prototype
+        stopUsing();
+      }
       const box = boxAt(t, e.altKey);
       if (!current()?.contains(t)) return;
       e.preventDefault();
@@ -332,6 +343,35 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   stage.addEventListener("pointercancel", endDrag);
   stage.addEventListener("pointerleave", () => (hoverUI.style.display = "none"));
 
+  /* ---- using a prototype ------------------------------------------- */
+  let using: HTMLElement | null = null;
+  const startUsing = (live: HTMLElement) => {
+    commitText();
+    select(live);
+    using = live;
+    live.classList.add("is-using");
+    // once you click inside, keys go to the prototype's own window
+    const fw = live.querySelector("iframe")?.contentWindow;
+    if (fw && !(fw as any).__deckEsc) {
+      (fw as any).__deckEsc = true;
+      fw.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && using) {
+          e.preventDefault();
+          stopUsing();
+        }
+      });
+    }
+    selUI.classList.add("using");
+    hoverUI.style.display = "none";
+  };
+  const stopUsing = () => {
+    if (!using) return;
+    using.classList.remove("is-using");
+    selUI.classList.remove("using");
+    using = null;
+    refresh();
+  };
+
   /* ---- text -------------------------------------------------------- */
   let before = "";
   const commitText = (cancel = false) => {
@@ -352,6 +392,14 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   stage.addEventListener(
     "dblclick",
     (e) => {
+      // a prototype: double-click to use it
+      const hitLive = (document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null)?.closest<HTMLElement>(".gd-live");
+      if (hitLive && current()?.contains(hitLive)) {
+        e.preventDefault();
+        e.stopPropagation();
+        startUsing(hitLive);
+        return;
+      }
       const hit = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
       if (!hit || !current()?.contains(hit)) return;
       // the line of text under the pointer; failing that, the box's only line
@@ -413,6 +461,12 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
         e.preventDefault();
         e.stopPropagation();
         undo();
+        return;
+      }
+      if (using && e.key === "Escape") {
+        e.preventDefault();
+        e.stopPropagation();
+        stopUsing();
         return;
       }
       if (e.key === "Escape" && drag?.moved) {
@@ -689,6 +743,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     true,
   );
   new MutationObserver(() => {
+    if (using && !current()?.contains(using)) stopUsing();
     if (sel && !current()?.contains(sel)) select(null);
     hoverUI.style.display = "none";
     refresh();
