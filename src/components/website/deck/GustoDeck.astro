@@ -674,6 +674,50 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
         w.AudioContext = undefined;
         w.webkitAudioContext = undefined;
       },
+      /* slide 32: the stock ticket discloses itself as you present. First
+         only the symbol; clicking it opens the rest of the ticket; from
+         there the ticket's own "+ Bracket order" works as on its page.
+         The card's top edge stays put while it grows. */
+      symbolFirst: (w, d) => {
+        const shell = d.querySelector<HTMLElement>(".wshell");
+        const deckEl = d.querySelector<HTMLElement>(".ob-deck");
+        const pill = d.querySelector<HTMLElement>(".st-id");
+        if (!shell || !deckEl || !pill) return;
+        const st = d.createElement("style");
+        st.textContent = `
+          html.deck-sym .st-body > :not(.st-quote),
+          html.deck-sym .ob-card > :not(.st-body) { display: none !important; }
+          html.deck-sym .st-id { cursor: pointer; }
+          .deck-rest { animation: deck-in .45s cubic-bezier(.2,.8,.2,1) both; }
+          @keyframes deck-in { from { opacity: 0; translate: 0 -6px; } }
+        `;
+        d.head.appendChild(st);
+        const top0 = shell.getBoundingClientRect().top;
+        let shift = 0;
+        const pin = () => {
+          const drift = shell.getBoundingClientRect().top - top0;
+          if (Math.abs(drift) < 0.5) return;
+          shift -= drift;
+          deckEl.style.translate = `0 ${shift}px`;
+        };
+        new (w.ResizeObserver as typeof ResizeObserver)(pin).observe(shell);
+        d.documentElement.classList.add("deck-sym");
+        pin();
+        pill.addEventListener(
+          "click",
+          (e) => {
+            if (!d.documentElement.classList.contains("deck-sym")) return;
+            e.preventDefault();
+            e.stopPropagation();
+            d.documentElement.classList.remove("deck-sym");
+            d.querySelectorAll<HTMLElement>(".st-body > :not(.st-quote), .ob-card > :not(.st-body)").forEach(
+              (el) => el.classList.add("deck-rest"),
+            );
+            pin();
+          },
+          true,
+        );
+      },
     };
     const runInit = (f: HTMLIFrameElement) => {
       const name = f.dataset.init;

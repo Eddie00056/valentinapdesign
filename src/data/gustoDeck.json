@@ -482,7 +482,8 @@
     "w": 40,
     "h": 54,
     "vw": 1280,
-    "css": ".ob-stage{background:none!important}",
+    "css": ".ob-stage{background:none!important}.wshell-bar{display:none!important}",
+    "init": "symbolFirst",
     "fit": ".wshell",
     "vh": 960
    }

@@ -133,6 +133,7 @@ def raster(n):
 # lays out at; the box (x/y/w/h, % of canvas) decides the scale. Pages are
 # re-grounded to transparent so they sit on the slide, not on a tile.
 TICKET_BG = ".ob-stage{background:none!important}"
+NO_HEADER = ".wshell-bar{display:none!important}"  # the widget without its title bar
 FOF_BG = ".fof-stage{background:none!important}"
 ACS_BG = ".acs-root{background:none!important}"
 PHONE_BG = ".phone-stage{background:none!important}"
@@ -301,7 +302,7 @@ N[32] = {"kind": "media", "bg": "black", "heading": "What data do we show?",
          "labels": [{"text": "Current widget design", "x": 25, "y": 22.6},
                     {"text": "Updated widget design", "x": 75, "y": 22.6}],
          "shots": [place(crop(32, 'a', 8.9, 25.1, 39.2, 51.7), 4, 42, cy=57)],
-         "live": [live("stock-order-entry", 55, 30, 40, 54, css=TICKET_BG, fit=CARD)]}
+         "live": [live("stock-order-entry", 55, 30, 40, 54, css=TICKET_BG + NO_HEADER, fit=CARD, init="symbolFirst")]}
 N[33] = S("How do we make the option trade\nexperience faster?", "Reducing time to trade")
 N[34] = S("What are options?")
 N[35] = {"kind": "twocol", "bg": "black", "panels": [P(0, 50, DARK_PANEL)],
