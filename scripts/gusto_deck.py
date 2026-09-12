@@ -231,12 +231,19 @@ N[26] = {"kind": "metrics", "bg": "black", "kicker": "Success metrics",
          "items": [{"text": "Reduce time to\ntrade by 15%"}, {"text": "Reduce number of\nclicks by 30%"}]}
 N[27] = D("How?")
 N[28] = S("What data do we show and how?", "Reducing time to trade")
+# 29 -> 30 is a build (30 adds the numbered markers): both crop the same
+# widget bitmap with the same padding and sit in the same place, so nothing
+# moves between them. Args are the widget image's rect on that slide.
+def widget(n, x0, y0, x1, y1, padx=0.8, pady=0.6):
+    return place(crop(n, 'a', x0 - padx, y0 - pady, x1 + padx, y1 + pady), 21, 58, y=25.5)
+
+
 N[29] = {"kind": "media", "bg": "black", "heading": "How do we show the data?",
          "labels": [{"text": "Current widget layout", "x": 50, "y": 21.5}],
-         "shots": [place(crop(29, 'a', 34.8, 34.6, 65.1, 61.4), 21, 58, y=25.5)]}
+         "shots": [widget(29, 34.93, 34.815, 65.07, 61.204)]}
 N[30] = {"kind": "media", "bg": "black", "heading": "How do we show the data?",
          "labels": [{"text": "Current widget layout", "x": 50, "y": 21.5}],
-         "shots": [place(crop(30, 'a', 35.3, 37.4, 66.4, 65.4), 20.5, 59, y=25.5)]}
+         "shots": [widget(30, 36.075, 38.333, 66.216, 64.722)]}
 # 31: the PDF's red boxes don't line up with the fields once the widget is
 # enlarged, so the widget comes from the clean embedded bitmap and the marks
 # are drawn by the deck, positioned in the image's own coordinates.
