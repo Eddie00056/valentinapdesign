@@ -134,6 +134,9 @@ def raster(n):
 # re-grounded to transparent so they sit on the slide, not on a tile.
 TICKET_BG = ".ob-stage{background:none!important}"
 NO_HEADER = ".wshell-bar{display:none!important}"
+WIDGETS_ONLY = (".wsp-stage,.wsp-screen,.wsp,.wsp-canvas{background:none!important;box-shadow:none!important;border-color:transparent!important}"
+                ".wsp-screen{overflow:visible!important}.wsp-rail{visibility:hidden!important}"
+                ".ob-scrim{background-color:transparent!important}")  # its tint drew a box on the black slide
 # slide 44's tickets, pared down: no estimate, no bracket/special-instructions
 # adders, and every CTA label in the same type (Submit was 400, Sell/Buy 600)
 LEAN = (".ob-cost,.st-attach-stack,.wshell-actions{display:none!important}"
@@ -349,7 +352,10 @@ N[44] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Optio
          "live": [dict(live("stock-order-entry", _TX / 19.2, _T1 / 10.8, _TW / 19.2, 45, css=TICKET_BG + LEAN, fit=CARD, mode="width", init="freeze"), s=1),
                   dict(live("options-strategy-builder", _TX / 19.2, _T2 / 10.8, _TW / 19.2, 45, css=TICKET_BG + LEAN, fit=CARD, mode="width", init="freeze"), s=1)]}
 N[45] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Options",
-         "live": [live("chain-to-order", 8, 15, 84, 80, 1440, fit=".ctt .wshell", vh=900, clip=True, pad=18)]}
+         # just the two widgets: the workspace's ground, frame and rail are
+         # taken away, and nothing clips — so the order confirmation, which
+         # opens over them, shows in full
+         "live": [live("chain-to-order", 8, 15, 84, 80, 1440, css=WIDGETS_ONLY, fit=".ctt .wshell", vh=900, pad=18)]}
 N[46] = {"kind": "media", "bg": "black",
          "live": [live("options-strategy-builder", 26, 12, 48, 76, css=TICKET_BG, fit=CARD)]}
 N[47] = {"kind": "media", "bg": "black",

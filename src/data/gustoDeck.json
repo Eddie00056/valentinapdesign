@@ -750,9 +750,8 @@
     "w": 84,
     "h": 80,
     "vw": 1440,
-    "css": "",
+    "css": ".wsp-stage,.wsp-screen,.wsp,.wsp-canvas{background:none!important;box-shadow:none!important;border-color:transparent!important}.wsp-screen{overflow:visible!important}.wsp-rail{visibility:hidden!important}.ob-scrim{background-color:transparent!important}",
     "pad": 18,
-    "clip": true,
     "fit": ".ctt .wshell",
     "vh": 900
    }
