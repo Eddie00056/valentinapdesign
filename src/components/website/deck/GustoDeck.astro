@@ -274,7 +274,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                     ))}
                     {(s.labels || []).map((l: any) => (
                       <p
-                        class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`]}
+                        class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade"]}
+                        data-s={l.s ?? undefined}
                         style={`left:${l.x}%;top:${l.y ?? 19}%`}
                       >
                         {l.text}
@@ -329,6 +330,17 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                       ) : (
                         <Shot {...sh} />
                       ),
+                    )}
+                    {s.connectors && (
+                      <svg class="gd-connectors" viewBox="0 0 1920 1080" aria-hidden="true">
+                        {s.connectors.map((c: any) => (
+                          <polyline
+                            class="gd-fade"
+                            data-s={c.s ?? undefined}
+                            points={c.points.map((p: number[]) => p.join(",")).join(" ")}
+                          />
+                        ))}
+                      </svg>
                     )}
                     {(s.marks || []).map((m: any) => (
                       <span
@@ -420,7 +432,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                   const vh = l.fit ? l.vh : Math.round(bh / k);
                   return (
                     <div
-                      class:list={["gd-live", { "is-clip": l.clip }]}
+                      class:list={["gd-live", { "is-clip": l.clip, "gd-fade": l.s }]}
+                      data-s={l.s ?? undefined}
                       style={`left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%`}
                     >
                       <iframe
@@ -527,7 +540,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     let nextBuild: number | null = null;
     const setBuild = (n: number, v: number) => {
       build = v;
-      slides[n - 1]?.querySelectorAll<SVGElement>("[data-s]").forEach((el) =>
+      slides[n - 1]?.querySelectorAll<HTMLElement | SVGElement>("[data-s]").forEach((el) =>
         el.classList.toggle("is-on", parseInt(el.dataset.s || "0", 10) <= v),
       );
     };
@@ -760,7 +773,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       const arrived = next !== i || !started;
       const from = i;
       i = next;
-      if (arrived) setBuild(i, nextBuild ?? 0);
+      if (arrived) setBuild(i, stage.classList.contains("gd-edit") ? steps(i) : (nextBuild ?? 0));
       nextBuild = null;
       /* The slides either side stay laid out but invisible, so their
          prototypes load AND get measured before you arrive — no pop-in, no
@@ -1767,6 +1780,32 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     .gd-annot-pop {
       transition: none !important;
     }
+  }
+  /* build parts that simply fade in on their click (slide 44) */
+  .gd-slide :global(.gd-fade[data-s]:not(.is-on)) {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .gd-slide :global(.gd-fade[data-s]) {
+    transition: opacity 0.5s ease;
+  }
+  .gd-slide :global(.gd-fade[data-s].is-on) {
+    transition-delay: calc(var(--d, 0) * 1ms);
+  }
+  .gd-connectors {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: visible;
+  }
+  .gd-connectors polyline {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.35);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
   }
   .gd-mark {
     position: absolute;

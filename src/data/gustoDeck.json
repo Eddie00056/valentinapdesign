@@ -640,7 +640,7 @@
   "panels": [
    {
     "x": 0,
-    "w": 33,
+    "w": 50,
     "y": 0,
     "c": "#111116"
    }
@@ -648,48 +648,92 @@
   "shots": [
    {
     "src": "044a",
-    "x": 1.5,
-    "y": 45.24,
-    "w": 30
+    "x": 3,
+    "y": 40.686,
+    "w": 44
+   }
+  ],
+  "steps": 1,
+  "labels": [
+   {
+    "text": "Stocks",
+    "x": 61.354,
+    "y": 25.648,
+    "size": "lg",
+    "s": 1
+   },
+   {
+    "text": "Options",
+    "x": 61.354,
+    "y": 70.556,
+    "size": "lg",
+    "s": 1
+   }
+  ],
+  "connectors": [
+   {
+    "s": 1,
+    "points": [
+     [
+      871,
+      522
+     ],
+     [
+      935,
+      522
+     ]
+    ]
+   },
+   {
+    "s": 1,
+    "points": [
+     [
+      1108,
+      290
+     ],
+     [
+      935,
+      290
+     ],
+     [
+      935,
+      775
+     ],
+     [
+      1108,
+      775
+     ]
+    ]
    }
   ],
   "live": [
    {
     "page": "stock-order-entry",
-    "x": 35,
-    "y": 25,
-    "w": 29.5,
-    "h": 60,
+    "x": 65.625,
+    "y": 6.944444444444444,
+    "w": 31.25,
+    "h": 45,
     "vw": 1280,
     "css": ".ob-stage{background:none!important}",
+    "mode": "width",
     "fit": ".wshell",
-    "vh": 960
+    "vh": 960,
+    "s": 1
    },
    {
     "page": "options-strategy-builder",
-    "x": 66.5,
-    "y": 20,
-    "w": 30.5,
-    "h": 70,
+    "x": 65.625,
+    "y": 50.55555555555555,
+    "w": 31.25,
+    "h": 45,
     "vw": 1280,
     "css": ".ob-stage{background:none!important}",
+    "mode": "width",
     "fit": ".wshell",
-    "vh": 960
+    "vh": 960,
+    "s": 1
    }
-  ],
-  "enter": {
-   "from": 43,
-   "morph": [
-    ".gd-panel",
-    ".gd-media-shot"
-   ],
-   "split": {
-    "from": ".gd-media-shot",
-    "items": [
-     ".gd-live"
-    ]
-   }
-  }
+  ]
  },
  {
   "n": 45,

@@ -322,16 +322,27 @@ N[42] = S("Tailor the order placement experience\nto each security type", "The s
 N[43] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Options",
          "panels": [P(0, 50, DARK_PANEL)],
          "shots": [cardimg(43, 'a', 2644, 3, 44, cy=55, radius=0)]}
+# 44: the old widget stays exactly as on 43; one click fades in the split —
+# a connector from it forking to two tickets stacked on the right, Stocks
+# above Options, same width, each captioned on its left. (Old widget on 43
+# measures x 115-847, y 388-656 in canvas px; ticket heights at 600px wide
+# measure ~431 and ~459.)
+_TW, _TX, _GAP = 600, 1260, 40
+_H = (431, 459)
+_T1 = round((1080 - (_H[0] + _GAP + _H[1])) / 2)
+_T2 = _T1 + _H[0] + _GAP
+_M = (_T1 + _H[0] // 2, _T2 + _H[1] // 2)       # ticket middles
+_SPINE, _CAPX = 935, 1178
 N[44] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Options",
-         "panels": [P(0, 33, DARK_PANEL)],
-         "shots": [cardimg(44, 'a', 2644, 1.5, 30, cy=55, radius=0)],
-         "live": [live("stock-order-entry", 35, 25, 29.5, 60, css=TICKET_BG, fit=CARD),
-                  live("options-strategy-builder", 66.5, 20, 30.5, 70, css=TICKET_BG, fit=CARD)],
-         # arriving from 43: the one legacy widget shrinks aside, and the two
-         # security-specific tickets split out of where it stood
-         "enter": {"from": 43,
-                   "morph": [".gd-panel", ".gd-media-shot"],
-                   "split": {"from": ".gd-media-shot", "items": [".gd-live"]}}}
+         "panels": [P(0, 50, DARK_PANEL)],
+         "shots": [cardimg(44, 'a', 2644, 3, 44, cy=55, radius=0)],
+         "steps": 1,
+         "labels": [{"text": t, "x": round(_CAPX / 19.2, 3), "y": round((m - 13) / 10.8, 3), "size": "lg", "s": 1}
+                    for t, m in (("Stocks", _M[0]), ("Options", _M[1]))],
+         "connectors": [{"s": 1, "points": [[871, 522], [_SPINE, 522]]},
+                        {"s": 1, "points": [[_CAPX - 70, _M[0]], [_SPINE, _M[0]], [_SPINE, _M[1]], [_CAPX - 70, _M[1]]]}],
+         "live": [dict(live("stock-order-entry", _TX / 19.2, _T1 / 10.8, _TW / 19.2, 45, css=TICKET_BG, fit=CARD, mode="width"), s=1),
+                  dict(live("options-strategy-builder", _TX / 19.2, _T2 / 10.8, _TW / 19.2, 45, css=TICKET_BG, fit=CARD, mode="width"), s=1)]}
 N[45] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Options",
          "live": [live("chain-to-order", 8, 15, 84, 80, 1440, fit=".ctt .wshell", vh=900, clip=True, pad=18)]}
 N[46] = {"kind": "media", "bg": "black",
