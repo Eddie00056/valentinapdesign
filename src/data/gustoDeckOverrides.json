@@ -30,7 +30,7 @@
     "gd-metrics-t:1": {
       "ta": "center",
       "dy": -25,
-      "dx": 42
+      "dx": 10
     },
     "t.gd-metrics-t:1": {
       "orig": "Reduce number of\nclicks by 30%",
