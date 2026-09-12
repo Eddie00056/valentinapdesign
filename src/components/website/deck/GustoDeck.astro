@@ -304,8 +304,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                             {sh.annot.points.map((pt: any, k: number) => (
                               <g class="gd-annot-dot" data-s={k} transform={`translate(${pt.at[0]} ${pt.at[1]})`}>
                                 <g class="gd-annot-pop">
-                                  <circle r="6" fill={pt.c} />
-                                  <text text-anchor="middle" dy="2.6">{pt.n}</text>
+                                  <circle r="8" fill={pt.c} />
+                                  <text text-anchor="middle" dy="3.3">{pt.n}</text>
                                 </g>
                               </g>
                             ))}
@@ -1622,8 +1622,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     transition-delay: 0s;
   }
   .gd-annot text {
-    font: 700 7px var(--gd-font);
-    fill: #fff;
+    font: 700 9.5px var(--gd-font);
+    fill: #000;
   }
   @media (prefers-reduced-motion: reduce) {
     .gd-annot-line,
