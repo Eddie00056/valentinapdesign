@@ -4,16 +4,6 @@
       "hidden": true
     }
   },
-  "20": {
-    "gd-statement-t:0": {
-      "dy": -7
-    }
-  },
-  "21": {
-    "gd-statement-t:0": {
-      "dy": -7
-    }
-  },
   "22": {
     "gd-journey-row:0": {
       "dy": 2,
@@ -26,10 +16,6 @@
     }
   },
   "24": {
-    "gd-kicker:0": {
-      "dy": 8,
-      "dx": -1
-    },
     "t.gd-statement-t:0": {
       "orig": "The current order placement is slow, in\nparticular for option traders.",
       "text": "The current order placement is slow,\nparticularly for option traders."
