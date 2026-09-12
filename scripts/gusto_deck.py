@@ -136,7 +136,7 @@ TICKET_BG = ".ob-stage{background:none!important}"
 NO_HEADER = ".wshell-bar{display:none!important}"
 # slide 44's tickets, pared down: no estimate, no bracket/special-instructions
 # adders, and every CTA label in the same type (Submit was 400, Sell/Buy 600)
-LEAN = (".ob-cost,.st-attach-stack{display:none!important}"
+LEAN = (".ob-cost,.st-attach-stack,.wshell-actions{display:none!important}"
         ".ob-foot{justify-content:flex-end!important}"
         ".ob-cta-label{font-weight:600!important}")  # the widget without its title bar
 FOF_BG = ".fof-stage{background:none!important}"
@@ -332,20 +332,20 @@ N[43] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Optio
 # above Options, same width, each captioned on its left. (Old widget on 43
 # measures x 115-847, y 388-656 in canvas px; ticket heights at 600px wide
 # measure ~431 and ~459.)
-_TW, _TX, _GAP = 600, 1260, 40
+_TW, _TX, _GAP = 600, 1110, 40              # pulled in toward the old widget
 _H = (369, 458)  # with the estimate and adders hidden
 _T1 = round((1080 - (_H[0] + _GAP + _H[1])) / 2)
 _T2 = _T1 + _H[0] + _GAP
 _M = (_T1 + _H[0] // 2, _T2 + _H[1] // 2)       # ticket middles
-_SPINE, _CAPX = 935, 1178
+_SPINE, _CAPX = 895, 1030
 N[44] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Options",
          "panels": [P(0, 50, DARK_PANEL)],
          "shots": [cardimg(44, 'a', 2644, 3, 44, cy=55, radius=0)],
          "steps": 1,
          "labels": [{"text": t, "x": round(_CAPX / 19.2, 3), "y": round((m - 13) / 10.8, 3), "size": "lg", "s": 1}
                     for t, m in (("Stocks", _M[0]), ("Options", _M[1]))],
-         "connectors": [{"s": 1, "points": [[871, 522], [_SPINE, 522]]},
-                        {"s": 1, "points": [[_CAPX - 70, _M[0]], [_SPINE, _M[0]], [_SPINE, _M[1]], [_CAPX - 70, _M[1]]]}],
+         "connectors": [{"s": 1, "points": [[863, 522], [_SPINE, 522]]},
+                        {"s": 1, "points": [[_CAPX - 52, _M[0]], [_SPINE, _M[0]], [_SPINE, _M[1]], [_CAPX - 52, _M[1]]]}],
          "live": [dict(live("stock-order-entry", _TX / 19.2, _T1 / 10.8, _TW / 19.2, 45, css=TICKET_BG + LEAN, fit=CARD, mode="width", init="freeze"), s=1),
                   dict(live("options-strategy-builder", _TX / 19.2, _T2 / 10.8, _TW / 19.2, 45, css=TICKET_BG + LEAN, fit=CARD, mode="width", init="freeze"), s=1)]}
 N[45] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Options",

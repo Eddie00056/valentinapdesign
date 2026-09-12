@@ -657,14 +657,14 @@
   "labels": [
    {
     "text": "Stocks",
-    "x": 61.354,
+    "x": 53.646,
     "y": 25.648,
     "size": "lg",
     "s": 1
    },
    {
     "text": "Options",
-    "x": 61.354,
+    "x": 53.646,
     "y": 67.685,
     "size": "lg",
     "s": 1
@@ -675,11 +675,11 @@
     "s": 1,
     "points": [
      [
-      871,
+      863,
       522
      ],
      [
-      935,
+      895,
       522
      ]
     ]
@@ -688,19 +688,19 @@
     "s": 1,
     "points": [
      [
-      1108,
+      978,
       290
      ],
      [
-      935,
+      895,
       290
      ],
      [
-      935,
+      895,
       744
      ],
      [
-      1108,
+      978,
       744
      ]
     ]
@@ -709,12 +709,12 @@
   "live": [
    {
     "page": "stock-order-entry",
-    "x": 65.625,
+    "x": 57.8125,
     "y": 9.814814814814815,
     "w": 31.25,
     "h": 45,
     "vw": 1280,
-    "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}",
+    "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}",
     "mode": "width",
     "init": "freeze",
     "fit": ".wshell",
@@ -723,12 +723,12 @@
    },
    {
     "page": "options-strategy-builder",
-    "x": 65.625,
+    "x": 57.8125,
     "y": 47.68518518518518,
     "w": 31.25,
     "h": 45,
     "vw": 1280,
-    "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}",
+    "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}",
     "mode": "width",
     "init": "freeze",
     "fit": ".wshell",
