@@ -1,9 +1,10 @@
 /* valentinapdesign.com Worker.
 
-   Serves the static site exactly as before (env.ASSETS) and adds one thing:
+   Serves the static site exactly as before (env.ASSETS) and adds two things:
    /api/comments, the pinned review comments on the /work prototypes, stored
-   in D1. wrangler.jsonc routes only /api/* here first, so every other
-   request is still answered by the asset layer without touching this code.
+   in D1; and /thumbs/*.mp4 with byte-range support (see serveClip).
+   wrangler.jsonc routes only those here first, so every other request is
+   still answered by the asset layer without touching this code.
 
    Permissions, as agreed:
    - anyone can read and post;
@@ -151,9 +152,65 @@ async function api(req, env, url) {
   return json({ error: "not found" }, 404);
 }
 
+/* Gallery clips, served with byte-range support.
+
+   The static-asset layer ignores Range: it answers the whole file with a 200
+   and no Accept-Ranges. Chrome tolerates that; Safari and iOS will not play a
+   <video> from a server that doesn't honour ranges, so on those the gallery
+   sat on its posters and never moved. Clips are a few hundred KB, so reading
+   one whole and slicing it here costs nothing worth measuring. */
+async function serveClip(req, env, url) {
+  const asset = await env.ASSETS.fetch(new Request(url.origin + url.pathname));
+  if (!asset.ok) return asset;
+  const etag = asset.headers.get("etag");
+  const base = {
+    "content-type": "video/mp4",
+    "accept-ranges": "bytes",
+    // clips keep their names when re-recorded, so revalidate rather than cache blind
+    "cache-control": "public, max-age=0, must-revalidate",
+    ...(etag ? { etag } : {}),
+  };
+  if (etag && req.headers.get("if-none-match") === etag) {
+    return new Response(null, { status: 304, headers: base });
+  }
+
+  const buf = await asset.arrayBuffer();
+  const size = buf.byteLength;
+  const head = req.method === "HEAD";
+  const range = req.headers.get("range");
+  const m = range && range.match(/^bytes=(\d*)-(\d*)$/);
+  if (!m || (m[1] === "" && m[2] === "")) {
+    return new Response(head ? null : buf, { status: 200, headers: { ...base, "content-length": String(size) } });
+  }
+
+  let start, end;
+  if (m[1] === "") {
+    // suffix: the last N bytes
+    start = Math.max(0, size - Number(m[2]));
+    end = size - 1;
+  } else {
+    start = Number(m[1]);
+    end = m[2] === "" ? size - 1 : Math.min(Number(m[2]), size - 1);
+  }
+  if (start >= size || start > end) {
+    return new Response(null, { status: 416, headers: { ...base, "content-range": `bytes */${size}` } });
+  }
+  return new Response(head ? null : buf.slice(start, end + 1), {
+    status: 206,
+    headers: {
+      ...base,
+      "content-range": `bytes ${start}-${end}/${size}`,
+      "content-length": String(end - start + 1),
+    },
+  });
+}
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
+    if (url.pathname.startsWith("/thumbs/") && url.pathname.endsWith(".mp4")) {
+      return serveClip(req, env, url);
+    }
     if (url.pathname.startsWith("/api/")) {
       try {
         return await api(req, env, url);
