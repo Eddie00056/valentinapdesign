@@ -1,20 +1,20 @@
 /**
  * ?edit mode for the GUSTO deck — dev server only (the import is behind
- * `import.meta.env.DEV`, so none of this ships).
+ * `import.meta.env.DEV`, so none of this ships). Works like Keynote/Figma:
  *
- *   click          select an element (Alt-click: its container)
- *   drag           move it; snaps to the slide's centre line
- *   arrows         nudge 1px   (Shift: 10px)
- *   [  ]           type size −1 / +1px
- *   double-click   retype text (Enter to keep, Esc to cancel, Shift+Enter new line)
- *   Delete         reset the selected element
- *   ⌘Z             undo       ⌘S  save
+ *   click          select the whole box — text box, list, card, image, prototype
+ *   drag           move it (hold anywhere inside); snaps to the slide's centre lines
+ *   double-click   edit the line of text under the pointer
+ *                  (Enter keeps · Esc cancels · Shift+Enter new line · click away keeps)
+ *   arrows         nudge 1px (Shift 10px)       [ ]  type size −1 / +1px
+ *   Backspace/⌘Z   undo the last change          ⌘S save
+ *   Esc            cancel (a text edit, a drag in progress) · otherwise deselect
+ *   Alt-click      select the smaller box inside (e.g. one line of a card)
  *
- * Changes are stored per slide and element key in gustoDeckOverrides.json,
- * which the generator never touches. See applyOverrides in GustoDeck.astro.
+ * Saves to gustoDeckOverrides.json. See deckOverrides.ts.
  */
 import type { Overrides, Override } from "./deckOverrides";
-import { MOVABLE, applyOne } from "./deckOverrides";
+import { applyBox, applyText, isLeafText } from "./deckOverrides";
 
 const W = 1920;
 const H = 1080;
@@ -36,15 +36,23 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   /* ---- chrome ------------------------------------------------------ */
   const css = document.createElement("style");
   css.textContent = `
-    .gd-edit .gd-slide [data-ek] { cursor: default; }
-    .gd-edit .gd-slide [data-ek]:hover { outline: 1px dashed rgba(10,132,255,.7); outline-offset: 1px; }
+    .gd-edit .gd-slide * { cursor: default; }
+    .gd-edit .gd-slide [contenteditable] { cursor: text; outline: none; caret-color: #0a84ff; }
     .gd-edit .gd-live::after { content: ""; position: absolute; inset: 0; z-index: 5; }
-    .gd-edit .gd-sel { outline: 2px solid #0a84ff !important; outline-offset: 2px; }
-    .gd-edit [contenteditable] { outline: 2px solid #ff9f0a !important; cursor: text; }
-    .gd-guide { position: absolute; top: 0; bottom: 0; left: 960px; width: 0;
-      border-left: 1px solid #ff2d55; z-index: 50; pointer-events: none; display: none; }
-    .gd-guide.is-h { left: 0; right: 0; top: 540px; bottom: auto; height: 0; width: auto;
-      border-left: 0; border-top: 1px solid #ff2d55; }
+    .gd-frame-ui { position: absolute; z-index: 60; pointer-events: none; box-sizing: border-box; display: none; }
+    .gd-frame-ui.hover { border: 1.5px solid rgba(10,132,255,.55); }
+    .gd-frame-ui.sel { border: 2px solid #0a84ff; }
+    .gd-frame-ui.sel i { position: absolute; width: 11px; height: 11px; background: #fff;
+      border: 2px solid #0a84ff; box-sizing: border-box; border-radius: 2px; }
+    .gd-frame-ui.sel i:nth-child(1) { left: -6px; top: -6px; }
+    .gd-frame-ui.sel i:nth-child(2) { right: -6px; top: -6px; }
+    .gd-frame-ui.sel i:nth-child(3) { left: -6px; bottom: -6px; }
+    .gd-frame-ui.sel i:nth-child(4) { right: -6px; bottom: -6px; }
+    .gd-frame-ui.text { border: 2px solid #0a84ff; background: rgba(10,132,255,.06); }
+    .gd-frame-ui.text i { display: none; }
+    .gd-guide { position: absolute; z-index: 61; pointer-events: none; display: none; }
+    .gd-guide.v { top: 0; bottom: 0; left: 960px; border-left: 1px solid #ff2d55; }
+    .gd-guide.h { left: 0; right: 0; top: 540px; border-top: 1px solid #ff2d55; }
     .gd-editbar { position: fixed; z-index: 2000; left: 50%; top: 14px; transform: translateX(-50%);
       display: flex; align-items: center; gap: 10px; padding: 7px 8px 7px 14px; border-radius: 12px;
       font: 500 12.5px/1 -apple-system, system-ui, sans-serif; color: #f2f2f2;
@@ -61,21 +69,47 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   `;
   document.head.appendChild(css);
 
-  const guideV = document.createElement("div");
-  guideV.className = "gd-guide";
-  const guideH = document.createElement("div");
-  guideH.className = "gd-guide is-h";
-  canvas.append(guideV, guideH);
+  const mk = (cls: string, handles = false) => {
+    const d = document.createElement("div");
+    d.className = cls;
+    if (handles) d.innerHTML = "<i></i><i></i><i></i><i></i>";
+    canvas.appendChild(d);
+    return d;
+  };
+  const hoverUI = mk("gd-frame-ui hover");
+  const selUI = mk("gd-frame-ui sel", true);
+  const guideV = mk("gd-guide v");
+  const guideH = mk("gd-guide h");
+
+  const place = (ui: HTMLElement, el: HTMLElement | null) => {
+    if (!el) {
+      ui.style.display = "none";
+      return;
+    }
+    const k = scale();
+    const c = canvas.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    const pad = 4;
+    ui.style.display = "block";
+    ui.style.left = `${(r.left - c.left) / k - pad}px`;
+    ui.style.top = `${(r.top - c.top) / k - pad}px`;
+    ui.style.width = `${r.width / k + pad * 2}px`;
+    ui.style.height = `${r.height / k + pad * 2}px`;
+  };
 
   const bar = document.createElement("div");
   bar.className = "gd-editbar";
   bar.innerHTML = `<b>Edit</b><span class="k" data-r="where"></span><span class="k" data-r="sel"></span>
-    <button data-a="undo">Undo</button><button data-a="reset">Reset slide</button>
+    <button data-a="undo">Undo</button><button data-a="resetbox">Reset box</button><button data-a="reset">Reset slide</button>
     <button data-a="save" class="save">Save</button>
-    <span class="help">dbl-click text · drag / arrows · [ ] size · ⌘S</span>`;
+    <span class="help">click select · drag move · double-click edit · ⌫ undo · Esc cancel · [ ] size · ⌘S</span>`;
   document.body.appendChild(bar);
   const r = (k: string) => bar.querySelector<HTMLElement>(`[data-r="${k}"]`)!;
   const btn = (a: string) => bar.querySelector<HTMLButtonElement>(`[data-a="${a}"]`)!;
+
+  /* ---- model ------------------------------------------------------- */
+  const keyOf = (el: HTMLElement) => el.dataset.bk!;
+  const get = (el: HTMLElement, k = keyOf(el)): Override | undefined => ov[slideOf(el)]?.[k];
 
   const refresh = () => {
     const s = current();
@@ -83,48 +117,65 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     r("where").textContent = s ? `slide ${s.dataset.n}` : "";
     const o = sel ? get(sel) : undefined;
     r("sel").textContent = sel
-      ? `${sel.dataset.ek}` +
-        (o?.dx || o?.dy ? ` · ${Math.round(o.dx || 0)}, ${Math.round(o.dy || 0)}` : "") +
-        (o?.fs ? ` · ${o.fs}px` : "")
+      ? keyOf(sel).split(":")[0].replace(/^gd-/, "") +
+        (o?.dx || o?.dy ? ` · x ${o.dx || 0} y ${o.dy || 0}` : "") +
+        (o?.fsd ? ` · type ${o.fsd > 0 ? "+" : ""}${o.fsd}px` : "")
       : "";
     btn("save").disabled = !dirty;
     btn("save").textContent = dirty ? "Save" : "Saved";
     btn("undo").disabled = !history.length;
+    btn("resetbox").disabled = !sel;
+    place(selUI, editing || sel);
+    selUI.classList.toggle("text", !!editing);
   };
 
-  /* ---- model ------------------------------------------------------- */
-  const get = (el: HTMLElement): Override | undefined => ov[slideOf(el)]?.[el.dataset.ek!];
   const snapshot = () => {
     history.push(JSON.stringify(ov));
     if (history.length > 200) history.shift();
   };
-  const set = (el: HTMLElement, patch: Partial<Override>) => {
+  const write = (el: HTMLElement, k: string, patch: Partial<Override>) => {
     const n = slideOf(el);
-    const k = el.dataset.ek!;
-    const next = { ...(ov[n]?.[k] || {}), ...patch } as Override;
-    for (const key of Object.keys(next) as (keyof Override)[]) {
-      if (next[key] === undefined || next[key] === 0) delete next[key];
-    }
+    const next: Override = { ...(ov[n]?.[k] || {}), ...patch };
+    (Object.keys(next) as (keyof Override)[]).forEach((x) => {
+      if (next[x] === undefined || next[x] === 0) delete next[x];
+    });
     if (next.text !== undefined && next.text === next.orig) {
       delete next.text;
       delete next.orig;
     }
     ov[n] = { ...(ov[n] || {}) };
-    if (Object.keys(next).filter((x) => x !== "orig").length) ov[n][k] = next;
+    if (Object.keys(next).some((x) => x !== "orig")) ov[n][k] = next;
     else delete ov[n][k];
     if (!Object.keys(ov[n]).length) delete ov[n];
-    applyOne(el, ov[n]?.[k]);
+    return ov[n]?.[k];
+  };
+  const setBox = (el: HTMLElement, patch: Partial<Override>) => {
+    applyBox(el, write(el, keyOf(el), patch));
     refresh();
   };
   const reapplyAll = () => {
-    stage.querySelectorAll<HTMLElement>("[data-ek]").forEach((el) => applyOne(el, get(el)));
+    stage.querySelectorAll<HTMLElement>("[data-tk]").forEach((el) => applyText(el, get(el, el.dataset.tk!)));
+    stage.querySelectorAll<HTMLElement>("[data-bk]").forEach((el) => applyBox(el, get(el)));
   };
 
   const select = (el: HTMLElement | null) => {
-    sel?.classList.remove("gd-sel");
     sel = el;
-    sel?.classList.add("gd-sel");
     refresh();
+  };
+
+  /* which box a click means: the outermost one under the pointer
+     (Alt: the innermost) — a click on a card's line selects the card */
+  const boxAt = (t: HTMLElement, inner: boolean) => {
+    const slide = current();
+    if (!slide || !slide.contains(t)) return null;
+    let found: HTMLElement | null = null;
+    for (let e: HTMLElement | null = t; e && e !== slide; e = e.parentElement) {
+      if (e.dataset.bk) {
+        found = e;
+        if (inner) break;
+      }
+    }
+    return found;
   };
 
   /* ---- pointer ----------------------------------------------------- */
@@ -133,49 +184,51 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   stage.addEventListener(
     "pointerdown",
     (e) => {
-      if (editing && e.target instanceof Node && editing.contains(e.target)) return;
-      const s = current();
       const t = e.target as HTMLElement;
-      if (!s || !s.contains(t) || bar.contains(t)) return;
-      let el = t.closest<HTMLElement>("[data-ek]");
-      if (el && e.altKey) el = el.parentElement?.closest<HTMLElement>("[data-ek]") || el;
-      if (!el) {
-        select(null);
-        return;
-      }
+      if (bar.contains(t)) return;
+      if (editing && editing.contains(t)) return; // placing the caret
+      const box = boxAt(t, e.altKey);
+      if (!current()?.contains(t)) return;
       e.preventDefault();
       e.stopPropagation();
       commitText();
-      select(el);
-      const o = get(el) || {};
-      drag = { el, x: e.clientX, y: e.clientY, dx: o.dx || 0, dy: o.dy || 0, moved: false, base: el.getBoundingClientRect() };
+      select(box);
+      if (!box) return;
+      const o = get(box) || {};
+      drag = { el: box, x: e.clientX, y: e.clientY, dx: o.dx || 0, dy: o.dy || 0, moved: false, base: box.getBoundingClientRect() };
     },
     true,
   );
   stage.addEventListener("pointermove", (e) => {
-    if (!drag) return;
+    if (!drag) {
+      if (!editing) {
+        const t = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+        const b = t ? boxAt(t, e.altKey) : null;
+        place(hoverUI, b && b !== sel ? b : null);
+      }
+      return;
+    }
     const k = scale();
     let ddx = (e.clientX - drag.x) / k;
     let ddy = (e.clientY - drag.y) / k;
     if (!drag.moved && Math.hypot(ddx, ddy) < 3) return;
     if (!drag.moved) {
       snapshot();
-      /* capture only once it is really a drag — capturing on press would
-         retarget the click/dblclick that follows to the stage */
+      // capture only once it is really a drag, so a double-click still lands on the text
       stage.setPointerCapture(e.pointerId);
+      hoverUI.style.display = "none";
     }
     drag.moved = true;
-    // snap the element's centre to the slide's centre lines
     const c = canvas.getBoundingClientRect();
     const cx = (drag.base.left + drag.base.width / 2 - c.left) / k + ddx;
     const cy = (drag.base.top + drag.base.height / 2 - c.top) / k + ddy;
-    const sx = Math.abs(cx - W / 2) < SNAP && !e.altKey;
-    const sy = Math.abs(cy - H / 2) < SNAP && !e.altKey;
+    const sx = !e.altKey && Math.abs(cx - W / 2) < SNAP;
+    const sy = !e.altKey && Math.abs(cy - H / 2) < SNAP;
     if (sx) ddx += W / 2 - cx;
     if (sy) ddy += H / 2 - cy;
     guideV.style.display = sx ? "block" : "none";
     guideH.style.display = sy ? "block" : "none";
-    set(drag.el, { dx: Math.round(drag.dx + ddx), dy: Math.round(drag.dy + ddy) });
+    setBox(drag.el, { dx: Math.round(drag.dx + ddx), dy: Math.round(drag.dy + ddy) });
   });
   const endDrag = () => {
     drag = null;
@@ -183,46 +236,61 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   };
   stage.addEventListener("pointerup", endDrag);
   stage.addEventListener("pointercancel", endDrag);
+  stage.addEventListener("pointerleave", () => (hoverUI.style.display = "none"));
 
   /* ---- text -------------------------------------------------------- */
-  const isText = (el: HTMLElement) =>
-    Array.from(el.childNodes).every((c) => c.nodeType === Node.TEXT_NODE || (c as HTMLElement).tagName === "BR") &&
-    !!el.textContent?.trim();
   let before = "";
   const commitText = (cancel = false) => {
     if (!editing) return;
     const el = editing;
     editing = null;
     el.removeAttribute("contenteditable");
+    getSelection()?.removeAllRanges();
     const text = (el.innerText || "").replace(/\n$/, "");
     if (cancel || text === before) {
       el.textContent = before;
-      return;
+    } else {
+      snapshot();
+      applyText(el, write(el, el.dataset.tk!, { orig: el.dataset.orig, text }));
     }
-    snapshot();
-    const o = get(el);
-    set(el, { orig: o?.orig ?? el.dataset.orig ?? before, text });
+    refresh();
   };
   stage.addEventListener(
     "dblclick",
     (e) => {
-      const el = (e.target as HTMLElement).closest<HTMLElement>("[data-ek]") || sel;
-      if (!el || !isText(el) || !current()?.contains(el)) return;
+      const hit = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null;
+      if (!hit || !current()?.contains(hit)) return;
+      // the line of text under the pointer; failing that, the box's only line
+      let leaf = hit.closest<HTMLElement>("[data-tk]");
+      const box = sel || boxAt(hit, false);
+      if (!leaf && box) {
+        const lines = [box, ...box.querySelectorAll<HTMLElement>("[data-tk]")].filter((x) => x.dataset.tk);
+        if (lines.length === 1) leaf = lines[0];
+      }
+      if (!leaf || !isLeafText(leaf) || (box && !box.contains(leaf))) return;
       e.preventDefault();
       e.stopPropagation();
-      select(el);
-      before = el.textContent || "";
-      editing = el;
-      el.setAttribute("contenteditable", "plaintext-only");
-      el.focus();
-      const range = document.createRange();
-      range.selectNodeContents(el);
+      before = leaf.textContent || "";
+      editing = leaf;
+      leaf.setAttribute("contenteditable", "plaintext-only");
+      leaf.focus();
+      // caret where you clicked, like any text editor
+      const range = (document as any).caretRangeFromPoint?.(e.clientX, e.clientY) as Range | null;
       const s = getSelection()!;
       s.removeAllRanges();
-      s.addRange(range);
+      if (range && leaf.contains(range.startContainer)) s.addRange(range);
+      else {
+        const all = document.createRange();
+        all.selectNodeContents(leaf);
+        s.addRange(all);
+      }
+      hoverUI.style.display = "none";
+      refresh();
     },
     true,
   );
+  // typing reflows the line; keep the frame hugging it
+  stage.addEventListener("input", () => editing && refresh(), true);
 
   /* ---- keys -------------------------------------------------------- */
   window.addEventListener(
@@ -246,46 +314,36 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
         e.stopPropagation(); // typing never drives the deck
         return;
       }
-      if (mod && e.key.toLowerCase() === "z") {
+      if ((mod && e.key.toLowerCase() === "z") || e.key === "Backspace" || e.key === "Delete") {
         e.preventDefault();
+        e.stopPropagation();
         undo();
         return;
       }
+      if (e.key === "Escape" && drag?.moved) {
+        e.preventDefault();
+        e.stopPropagation();
+        const d = drag;
+        endDrag();
+        undo(); // back to where the drag started
+        select(d.el);
+        return;
+      }
       if (!sel) return;
+      const box = sel;
       const step = e.shiftKey ? 10 : 1;
-      const o = get(sel) || {};
-      const nudge = (x: number, y: number) => {
-        snapshot();
-        set(sel!, { dx: (o.dx || 0) + x, dy: (o.dy || 0) + y });
-      };
-      const handled = (() => {
-        switch (e.key) {
-          case "ArrowLeft": return nudge(-step, 0), true;
-          case "ArrowRight": return nudge(step, 0), true;
-          case "ArrowUp": return nudge(0, -step), true;
-          case "ArrowDown": return nudge(0, step), true;
-          case "[":
-          case "]": {
-            snapshot();
-            const cur = o.fs || Math.round(parseFloat(getComputedStyle(sel).fontSize));
-            set(sel, { fs: cur + (e.key === "]" ? 1 : -1) });
-            return true;
-          }
-          case "Delete":
-          case "Backspace": {
-            snapshot();
-            const n = slideOf(sel);
-            if (o.text !== undefined && o.orig !== undefined) sel.textContent = o.orig;
-            if (ov[n]) delete ov[n][sel.dataset.ek!];
-            if (ov[n] && !Object.keys(ov[n]).length) delete ov[n];
-            applyOne(sel, undefined);
-            refresh();
-            return true;
-          }
-          case "Escape": return select(null), true;
-        }
-        return false;
-      })();
+      const o = get(box) || {};
+      let handled = true;
+      switch (e.key) {
+        case "ArrowLeft": snapshot(); setBox(box, { dx: (o.dx || 0) - step }); break;
+        case "ArrowRight": snapshot(); setBox(box, { dx: (o.dx || 0) + step }); break;
+        case "ArrowUp": snapshot(); setBox(box, { dy: (o.dy || 0) - step }); break;
+        case "ArrowDown": snapshot(); setBox(box, { dy: (o.dy || 0) + step }); break;
+        case "[": snapshot(); setBox(box, { fsd: (o.fsd || 0) - 1 }); break;
+        case "]": snapshot(); setBox(box, { fsd: (o.fsd || 0) + 1 }); break;
+        case "Escape": select(null); break;
+        default: handled = false;
+      }
       if (handled) {
         e.preventDefault();
         e.stopPropagation();
@@ -298,12 +356,20 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   const undo = () => {
     const prev = history.pop();
     if (prev === undefined) return;
-    // put back the text of anything whose text override is going away
-    stage.querySelectorAll<HTMLElement>("[data-ek]").forEach((el) => {
-      const o = get(el);
-      if (o?.orig !== undefined) el.textContent = o.orig;
-    });
     ov = JSON.parse(prev);
+    reapplyAll();
+    refresh();
+  };
+  const resetBox = () => {
+    if (!sel) return;
+    const n = slideOf(sel);
+    if (!ov[n]) return;
+    snapshot();
+    [sel, ...sel.querySelectorAll<HTMLElement>("[data-tk]")].forEach((x) => {
+      if (x.dataset.tk) delete ov[n][x.dataset.tk];
+    });
+    delete ov[n][keyOf(sel)];
+    if (!Object.keys(ov[n]).length) delete ov[n];
     reapplyAll();
     refresh();
   };
@@ -311,12 +377,8 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     const s = current();
     if (!s || !ov[s.dataset.n!]) return;
     snapshot();
-    s.querySelectorAll<HTMLElement>("[data-ek]").forEach((el) => {
-      const o = get(el);
-      if (o?.orig !== undefined) el.textContent = o.orig;
-      applyOne(el, undefined);
-    });
     delete ov[s.dataset.n!];
+    reapplyAll();
     refresh();
   };
   const save = async () => {
@@ -335,15 +397,17 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     const a = (e.target as HTMLElement).closest<HTMLElement>("button")?.dataset.a;
     if (a === "undo") undo();
     if (a === "reset") resetSlide();
+    if (a === "resetbox") resetBox();
     if (a === "save") save();
   });
   window.addEventListener("beforeunload", (e) => {
     if (JSON.stringify(ov) !== saved) e.preventDefault();
   });
-  // keep "slide N" current as the deck moves
+  window.addEventListener("resize", () => refresh());
   new MutationObserver(() => {
     if (sel && !current()?.contains(sel)) select(null);
+    hoverUI.style.display = "none";
     refresh();
-  }).observe(stage.querySelector(".gd-canvas")!, { subtree: true, attributes: true, attributeFilter: ["hidden"] });
+  }).observe(canvas, { subtree: true, attributes: true, attributeFilter: ["hidden"] });
   refresh();
 }

@@ -1,38 +1,67 @@
 /**
  * Hand edits layered over the generated deck (src/data/gustoDeckOverrides.json).
  *
- * Every movable element on a slide gets a key — its first class (or tag)
- * plus its index among same-named elements on that slide, e.g. "gd-media-l:1".
- * An override can move it (dx/dy, canvas px), resize its type (fs, px) and
- * replace its text. Text only applies while the generated text still equals
- * `orig`, so re-running the generator against a new export can never paste an
- * old edit onto different copy.
+ * Two kinds of thing can be edited:
+ *  - a BOX: a whole text box, list, card, image or prototype — it moves (dx/dy,
+ *    canvas px) and its type can grow or shrink as one (fsd, px added to every
+ *    line inside). Keyed by first class (or tag) + index, e.g. "gd-media-h:0".
+ *  - a TEXT: one line of copy inside a box. Keyed "t.<class-or-tag>:<index>".
+ *    Its replacement only applies while the generated text still equals
+ *    `orig`, so a new deck export can never inherit stale copy.
  */
-export type Override = { dx?: number; dy?: number; fs?: number; text?: string; orig?: string };
+export type Override = { dx?: number; dy?: number; fsd?: number; text?: string; orig?: string };
 export type Overrides = Record<string, Record<string, Override>>;
 
-export const MOVABLE = [
-  "h2", "p", "li", "img",
-  ".gd-step", ".gd-fig-n", ".gd-fig-l", ".gd-own-n", ".gd-own-l",
-  ".gd-award-t", ".gd-award-s", ".gd-twocol > span", ".gd-divider > span",
-  ".gd-live", ".gd-mark", ".gd-card", ".gd-goal", ".gd-box", ".gd-own-card",
+/** What a click selects — the outermost of these under the pointer. */
+export const BOXES = [
+  ".gd-cover", ".gd-titlecard", ".gd-statement-t", ".gd-kicker", ".gd-corner",
+  ".gd-media-h", ".gd-media-l", ".gd-media-big", ".gd-numbered ol", ".gd-journey-row",
+  ".gd-card", ".gd-goal", ".gd-fig", ".gd-award", ".gd-fig-note", ".gd-role-col",
+  ".gd-cl-col", ".gd-twocol > span", ".gd-divider > span", ".gd-metrics-t", ".gd-own",
+  "img", ".gd-live", ".gd-mark", ".gd-box",
 ].join(",");
 
+const TEXTS = "h2, p, li, span";
+
+const nameOf = (el: HTMLElement) => el.classList[0] || el.tagName.toLowerCase();
+export const isLeafText = (el: HTMLElement) =>
+  el.matches(TEXTS) && el.childElementCount === 0 && !!el.textContent?.trim();
+
 export function keyElements(slide: HTMLElement) {
-  const count: Record<string, number> = {};
-  slide.querySelectorAll<HTMLElement>(MOVABLE).forEach((el) => {
+  const boxes: Record<string, number> = {};
+  const texts: Record<string, number> = {};
+  slide.querySelectorAll<HTMLElement>(`${BOXES}, ${TEXTS}`).forEach((el) => {
     if (el.closest(".gd-live") && !el.classList.contains("gd-live")) return;
-    const name = el.classList[0] || el.tagName.toLowerCase();
-    const i = (count[name] = (count[name] ?? -1) + 1);
-    el.dataset.ek = `${name}:${i}`;
-    if (el.childElementCount === 0) el.dataset.orig = el.textContent || "";
+    if (el.matches(BOXES)) {
+      const n = nameOf(el);
+      el.dataset.bk = `${n}:${(boxes[n] = (boxes[n] ?? -1) + 1)}`;
+    }
+    if (isLeafText(el)) {
+      const n = nameOf(el);
+      el.dataset.tk = `t.${n}:${(texts[n] = (texts[n] ?? -1) + 1)}`;
+      el.dataset.orig = el.textContent || "";
+    }
   });
 }
 
-export function applyOne(el: HTMLElement, o: Override | undefined) {
+const leaves = (box: HTMLElement) =>
+  [box, ...box.querySelectorAll<HTMLElement>("[data-tk]")].filter((e) => e.dataset.tk);
+
+export function applyBox(el: HTMLElement, o: Override | undefined) {
   el.style.translate = o?.dx || o?.dy ? `${o.dx || 0}px ${o.dy || 0}px` : "";
-  el.style.fontSize = o?.fs ? `${o.fs}px` : "";
-  if (o?.text !== undefined && (el.dataset.orig ?? el.textContent) === o.orig) el.textContent = o.text;
+  for (const leaf of leaves(el)) {
+    if (!leaf.dataset.basefs) {
+      leaf.style.fontSize = "";
+      leaf.dataset.basefs = String(parseFloat(getComputedStyle(leaf).fontSize) || 0);
+    }
+    const base = parseFloat(leaf.dataset.basefs);
+    leaf.style.fontSize = o?.fsd && base ? `${base + o.fsd}px` : "";
+  }
+}
+
+export function applyText(el: HTMLElement, o: Override | undefined) {
+  const orig = el.dataset.orig ?? "";
+  el.textContent = o?.text !== undefined && o.orig === orig ? o.text : orig;
 }
 
 export function applyOverrides(stage: HTMLElement, ov: Overrides) {
@@ -41,8 +70,13 @@ export function applyOverrides(stage: HTMLElement, ov: Overrides) {
     const mine = ov[slide.dataset.n || ""];
     if (!mine) return;
     for (const [k, o] of Object.entries(mine)) {
-      const el = slide.querySelector<HTMLElement>(`[data-ek="${k}"]`);
-      if (el) applyOne(el, o);
+      if (k.startsWith("t.")) {
+        const el = slide.querySelector<HTMLElement>(`[data-tk="${k}"]`);
+        if (el) applyText(el, o);
+      } else {
+        const el = slide.querySelector<HTMLElement>(`[data-bk="${k}"]`);
+        if (el) applyBox(el, o);
+      }
     }
   });
 }
