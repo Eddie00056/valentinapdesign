@@ -1017,12 +1017,7 @@ export function FractionalOrderFlow({
                       transition={spring}
                       style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 16px 0" }}
                     >
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start" }}>
-                        <span style={{ fontSize: 12, lineHeight: "18px", color: "#262D33" }}>Estimated total</span>
-                        <span style={{ fontSize: 12, lineHeight: "18px", color: "#5E6D83" }}>
-                          {(shares ? +shares.toFixed(3) : 0) + " @ " + money(limitPx)}
-                        </span>
-                      </div>
+                      <span style={{ fontSize: 12, lineHeight: "18px", color: "#262D33" }}>Estimated total</span>
                       <div style={{ display: "flex", gap: 4, alignItems: "baseline" }}>
                         <span style={{ fontWeight: 600, fontSize: 16, lineHeight: "24px", color: "#262D33" }}>{money(amt)}</span>
                         <span style={{ fontSize: 12, lineHeight: "18px", color: "#5E6D83" }}>USD</span>
