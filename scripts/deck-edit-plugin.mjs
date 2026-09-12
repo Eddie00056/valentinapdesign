@@ -1,6 +1,6 @@
 // Dev-server only: lets the presentation's ?edit mode save its overrides.
 // `astro build` never runs configureServer, so none of this reaches the site.
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
@@ -59,7 +59,11 @@ export function deckEdit() {
         res.setHeader("content-type", "application/json");
         res.end(JSON.stringify(result));
       });
-      server.middlewares.use("/__deck/overrides", (req, res) => {
+      server.middlewares.use("/__deck/overrides", async (req, res) => {
+        if (req.method === "GET") {
+          res.setHeader("content-type", "application/json");
+          return res.end(await readFile(FILE, "utf8"));
+        }
         if (req.method !== "POST") {
           res.statusCode = 405;
           return res.end();

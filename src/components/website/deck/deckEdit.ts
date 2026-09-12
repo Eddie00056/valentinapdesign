@@ -489,6 +489,30 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     reapplyAll();
     refresh();
   };
+  const staleDialog = () => {
+    ask.hidden = false;
+    ask.querySelector("h3")!.textContent = "The deck changed since you opened it";
+    ask.querySelector<HTMLElement>('[data-r="msg"]')!.textContent =
+      "Someone (or another tab) saved edits after this page loaded. Reload to get them, then redo your change — saving from here would put old edits back.";
+    const row = ask.querySelector<HTMLElement>(".row")!;
+    const prev = row.innerHTML;
+    row.innerHTML = `<button data-q="close">Not now</button><button data-q="reload" class="primary">Reload</button>`;
+    const done = () => {
+      row.innerHTML = prev;
+      ask.querySelector("h3")!.textContent = "Save and publish your changes?";
+      ask.hidden = true;
+    };
+    row.querySelector<HTMLButtonElement>('[data-q="reload"]')!.onclick = (e) => {
+      e.stopPropagation();
+      saved = JSON.stringify(ov); // don't trigger the unsaved-changes prompt on the way out
+      location.reload();
+    };
+    row.querySelector<HTMLButtonElement>('[data-q="close"]')!.onclick = (e) => {
+      e.stopPropagation();
+      done();
+    };
+    return false;
+  };
   const toggleHidden = () => {
     const s = current();
     if (!s) return;
@@ -534,9 +558,20 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     }
     publishing = false;
   };
+  /* The file can change outside this tab — another tab, or a fix made in
+     code. Saving would silently put old edits back, so check first. */
+  const stale = async () => {
+    try {
+      const disk = await (await fetch("/__deck/overrides")).json();
+      return JSON.stringify(disk) !== saved;
+    } catch {
+      return false;
+    }
+  };
   const save = async () => {
     const body = JSON.stringify(ov);
     if (body === saved) return;
+    if (await stale()) return void staleDialog();
     btn("save").textContent = "Saving…";
     const res = await fetch("/__deck/overrides", { method: "POST", body });
     if (res.ok) {
