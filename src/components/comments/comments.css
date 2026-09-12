@@ -1,0 +1,473 @@
+/* Review comments — the chrome that sits over every /work prototype.
+
+   Same material as the page chrome the prototypes already carry (the `.back`
+   and `.bg-toggle` buttons): near-black glass at 72%, an 18px blur, a #1d2328
+   hairline, a deep soft shadow. Accent is the house UP green. Everything is
+   prefixed `cmt-` and scoped to fixed layers, so no prototype's own styles
+   can reach it and it can't reach them. */
+
+.cmt-root {
+  --cmt-glass: rgba(17, 19, 23, 0.82);
+  --cmt-line: #262d33;
+  --cmt-ink: #f2f2f8;
+  --cmt-muted: #8e97ad;
+  --cmt-accent: #48d597;
+  --cmt-on-accent: #04150c;
+  --cmt-danger: #ff557d;
+  --cmt-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  font-family: "DM Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--cmt-ink);
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+.cmt-root *,
+.cmt-root *::before,
+.cmt-root *::after {
+  box-sizing: border-box;
+}
+
+/* Buttons wear no UA chrome — border, background and colour are all stated
+   per control below (this project has been bitten by each of the three).
+
+   `:where()` takes this rule to zero specificity. As a plain `.cmt-root
+   button` it sat at (0,1,1) and beat every single-class control below —
+   its `margin: 0` erased the pins' tip offset and the delete button's
+   `margin-left: auto`. A reset should lose to everything it resets. */
+:where(.cmt-root) button {
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(.cmt-root) :focus-visible {
+  outline: 2px solid var(--cmt-accent);
+  outline-offset: 2px;
+}
+
+.cmt-glass {
+  background: var(--cmt-glass);
+  border: 1px solid var(--cmt-line);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(18px) saturate(1.15);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* ---- the launcher ---- */
+.cmt-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2147483600;
+  height: 44px;
+  padding: 0 14px 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 999px;
+  color: var(--cmt-ink);
+  font-weight: 500;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s var(--cmt-ease);
+}
+.cmt-fab:hover {
+  transform: translateY(-1px);
+}
+.cmt-fab svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.cmt-fab[aria-pressed="true"] {
+  background: var(--cmt-accent);
+  border-color: var(--cmt-accent);
+  color: var(--cmt-on-accent);
+}
+.cmt-count {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  background: rgba(255, 255, 255, 0.1);
+}
+.cmt-fab[aria-pressed="true"] .cmt-count {
+  background: rgba(4, 21, 12, 0.14);
+}
+.cmt-count:empty {
+  display: none;
+}
+
+/* ---- capture layer: the whole prototype becomes a click target ---- */
+.cmt-capture {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  cursor: crosshair;
+  background: transparent;
+}
+
+.cmt-hint {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  z-index: 2147483600;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: var(--cmt-muted);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.cmt-hint b {
+  color: var(--cmt-ink);
+  font-weight: 500;
+}
+
+/* ---- pins ---- */
+.cmt-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483100;
+  pointer-events: none;
+}
+
+/* Positioned with left/top from script, never with transform: the pin-in,
+   hover and flash effects all animate `transform`, and a CSS animation
+   outranks an inline transform — with fill-mode `both` it pinned every
+   freshly rendered pin to the corner of the screen. The bottom-left corner
+   sits on the point, the way a map pin does (the script subtracts 28). */
+.cmt-pin {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px 14px 14px 3px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2px solid #0b0b0d;
+  background: var(--cmt-accent);
+  color: var(--cmt-on-accent);
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+  transition: transform 0.22s var(--cmt-ease), box-shadow 0.22s ease;
+  animation: cmtPinIn 0.32s var(--cmt-ease) both;
+  transform-origin: 0 100%;
+}
+.cmt-pin:hover,
+.cmt-pin.is-open {
+  transform: scale(1.12);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+.cmt-pin.is-draft {
+  background: var(--cmt-ink);
+  color: #0b0b0d;
+}
+.cmt-pin.is-flash {
+  animation: cmtFlash 0.9s var(--cmt-ease);
+}
+@keyframes cmtPinIn {
+  from { opacity: 0; transform: scale(0.4); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes cmtFlash {
+  0% { box-shadow: 0 0 0 0 rgba(72, 213, 151, 0.7); }
+  100% { box-shadow: 0 0 0 16px rgba(72, 213, 151, 0); }
+}
+
+/* ---- the bubble a pin opens, and the composer ---- */
+.cmt-card {
+  position: absolute;
+  width: 264px;
+  padding: 12px;
+  border-radius: 12px;
+  pointer-events: auto;
+  animation: cmtCardIn 0.22s var(--cmt-ease) both;
+}
+@keyframes cmtCardIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+.cmt-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+.cmt-name {
+  font-weight: 600;
+  color: var(--cmt-ink);
+}
+.cmt-time {
+  color: var(--cmt-muted);
+  font-size: 12px;
+}
+.cmt-body {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--cmt-ink);
+}
+.cmt-del {
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cmt-muted);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.cmt-del:hover {
+  color: var(--cmt-danger);
+  background: rgba(255, 85, 125, 0.1);
+}
+.cmt-del svg {
+  width: 14px;
+  height: 14px;
+}
+
+.cmt-field {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--cmt-line);
+  border-radius: 8px;
+  background: #0b0b0d;
+  color: var(--cmt-ink);
+  font: inherit;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.cmt-field:focus {
+  border-color: var(--cmt-accent);
+}
+.cmt-field::placeholder {
+  color: #5c6475;
+}
+textarea.cmt-field {
+  min-height: 76px;
+  resize: vertical;
+}
+.cmt-field + .cmt-field {
+  margin-top: 6px;
+}
+
+.cmt-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.cmt-hintline {
+  color: var(--cmt-muted);
+  font-size: 11px;
+  margin-right: auto;
+}
+.cmt-btn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--cmt-line);
+  background: transparent;
+  color: var(--cmt-ink);
+  font-weight: 500;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+.cmt-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.cmt-btn--primary {
+  background: var(--cmt-accent);
+  border-color: var(--cmt-accent);
+  color: var(--cmt-on-accent);
+}
+.cmt-btn--primary:hover {
+  background: #5fe0a6;
+}
+.cmt-btn--danger {
+  background: var(--cmt-danger);
+  border-color: var(--cmt-danger);
+  color: #1f0610;
+}
+.cmt-btn--danger:hover {
+  background: #ff6d8f;
+}
+.cmt-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.cmt-error {
+  color: var(--cmt-danger);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* ---- the panel ---- */
+.cmt-panel {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  bottom: 84px;
+  z-index: 2147483500;
+  width: 320px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: cmtPanelIn 0.28s var(--cmt-ease) both;
+}
+@keyframes cmtPanelIn {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: none; }
+}
+.cmt-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 12px 12px 16px;
+  border-bottom: 1px solid var(--cmt-line);
+}
+.cmt-title {
+  font-size: 14px;
+  font-weight: 600;
+}
+.cmt-title span {
+  color: var(--cmt-muted);
+  font-weight: 400;
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.cmt-close {
+  margin-left: auto;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--cmt-muted);
+}
+.cmt-close:hover {
+  color: var(--cmt-ink);
+  background: rgba(255, 255, 255, 0.06);
+}
+.cmt-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cmt-list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  scrollbar-width: thin;
+  scrollbar-color: #2a3138 transparent;
+}
+.cmt-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.cmt-item:hover,
+.cmt-item.is-open {
+  background: rgba(255, 255, 255, 0.05);
+}
+.cmt-item .cmt-num {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 11px 11px 11px 3px;
+  display: grid;
+  place-items: center;
+  background: var(--cmt-accent);
+  color: var(--cmt-on-accent);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.cmt-item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.cmt-empty {
+  padding: 28px 18px;
+  color: var(--cmt-muted);
+  text-align: center;
+}
+
+.cmt-foot {
+  padding: 10px 12px 12px 16px;
+  border-top: 1px solid var(--cmt-line);
+}
+.cmt-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--cmt-muted);
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.cmt-link:hover {
+  color: var(--cmt-ink);
+}
+.cmt-link--danger {
+  color: var(--cmt-danger);
+}
+.cmt-link--danger:hover {
+  color: #ff7d9b;
+}
+.cmt-confirm {
+  color: var(--cmt-ink);
+}
+
+@media (max-width: 600px) {
+  .cmt-fab {
+    right: 12px;
+    bottom: 12px;
+  }
+  .cmt-panel {
+    top: auto;
+    left: 12px;
+    right: 12px;
+    bottom: 64px;
+    width: auto;
+    max-height: 46vh;
+  }
+  .cmt-hint {
+    top: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmt-root *,
+  .cmt-root *::before,
+  .cmt-root *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

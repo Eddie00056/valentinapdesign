@@ -59,6 +59,14 @@ const pageTitle = title ? `${title} — ${site.name}` : site.name;
   <body>
     <slot />
 
+    {/* Review comments on every /work prototype (src/components/comments).
+        Bundled, deferred, framework-free, and a no-op in embed mode and on
+        any page outside /work. */}
+    <script>
+      import { mountComments } from "../components/comments/comments";
+      mountComments();
+    </script>
+
     <!-- Embed mode. The gallery renders these pages live inside its tiles,
          where a page's own chrome — the back button, the demo shell's nav
          and footer — is not part of the work being shown. Marking the
