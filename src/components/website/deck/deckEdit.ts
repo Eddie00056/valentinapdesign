@@ -10,6 +10,9 @@
  *   Backspace/⌘Z   undo the last change          ⌘S save
  *   Esc            cancel (a text edit, a drag in progress) · otherwise deselect
  *   Alt-click      select the smaller box inside (e.g. one line of a card)
+ *   ⌥A ⌥H ⌥D       align the box left / centre / right on the slide
+ *   ⌥W ⌥V ⌥S       align it top / middle / bottom (edges sit at the deck's 100px margin)
+ *   toolbar        also text-align left / centre / right inside the box
  *
  * Saves to gustoDeckOverrides.json. See deckOverrides.ts.
  */
@@ -19,6 +22,23 @@ import { applyBox, applyText, isLeafText } from "./deckOverrides";
 const W = 1920;
 const H = 1080;
 const SNAP = 8;
+const MARGIN = 100; // the deck's own edge margin (corner kickers sit at 5.2% = 100px)
+
+const ico = (d: string) =>
+  `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">${d}</svg>`;
+const ICONS: Record<string, [string, string]> = {
+  "al-left": [ico('<path d="M2 2v12M5 5h8M5 11h5"/>'), "Align left  ⌥A"],
+  "al-hcenter": [ico('<path d="M8 2v12M4 5h8M5.5 11h5"/>'), "Align centre  ⌥H"],
+  "al-right": [ico('<path d="M14 2v12M3 5h8M6 11h5"/>'), "Align right  ⌥D"],
+  "al-top": [ico('<path d="M2 2h12M5 5v8M11 5v5"/>'), "Align top  ⌥W"],
+  "al-vcenter": [ico('<path d="M2 8h12M5 4v8M11 5.5v5"/>'), "Align middle  ⌥V"],
+  "al-bottom": [ico('<path d="M2 14h12M5 3v8M11 6v5"/>'), "Align bottom  ⌥S"],
+  "ta-left": [ico('<path d="M2 4h12M2 8h8M2 12h10"/>'), "Text left"],
+  "ta-center": [ico('<path d="M2 4h12M4 8h8M3 12h10"/>'), "Text centre"],
+  "ta-right": [ico('<path d="M2 4h12M6 8h8M4 12h10"/>'), "Text right"],
+  "fs-down": [`<span style="font:600 11px/16px system-ui;letter-spacing:-.02em">A−</span>`, "Smaller text  ["],
+  "fs-up": [`<span style="font:600 14px/16px system-ui;letter-spacing:-.02em">A+</span>`, "Bigger text  ]"],
+};
 
 export function startEdit(stage: HTMLElement, initial: Overrides) {
   let ov: Overrides = structuredClone(initial);
@@ -66,6 +86,10 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     .gd-editbar button.save { background: #0a84ff; }
     .gd-editbar button:disabled { opacity: .4; cursor: default; }
     .gd-editbar .help { color: #7c7c82; font-weight: 400; }
+    .gd-editbar .grp { display: flex; gap: 2px; padding: 2px; border-radius: 9px; background: rgba(255,255,255,.06); }
+    .gd-editbar .grp button { background: none; padding: 5px 6px; display: grid; place-items: center; }
+    .gd-editbar .grp button:hover { background: rgba(255,255,255,.14); }
+    .gd-editbar .grp button.on { background: rgba(10,132,255,.35); }
   `;
   document.head.appendChild(css);
 
@@ -100,9 +124,13 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   const bar = document.createElement("div");
   bar.className = "gd-editbar";
   bar.innerHTML = `<b>Edit</b><span class="k" data-r="where"></span><span class="k" data-r="sel"></span>
+    <span class="grp" data-g="align">${["al-left", "al-hcenter", "al-right", "al-top", "al-vcenter", "al-bottom"]
+      .map((a) => `<button data-a="${a}" title="${ICONS[a][1]}">${ICONS[a][0]}</button>`).join("")}</span>
+    <span class="grp" data-g="text">${["ta-left", "ta-center", "ta-right", "fs-down", "fs-up"]
+      .map((a) => `<button data-a="${a}" title="${ICONS[a][1]}">${ICONS[a][0]}</button>`).join("")}</span>
     <button data-a="undo">Undo</button><button data-a="resetbox">Reset box</button><button data-a="reset">Reset slide</button>
     <button data-a="save" class="save">Save</button>
-    <span class="help">click select · drag move · double-click edit · ⌫ undo · Esc cancel · [ ] size · ⌘S</span>`;
+    <span class="help">double-click to edit text</span>`;
   document.body.appendChild(bar);
   const r = (k: string) => bar.querySelector<HTMLElement>(`[data-r="${k}"]`)!;
   const btn = (a: string) => bar.querySelector<HTMLButtonElement>(`[data-a="${a}"]`)!;
@@ -125,6 +153,10 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     btn("save").textContent = dirty ? "Save" : "Saved";
     btn("undo").disabled = !history.length;
     btn("resetbox").disabled = !sel;
+    bar.querySelectorAll<HTMLButtonElement>(".grp button").forEach((b) => (b.disabled = !sel));
+    (["left", "center", "right"] as const).forEach((t) =>
+      btn(`ta-${t}`).classList.toggle("on", !!sel && (o?.ta ?? getComputedStyle(sel).textAlign) === t),
+    );
     place(selUI, editing || sel);
     selUI.classList.toggle("text", !!editing);
   };
@@ -331,6 +363,16 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
       }
       if (!sel) return;
       const box = sel;
+      const ALT: Record<string, string> = {
+        KeyA: "al-left", KeyH: "al-hcenter", KeyD: "al-right",
+        KeyW: "al-top", KeyV: "al-vcenter", KeyS: "al-bottom",
+      };
+      if (e.altKey && !mod && ALT[e.code]) {
+        e.preventDefault();
+        e.stopPropagation();
+        align(ALT[e.code]);
+        return;
+      }
       const step = e.shiftKey ? 10 : 1;
       const o = get(box) || {};
       let handled = true;
@@ -360,6 +402,31 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     reapplyAll();
     refresh();
   };
+  /* align the selected box to the slide: centre lines, or the deck's margin */
+  const align = (how: string) => {
+    if (!sel) return;
+    const o = get(sel) || {};
+    const k = scale();
+    const c = canvas.getBoundingClientRect();
+    const r = sel.getBoundingClientRect();
+    const left = (r.left - c.left) / k - (o.dx || 0);
+    const top = (r.top - c.top) / k - (o.dy || 0);
+    const w = r.width / k;
+    const h = r.height / k;
+    const patch: Partial<Override> = {};
+    if (how === "al-left") patch.dx = MARGIN - left;
+    if (how === "al-hcenter") patch.dx = (W - w) / 2 - left;
+    if (how === "al-right") patch.dx = W - MARGIN - w - left;
+    if (how === "al-top") patch.dy = MARGIN - top;
+    if (how === "al-vcenter") patch.dy = (H - h) / 2 - top;
+    if (how === "al-bottom") patch.dy = H - MARGIN - h - top;
+    if (how.startsWith("ta-")) patch.ta = how.slice(3) as Override["ta"];
+    if (how === "fs-down" || how === "fs-up") patch.fsd = (o.fsd || 0) + (how === "fs-up" ? 1 : -1);
+    for (const key of ["dx", "dy"] as const) if (patch[key] !== undefined) patch[key] = Math.round(patch[key]!);
+    snapshot();
+    setBox(sel, patch);
+  };
+
   const resetBox = () => {
     if (!sel) return;
     const n = slideOf(sel);
@@ -398,6 +465,7 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     if (a === "undo") undo();
     if (a === "reset") resetSlide();
     if (a === "resetbox") resetBox();
+    if (a && /^(al|ta|fs)-/.test(a)) align(a);
     if (a === "save") save();
   });
   window.addEventListener("beforeunload", (e) => {

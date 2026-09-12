@@ -9,7 +9,14 @@
  *    Its replacement only applies while the generated text still equals
  *    `orig`, so a new deck export can never inherit stale copy.
  */
-export type Override = { dx?: number; dy?: number; fsd?: number; text?: string; orig?: string };
+export type Override = {
+  dx?: number;
+  dy?: number;
+  fsd?: number;
+  ta?: "left" | "center" | "right";
+  text?: string;
+  orig?: string;
+};
 export type Overrides = Record<string, Record<string, Override>>;
 
 /** What a click selects — the outermost of these under the pointer. */
@@ -49,6 +56,7 @@ const leaves = (box: HTMLElement) =>
 
 export function applyBox(el: HTMLElement, o: Override | undefined) {
   el.style.translate = o?.dx || o?.dy ? `${o.dx || 0}px ${o.dy || 0}px` : "";
+  el.style.textAlign = o?.ta || "";
   for (const leaf of leaves(el)) {
     if (!leaf.dataset.basefs) {
       leaf.style.fontSize = "";
