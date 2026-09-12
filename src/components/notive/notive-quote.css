@@ -1,0 +1,220 @@
+/* Notive quote screen.
+   Open Sans is the house face (same as the alert-creation screen and the
+   fractional order flow); it isn't in the Bare layout's font link, so this
+   stylesheet pulls it the way FractionalOrderFlow.css does. */
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap");
+
+/* Button reset — the one that has cost this project the most time.
+   `appearance: none` on its own drops NEITHER the UA border (Chrome paints
+   2px outset) NOR the UA background (`buttonface`, a light plate). Both
+   have to be cleared explicitly.
+
+   `background` deliberately stays OUT of this rule: at (0,1,1) it outranks
+   every single-class chip below and would strip their fills. Every button
+   in this screen sets its own background, in its own class or inline.
+
+   And `color` is out for a third reason of its own, found the hard way: at
+   (0,2,1) this rule beats `.nq-cta` at (0,1,0), so `color: inherit` here
+   quietly repainted the Buy and Sell labels in the body's ink — black text
+   on a dark green pill. Every button below states its own colour, so the
+   UA's `buttontext` never gets a chance either way.
+
+   `:not(.btn)` for the same reason in reverse — `padding: 0` and
+   `font: inherit` here would outrank glass-button.css's own `.btn--mobile`
+   sizing and typography, which are single-class rules. The glass buttons
+   ship their own reset; they must not be caught by this one. */
+.nq-root button:not(.btn) {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nq-root {
+  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  letter-spacing: 0;
+}
+
+/* Scrollbar off — the 24px left/right padding has to read as symmetric, and
+   a classic scrollbar eats into the right inset and shifts the chart's
+   negative-margin bleed. Matches iOS, where the scrollbar is an overlay. */
+.nq-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.nq-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* ---- ice ----
+   One class for the screen's glass, carrying glass-button.css's `.btn--light`
+   by value — its fill, its 270deg masked rim, its shadow. None of these can
+   simply BE a `.btn`: that class brings a 160x48 box, its own typeface and a
+   hover lift. Where an inner highlight is wanted the REAL
+   `.inner-stroke.inner-stroke--light` element is nested inside, exactly the
+   way GlassButton nests it. */
+.nq-glass {
+  position: relative;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+.nq-glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    270deg,
+    rgba(0, 0, 0, 0.07) 0%,
+    rgba(0, 0, 0, 0) 24.61%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* The selected range pill: the same material as the rail it sits on, one
+   step more solid. */
+.nq-tf-pill {
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 2px 8px rgba(20, 28, 24, 0.08);
+}
+
+/* ---- the fractional card ----
+   Carries the fractional order flow's own chip by value (see the icon at
+   the end of FractionalOrderFlow's toolbar row): a white glass disc under a
+   10% blue wash, the blue gradient rim at half strength — which is
+   glass-button.css's `.btn--blue::before` verbatim, hand-inlined over there
+   — and the library's real `.inner-stroke--blue` nested inside. Blue, not
+   the screen's green: fractional is one accent across both prototypes, and
+   matching the order flow is the point. */
+.nq-frac {
+  background: rgba(255, 255, 255, 0.5);
+  background-image: linear-gradient(rgba(0, 102, 219, 0.1), rgba(0, 102, 219, 0.1));
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  color: #0066db;
+}
+.nq-frac::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0.5;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(273.75deg, #6c9be6 3.96%, #b2e1f5 34.23%, #6291dc 98.29%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 13px, the size the order flow renders it at. It stays 13 in the expanded
+   banner too: the glyph carries its own `layoutId`, so any size difference
+   between the two states would be animated, and there is nothing to gain
+   from that. */
+.nq-frac-glyph svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ---- Buy / Sell ----
+   The fractional order flow's own CTA, by value: 44 tall, a 100 radius,
+   #227C20 on white at 16/600 with a 24px line box, and NO shadow — that
+   flow's primary button floats over a plain ground and doesn't need one.
+   Solid, not glass: two goes at a translucent pair both washed out against
+   the white card and read as unavailable rather than as material. */
+.nq-cta {
+  position: relative;
+  height: 44px;
+  border-radius: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+/* …and the band it floats on, also the order flow's idea: its CTA sits in a
+   72px strip that takes the screen's own ground. Without it the stats grid
+   runs right up to the pills and gets sliced mid-row. A fade rather than a
+   hard band, because the artboard has no footer and the content should read
+   as continuing underneath. */
+.nq-scrim {
+  /* Negative insets: the scrim is a child of the pills' 24px column, so it
+     has to reach back out to the screen edges and down past their bottom
+     offset. Being the first child puts it behind them in paint order with
+     no z-index needed. */
+  position: absolute;
+  left: -24px;
+  right: -24px;
+  bottom: -28px;
+  height: 116px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(242, 242, 248, 0) 0%,
+    rgba(242, 242, 248, 0.86) 38%,
+    #f2f2f8 72%
+  );
+}
+.nq-cta--buy {
+  background: #227c20;
+}
+.nq-cta--sell {
+  background: #262d33;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nq-root *,
+  .nq-root *::before {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---- the Key statistics panel ----
+   Liquid glass, built from `glasslab.css`'s `.pshell-glass` — this project's
+   light large-surface spec (blur 18, a white fill at ~0.8, a soft low shadow)
+   — plus `.nq-glass`'s masked rim and the library's real
+   `.inner-stroke--light` highlight, so the panel is the same material as the
+   range pill rather than a second kind of glass.
+
+   `saturate(1.15)` rides along with the blur per the widget shell's note: it
+   only bites when something varied sits behind the panel, and costs nothing
+   over a flat ground while keeping the treatment honest. */
+.nq-card {
+  background: rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(18px) saturate(1.15);
+  box-shadow: 0 8px 24px rgba(20, 28, 24, 0.05);
+}
+
+/* 11, not 12 — the widget shell's own note applies here too: the panel
+   rounds at 12 on its border box and the highlight sits 1px inside it, so
+   what it has to trace is 11. `.inner-stroke` ships at 1000px because every
+   other thing wearing it is a pill. */
+.nq-card > .inner-stroke {
+  border-radius: 11px;
+}

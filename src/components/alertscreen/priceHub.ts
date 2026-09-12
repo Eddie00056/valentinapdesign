@@ -2,7 +2,9 @@
 // One timer advances a mean-reverting walk and pushes {price, prev, dir, n}
 // to every subscriber.
 
-const PX_STEP = 2200;
+/* Exported: anything that wants to beat in time with the quote needs this,
+   not a number of its own that happens to match today. */
+export const PX_STEP = 2200;
 export const PX_BASE = 194.29;
 
 export type PriceState = {
@@ -10,6 +12,12 @@ export type PriceState = {
   prev: number;
   dir: number;
   n: number;
+  /** `Date.now()` of the last tick. Lets a subscriber work out where in the
+      cycle it is joining — a CSS animation can then be phase-locked to the
+      clock with a negative `animation-delay` instead of free-running.
+      Optional: several screens build a PriceState literal of their own for
+      their initial state, and none of them need it. */
+  t?: number;
 };
 
 type Hub = PriceState & {
@@ -32,6 +40,7 @@ export function pxHub(): Hub {
       prev: PX_BASE,
       dir: 0,
       n: 0,
+      t: 0,
       subs: [],
       timer: 0 as unknown as ReturnType<typeof setInterval>,
       subscribe: () => () => {},
@@ -44,6 +53,7 @@ export function pxHub(): Hub {
     prev: PX_BASE,
     dir: 0,
     n: 0,
+    t: Date.now(),
     subs: [] as ((s: PriceState) => void)[],
   } as Hub;
 
@@ -61,6 +71,7 @@ export function pxHub(): Hub {
     h.price = +(h.price + d).toFixed(2);
     h.dir = d >= 0 ? 1 : -1;
     h.n++;
+    h.t = Date.now();
     h.subs.forEach((fn) => fn(h));
   }, PX_STEP);
 

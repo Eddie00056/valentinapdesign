@@ -1,0 +1,53 @@
+/* The "now" pulse.
+
+   This is CSS and not Motion, deliberately, after Motion's `repeat` kept
+   reading as a pop. Two reasons it has to be CSS here:
+
+   1. **Re-renders.** The ring lives inside a group whose position Motion
+      animates on every price tick, so the whole subtree re-renders every
+      2.2s. A declarative `animate` + `repeat` is re-evaluated on each of
+      those, and any hiccup lands as a visible restart. A CSS animation is
+      owned by the compositor and cannot be interrupted by React at all.
+   2. **Phase.** `animation-delay: -1.7s` starts the second ring already
+      halfway through its cycle, from the very first frame. A positive delay
+      would leave a gap before it joins, which is itself a seam. Negative
+      delay is the only way to get two rings genuinely out of phase with no
+      lead-in.
+
+   The cycle starts at `scale(1)` — exactly the dot, in exactly the dot's
+   colour, therefore invisible — so the ring grows *out of* the dot instead
+   of appearing from behind it. And it must end at `opacity: 0`: the loop
+   boundary snaps scale 6 -> 1, and zero opacity is the only thing hiding
+   that. */
+@keyframes lacPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.26;
+  }
+  100% {
+    transform: scale(6);
+    opacity: 0;
+  }
+}
+
+.lac-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  /* Gentle ease-in-out over a long beat. `easeOut` slams the ring outward
+     and then crawls, which is the other half of what read as a pop. */
+  animation: lacPulse 3.4s cubic-bezier(0.25, 0.1, 0.25, 1) infinite;
+  will-change: transform, opacity;
+}
+
+.lac-pulse--b {
+  animation-delay: -1.7s;
+}
+
+/* An explicit rule, not the usual 0.001ms duration override — that would
+   loop this a thousand times a second rather than stop it. */
+@media (prefers-reduced-motion: reduce) {
+  .lac-pulse {
+    animation: none;
+    opacity: 0;
+  }
+}

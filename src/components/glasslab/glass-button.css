@@ -39,11 +39,23 @@
   outline-offset: 3px;
 }
 
+/* `.btn-glyph` is the wrapper convention for an icon that has to be its own
+   element — a glyph that animates (a star that pops on toggle, a refresh
+   mark that spins) can't live on the button box, because the button already
+   owns a transform for its press state. Wrapping it would otherwise drop it
+   out of every `> svg` rule below, so each of those carries a matching
+   `> .btn-glyph > svg` arm. */
 .btn > svg,
-.btn > .icon-mask {
+.btn > .icon-mask,
+.btn > .btn-glyph {
   position: relative;
   z-index: 4;
   flex: none;
+}
+
+.btn > .btn-glyph {
+  display: flex;
+  line-height: 0;
 }
 
 /* mask-image icons scale via width/height on the span, not the > svg rule */
@@ -128,6 +140,19 @@
   background: linear-gradient(270deg, rgba(0, 0, 0, 0.07) 0%, rgba(0, 0, 0, 0) 24.61%, rgba(0, 0, 0, 0.05) 100%);
 }
 
+/* "ink" — the translucent sibling of .btn--dark. `dark` is the near-opaque
+   primary (0.96); this is the same hue built the way `green` and `red` are,
+   so a dark secondary can sit next to a glass primary and read as the same
+   material rather than as a hole in it. Same recipe, ink hue. */
+.btn--ink {
+  background: rgba(38, 45, 51, 0.55);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.08);
+  color: #FFFFFF;
+}
+.btn--ink::before {
+  background: linear-gradient(273.75deg, #1B2228 3.96%, #4A555F 34.23%, #232A31 98.29%);
+}
+
 .btn--cream {
   background: rgba(228, 222, 158, 0.50);
   box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.06);
@@ -182,7 +207,8 @@
   transition: transform 0.14s ease, box-shadow 0.2s ease, opacity 0.14s ease;
 }
 
-.btn--mobile > svg {
+.btn--mobile > svg,
+.btn--mobile > .btn-glyph > svg {
   width: 20px;
   height: 20px;
 }
@@ -212,7 +238,8 @@
   min-width: 0;
   min-height: 0;
 }
-.btn--mobile.btn--icon > svg {
+.btn--mobile.btn--icon > svg,
+.btn--mobile.btn--icon > .btn-glyph > svg {
   width: 14px;
   height: 14px;
 }
@@ -272,7 +299,20 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 25.12%, rgba(255, 255, 255, 0.18) 102.08%);
 }
 
-.dark .btn--cream {
+.dark /* "ink" — the translucent sibling of .btn--dark. `dark` is the near-opaque
+   primary (0.96); this is the same hue built the way `green` and `red` are,
+   so a dark secondary can sit next to a glass primary and read as the same
+   material rather than as a hole in it. Same recipe, ink hue. */
+.btn--ink {
+  background: rgba(38, 45, 51, 0.55);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.08);
+  color: #FFFFFF;
+}
+.btn--ink::before {
+  background: linear-gradient(273.75deg, #1B2228 3.96%, #4A555F 34.23%, #232A31 98.29%);
+}
+
+.btn--cream {
   background: rgba(200, 180, 80, 0.18);
   box-shadow: 0px 8px 20px rgba(180, 160, 60, 0.08);
   color: #D4C46A;

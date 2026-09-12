@@ -63,24 +63,50 @@ export function SearchIcon() {
   );
 }
 
-/* "Fractional shares" — a pie chart with one wedge. Same viewBox, stroke
-   weight and round caps as StarIcon / BellIcon so it sits with the set. */
+/* "Fractional shares" — the mark from the fractional order flow
+   (public/prototypes/uploads/fof-fractional-icon.png), redrawn here so it
+   scales and takes currentColor. A pie cut by a radius east and a radius
+   south, with the missing quarter set down beside it, bottom-right.
+
+   The geometry is not eyeballed: the PNG's outer ring was least-squares
+   circle-fitted, then centre / radius / stroke were swept against the
+   alpha mask for best overlap. The values below score IoU 0.93 against it,
+   the remainder being antialiasing. An earlier hand-drawn version sat at
+   r 7.5 with a 2 stroke — 11% small and a quarter too light — which is
+   exactly why it read as a different icon next to the real one. */
 export function FractionalIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
-        d="M21.21 15.89A10 10 0 1 1 8 2.83"
+        d="M18.31 9.87A8.46 8.46 0 1 0 9.85 18.33L9.85 9.87Z"
         stroke="currentColor"
-        strokeWidth="1.8"
+        strokeWidth="2.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
-        d="M22 12A10 10 0 0 0 12 2v10z"
+        d="M22.45 14A8.45 8.45 0 0 1 14 22.45L14 14Z"
         stroke="currentColor"
-        strokeWidth="1.8"
+        strokeWidth="2.8"
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/* Apple's mark, for the AAPL quote. Filled, not stroked — it is a logo,
+   not a UI glyph, so it does not take the set's stroke weight; `size` is how
+   it is balanced against the type it sits with. Two subpaths, body and leaf,
+   on the standard 24-unit outline: a hand-approximated apple reads as a
+   blob at 16px, where the notch and the leaf's angle are the whole
+   silhouette. */
+export function AppleIcon({ size = 20 }: { size?: number } = {}) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.088-4.61 1.088zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701z"
+        fill="currentColor"
       />
     </svg>
   );
@@ -146,6 +172,21 @@ export function ArrowBackIcon() {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/* Material Symbols "close" (opsz24, wght400). Same 2px weight and round
+   caps as SearchIcon / ArrowBackIcon so the header set reads as one row. */
+export function CloseIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M5.5 5.5l13 13M18.5 5.5l-13 13"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
       />
     </svg>
   );

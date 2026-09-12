@@ -12,7 +12,12 @@ export const BASE_Y = PAD_T + (H - PAD_T - PAD_B) * 0.62;
 export const LEAD = "360ms cubic-bezier(.2,.9,.25,1)",
   TRAIL = "560ms cubic-bezier(.32,.78,.22,1)";
 
-function walk(seed: number, n: number, drift: number, vol: number) {
+/* Deterministic LCG random walk — the one source of demo series for every
+   chart on the site (this module's SERIES, and the Notive quote screen's).
+   Deterministic on purpose: a Math.random() walk reshuffles the shape of
+   the work on every reload, which makes a visual change impossible to
+   review against the previous build. */
+export function walk(seed: number, n: number, drift: number, vol: number) {
   let s = seed,
     v = 50;
   const out: number[] = [];

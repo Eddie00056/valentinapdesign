@@ -5,6 +5,7 @@ import {
   SearchIcon,
   ArrowBackIcon,
   FractionalIcon,
+  CloseIcon,
 } from "./icons";
 
 export {
@@ -14,10 +15,15 @@ export {
   SearchIcon,
   ArrowBackIcon,
   FractionalIcon,
+  AppleIcon,
+  StackIcon,
+  DollarIcon,
+  CloseIcon,
 } from "./icons";
 
 export type GlassVariant =
   | "dark"
+  | "ink"
   | "light"
   | "cream"
   | "blue"
@@ -26,6 +32,10 @@ export type GlassVariant =
 
 type GlassButtonProps = Omit<ComponentProps<"button">, "className"> & {
   variant?: GlassVariant;
+  /** Appended to the component's own class list — never replaces it. The
+      variants' fills were tuned against the dark showcase ground, so a page
+      on a light surface needs a hook to re-tune them; this is that hook. */
+  className?: string;
   /**
    * "web" = 160×48 desktop pill;
    * "mobile" = iOS sizing (50pt tall labelled, or 24px with iconOnly);
@@ -54,11 +64,14 @@ export function GlassButton({
   iconOnly = false,
   icon,
   children,
+  className,
   type = "button",
   ...rest
 }: GlassButtonProps) {
+  /* `dark` and `ink` share the base highlight — both are dark plates, and
+     the tinted `--variant` highlights exist to sit on light fills. */
   const strokeClass =
-    variant === "dark"
+    variant === "dark" || variant === "ink"
       ? "inner-stroke"
       : `inner-stroke inner-stroke--${variant}`;
 
@@ -69,6 +82,7 @@ export function GlassButton({
     size === "trade" && "btn--trade",
     iconOnly && "btn--icon",
     block && !iconOnly && "btn--block",
+    className,
   ]
     .filter(Boolean)
     .join(" ");
@@ -165,6 +179,25 @@ export function FractionalButton({
       size={size}
       iconOnly
       icon={<FractionalIcon />}
+      aria-label={label}
+      {...rest}
+    >
+      {label}
+    </GlassButton>
+  );
+}
+
+/** Icon-only dismiss action — same sizing as Watchlist / Alert. */
+export function CloseButton({
+  label = "Close",
+  size = "mobile",
+  ...rest
+}: WrappedProps) {
+  return (
+    <GlassButton
+      size={size}
+      iconOnly
+      icon={<CloseIcon />}
       aria-label={label}
       {...rest}
     >

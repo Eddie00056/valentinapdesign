@@ -147,6 +147,15 @@ export const pieces: Piece[] = [
     previewHeight: 620,
   },
   {
+    slug: "notive-quote",
+    href: "/work/notive-quote",
+    /* The whole device is shown (no bottom crop), so the tile needs the
+       taller viewport the other phone pieces don't. */
+    previewWidth: 820,
+    previewHeight: 960,
+    title: "Notive quote",
+  },
+  {
     slug: "chain-to-order",
     href: "/work/chain-to-order",
     title: "Chain to order",
