@@ -355,7 +355,7 @@ N[45] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Optio
          # just the two widgets: the workspace's ground, frame and rail are
          # taken away, and nothing clips — so the order confirmation, which
          # opens over them, shows in full
-         "live": [live("chain-to-order", 8, 15, 84, 80, 1440, css=WIDGETS_ONLY, fit=".ctt .wshell", vh=900, pad=18)]}
+         "live": [live("chain-to-order", 8, 15, 84, 80, 1440, css=WIDGETS_ONLY, fit=".ctt .wshell", vh=900, pad=18, init="chainFirst")]}
 N[46] = {"kind": "media", "bg": "black",
          "live": [live("options-strategy-builder", 26, 12, 48, 76, css=TICKET_BG, fit=CARD)]}
 N[47] = {"kind": "media", "bg": "black",

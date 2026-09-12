@@ -689,6 +689,41 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
         const hub = w.__pxHub;
         if (hub) w.clearInterval(hub.timer); // the frame's own clearInterval: timer ids are per window
       },
+      /* the chain-to-order slide: opens on the option chain alone (the
+         ticket arrives when a price is clicked), and the order confirmation
+         and the "order placed" toast are brought over the widgets — they
+         are placed for a full browser window, which here runs off the slide */
+      chainFirst: (w, d) => {
+        const cards = [...d.querySelectorAll<HTMLElement>(".ctt .wshell")].map((e) => e.getBoundingClientRect());
+        if (!cards.length) return;
+        const u = {
+          l: Math.min(...cards.map((r) => r.left)),
+          t: Math.min(...cards.map((r) => r.top)),
+          r: Math.max(...cards.map((r) => r.right)),
+          b: Math.max(...cards.map((r) => r.bottom)),
+        };
+        const st = d.createElement("style");
+        st.textContent = `
+          .ob-stage .ob-modal-wrap { inset: auto !important; left: ${u.l}px !important; top: ${u.t}px !important;
+            width: ${u.r - u.l}px !important; height: ${u.b - u.t}px !important; padding: 0 !important; overflow: visible; }
+          .ob-stage .ob-toast-wrap { left: ${u.l}px !important; right: auto !important; width: ${u.r - u.l}px !important;
+            bottom: auto !important; top: ${u.b - 96}px !important; }
+        `;
+        d.head.appendChild(st);
+        /* With the ticket away, the chain alone sits in the middle; when a
+           price brings the ticket in, the chain glides aside so the pair is
+           centred instead. */
+        const chain = d.querySelector<HTMLElement>(".ctt-chain .wshell")!.getBoundingClientRect();
+        const alone = (u.l + u.r) / 2 - (chain.left + chain.right) / 2;
+        const ctt = d.querySelector<HTMLElement>(".ctt")!;
+        const slot = d.querySelector<HTMLElement>(".ctt-ticket")!;
+        ctt.style.transition = "translate .5s cubic-bezier(.2,.8,.2,1)";
+        const sync = () => (ctt.style.translate = slot.childElementCount ? "" : `${alone}px 0`);
+        new (w.MutationObserver as typeof MutationObserver)(sync).observe(slot, { childList: true, subtree: false });
+        // close the ticket: picking a price in the chain brings it back
+        const close = d.querySelector<HTMLElement>(".ctt-ticket .wshell-actions .wshell-btn:not(.wshell-linkout)");
+        close?.click();
+      },
       mute: (w) => {
         w.AudioContext = undefined;
         w.webkitAudioContext = undefined;
