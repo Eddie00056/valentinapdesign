@@ -11,6 +11,7 @@
  * Slide data lives in `src/data/gustoDeck.json` (generated — see gen4.py).
  */
 import deck from "../../../data/gustoDeck.json";
+import overrides from "../../../data/gustoDeckOverrides.json";
 import Shot from "./DeckShot.astro";
 
 type Slide = Record<string, any>;
@@ -27,7 +28,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
 ---
 
 <section class="gd w-wrap">
-  <div class="gd-stage" data-count={COUNT}>
+  <div class="gd-stage" data-count={COUNT} data-overrides={JSON.stringify(overrides)}>
     <button type="button" class="gd-play">
       <span class="gd-play-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
@@ -407,8 +408,14 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
 </section>
 
 <script>
+  import { applyOverrides } from "./deckOverrides";
+  import type { Overrides } from "./deckOverrides";
+
   const stage = document.querySelector<HTMLElement>(".gd-stage");
   if (stage) {
+    // hand edits made in ?edit mode (gustoDeckOverrides.json), on top of the generated slides
+    const overrides: Overrides = JSON.parse(stage.dataset.overrides || "{}");
+    applyOverrides(stage, overrides);
     const count = parseInt(stage.dataset.count || "0", 10);
     const play = stage.querySelector<HTMLButtonElement>(".gd-play")!;
     const viewer = stage.querySelector<HTMLElement>(".gd-viewer")!;
@@ -654,7 +661,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     });
     window.addEventListener("resize", () => started && fit());
     stage.addEventListener("keydown", (e) => {
-      if (!started) return;
+      if (!started || typing(e.target)) return;
       const k = e.key;
       if (k === "ArrowRight" || k === "PageDown" || k === " ") {
         e.preventDefault();
@@ -676,9 +683,12 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     /* Deep links: #slide-24 opens the deck on that slide; ?solo makes the
        deck the whole window (a presenter view you can open in its own tab). */
     const params = new URLSearchParams(location.search);
-    if (params.has("solo")) stage.classList.add("is-solo");
+    const edit = import.meta.env.DEV && params.has("edit");
+    if (params.has("solo") || edit) stage.classList.add("is-solo");
     const m = /^#slide-(\d+)$/.exec(location.hash);
-    if (m || params.has("solo")) startShow(m ? parseInt(m[1], 10) : 1);
+    if (m || params.has("solo") || edit) startShow(m ? parseInt(m[1], 10) : 1);
+    // ?edit — local dev server only; the import is dropped from production builds
+    if (edit) import("./deckEdit").then((mod) => mod.startEdit(stage, overrides));
   }
 </script>
 
