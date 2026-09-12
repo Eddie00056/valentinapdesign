@@ -46,7 +46,12 @@ const ZOOM_DEFAULT = 1;
       </div>
     </header>
 
-    <ul class="grid">
+    {/* `is-waiting` holds every poster invisible until all of them have
+        decoded, then the script lifts it in one fade — so the grid arrives
+        as a set instead of tile by tile. The noscript rule means a visitor
+        without JS still sees them. */}
+    <noscript><style>.grid.is-waiting .poster{opacity:1 !important}</style></noscript>
+    <ul class="grid is-waiting">
       {
         pieces.map((p, i) => (
           <li>
@@ -61,7 +66,9 @@ const ZOOM_DEFAULT = 1;
                     piece (scripts/thumbs.py) and paints with the page — no
                     React, no Motion, no fonts, no phone PNG to decode. The
                     live piece only mounts on hover; see the script below.
-                    The first row loads eagerly so the fold is never blank. */}
+                    All eager, not lazy: the whole set is ~400 KB, and lazy
+                    loading is exactly what made the lower tiles trickle in
+                    after the fold. */}
                 <img
                   class="poster"
                   src={`/thumbs/${p.slug}.webp`}
@@ -69,8 +76,8 @@ const ZOOM_DEFAULT = 1;
                   width={p.previewWidth}
                   height={p.previewHeight}
                   decoding="async"
-                  loading={i < 8 ? "eager" : "lazy"}
-                  fetchpriority={i < 4 ? "high" : "auto"}
+                  loading="eager"
+                  fetchpriority="high"
                 />
               </span>
             </a>
@@ -101,6 +108,18 @@ const ZOOM_DEFAULT = 1;
 
   const thumbs = [...document.querySelectorAll(".thumb")];
   thumbs.forEach(fit);
+
+  /* Reveal the posters together. `decode()` resolves once an image is
+     decoded and ready to paint, so waiting on all of them is what makes the
+     grid appear in one beat rather than as each file lands. A failed image
+     must not hold the rest back, and a slow network gets 3s before the grid
+     shows whatever is ready. */
+  const grid = document.querySelector(".grid");
+  const reveal = () => grid.classList.remove("is-waiting");
+  Promise.all(
+    [...document.querySelectorAll(".poster")].map((img) => img.decode().catch(() => {})),
+  ).then(reveal);
+  setTimeout(reveal, 3000);
 
   /* Live on hover. Every tile used to be an iframe booting its whole piece
      at load, a dozen React apps at once, and the grid sat black until they
@@ -296,6 +315,13 @@ const ZOOM_DEFAULT = 1;
     width: 100%;
     height: 100%;
     display: block;
+    transition: opacity 0.32s ease;
+  }
+
+  /* The card itself (its #141414 ground and exact aspect ratio) is on screen
+     from the first paint, so the layout never shifts; only the image waits. */
+  .grid.is-waiting .poster {
+    opacity: 0;
   }
 
   /* The page renders at its own --vw and is scaled to the tile by --s,
@@ -321,6 +347,7 @@ const ZOOM_DEFAULT = 1;
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .poster,
     .thumb,
     #zoom::-webkit-slider-thumb {
       transition: none;
