@@ -65,7 +65,10 @@ const pageTitle = title ? `${title} — ${site.name}` : site.name;
          document lets one global rule below hide all of it, rather than
          each page having to know it might be framed. -->
     <script is:inline>
-      if (window.self !== window.top) {
+      /* `?embed` gives the same view without an iframe — it is how the
+         gallery's static posters are captured (scripts/thumbs.py), so a
+         poster and the live tile that replaces it on hover match. */
+      if (window.self !== window.top || /[?&]embed\b/.test(location.search)) {
         document.documentElement.setAttribute("data-embed", "");
 
         /* Some pieces are a static artboard wrapped in a nested iframe, so

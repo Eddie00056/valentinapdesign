@@ -48,21 +48,29 @@ const ZOOM_DEFAULT = 1;
 
     <ul class="grid">
       {
-        pieces.map((p) => (
+        pieces.map((p, i) => (
           <li>
             <a href={p.href} aria-label={p.title}>
               <span
                 class="thumb"
-                style={`aspect-ratio: ${p.previewWidth} / ${p.previewHeight}; --vw: ${p.previewWidth}`}
+                data-src={p.href}
+                data-title={p.title}
+                style={`aspect-ratio: ${p.previewWidth} / ${p.previewHeight}; --vw: ${p.previewWidth}; --vh: ${p.previewHeight}`}
               >
-                <iframe
-                  src={p.href}
-                  title={p.title}
-                  tabindex="-1"
-                  aria-hidden="true"
-                  loading="lazy"
-                  scrolling="no"
-                  style={`width: ${p.previewWidth}px; height: ${p.previewHeight}px`}
+                {/* The poster IS the tile. It is a static capture of the
+                    piece (scripts/thumbs.py) and paints with the page — no
+                    React, no Motion, no fonts, no phone PNG to decode. The
+                    live piece only mounts on hover; see the script below.
+                    The first row loads eagerly so the fold is never blank. */}
+                <img
+                  class="poster"
+                  src={`/thumbs/${p.slug}.webp`}
+                  alt=""
+                  width={p.previewWidth}
+                  height={p.previewHeight}
+                  decoding="async"
+                  loading={i < 8 ? "eager" : "lazy"}
+                  fetchpriority={i < 4 ? "high" : "auto"}
                 />
               </span>
             </a>
@@ -93,6 +101,35 @@ const ZOOM_DEFAULT = 1;
 
   const thumbs = [...document.querySelectorAll(".thumb")];
   thumbs.forEach(fit);
+
+  /* Live on hover. Every tile used to be an iframe booting its whole piece
+     at load, a dozen React apps at once, and the grid sat black until they
+     arrived. Now the poster shows immediately and the real piece is mounted
+     only when the pointer asks for it — and only on a device that has a
+     pointer that hovers, so touch never pays for it. It stays hidden until
+     its own load event, then fades in over the matching poster, so there is
+     never a blank frame between the two. Once mounted it is kept. */
+  if (matchMedia("(hover: hover)").matches) {
+    const mount = (t) => {
+      if (t.querySelector("iframe")) return;
+      const f = document.createElement("iframe");
+      f.src = t.dataset.src;
+      f.title = t.dataset.title;
+      f.tabIndex = -1;
+      f.setAttribute("aria-hidden", "true");
+      f.setAttribute("scrolling", "no");
+      f.style.width = getComputedStyle(t).getPropertyValue("--vw") + "px";
+      f.style.height = getComputedStyle(t).getPropertyValue("--vh") + "px";
+      f.addEventListener("load", () => {
+        // one more frame so the piece's own first paint has landed
+        setTimeout(() => t.classList.add("is-live"), 250);
+      });
+      t.appendChild(f);
+    };
+    thumbs.forEach((t) =>
+      t.closest("a").addEventListener("pointerenter", () => mount(t), { passive: true }),
+    );
+  }
 
   if ("ResizeObserver" in window) {
     const ro = new ResizeObserver((entries) => {
@@ -253,9 +290,27 @@ const ZOOM_DEFAULT = 1;
     transform: scale(1.015);
   }
 
+  .poster {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
   /* The page renders at its own --vw and is scaled to the tile by --s,
-     set from the tile's measured width by the script above. */
-  .thumb iframe {
+     set from the tile's measured width by the script above. It sits over the
+     poster fully transparent until it has loaded. */
+  .thumb :global(iframe) {
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+
+  .thumb.is-live :global(iframe) {
+    opacity: 1;
+  }
+
+  .thumb :global(iframe) {
     position: absolute;
     top: 0;
     left: 0;

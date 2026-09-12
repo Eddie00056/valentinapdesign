@@ -28,6 +28,11 @@ import "./PhoneFrame.css";
      where the fade begins; default matches the quote screen). */
 
 const ASSETS = "/prototypes/uploads";
+/* 1218 x 2475 — 3x the 406px it is always drawn at. It shipped at the render's
+   native 5200 x 10568, a ~55MP decode (~220MB of bitmap) for every phone on
+   screen, which is most of why the gallery stalled with several phones
+   mounted at once. The resize is uniform, so every inset measured "@406"
+   below still holds. */
 const PHONE = `${ASSETS}/iphone17pro.png`;
 
 /* Screen box, in frame px @406 wide. The render's own screen starts at
@@ -270,6 +275,10 @@ export function PhoneFrame({
             bottom: fullDevice ? 8 : 0,
             borderRadius: fullDevice ? SCREEN_R : `${SCREEN_R}px ${SCREEN_R}px 0 0`,
             overflow: "hidden",
+            // same backdrop-filter escape as the plate below — see there
+            clipPath: fullDevice
+              ? `inset(0 round ${SCREEN_R}px)`
+              : `inset(0 round ${SCREEN_R}px ${SCREEN_R}px 0 0)`,
             background: drawn ? "#000" : "transparent",
             paddingTop: drawn ? 0 : 50,
             boxSizing: "border-box",
@@ -289,6 +298,16 @@ export function PhoneFrame({
                   ? SCREEN_R - 1
                   : `${SCREEN_R - 1}px ${SCREEN_R - 1}px 0 0`,
                 overflow: "hidden",
+                /* `overflow: hidden` + a radius does NOT clip a descendant
+                   with `backdrop-filter`: that element becomes its own
+                   backdrop root, renders as a rectangle, and pokes square
+                   corners out past the curve (the widget shell hit the same
+                   thing). Here it showed as a light wedge on the bezel below
+                   the glass stats panels. `clip-path` clips everything a
+                   subtree paints, backdrop roots included. */
+                clipPath: fullDevice
+                  ? `inset(0 round ${SCREEN_R - 1}px)`
+                  : `inset(0 round ${SCREEN_R - 1}px ${SCREEN_R - 1}px 0 0)`,
                 background: screenBg,
                 paddingTop: 50,
                 boxSizing: "border-box",

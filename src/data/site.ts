@@ -58,7 +58,9 @@ export const caseStudies: CaseStudy[] = [
   },
 ];
 
-// The gallery, in display order.
+// The gallery, in display order. A page left out of this list still builds
+// and is reachable by URL; it just isn't shown (e.g. /work/alert-prototype,
+// superseded by /work/alert-creation and hidden on request 2026-09-12).
 export const pieces: Piece[] = [
   {
     slug: "stock-option-toggle",
@@ -80,13 +82,6 @@ export const pieces: Piece[] = [
     title: "Fractional shares banner",
     previewWidth: 900,
     previewHeight: 480,
-  },
-  {
-    slug: "alert-prototype",
-    href: "/work/alert-prototype",
-    title: "Alert creation prototype",
-    previewWidth: 900,
-    previewHeight: 900,
   },
   {
     slug: "alert-creation",
