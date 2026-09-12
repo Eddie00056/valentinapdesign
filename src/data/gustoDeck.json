@@ -953,7 +953,7 @@
     "w": 40,
     "h": 33,
     "vw": 1280,
-    "css": ".ob-stage{background:none!important}",
+    "css": ".ob-stage{background:none!important}.st-attach-stack{display:none!important}",
     "fit": ".wshell",
     "vh": 960
    },
@@ -964,7 +964,7 @@
     "w": 40,
     "h": 39,
     "vw": 1280,
-    "css": ".ob-stage{background:none!important}",
+    "css": ".ob-stage{background:none!important}.ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}",
     "fit": ".wshell",
     "vh": 960
    }

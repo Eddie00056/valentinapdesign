@@ -53,6 +53,8 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
   let editing: HTMLElement | null = null;
 
   stage.classList.add("gd-edit");
+  // builds (click-to-reveal parts) show finished while editing
+  stage.querySelectorAll<HTMLElement>("[data-s]").forEach((el) => el.classList.add("is-on"));
   const canvas = stage.querySelector<HTMLElement>(".gd-canvas")!;
   const current = () => stage.querySelector<HTMLElement>(".gd-slide:not([hidden]):not(.is-near)");
   const slideOf = (el: HTMLElement) => el.closest<HTMLElement>(".gd-slide")!.dataset.n!;

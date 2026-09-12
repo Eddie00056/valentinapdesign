@@ -373,8 +373,10 @@ N[52] = D("Final designs")
 N[53] = {"kind": "media", "bg": "black", "bigTitle": "Then vs ", "bigAccent": "Now",
          "panels": [P(0, 50.1, DARK_PANEL, 23)],
          "shots": [cardimg(53, 'a', 3019, 4, 42, cy=58, radius=0)],
-         "live": [live("stock-order-entry", 55, 22, 40, 33, css=TICKET_BG, fit=CARD),
-                  live("options-strategy-builder", 55, 57, 40, 39, css=TICKET_BG, fit=CARD)]}
+         # footers kept; the stock ticket's adders row and the options
+         # ticket's estimated cost are hidden
+         "live": [live("stock-order-entry", 55, 22, 40, 33, css=TICKET_BG + ".st-attach-stack{display:none!important}", fit=CARD),
+                  live("options-strategy-builder", 55, 57, 40, 39, css=TICKET_BG + ".ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}", fit=CARD)]}
 N[54] = dict(raster(54), live=[live("chain-to-order", 12.2, 8.3, 75.3, 83.6, 1440,
                                      fit=".wsp-screen", vh=900, clip=True)])
 N[55] = D("Impact")
