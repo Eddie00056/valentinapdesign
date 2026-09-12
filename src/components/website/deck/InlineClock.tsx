@@ -48,6 +48,7 @@ export function InlineClock({
   dotColor?: string;
   dotBorder?: string;
 }) {
+  // the server renders the time it rendered at; the first frame corrects it
   const initial = angles();
   const hrs = useRef<HTMLSpanElement>(null);
   const min = useRef<HTMLSpanElement>(null);
@@ -78,9 +79,9 @@ export function InlineClock({
         border: `6px solid ${borderColor}`,
       }}
     >
-      <span ref={hrs} style={hand(size * 0.286, 6, handColor, initial.h, glow)} />
-      <span ref={min} style={hand(size * 0.371, 4, handColor, initial.m, glow)} />
-      <span ref={sec} style={hand(size * 0.257, 2, secondsColor, initial.s, false)} />
+      <span suppressHydrationWarning ref={hrs} style={hand(size * 0.286, 6, handColor, initial.h, glow)} />
+      <span suppressHydrationWarning ref={min} style={hand(size * 0.371, 4, handColor, initial.m, glow)} />
+      <span suppressHydrationWarning ref={sec} style={hand(size * 0.257, 2, secondsColor, initial.s, false)} />
       <span
         style={{
           position: "absolute",
