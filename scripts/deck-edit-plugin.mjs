@@ -38,8 +38,15 @@ export function deckEdit() {
     name: "deck-edit",
     // saving rewrites a file the page imports — don't let Vite reload the
     // editor out from under you (and its "Publishing…" status) on every save
-    handleHotUpdate({ file }) {
-      if (file === FILE) return [];
+    // — but do drop the cached module, so the next page load (and SSR)
+    // reads what was just saved instead of the stale edits
+    handleHotUpdate({ file, modules, server }) {
+      if (file !== FILE) return;
+      for (const m of modules) server.moduleGraph.invalidateModule(m);
+      for (const env of Object.values(server.environments || {})) {
+        for (const m of env.moduleGraph?.getModulesByFile?.(FILE) || []) env.moduleGraph.invalidateModule(m);
+      }
+      return [];
     },
     configureServer(server) {
       server.middlewares.use("/__deck/publish", async (req, res) => {
