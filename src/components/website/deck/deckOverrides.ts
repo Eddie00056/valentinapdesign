@@ -13,6 +13,8 @@ export type Override = {
   dx?: number;
   dy?: number;
   fsd?: number;
+  /** scale (resize handles): 1 = as generated */
+  sc?: number;
   ta?: "left" | "center" | "right";
   text?: string;
   orig?: string;
@@ -27,7 +29,7 @@ export const BOXES = [
   ".gd-media-h", ".gd-media-l", ".gd-media-big", ".gd-numbered ol", ".gd-journey-row",
   ".gd-card", ".gd-goal", ".gd-fig", ".gd-award", ".gd-fig-note", ".gd-role-col",
   ".gd-cl-col", ".gd-twocol > span", ".gd-divider > span", ".gd-metrics-t", ".gd-own",
-  "img", ".gd-live", ".gd-mark", ".gd-box",
+  "img", ".gd-live", ".gd-mark", ".gd-box", ".gd-metrics-clock",
 ].join(",");
 
 const TEXTS = "h2, p, li, span";
@@ -59,6 +61,7 @@ const leaves = (box: HTMLElement) =>
 export function applyBox(el: HTMLElement, o: Override | undefined) {
   el.style.translate = o?.dx || o?.dy ? `${o.dx || 0}px ${o.dy || 0}px` : "";
   el.style.textAlign = o?.ta || "";
+  el.style.scale = o?.sc && o.sc !== 1 ? String(o.sc) : "";
   for (const leaf of leaves(el)) {
     if (!leaf.dataset.basefs) {
       leaf.style.fontSize = "";

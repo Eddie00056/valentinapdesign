@@ -68,6 +68,10 @@ export function InlineClock({
   }, []);
 
   const glow = handColor === "black";
+  // hands, ring and dot were drawn for a 350px clock; keep those proportions
+  // at any size (a 24px clock with 6px hands is a blob)
+  const k = size / 350;
+  const px = (v: number, min: number) => Math.max(min, v * k);
   return (
     <div
       style={{
@@ -76,21 +80,21 @@ export function InlineClock({
         height: size,
         boxSizing: "border-box",
         borderRadius: "50%",
-        border: `6px solid ${borderColor}`,
+        border: `${px(6, 1)}px solid ${borderColor}`,
       }}
     >
-      <span suppressHydrationWarning ref={hrs} style={hand(size * 0.286, 6, handColor, initial.h, glow)} />
-      <span suppressHydrationWarning ref={min} style={hand(size * 0.371, 4, handColor, initial.m, glow)} />
-      <span suppressHydrationWarning ref={sec} style={hand(size * 0.257, 2, secondsColor, initial.s, false)} />
+      <span suppressHydrationWarning ref={hrs} style={hand(size * 0.286, px(6, 1.6), handColor, initial.h, glow)} />
+      <span suppressHydrationWarning ref={min} style={hand(size * 0.371, px(4, 1.2), handColor, initial.m, glow)} />
+      <span suppressHydrationWarning ref={sec} style={hand(size * 0.257, px(2, 0.8), secondsColor, initial.s, false)} />
       <span
         style={{
           position: "absolute",
-          width: 12,
-          height: 12,
+          width: px(12, 3),
+          height: px(12, 3),
           boxSizing: "border-box",
           borderRadius: "50%",
           background: dotColor,
-          border: `2px solid ${dotBorder}`,
+          border: `${px(2, 0.75)}px solid ${dotBorder}`,
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",

@@ -113,20 +113,23 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                   </div>
                 ) : s.kind === "metrics" ? (
                   <div class="gd-metrics">
-                    <p class="gd-kicker">{s.kicker}</p>
-                    {/* the live clock sits between the two metrics — it's about both */}
-                    <div class="gd-metrics-row">
-                      <p class="gd-metrics-t">{s.items[0].text}</p>
+                    <div class="gd-metrics-head">
+                      {/* the title is the plain slide title — same element, same styling as every other */}
+                      <p class="gd-kicker">{s.kicker}</p>
+                      {/* the clock is its own box: in ?edit it can be dragged and resized */}
                       <div class="gd-metrics-clock">
                         <InlineClock
                           client:visible
-                          size={240}
-                          borderColor="rgba(255,255,255,0.14)"
+                          size={26}
+                          borderColor="rgba(255,255,255,0.4)"
                           handColor="#fff"
-                          dotColor="#010101"
+                          dotColor="#fff"
                           dotBorder="#fff"
                         />
                       </div>
+                    </div>
+                    <div class="gd-metrics-row">
+                      <p class="gd-metrics-t">{s.items[0].text}</p>
                       <p class="gd-metrics-t">{s.items[1].text}</p>
                     </div>
                   </div>
@@ -1396,17 +1399,23 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
   .gd-metrics .gd-kicker {
     margin: 0 0 9px;
   }
-  .gd-metrics-row {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    align-items: center;
-    gap: 72px;
-    width: 1500px;
-    margin-top: 24px;
+  /* the clock hangs to the left of the title, so the title itself stays
+     centred on the same line as every other slide's */
+  .gd-metrics-head {
+    position: relative;
   }
   .gd-metrics-clock {
+    position: absolute;
+    right: calc(100% + 12px);
+    top: calc(50% - 13px - 4.5px); /* centred on the title line (the title has a 9px bottom margin) */
+    line-height: 0;
+  }
+  .gd-metrics-row {
     display: grid;
-    place-items: center;
+    grid-template-columns: 1fr 1fr;
+    gap: 120px;
+    width: 1100px;
+    margin-top: 24px;
   }
   .gd-metrics-t {
     margin: 0;
@@ -1416,9 +1425,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     letter-spacing: -0.02em;
     white-space: pre-line;
   }
-  /* the two metrics face the clock */
-  .gd-metrics-t:first-child {
-    text-align: right;
+  .gd-metrics-t {
+    text-align: center;
   }
 
   /* ---- role (slides 20, 61) ---- */

@@ -10,6 +10,7 @@
  *   Backspace/⌘Z   undo the last change          ⌘S save
  *   Esc            cancel (a text edit, a drag in progress) · otherwise deselect
  *   Alt-click      select the smaller box inside (e.g. one line of a card)
+ *   corner handle  drag to resize the selected box (scales from its centre)
  *   ⌥A ⌥H ⌥D       align the box left / centre / right on the slide
  *   ⌥W ⌥V ⌥S       align it top / middle / bottom (edges sit at the deck's 100px margin)
  *   toolbar        also text-align left / centre / right inside the box
@@ -64,6 +65,8 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     .gd-frame-ui { position: absolute; z-index: 60; pointer-events: none; box-sizing: border-box; display: none; }
     .gd-frame-ui.hover { border: 1.5px solid rgba(10,132,255,.55); }
     .gd-frame-ui.sel { border: 2px solid #0a84ff; }
+    .gd-frame-ui.sel i { pointer-events: auto; cursor: nwse-resize !important; }
+    .gd-frame-ui.sel i:nth-child(2), .gd-frame-ui.sel i:nth-child(3) { cursor: nesw-resize !important; }
     .gd-frame-ui.sel i { position: absolute; width: 11px; height: 11px; background: #fff;
       border: 2px solid #0a84ff; box-sizing: border-box; border-radius: 2px; }
     .gd-frame-ui.sel i:nth-child(1) { left: -6px; top: -6px; }
@@ -171,7 +174,8 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
     r("sel").textContent = sel
       ? keyOf(sel).split(":")[0].replace(/^gd-/, "") +
         (o?.dx || o?.dy ? ` · x ${o.dx || 0} y ${o.dy || 0}` : "") +
-        (o?.fsd ? ` · type ${o.fsd > 0 ? "+" : ""}${o.fsd}px` : "")
+        (o?.fsd ? ` · type ${o.fsd > 0 ? "+" : ""}${o.fsd}px` : "") +
+        (o?.sc ? ` · ${Math.round(o.sc * 100)}%` : "")
       : "";
     btn("save").disabled = !dirty;
     btn("save").textContent = dirty ? "Save & publish" : "Saved";
@@ -246,6 +250,30 @@ export function startEdit(stage: HTMLElement, initial: Overrides) {
 
   /* ---- pointer ----------------------------------------------------- */
   let drag: { el: HTMLElement; x: number; y: number; dx: number; dy: number; moved: boolean; base: DOMRect } | null = null;
+  let resize: { el: HTMLElement; cx: number; cy: number; d0: number; sc: number } | null = null;
+
+  /* corner handles resize: scale follows the pointer's distance from the
+     box's centre, relative to where the drag started */
+  selUI.addEventListener("pointerdown", (e) => {
+    if (!sel || !(e.target as HTMLElement).matches("i")) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const r = sel.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    resize = { el: sel, cx, cy, d0: Math.max(4, Math.hypot(e.clientX - cx, e.clientY - cy)), sc: get(sel)?.sc || 1 };
+    snapshot();
+    selUI.setPointerCapture(e.pointerId);
+  });
+  selUI.addEventListener("pointermove", (e) => {
+    if (!resize) return;
+    const d = Math.hypot(e.clientX - resize.cx, e.clientY - resize.cy);
+    const sc = Math.max(0.1, Math.min(20, +(resize.sc * (d / resize.d0)).toFixed(3)));
+    setBox(resize.el, { sc: sc === 1 ? undefined : sc });
+  });
+  const endResize = () => (resize = null);
+  selUI.addEventListener("pointerup", endResize);
+  selUI.addEventListener("pointercancel", endResize);
 
   stage.addEventListener(
     "pointerdown",
