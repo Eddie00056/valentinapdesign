@@ -461,13 +461,30 @@
   "n": 39,
   "kind": "media",
   "bg": "black",
-  "heading": "Reduce time to trade",
+  "labels": [
+   {
+    "text": "Option chain (your catalog)",
+    "x": 25.6,
+    "y": 8.6
+   },
+   {
+    "text": "Order entry (checkout)",
+    "x": 74.4,
+    "y": 8.6
+   }
+  ],
   "shots": [
    {
     "src": "039a",
-    "x": 10.4,
-    "y": 13.2,
-    "w": 79.2
+    "x": 1.4,
+    "y": 11.8,
+    "w": 54.0
+   },
+   {
+    "src": "039b",
+    "x": 55.9,
+    "y": 11.8,
+    "w": 40.5
    }
   ]
  },
@@ -479,6 +496,20 @@
   "shots": [
    {
     "src": "040a",
+    "x": 10.4,
+    "y": 13.2,
+    "w": 79.2
+   }
+  ]
+ },
+ {
+  "n": 41,
+  "kind": "media",
+  "bg": "black",
+  "heading": "Reduce time to trade",
+  "shots": [
+   {
+    "src": "041a",
     "x": 17,
     "y": 33.332,
     "w": 66
@@ -486,14 +517,14 @@
   ]
  },
  {
-  "n": 41,
+  "n": 42,
   "kind": "statement",
   "bg": "black",
   "text": "Tailor the order placement experience\nto each security type",
   "kicker": "The solution"
  },
  {
-  "n": 42,
+  "n": 43,
   "kind": "media",
   "bg": "black",
   "heading": "Reduce time to trade: Options",
@@ -507,7 +538,7 @@
   ],
   "shots": [
    {
-    "src": "042a",
+    "src": "043a",
     "x": 3,
     "y": 40.686,
     "w": 44
@@ -515,7 +546,7 @@
   ]
  },
  {
-  "n": 43,
+  "n": 44,
   "kind": "media",
   "bg": "black",
   "heading": "Reduce time to trade: Options",
@@ -529,7 +560,7 @@
   ],
   "shots": [
    {
-    "src": "043a",
+    "src": "044a",
     "x": 1.5,
     "y": 45.24,
     "w": 30
@@ -561,7 +592,7 @@
   ]
  },
  {
-  "n": 44,
+  "n": 45,
   "kind": "media",
   "bg": "black",
   "heading": "Reduce time to trade: Options",
@@ -582,7 +613,7 @@
   ]
  },
  {
-  "n": 45,
+  "n": 46,
   "kind": "media",
   "bg": "black",
   "live": [
@@ -600,7 +631,7 @@
   ]
  },
  {
-  "n": 46,
+  "n": 47,
   "kind": "media",
   "bg": "black",
   "live": [
@@ -615,20 +646,6 @@
     "fit": ".wshell",
     "vh": 960
    }
-  ]
- },
- {
-  "n": 47,
-  "kind": "numbered",
-  "bg": "black",
-  "items": [
-   "Reduce time to trade",
-   "Standardize",
-   "Innovate while respecting the past"
-  ],
-  "active": [
-   0,
-   1
   ]
  },
  {
@@ -647,6 +664,20 @@
  },
  {
   "n": 49,
+  "kind": "numbered",
+  "bg": "black",
+  "items": [
+   "Reduce time to trade",
+   "Standardize",
+   "Innovate while respecting the past"
+  ],
+  "active": [
+   0,
+   1
+  ]
+ },
+ {
+  "n": 50,
   "kind": "media",
   "bg": "black",
   "heading": "Maximizing widget and workspace efficiency",
@@ -672,7 +703,7 @@
   ],
   "shots": [
    {
-    "src": "049a",
+    "src": "050a",
     "x": 2.2,
     "y": 27.1,
     "w": 45.8
@@ -694,7 +725,7 @@
   ]
  },
  {
-  "n": 50,
+  "n": 51,
   "kind": "media",
   "bg": "black",
   "heading": "Maximizing widget and workspace efficiency",
@@ -720,19 +751,19 @@
   ],
   "shots": [
    {
-    "src": "050a",
+    "src": "051a",
     "x": 3,
     "y": 26,
     "w": 28.5
    },
    {
-    "src": "050b",
+    "src": "051b",
     "x": 33.5,
     "y": 26,
     "w": 26.5
    },
    {
-    "src": "050c",
+    "src": "051c",
     "x": 67,
     "y": 26,
     "w": 29
@@ -740,14 +771,14 @@
   ]
  },
  {
-  "n": 51,
+  "n": 52,
   "kind": "divider",
   "bg": "black",
   "text": "Final designs",
   "size": "lg"
  },
  {
-  "n": 52,
+  "n": 53,
   "kind": "media",
   "bg": "black",
   "bigTitle": "Then vs ",
@@ -762,7 +793,7 @@
   ],
   "shots": [
    {
-    "src": "052a",
+    "src": "053a",
     "x": 4,
     "y": 40.971,
     "w": 42
@@ -794,9 +825,9 @@
   ]
  },
  {
-  "n": 53,
+  "n": 54,
   "bg": "black",
-  "raster": "053.webp",
+  "raster": "054.webp",
   "live": [
    {
     "page": "chain-to-order",
@@ -813,14 +844,14 @@
   ]
  },
  {
-  "n": 54,
+  "n": 55,
   "kind": "divider",
   "bg": "black",
   "text": "Impact",
   "size": "lg"
  },
  {
-  "n": 55,
+  "n": 56,
   "kind": "figures",
   "bg": "black",
   "tone": "mint",
@@ -845,28 +876,28 @@
   ]
  },
  {
-  "n": 56,
+  "n": 57,
   "kind": "divider",
   "bg": "black",
   "text": "Reflections",
   "size": "lg"
  },
  {
-  "n": 57,
+  "n": 58,
   "kind": "titlecard",
   "bg": "white",
   "kicker": "Case study",
   "title": "Fractional\nshares",
   "fs": 84,
   "shot": {
-   "src": "057a",
+   "src": "058a",
    "x": 46.7,
    "y": 4.9,
    "w": 51.6
   }
  },
  {
-  "n": 58,
+  "n": 59,
   "kind": "numbered",
   "bg": "white",
   "corner": "Company goal",
@@ -878,27 +909,27 @@
   "active": "all"
  },
  {
-  "n": 59,
+  "n": 60,
   "kind": "statement",
   "bg": "white",
   "text": "Introduce fractional trading",
   "corner": "Solution"
  },
  {
-  "n": 60,
+  "n": 61,
   "kind": "statement",
   "bg": "white",
   "text": "What is that?",
   "corner": "Solution"
  },
  {
-  "n": 61,
+  "n": 62,
   "kind": "media",
   "bg": "white",
   "corner": "Solution",
   "shots": [
    {
-    "src": "061a",
+    "src": "062a",
     "x": 15.5,
     "y": 19.5,
     "w": 64.5
@@ -906,7 +937,7 @@
   ]
  },
  {
-  "n": 62,
+  "n": 63,
   "kind": "role",
   "bg": "white",
   "corner": "My contribution",
@@ -925,36 +956,37 @@
    ]
   ],
   "shot": {
-   "src": "062a",
+   "src": "063a",
    "x": 58.4,
    "y": 9.0,
    "w": 29.3
   }
  },
  {
-  "n": 63,
+  "n": 64,
   "kind": "media",
   "bg": "white",
   "corner": "Research",
   "shots": [
    {
-    "src": "063a",
+    "src": "064a",
     "x": 31.6,
-    "y": 20.2,
+    "y": 19.4,
     "w": 37.2
    }
   ]
  },
  {
-  "n": 64,
+  "n": 65,
   "kind": "statement",
   "bg": "white",
-  "text": "Traders need affordable and flexible ways\nto trade.",
+  "text": "Traders need affordable and flexible\nways to trade.",
   "fw": 600,
-  "corner": "Problem"
+  "corner": "Problem",
+  "fs": 80
  },
  {
-  "n": 65,
+  "n": 66,
   "kind": "statement",
   "bg": "white",
   "text": "1 Feature.",
@@ -962,7 +994,7 @@
   "corner": "Design challenge"
  },
  {
-  "n": 66,
+  "n": 67,
   "kind": "statement",
   "bg": "white",
   "text": "1 Feature. 2 Personas.",
@@ -970,7 +1002,7 @@
   "corner": "Design challenge"
  },
  {
-  "n": 67,
+  "n": 68,
   "kind": "statement",
   "bg": "white",
   "text": "1 Feature. 2 Personas. 2 Design languages",
@@ -978,53 +1010,55 @@
   "corner": "Design challenge"
  },
  {
-  "n": 68,
-  "kind": "media",
+  "n": 69,
+  "kind": "cards",
   "bg": "white",
-  "corner": "2 Personas = 2 mental models",
+  "heading": "Trader types",
   "panels": [
    {
-    "x": 50,
+    "x": 0,
     "w": 50,
     "y": 0,
     "c": "#f2f2f2"
    }
   ],
-  "labels": [
+  "cards": [
    {
-    "text": "Regular trader",
-    "x": 25.9,
-    "y": 27.6
+    "x": 14.32,
+    "y": 37.2,
+    "w": 25,
+    "tone": "white",
+    "title": "Regular trader",
+    "points": [
+     "Fractional shares is a primary feature",
+     "Wants to trade in $ amounts",
+     "Wants to distribute 100% of all their assets",
+     "Has limited understanding of industry rules and limitations"
+    ]
    },
    {
-    "text": "Advanced trader",
-    "x": 75,
-    "y": 27.6
-   }
-  ],
-  "shots": [
-   {
-    "src": "068a",
-    "x": 10.2,
-    "y": 31.3,
-    "w": 31.4
-   },
-   {
-    "src": "068b",
-    "x": 56.9,
-    "y": 31.3,
-    "w": 36.1
+    "x": 62.19,
+    "y": 36.1,
+    "w": 25,
+    "tone": "canvas",
+    "title": "Advanced trader",
+    "points": [
+     "Fractional shares as a “nice to have” feature",
+     "Wants to short fractional amounts",
+     "Wants to mitigate risk",
+     "Has some understanding of industry rules and limitations"
+    ]
    }
   ]
  },
  {
-  "n": 69,
+  "n": 70,
   "kind": "media",
   "bg": "white",
   "corner": "2 Platforms = 2 Design languages",
   "panels": [
    {
-    "x": 50,
+    "x": 0,
     "w": 50,
     "y": 0,
     "c": "#f2f2f2"
@@ -1034,31 +1068,31 @@
    {
     "text": "Regular trading platforms",
     "x": 25,
-    "y": 24.8
+    "y": 34.6
    },
    {
     "text": "Advanced trading platforms",
     "x": 75,
-    "y": 24.8
+    "y": 34.6
    }
   ],
   "shots": [
    {
-    "src": "069a",
-    "x": 11.5,
-    "y": 28,
-    "w": 27.0
+    "src": "070a",
+    "x": 12.0,
+    "y": 38.6,
+    "w": 26.0
    },
    {
-    "src": "069b",
-    "x": 63,
-    "y": 28,
-    "w": 26.5
+    "src": "070b",
+    "x": 62.4,
+    "y": 37.8,
+    "w": 25.2
    }
   ]
  },
  {
-  "n": 70,
+  "n": 71,
   "kind": "checklist",
   "bg": "white",
   "corner": "Project scope",
@@ -1131,7 +1165,7 @@
   ]
  },
  {
-  "n": 71,
+  "n": 72,
   "kind": "checklist",
   "bg": "white",
   "corner": "Project scope",
@@ -1261,7 +1295,7 @@
   ]
  },
  {
-  "n": 72,
+  "n": 73,
   "kind": "statement",
   "bg": "white",
   "text": "How might we make investing\naccessible to new investors without\nslowing down advanced traders?",
@@ -1269,7 +1303,7 @@
   "corner": "The challenge"
  },
  {
-  "n": 73,
+  "n": 74,
   "kind": "divider",
   "bg": "white",
   "text": "Design process",
@@ -1278,72 +1312,104 @@
   "fs": 125
  },
  {
-  "n": 74,
-  "kind": "numbered",
-  "bg": "white",
-  "corner": "Goal",
-  "items": [
-   "Help traders find fractional symbols",
-   "Allow traders to seamlessly place a fractional trade"
-  ],
-  "active": "all"
- },
- {
   "n": 75,
-  "kind": "numbered",
+  "kind": "goals",
   "bg": "white",
   "corner": "Goal",
-  "items": [
-   "Help traders find fractional symbols",
-   "Allow traders to seamlessly place a fractional trade"
+  "cards": [
+   {
+    "x": 5.8,
+    "y": 25.95,
+    "w": 40.57,
+    "h": 45.05,
+    "icon": {
+     "src": "075i1",
+     "x": 20.2,
+     "y": 34.2,
+     "w": 11.8
+    },
+    "text": "Help traders discover\nfractional symbols"
+   },
+   {
+    "x": 50.02,
+    "y": 25.95,
+    "w": 40.57,
+    "h": 45.05,
+    "icon": {
+     "src": "075i2",
+     "x": 65.7,
+     "y": 32.6,
+     "w": 9.2,
+     "hide": true
+    },
+    "text": "Allow traders to place\na fractional trade"
+   }
   ],
-  "active": [
-   0
+  "live": [
+   {
+    "page": "order-placed-animation",
+    "x": 65.7,
+    "y": 34.59,
+    "w": 9.2,
+    "h": 15.35,
+    "vw": 1280,
+    "css": ".opa-stage{background:none!important}",
+    "init": "mute",
+    "pad": 14,
+    "clip": true,
+    "fit": ".opa-badge",
+    "vh": 1000
+   }
   ]
  },
  {
   "n": 76,
-  "kind": "media",
+  "kind": "goals",
   "bg": "white",
-  "corner": "How do I find the right symbol?",
-  "labels": [
+  "corner": "Goal",
+  "cards": [
    {
-    "text": "Original design",
-    "x": 18.3,
-    "y": 80.4,
-    "size": "lg"
+    "x": 5.8,
+    "y": 25.95,
+    "w": 40.57,
+    "h": 45.05,
+    "icon": {
+     "src": "075i1",
+     "x": 20.2,
+     "y": 34.2,
+     "w": 11.8
+    },
+    "text": "Help traders discover\nfractional symbols"
    },
    {
-    "text": "Beta release",
-    "x": 50,
-    "y": 80.4,
-    "size": "lg"
-   },
-   {
-    "text": "Public release",
-    "x": 81.6,
-    "y": 80.4,
-    "size": "lg"
+    "x": 50.02,
+    "y": 25.95,
+    "w": 40.57,
+    "h": 45.05,
+    "icon": {
+     "src": "075i2",
+     "x": 65.7,
+     "y": 32.6,
+     "w": 9.2,
+     "hide": true
+    },
+    "text": "Allow traders to place\na fractional trade"
    }
   ],
-  "shots": [
+  "live": [
    {
-    "src": "076a",
-    "x": 3.9,
-    "y": 23.3,
-    "w": 29.1
-   },
-   {
-    "src": "076b",
-    "x": 35.5,
-    "y": 23.3,
-    "w": 29.0
-   },
-   {
-    "src": "076c",
-    "x": 67.0,
-    "y": 23.3,
-    "w": 29.2
+    "page": "order-placed-animation",
+    "x": 65.7,
+    "y": 34.59,
+    "w": 9.2,
+    "h": 15.35,
+    "vw": 1280,
+    "css": ".opa-stage{background:none!important}",
+    "init": "mute",
+    "pad": 14,
+    "clip": true,
+    "fit": ".opa-badge",
+    "vh": 1000
    }
   ]
  },
@@ -1352,15 +1418,20 @@
   "kind": "media",
   "bg": "white",
   "corner": "How do I find the right symbol?",
-  "live": [
+  "labels": [
    {
-    "page": "fractional-shares-banner",
-    "x": 20,
-    "y": 30,
-    "w": 60,
-    "h": 40,
-    "vw": 420,
-    "css": ""
+    "text": "Original design",
+    "x": 18.36,
+    "y": 80.1,
+    "size": "lg"
+   }
+  ],
+  "shots": [
+   {
+    "src": "077a",
+    "x": 4.14,
+    "y": 23.8,
+    "w": 28.44
    }
   ]
  },
@@ -1369,52 +1440,116 @@
   "kind": "media",
   "bg": "white",
   "corner": "How do I find the right symbol?",
-  "live": [
-   {
-    "page": "alert-creation",
-    "x": 30,
-    "y": 14,
-    "w": 40,
-    "h": 84,
-    "vw": 1280,
-    "css": ".acs-root{background:none!important}",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   }
-  ]
- },
- {
-  "n": 79,
-  "kind": "numbered",
-  "bg": "white",
-  "corner": "Goal",
-  "items": [
-   "Help traders find fractional symbols",
-   "Allow traders to seamlessly place a fractional trade"
-  ],
-  "active": [
-   1
-  ]
- },
- {
-  "n": 80,
-  "kind": "media",
-  "bg": "canvas",
-  "heading": "Original design",
   "labels": [
    {
-    "text": "Original multi page wizard order entry",
-    "x": 47.3,
-    "y": 89.2,
+    "text": "Original design",
+    "x": 18.36,
+    "y": 80.1,
+    "size": "lg"
+   },
+   {
+    "text": "Beta release",
+    "x": 49.97,
+    "y": 80.1,
     "size": "lg"
    }
   ],
   "shots": [
    {
-    "src": "080a",
-    "x": 9.8,
-    "y": 21.6,
-    "w": 75.2
+    "src": "078a",
+    "x": 4.14,
+    "y": 23.8,
+    "w": 28.44
+   },
+   {
+    "src": "078b",
+    "x": 35.75,
+    "y": 23.8,
+    "w": 28.44
+   }
+  ]
+ },
+ {
+  "n": 79,
+  "kind": "media",
+  "bg": "white",
+  "corner": "How do I find the right symbol?",
+  "labels": [
+   {
+    "text": "Original design",
+    "x": 18.36,
+    "y": 80.1,
+    "size": "lg"
+   },
+   {
+    "text": "Beta release",
+    "x": 49.97,
+    "y": 80.1,
+    "size": "lg"
+   },
+   {
+    "text": "Public release",
+    "x": 81.59,
+    "y": 80.1,
+    "size": "lg"
+   }
+  ],
+  "shots": [
+   {
+    "src": "079a",
+    "x": 4.14,
+    "y": 23.8,
+    "w": 28.44
+   },
+   {
+    "src": "079b",
+    "x": 35.75,
+    "y": 23.8,
+    "w": 28.44
+   }
+  ],
+  "boxes": [
+   {
+    "x": 67.37,
+    "y": 23.8,
+    "w": 28.44,
+    "h": 55.0,
+    "c": "#f6f6f6"
+   }
+  ],
+  "live": [
+   {
+    "page": "fractional-order-flow",
+    "x": 72.2,
+    "y": 35.2,
+    "w": 20.85,
+    "h": 43.6,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "mode": "width",
+    "clip": true,
+    "fit": ".fof-frame",
+    "vh": 1000
+   }
+  ]
+ },
+ {
+  "n": 80,
+  "kind": "media",
+  "bg": "white",
+  "corner": "How do I find the right symbol?",
+  "live": [
+   {
+    "page": "alert-creation",
+    "x": 33.38,
+    "y": 35.28,
+    "w": 33.3,
+    "h": 64.72,
+    "vw": 1280,
+    "css": ".acs-root{background:none!important}",
+    "mode": "width",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
    }
   ]
  },
@@ -1422,34 +1557,133 @@
   "n": 81,
   "kind": "media",
   "bg": "white",
-  "heading": "How does a novice trader place an order?",
-  "labels": [
+  "corner": "How do I find the right symbol?",
+  "live": [
    {
-    "text": "Old design",
-    "x": 26.3,
-    "y": 13.2
+    "page": "alert-creation",
+    "x": 33.38,
+    "y": 35.28,
+    "w": 33.3,
+    "h": 64.72,
+    "vw": 1280,
+    "css": ".acs-root{background:none!important}",
+    "mode": "width",
+    "init": "openFractional",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
+   }
+  ]
+ },
+ {
+  "n": 82,
+  "kind": "goals",
+  "bg": "white",
+  "plain": true,
+  "cards": [
+   {
+    "x": 8.9,
+    "y": 38,
+    "w": 40,
+    "h": 20,
+    "icon": null,
+    "text": "Help traders discover\nfractional symbols"
    },
    {
-    "text": "Updated design",
-    "x": 72.5,
-    "y": 13.2
+    "x": 51.1,
+    "y": 38,
+    "w": 40,
+    "h": 20,
+    "icon": null,
+    "text": "Allow traders to place\na fractional trade"
+   }
+  ]
+ },
+ {
+  "n": 83,
+  "kind": "media",
+  "bg": "canvas",
+  "heading": "Original design",
+  "labels": [
+   {
+    "text": "Original multi page wizard order entry",
+    "x": 47.45,
+    "y": 19.6,
+    "size": "lg"
    }
   ],
   "shots": [
    {
-    "src": "081a",
-    "x": 15.8,
-    "y": 16.8,
-    "w": 21.0
+    "src": "083a",
+    "x": 0,
+    "y": 22.0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 84,
+  "kind": "media",
+  "bg": "canvas",
+  "heading": "Original design",
+  "labels": [
+   {
+    "text": "Original multi page wizard order entry",
+    "x": 47.45,
+    "y": 17.1,
+    "size": "lg"
+   }
+  ],
+  "shots": [
+   {
+    "src": "084a",
+    "x": 0,
+    "y": 19.6,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 85,
+  "kind": "media",
+  "bg": "white",
+  "heading": "Original design",
+  "panels": [
+   {
+    "x": 0,
+    "w": 64.27,
+    "y": 0,
+    "c": "#f6f4f5"
+   }
+  ],
+  "labels": [
+   {
+    "text": "Original multi page wizard order entry",
+    "x": 26.85,
+    "y": 15.3,
+    "size": "lg"
+   },
+   {
+    "text": "Suggested design",
+    "x": 82.5,
+    "y": 15.3,
+    "size": "lg"
+   }
+  ],
+  "shots": [
+   {
+    "src": "085a",
+    "x": 0,
+    "y": 17.7,
+    "w": 64.27
    }
   ],
   "live": [
    {
     "page": "fractional-order-flow",
-    "x": 58,
-    "y": 16.5,
-    "w": 29,
-    "h": 77,
+    "x": 72.08,
+    "y": 18.4,
+    "w": 21.11,
+    "h": 73.11,
     "vw": 1280,
     "css": ".fof-stage{background:none!important}",
     "fit": ".fof-frame",
@@ -1458,7 +1692,7 @@
   ]
  },
  {
-  "n": 82,
+  "n": 86,
   "kind": "media",
   "bg": "white",
   "heading": "How does an advanced trader place an order?",
@@ -1473,24 +1707,28 @@
   "labels": [
    {
     "text": "Old design",
-    "x": 26,
-    "y": 13.2
+    "x": 28.45,
+    "y": 15.5
    }
   ],
   "shots": [
    {
-    "src": "082a",
-    "x": 15.6,
-    "y": 16.6,
-    "w": 21.8
+    "src": "086a",
+    "x": 16.2,
+    "y": 17.8,
+    "w": 21.2
    }
   ]
  },
  {
-  "n": 83,
+  "n": 87,
   "kind": "media",
   "bg": "white",
   "heading": "Happy path",
+  "heading2": {
+   "text": "Happy path",
+   "x": 52.6
+  },
   "panels": [
    {
     "x": 50,
@@ -1502,32 +1740,39 @@
   "labels": [
    {
     "text": "Old design",
-    "x": 26,
+    "x": 26.99,
     "y": 13.2
    },
    {
     "text": "Updated design",
-    "x": 75,
+    "x": 73.57,
     "y": 13.2
    }
   ],
   "shots": [
    {
-    "src": "083a",
-    "x": 15.6,
-    "y": 16.6,
-    "w": 21.8
-   },
+    "src": "087a",
+    "x": 16.2,
+    "y": 17.8,
+    "w": 21.2
+   }
+  ],
+  "live": [
    {
-    "src": "083b",
-    "x": 64.0,
-    "y": 16.9,
-    "w": 22.1
+    "page": "order-placement-boxed-single",
+    "x": 64.22,
+    "y": 15.19,
+    "w": 18.7,
+    "h": 74.13,
+    "vw": 1280,
+    "css": ".phone-stage{background:none!important}",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
    }
   ]
  },
  {
-  "n": 84,
+  "n": 88,
   "kind": "numbered",
   "bg": "white",
   "kicker": "Design process",
@@ -1541,13 +1786,13 @@
   ]
  },
  {
-  "n": 85,
+  "n": 89,
   "kind": "media",
   "bg": "white",
   "heading": "Navigating edge cases",
   "shots": [
    {
-    "src": "085a",
+    "src": "089a",
     "x": 33.7,
     "y": 28.5,
     "w": 32.5
@@ -1555,31 +1800,31 @@
   ]
  },
  {
-  "n": 86,
+  "n": 90,
   "kind": "media",
   "bg": "white",
   "heading": "Navigating edge cases",
   "labels": [
    {
     "text": "V1",
-    "x": 30.85,
+    "x": 31.45,
     "y": 34.4
    },
    {
     "text": "V2",
-    "x": 72.55,
+    "x": 73.25,
     "y": 34.4
    }
   ],
   "shots": [
    {
-    "src": "086a",
+    "src": "090a",
     "x": 14.1,
     "y": 37.4,
     "w": 33.5
    },
    {
-    "src": "086b",
+    "src": "090b",
     "x": 55.8,
     "y": 37.4,
     "w": 33.5
@@ -1587,13 +1832,13 @@
   ]
  },
  {
-  "n": 87,
+  "n": 91,
   "kind": "media",
   "bg": "white",
   "heading": "Navigating edge cases",
   "shots": [
    {
-    "src": "087a",
+    "src": "091a",
     "x": 32.5,
     "y": 25.2,
     "w": 34.0
@@ -1601,7 +1846,7 @@
   ]
  },
  {
-  "n": 88,
+  "n": 92,
   "kind": "media",
   "bg": "white",
   "heading": "Navigating edge cases",
@@ -1615,13 +1860,13 @@
   ],
   "shots": [
    {
-    "src": "088a",
+    "src": "092a",
     "x": 14.0,
     "y": 16.8,
     "w": 22.3
    },
    {
-    "src": "088b",
+    "src": "092b",
     "x": 59.5,
     "y": 22.5,
     "w": 31.5
@@ -1629,7 +1874,7 @@
   ]
  },
  {
-  "n": 89,
+  "n": 93,
   "kind": "divider",
   "bg": "white",
   "text": "Final designs",
@@ -1637,107 +1882,97 @@
   "tone": "green"
  },
  {
-  "n": 90,
+  "n": 94,
+  "kind": "divider",
+  "bg": "white",
+  "text": "",
+  "size": "lg"
+ },
+ {
+  "n": 95,
   "kind": "media",
   "bg": "white",
-  "labels": [
-   {
-    "text": "Market non-fractional",
-    "x": 17.05,
-    "y": 26.6
-   },
-   {
-    "text": "Market fractional",
-    "x": 48.95,
-    "y": 26.6
-   },
-   {
-    "text": "Limit non-fractional",
-    "x": 80.85,
-    "y": 26.6
-   }
-  ],
   "shots": [
    {
-    "src": "090a",
-    "x": 2.0,
-    "y": 29.6,
-    "w": 30.1
+    "src": "095a",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ],
+  "live": [
+   {
+    "page": "fractional-order-flow",
+    "x": 21.0,
+    "y": 16.3,
+    "w": 12.4,
+    "h": 20.2,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "pad": 30,
+    "clip": true,
+    "fit": "img[alt=\"Swap amount and quantity\"]",
+    "vh": 1000
+   },
+   {
+    "page": "fractional-shares-banner",
+    "x": 6.4,
+    "y": 65.4,
+    "w": 39.5,
+    "h": 16.0,
+    "vw": 760,
+    "css": "html,body,html[data-embed],html[data-embed] body{background:#fff!important}",
+    "clip": true
+   },
+   {
+    "page": "fractional-order-flow",
+    "x": 63.94,
+    "y": 7.04,
+    "w": 22.55,
+    "h": 83.45,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "fit": ".fof-frame",
+    "vh": 1000
    }
   ]
  },
  {
-  "n": 91,
+  "n": 96,
   "kind": "media",
   "bg": "white",
   "labels": [
    {
     "text": "Market non-fractional",
-    "x": 17.05,
-    "y": 26.6
+    "x": 18.25,
+    "y": 27.2
    },
    {
     "text": "Market fractional",
-    "x": 48.95,
-    "y": 26.6
+    "x": 50.35,
+    "y": 27.2
    },
    {
     "text": "Limit non-fractional",
-    "x": 80.85,
-    "y": 26.6
+    "x": 82.05,
+    "y": 27.2
    }
   ],
   "shots": [
    {
-    "src": "091a",
+    "src": "096a",
     "x": 2.0,
     "y": 29.6,
     "w": 30.1
    },
    {
-    "src": "091b",
-    "x": 33.9,
-    "y": 29.6,
-    "w": 30.1
-   }
-  ]
- },
- {
-  "n": 92,
-  "kind": "media",
-  "bg": "white",
-  "labels": [
-   {
-    "text": "Market non-fractional",
-    "x": 17.05,
-    "y": 26.6
-   },
-   {
-    "text": "Market fractional",
-    "x": 48.95,
-    "y": 26.6
-   },
-   {
-    "text": "Limit non-fractional",
-    "x": 80.85,
-    "y": 26.6
-   }
-  ],
-  "shots": [
-   {
-    "src": "092a",
-    "x": 2.0,
-    "y": 29.6,
-    "w": 30.1
-   },
-   {
-    "src": "092b",
+    "src": "096b",
     "x": 33.9,
     "y": 29.6,
     "w": 30.1
    },
    {
-    "src": "092c",
+    "src": "096c",
     "x": 65.8,
     "y": 29.6,
     "w": 30.1
@@ -1745,20 +1980,49 @@
   ]
  },
  {
-  "n": 93,
+  "n": 97,
   "kind": "media",
   "bg": "white",
   "shots": [
    {
-    "src": "093a",
-    "x": 39.0,
-    "y": 15.0,
-    "w": 22.0
+    "src": "097a",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ],
+  "live": [
+   {
+    "page": "fractional-order-flow",
+    "x": 21.0,
+    "y": 16.3,
+    "w": 12.4,
+    "h": 20.2,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "pad": 30,
+    "clip": true,
+    "fit": "img[alt=\"Swap amount and quantity\"]",
+    "vh": 1000
+   },
+   {
+    "page": "order-placed-animation",
+    "x": 20.68,
+    "y": 62.78,
+    "w": 10.88,
+    "h": 21.2,
+    "vw": 1280,
+    "css": ".opa-stage{background:none!important}",
+    "init": "mute",
+    "pad": 26,
+    "clip": true,
+    "fit": ".opa-badge, .opa-caption",
+    "vh": 1000
    }
   ]
  },
  {
-  "n": 94,
+  "n": 98,
   "kind": "divider",
   "bg": "white",
   "text": "Impact",
@@ -1766,7 +2030,7 @@
   "tone": "green"
  },
  {
-  "n": 95,
+  "n": 99,
   "kind": "figures",
   "bg": "white",
   "tone": "green",
@@ -1783,7 +2047,7 @@
   ]
  },
  {
-  "n": 96,
+  "n": 100,
   "kind": "figures",
   "bg": "white",
   "tone": "green",
@@ -1804,7 +2068,7 @@
   ]
  },
  {
-  "n": 97,
+  "n": 101,
   "kind": "divider",
   "bg": "white",
   "text": "Reflections",
@@ -1812,44 +2076,15 @@
   "tone": "green"
  },
  {
-  "n": 98,
-  "kind": "numbered",
-  "bg": "black",
-  "kicker": "Questrade Goal",
-  "items": [
-   "Win more active traders",
-   "Streamline trading"
-  ],
-  "active": "all",
-  "shot": {
-   "src": "098a",
-   "x": 52.8,
-   "y": 14.3,
-   "w": 42.9
-  }
- },
- {
-  "n": 99,
-  "kind": "divider",
-  "bg": "black",
-  "text": "",
-  "size": "lg"
- },
- {
-  "n": 100,
-  "bg": "black",
-  "raster": "100.webp"
- },
- {
-  "n": 101,
-  "bg": "black",
-  "raster": "101.webp"
- },
- {
   "n": 102,
   "kind": "divider",
   "bg": "black",
   "text": "",
   "size": "lg"
+ },
+ {
+  "n": 103,
+  "bg": "black",
+  "raster": "103.webp"
  }
 ]

@@ -198,15 +198,62 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                     </div>
                     {s.shot && <Shot {...s.shot} />}
                   </div>
+                ) : s.kind === "cards" ? (
+                  <div class="gd-media">
+                    {s.heading && <p class="gd-media-h">{s.heading}</p>}
+                    {s.cards.map((c: any) => (
+                      <div
+                        class:list={["gd-card", `tone-${c.tone || "white"}`]}
+                        style={`left:${c.x}%;top:${c.y}%;width:${c.w}%`}
+                      >
+                        <p class="gd-card-t">{c.title}</p>
+                        <ul>
+                          {c.points.map((pt: string) => (
+                            <li>{pt}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                ) : s.kind === "goals" ? (
+                  <div class:list={["gd-media", { "is-plain": s.plain }]}>
+                    {s.cards.map((c: any) => (
+                      <div
+                        class="gd-goal"
+                        style={`left:${c.x}%;top:${c.y}%;width:${c.w}%;height:${c.h}%`}
+                      >
+                        {c.icon && (
+                          <img
+                            class:list={["gd-goal-i", { "is-hidden": c.icon.hide }]}
+                            src={`/website/case/gusto/v2/${c.icon.src}.webp`}
+                            alt=""
+                            style={`width:${((c.icon.w / c.w) * 100).toFixed(2)}%`}
+                          />
+                        )}
+                        <p class="gd-goal-t">{c.text}</p>
+                      </div>
+                    ))}
+                  </div>
                 ) : s.kind === "media" ? (
                   <div class="gd-media">
                     {s.heading && <p class="gd-media-h">{s.heading}</p>}
+                    {s.heading2 && (
+                      <p class="gd-media-h" style={`left:${s.heading2.x}%`}>
+                        {s.heading2.text}
+                      </p>
+                    )}
                     {s.bigTitle && (
                       <p class="gd-media-big">
                         {s.bigTitle}
                         {s.bigAccent && <span class="g">{s.bigAccent}</span>}
                       </p>
                     )}
+                    {(s.boxes || []).map((b: any) => (
+                      <div
+                        class="gd-box"
+                        style={`left:${b.x}%;top:${b.y}%;width:${b.w}%;height:${b.h}%;background:${b.c}`}
+                      />
+                    ))}
                     {(s.labels || []).map((l: any) => (
                       <p
                         class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`]}
@@ -316,6 +363,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                         data-css={l.css || ""}
                         data-fit={l.fit || ""}
                         data-pad={l.pad || 0}
+                        data-mode={l.mode || ""}
+                        data-init={l.init || ""}
                         data-clip={l.clip ? "1" : ""}
                         data-bw={bw}
                         data-bh={bh}
@@ -429,7 +478,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
             /* cross-origin never happens here; the page just keeps its ground */
           }
           f.dataset.loaded = "1";
-          place(f).then(() => f.classList.add("is-in"));
+          if (f.dataset.init === "mute") runInit(f);
+          reveal(f);
         },
         { once: true },
       );
@@ -475,9 +525,15 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       await new Promise((res) => setTimeout(res, 150)); // let entry springs settle
       r = measure() || r;
       const pad = parseFloat(f.dataset.pad || "0");
-      const k = Math.min((bw - 2 * pad) / r.width, (bh - 2 * pad) / r.height);
+      /* "width": the slide draws this device larger than the slide is tall
+         — it fills the rect's width from the top and bleeds off the bottom
+         edge, which the slide clips. Default: contain, centred. */
+      const byWidth = f.dataset.mode === "width";
+      const k = byWidth
+        ? bw / r.width
+        : Math.min((bw - 2 * pad) / r.width, (bh - 2 * pad) / r.height);
       const ox = bw / 2 - (r.left + r.width / 2) * k;
-      const oy = bh / 2 - (r.top + r.height / 2) * k;
+      const oy = byWidth ? -r.top * k : bh / 2 - (r.top + r.height / 2) * k;
       /* `zoom`, not `transform: scale()`. A transformed iframe is a GPU layer
          rasterized once and then stretched, so shrinking a 1440px page onto
          the slide read soft on real displays. Zoom lays the page out at its
@@ -501,10 +557,40 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       const m = 20;
       wrap.style.clipPath = `inset(-2000px ${bw - cl - cw - m}px -2000px ${cl - m}px)`;
     };
+    /* Named per-slide actions run inside a prototype after it has loaded —
+       putting it in the state the slide shows. Kept here, not in the
+       prototypes, so no gallery page needs to know it is in a deck. */
+    const INIT: Record<string, (w: any, d: Document) => void> = {
+      // slide 81: the quote screen with its fractional banner already open
+      openFractional: (_w, d) =>
+        d.querySelector<HTMLElement>('[aria-label="Fractional shares"]')?.click(),
+      // the order-placed animation chimes when its check lands; a deck is
+      // no place for a sound nobody asked for
+      mute: (w) => {
+        w.AudioContext = undefined;
+        w.webkitAudioContext = undefined;
+      },
+    };
+    const runInit = (f: HTMLIFrameElement) => {
+      const name = f.dataset.init;
+      if (!name || f.dataset.inited) return;
+      try {
+        INIT[name]?.(f.contentWindow, f.contentDocument!);
+        f.dataset.inited = "1";
+      } catch {
+        /* same-origin always; a missing element just leaves the default state */
+      }
+    };
+    const reveal = (f: HTMLIFrameElement) =>
+      place(f).then(() => {
+        runInit(f);
+        f.classList.add("is-in");
+      });
     const unmount = (f: HTMLIFrameElement) => {
       if (!f.getAttribute("src")) return;
       f.classList.remove("is-in");
       delete f.dataset.loaded;
+      delete f.dataset.inited;
       f.removeAttribute("src");
     };
     const syncLive = () => {
@@ -536,7 +622,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
         ?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe")
         .forEach((f) => {
           if (f.dataset.loaded && !f.classList.contains("is-in")) {
-            place(f).then(() => f.classList.add("is-in"));
+            reveal(f);
           }
         });
       countEl.textContent = `${i} / ${count}`;
@@ -936,7 +1022,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     white-space: nowrap;
   }
   .gd-award {
-    margin-top: 96px;
+    margin-top: 150px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1069,6 +1155,73 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
   }
   .gd-cl-item.no .gd-cl-mark {
     color: #d1242f;
+  }
+
+  /* ---- cards (69: trader types) ---- */
+  .gd-card {
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: 10px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    color: #232528;
+  }
+  .gd-card.tone-canvas {
+    background: #f6f4f5;
+  }
+  .gd-card-t {
+    margin: 0;
+    padding: 22px 24px 20px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .gd-card ul {
+    margin: 0;
+    padding: 18px 24px 26px 46px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    font-size: 20px;
+    line-height: 1.3;
+    color: #555965;
+  }
+
+  /* ---- goals (75, 76, 82) ---- */
+  .gd-goal {
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: 18px;
+    background: #f7f7f7;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.035);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+  }
+  .gd-goal-i {
+    height: auto;
+    border-radius: 2px;
+  }
+  .gd-goal-t {
+    margin: 0;
+    text-align: center;
+    white-space: pre-line;
+    font-size: 46px;
+    font-weight: 500;
+    line-height: 1.22;
+    letter-spacing: -0.02em;
+    color: #0b0b0b;
+  }
+  /* a live prototype sits exactly over this icon; it keeps its space */
+  .gd-goal-i.is-hidden {
+    visibility: hidden;
+  }
+  .is-plain .gd-goal {
+    background: none;
+    box-shadow: none;
   }
 
   /* ---- twocard (68) ---- */
@@ -1257,6 +1410,12 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
   }
   .gd-media-l-accent {
     color: #e5484d;
+  }
+  .gd-box {
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: 22px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
   }
   .gd-mark {
     position: absolute;
