@@ -52,6 +52,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
               <article
                 class:list={["gd-slide", `gd-slide--${s.bg}`]}
                 data-n={s.n}
+                data-steps={s.steps || undefined}
                 hidden
               >
                 {(s.panels || []).map((p: any) => (
@@ -279,7 +280,41 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                         {l.accent && <span class="gd-media-l-accent">{l.accent}</span>}
                       </p>
                     ))}
-                    {(s.shots || []).map((sh: any) => <Shot {...sh} />)}
+                    {(s.shots || []).map((sh: any) =>
+                      sh.annot ? (
+                        /* an image with a drawn path over it, built one line per click */
+                        <div
+                          class="gd-annot"
+                          style={`left:${sh.x}%;top:${sh.y}%;width:${sh.w}%;aspect-ratio:${sh.annot.w}/${sh.annot.h}`}
+                        >
+                          <img class="gd-annot-img" src={`/website/case/gusto/v2/${sh.src}.webp`} alt="" draggable="false" />
+                          <svg viewBox={`0 0 ${sh.annot.w} ${sh.annot.h}`} aria-hidden="true">
+                            {sh.annot.points.slice(1).map((pt: any, k: number) => (
+                              <line
+                                class="gd-annot-line"
+                                data-s={k + 1}
+                                x1={sh.annot.points[k].at[0]}
+                                y1={sh.annot.points[k].at[1]}
+                                x2={pt.at[0]}
+                                y2={pt.at[1]}
+                                stroke={sh.annot.line}
+                                pathLength="1"
+                              />
+                            ))}
+                            {sh.annot.points.map((pt: any, k: number) => (
+                              <g class="gd-annot-dot" data-s={k} transform={`translate(${pt.at[0]} ${pt.at[1]})`}>
+                                <g class="gd-annot-pop">
+                                  <circle r="6" fill={pt.c} />
+                                  <text text-anchor="middle" dy="2.6">{pt.n}</text>
+                                </g>
+                              </g>
+                            ))}
+                          </svg>
+                        </div>
+                      ) : (
+                        <Shot {...sh} />
+                      ),
+                    )}
                     {(s.marks || []).map((m: any) => (
                       <span
                         class="gd-mark"
@@ -469,11 +504,28 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       const o = order();
       return o.find((x) => x >= n) ?? o[o.length - 1] ?? 1;
     };
+    /* Builds: a slide with data-steps reveals its [data-s] parts one per
+       click before the deck moves on (slide 30's path). Arriving forwards
+       starts the build at 0; arriving backwards shows it finished. */
+    const steps = (n: number) => parseInt(slides[n - 1]?.dataset.steps || "0", 10);
+    let build = 0;
+    let nextBuild: number | null = null;
+    const setBuild = (n: number, v: number) => {
+      build = v;
+      slides[n - 1]?.querySelectorAll<SVGElement>("[data-s]").forEach((el) =>
+        el.classList.toggle("is-on", parseInt(el.dataset.s || "0", 10) <= v),
+      );
+    };
     const step = (dir: number) => {
+      const max = steps(i);
+      if (max && dir > 0 && build < max) return setBuild(i, build + 1);
+      if (max && dir < 0 && build > 0) return setBuild(i, build - 1);
       const o = order();
       const at = o.indexOf(i);
       const idx = at < 0 ? o.findIndex((x) => x > i) - (dir > 0 ? 0 : 1) : at + dir;
-      show(o[Math.max(0, Math.min(o.length - 1, idx))] ?? i);
+      const to = o[Math.max(0, Math.min(o.length - 1, idx))] ?? i;
+      nextBuild = dir > 0 ? 0 : steps(to);
+      show(to);
     };
 
     const warm = (n: number) => {
@@ -646,7 +698,10 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       // ?edit can hold a slide change (unsaved edits) and resume it later
       const guard = (stage as any).__beforeShow as ((n: number) => boolean) | undefined;
       if (started && next !== i && guard && !guard(next)) return;
+      const arrived = next !== i || !started;
       i = next;
+      if (arrived) setBuild(i, nextBuild ?? 0);
+      nextBuild = null;
       /* The slides either side stay laid out but invisible, so their
          prototypes load AND get measured before you arrive — no pop-in, no
          jump when a slide appears. Everything further away is display:none. */
@@ -1520,6 +1575,61 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     box-sizing: border-box;
     border-radius: 22px;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  }
+  /* ---- annotated image (slide 30): path built one line per click ---- */
+  .gd-annot {
+    position: absolute;
+  }
+  .gd-annot-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    user-select: none;
+  }
+  .gd-annot svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+  }
+  .gd-annot-line {
+    stroke-width: 1.1;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .gd-annot-line:global(.is-on) {
+    stroke-dashoffset: 0;
+  }
+  .gd-annot-pop {
+    opacity: 0;
+    transform: scale(0.4);
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: opacity 0.2s ease, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  /* a number pops in as its line arrives */
+  .gd-annot-dot:global(.is-on) .gd-annot-pop {
+    opacity: 1;
+    transform: none;
+    transition-delay: 0.3s;
+  }
+  .gd-annot-dot[data-s="0"]:global(.is-on) .gd-annot-pop {
+    transition-delay: 0s;
+  }
+  .gd-annot text {
+    font: 700 7px var(--gd-font);
+    fill: #fff;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .gd-annot-line,
+    .gd-annot-pop {
+      transition: none !important;
+    }
   }
   .gd-mark {
     position: absolute;

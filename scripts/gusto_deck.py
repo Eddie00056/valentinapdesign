@@ -238,12 +238,34 @@ def widget(n, x0, y0, x1, y1, padx=0.8, pady=0.6):
     return place(crop(n, 'a', x0 - padx, y0 - pady, x1 + padx, y1 + pady), 21, 58, y=25.5)
 
 
+# The numbered path over the widget on slide 30, traced from the PDF
+# (page 30 vectors) into the coordinates of 29's crop: crop origin =
+# widget origin − padding, units = PDF points. Order = reading order.
+_W30 = (36.075 * 19.2, 38.333 * 10.8)          # widget origin on page 30, pt
+_PAD = (0.8 * 19.2, 0.6 * 10.8)
+_q = lambda x, y: [round(x - _W30[0] + _PAD[0], 2), round(y - _W30[1] + _PAD[1], 2)]
+WIDGET_PATH = {
+    "w": round((65.07 - 34.93 + 1.6) * 19.2, 2),
+    "h": round((61.204 - 34.815 + 1.2) * 10.8, 2),
+    "line": "#E03E1A",
+    "points": [
+        {"at": _q(690, 426), "c": "#FB8618", "n": "1"},
+        {"at": _q(690, 676), "c": "#48D597", "n": "2"},
+        {"at": _q(774, 489), "c": "#49F4FF", "n": "3"},
+        {"at": _q(988, 607), "c": "#BA6BEB", "n": "4"},
+        {"at": _q(1135, 547), "c": "#E9F143", "n": "5"},
+    ],
+}
+
+
 N[29] = {"kind": "media", "bg": "black", "heading": "How do we show the data?",
          "labels": [{"text": "Current widget layout", "x": 50, "y": 21.5}],
          "shots": [widget(29, 34.93, 34.815, 65.07, 61.204)]}
 N[30] = {"kind": "media", "bg": "black", "heading": "How do we show the data?",
          "labels": [{"text": "Current widget layout", "x": 50, "y": 21.5}],
-         "shots": [widget(30, 36.075, 38.333, 66.216, 64.722)]}
+         # 29's image, with the reading-order path drawn by the deck and
+         # revealed one line per click (see the "annot" block in GustoDeck)
+         "shots": [dict(widget(29, 34.93, 34.815, 65.07, 61.204), annot=WIDGET_PATH)]}
 # 31: the PDF's red boxes don't line up with the fields once the widget is
 # enlarged, so the widget comes from the clean embedded bitmap and the marks
 # are drawn by the deck, positioned in the image's own coordinates.
@@ -488,6 +510,10 @@ N[101] = D("Reflections", bg="white", tone="green")
 N[102] = D("")
 N[103] = raster(103)
 
+for e in N.values():  # slides with a step-by-step build
+    for sh in e.get("shots", []):
+        if sh.get("annot"):
+            e["steps"] = len(sh["annot"]["points"]) - 1
 assert sorted(N) == list(range(1, 104)), set(range(1, 104)) - set(N)
 out = []
 for n in range(1, 104):

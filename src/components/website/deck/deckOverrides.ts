@@ -29,7 +29,7 @@ export const BOXES = [
   ".gd-media-h", ".gd-media-l", ".gd-media-big", ".gd-numbered ol", ".gd-journey-row",
   ".gd-card", ".gd-goal", ".gd-fig", ".gd-award", ".gd-fig-note", ".gd-role-col",
   ".gd-cl-col", ".gd-twocol > span", ".gd-divider > span", ".gd-metrics-t", ".gd-own",
-  "img", ".gd-live", ".gd-mark", ".gd-box", ".gd-metrics-clock",
+  ".gd-annot", "img", ".gd-live", ".gd-mark", ".gd-box", ".gd-metrics-clock",
 ].join(",");
 
 const TEXTS = "h2, p, li, span";
