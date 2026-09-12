@@ -710,16 +710,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
             bottom: auto !important; top: ${u.b - 96}px !important; }
         `;
         d.head.appendChild(st);
-        /* With the ticket away, the chain alone sits in the middle; when a
-           price brings the ticket in, the chain glides aside so the pair is
-           centred instead. */
-        const chain = d.querySelector<HTMLElement>(".ctt-chain .wshell")!.getBoundingClientRect();
-        const alone = (u.l + u.r) / 2 - (chain.left + chain.right) / 2;
-        const ctt = d.querySelector<HTMLElement>(".ctt")!;
-        const slot = d.querySelector<HTMLElement>(".ctt-ticket")!;
-        ctt.style.transition = "translate .5s cubic-bezier(.2,.8,.2,1)";
-        const sync = () => (ctt.style.translate = slot.childElementCount ? "" : `${alone}px 0`);
-        new (w.MutationObserver as typeof MutationObserver)(sync).observe(slot, { childList: true, subtree: false });
+        // the chain keeps its place; the ticket opens beside it
         // close the ticket: picking a price in the chain brings it back
         const close = d.querySelector<HTMLElement>(".ctt-ticket .wshell-actions .wshell-btn:not(.wshell-linkout)");
         close?.click();
@@ -805,6 +796,18 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       });
     };
 
+    /* Leaving a slide resets any chain-to-order prototype that was used
+       (ticket open, confirmation up), so it's fresh next time. */
+    const resetUsed = (n: number) => {
+      slides[n - 1]?.querySelectorAll<HTMLIFrameElement>('.gd-live iframe[data-init="chainFirst"]').forEach((f) => {
+        const d = f.contentDocument;
+        const used = d && (d.querySelector(".ctt-ticket")?.childElementCount || d.querySelector(".ob-modal-wrap *, .ob-toast-item"));
+        if (!used || !f.getAttribute("src")) return;
+        unmount(f);
+        mount(f);
+      });
+    };
+
     const show = (n: number) => {
       const next = nearest(Math.min(count, Math.max(1, n)));
       // ?edit can hold a slide change (unsaved edits) and resume it later
@@ -813,6 +816,7 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       const arrived = next !== i || !started;
       const from = i;
       i = next;
+      if (from !== i) resetUsed(from);
       if (arrived) setBuild(i, stage.classList.contains("gd-edit") ? steps(i) : (nextBuild ?? 0));
       nextBuild = null;
       /* The slides either side stay laid out but invisible, so their
