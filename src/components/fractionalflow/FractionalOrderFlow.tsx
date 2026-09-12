@@ -25,17 +25,9 @@ type Screen = "entry" | "review" | "sending" | "done";
 type OrderType = "Market" | "Limit";
 type Focus = "amount" | "limit" | "qty";
 
-const ORDER_TYPES: Array<{ id: OrderType; label: string; hint: Record<"Buy" | "Sell", string> }> = [
-  {
-    id: "Market",
-    label: "Market order",
-    hint: { Buy: "Fills now at the best available price", Sell: "Fills now at the best available price" },
-  },
-  {
-    id: "Limit",
-    label: "Limit order",
-    hint: { Buy: "Fills only at your price or lower", Sell: "Fills only at your price or higher" },
-  },
+const ORDER_TYPES: Array<{ id: OrderType; label: string; hint: string }> = [
+  { id: "Market", label: "Market order", hint: "Fills now at the best available price" },
+  { id: "Limit", label: "Limit order", hint: "Fills only at your price or better" },
 ];
 
 /* One spring for everything that moves because of a choice you made. */
@@ -831,7 +823,7 @@ export function FractionalOrderFlow({
                               >
                                 <span style={{ display: "flex", flexDirection: "column" }}>
                                   <span style={{ fontWeight: 600, fontSize: 14, lineHeight: "22px", color: "#262D33" }}>{t.label}</span>
-                                  <span style={{ fontSize: 12, lineHeight: "18px", color: "#5E6D83" }}>{t.hint[side]}</span>
+                                  <span style={{ fontSize: 12, lineHeight: "18px", color: "#5E6D83" }}>{t.hint}</span>
                                 </span>
                                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0, opacity: on ? 1 : 0 }}>
                                   <path d="M 3.5 8.25 L 6.5 11.25 L 12.5 4.75" stroke="#227C20" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
