@@ -284,6 +284,15 @@ const cards = pieces
   })();
 </script>
 
+<style is:global>
+  /* The page is the gallery's black, edge to edge: past the container's
+     1920px the body otherwise showed as white margins on a wide screen. */
+  html,
+  body {
+    background: #000;
+  }
+</style>
+
 <style>
   /* Values follow tcosta.com/wspoc's gallery stylesheet; the type is ours. */
   .vp-container {

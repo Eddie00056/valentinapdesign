@@ -16,7 +16,7 @@
   },
   "alert-creation": {
     "w": 1200,
-    "h": 1006,
+    "h": 1008,
     "seconds": 6.6
   },
   "order-placement-boxed": {
@@ -25,8 +25,8 @@
     "seconds": 6.6
   },
   "order-placed-animation": {
-    "w": 1200,
-    "h": 1466,
+    "w": 1800,
+    "h": 2192,
     "seconds": 4.6
   },
   "fractional-order-flow": {
@@ -51,13 +51,13 @@
   },
   "beam-ring": {
     "w": 1200,
-    "h": 742,
+    "h": 744,
     "seconds": 6
   },
   "notive-quote": {
     "w": 1200,
-    "h": 2042,
-    "seconds": 6
+    "h": 1028,
+    "seconds": 6.6
   },
   "chain-to-order": {
     "w": 1200,

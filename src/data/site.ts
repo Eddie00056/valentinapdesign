@@ -208,6 +208,8 @@ export const THUMBS: Record<
     cursor?: boolean;
     /** x264 CRF for this clip; 18 unless a clip's motion is all large bitmaps. */
     crf?: number;
+    /** Clip width; 1200 unless thin coloured strokes need the chroma resolution. */
+    outW?: number;
     pre?: Record<string, string | number>[];
     script?: Record<string, string | number>[];
   }
@@ -249,7 +251,7 @@ export const THUMBS: Record<
      candles, so that line crosses it and its pill falls outside. */
   "alert-creation": {
     "focus": "svg[viewBox=\"0 0 393 188\"]", "frame": "svg[viewBox=\"0 0 393 188\"] > g:first-of-type",
-    "isolate": "#000", "fill": 0.8, "ar": 0.84, "pad": 0, "seconds": 6.6
+    "isolate": "#000", "fill": 0.5, "ar": 0.84, "pad": 0, "seconds": 6.6
   },
   /* Only DASH and its live price: the two-line text column (found by its
      text — it is nothing but inline styles), isolated so neither the bid/ask
@@ -257,7 +259,8 @@ export const THUMBS: Record<
      2.2s price clock. */
   "order-placement-boxed": {
     "focus": "js:[...document.querySelectorAll('span')].filter(e => e.children.length === 0 && e.textContent.trim() === 'DASH').map(e => e.parentElement)",
-    "isolate": "#000", "fill": 0.8, "ar": 0.6, "pad": 0, "seconds": 6.6
+    "isolate": "#000", "fill": 0.4, "ar": 0.6, "pad": 0, "seconds": 6.6,
+    "pre": [{ "eval": "window.__pxHub && window.__pxHub.restart(1100)" }]
   },
   /* Only the success mark, isolated from its caption. Its own loop is
      dur + 2600 = 4.6s, so one cycle loops seamlessly from any phase.
@@ -265,7 +268,7 @@ export const THUMBS: Record<
      under a perspective (and the phone's drop-shadow filter) is rasterized
      without antialiasing, which is what stair-stepped the ring. */
   "order-placed-animation": {
-    "focus": ".opa-badge", "isolate": "#000", "fill": 0.5, "ar": 1.22, "pad": 0, "seconds": 4.6,
+    "focus": ".opa-badge", "isolate": "#000", "fill": 0.5, "ar": 1.22, "pad": 0, "seconds": 4.6, "outW": 1800, "crf": 16,
     "css": ".opa-phone { filter: none !important; } .opa-screen { perspective: none !important; } .opa-badge { transform-style: flat !important; animation-name: op-pop2d !important; } @keyframes op-pop2d { 0% { transform: scale(1); } 22% { transform: scale(1.15); } 48% { transform: scale(0.95); } 72% { transform: scale(1.03); } 100% { transform: scale(1); } }"
   },
   /* Only the swap toggle between Total amount and Share quantity. Each tap
@@ -273,7 +276,8 @@ export const THUMBS: Record<
      the green arc draws round it and clears again. Two taps, back to start. */
   "fractional-order-flow": {
     "focus": "[aria-label=\"Swap amount and quantity\"]",
-    "isolate": "#e8e8e8", "fill": 0.46, "ar": 1.0, "pad": 0, "seconds": 5,
+    "isolate": "#e8e8e8", "fill": 0.46, "ar": 1.0, "pad": 0, "seconds": 5, "cursor": false,
+    "css": "[aria-label=\"Swap amount and quantity\"] > svg { display: none !important; }",
     "script": [
       { "wait": 700 }, { "click": "[aria-label=\"Swap amount and quantity\"]" },
       { "wait": 2300 }, { "click": "[aria-label=\"Swap amount and quantity\"]" }
@@ -302,8 +306,13 @@ export const THUMBS: Record<
       { "wait": 500 }, { "leave": 1 }, { "eval": "document.activeElement && document.activeElement.blur()" }
     ]
   },
-  "beam-ring": { "focus": ".bd-cta", "fill": 0.72, "ar": 0.62, "pad": 0 },
-  "notive-quote": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
+  "beam-ring": { "focus": ".bd-cta", "fill": 0.24, "ar": 0.62, "pad": 0 },
+  /* Only the price line chart and the ticking price above it, on a flat
+     ground — no phone. Both move on the same clock tick. */
+  "notive-quote": {
+    "focus": "js:[document.querySelector('.nq-root svg[viewBox^=\"0 0 386\"]'), ...[...document.querySelectorAll('.nq-root *')].filter(e => e.style && e.style.fontSize === '35px').map(e => e.parentElement)]",
+    "isolate": "#e8e8e8", "fill": 0.72, "pad": 0, "seconds": 6.6
+  },
   /* Only the leg rows, on the legs panel's own ground. The opening $175 leg
      is priced unlike the same strike picked off the chain, so `pre` swaps it
      for the chain's one first: then the loop — +180, +165 to three rows,
@@ -328,7 +337,7 @@ export const THUMBS: Record<
   "holdings-empty-state": {
     "focus": ".he-scene:not(.he-scene--lit) .he-grid", "isolate": "#000",
     "css": ".he-lens { display: none !important; } .he-logo img { opacity: 1 !important; }",
-    "fill": 0.78, "ar": 1.06, "pad": 0, "seconds": 9, "crf": 23
+    "fill": 0.26, "ar": 1.06, "pad": 0, "seconds": 9, "crf": 23
   }
 };
 

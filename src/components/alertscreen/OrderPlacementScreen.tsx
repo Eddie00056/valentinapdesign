@@ -38,7 +38,9 @@ export function OrderPlacementScreen() {
   const [fracOpen, setFracOpen] = useState(false);
 
   useEffect(() => {
-    const unsub = pxHub().subscribe(setS);
+    // A fresh object per tick: the hub mutates in place, and handing React the
+    // same reference every time meant no re-render after the first tick.
+    const unsub = pxHub().subscribe((h) => setS({ ...h }));
     return unsub;
   }, []);
 

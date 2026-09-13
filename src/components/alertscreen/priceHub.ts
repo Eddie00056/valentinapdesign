@@ -24,6 +24,7 @@ type Hub = PriceState & {
   subs: ((h: PriceState) => void)[];
   timer: ReturnType<typeof setInterval>;
   subscribe: (fn: (h: PriceState) => void) => () => void;
+  restart: (ms: number) => void;
 };
 
 declare global {
@@ -44,6 +45,7 @@ export function pxHub(): Hub {
       subs: [],
       timer: 0 as unknown as ReturnType<typeof setInterval>,
       subscribe: () => () => {},
+      restart: () => {},
     };
   }
   if (window.__pxHub) return window.__pxHub;
@@ -64,7 +66,7 @@ export function pxHub(): Hub {
     };
   };
 
-  h.timer = setInterval(() => {
+  const tick = () => {
     const pull = (PX_BASE - h.price) * 0.14;
     const d = (Math.random() - 0.5) * 0.34 + pull;
     h.prev = h.price;
@@ -73,7 +75,14 @@ export function pxHub(): Hub {
     h.n++;
     h.t = Date.now();
     h.subs.forEach((fn) => fn(h));
-  }, PX_STEP);
+  };
+  h.timer = setInterval(tick, PX_STEP);
+  /* Re-run the clock at another step. Only the thumbnail recorder uses it
+     (a price that ticks every 2.2s barely moves in a 6s clip). */
+  h.restart = (ms) => {
+    clearInterval(h.timer);
+    h.timer = setInterval(tick, ms);
+  };
 
   window.__pxHub = h;
   return h;

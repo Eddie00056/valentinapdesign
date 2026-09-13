@@ -479,7 +479,9 @@ for (const p of pieces) {
   const y0 = Math.round(Math.max(0, Math.min(p.h - fh0, cfg.cut ? box[3] + padY - fh0 : cy - fh0 / 2)));
   const cw = Math.round(fw0);
   const ch = Math.round(fh0);
-  const W = OUT_W;
+  // `outW` for a piece whose thin coloured strokes need more chroma resolution
+  // than 1200 gives (4:2:0 halves it): the card downsamples, so the source is what counts
+  const W = cfg.outW ?? OUT_W;
   const H = Math.round((W * ch) / cw / 2) * 2;
   /* Density: enough real pixels for 1200 across. Chrome is LAUNCHED at it
      (--force-device-scale-factor), so every layer — including ones mid-
@@ -488,7 +490,7 @@ for (const p of pieces) {
      animating layer is just its 1x bitmap scaled up, which is what made the
      order-placed ring stair-step. */
   // capped at 14: the swap toggle is 41px across and asks for ~13
-  const density = Math.min(14, Math.max(1, Math.ceil((OUT_W / cw) * 2) / 2));
+  const density = Math.min(14, Math.max(1, Math.ceil((W / cw) * 2) / 2));
 
   /* Pass 2 — record, clipped: only the frame rectangle is rendered into the
      screencast, at the launch density, and the page never sees it. */
