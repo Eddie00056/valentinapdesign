@@ -193,70 +193,143 @@ export const THUMBS: Record<
   string,
   {
     focus?: string;
-    fill?: number;
+    frame?: string;
+    fill?: number | [number, number];
+    ar?: number;
+    minAr?: number;
+    isolate?: string;
+    css?: string;
     pad?: number | [number, number];
     maxH?: number;
+    /** Cut the frame's bottom at the n-th `sel` fully inside `within` — between rows, never through one. */
+    cut?: { sel: string; n: number; within?: string };
     seconds?: number;
+    /** A scripted piece is filmed with the pointer in shot (tcosta.com's clips are); `false` hides it. */
+    cursor?: boolean;
+    /** x264 CRF for this clip; 18 unless a clip's motion is all large bitmaps. */
+    crf?: number;
+    pre?: Record<string, string | number>[];
     script?: Record<string, string | number>[];
   }
 > = {
+  /* Grounds: his light cards sit at #e4–#ec, never white — white glares on
+     the black page — and his dark ones at #0a–#14 with a few phone pieces on
+     true black. One soft grey for every light piece here. */
+  /* Card shape (`ar`, height per width) is chosen per piece and deliberately
+     VARIED. One shared shape (930x639 for everything small) made every card
+     the same height, and a masonry of equal heights is just rows — the thing
+     that makes tcosta.com/wspoc read as a masonry is that its cards run
+     0.61 to 1.27 tall from the very first row. Wide components get short
+     cards, round or square ones tall cards; the component stays large in
+     each (`fill`). */
   "stock-option-toggle": {
-    "fill": 0.55, "focus": "button.lbl", "pad": 0, "seconds": 5,
+    "focus": "button.lbl", "fill": 0.8, "ar": 0.6, "pad": 0, "seconds": 5.5,
     "script": [{ "wait": 500 }, { "label": "Option" }, { "wait": 2100 }, { "label": "Stock" }]
   },
   "limit-order-error": {
-    "fill": 0.45, "focus": "[aria-label=\"Trigger limit order error\"]", "pad": 0, "seconds": 5,
+    "focus": "[aria-label=\"Trigger limit order error\"]", "fill": 0.72, "ar": 0.76, "pad": 0, "seconds": 5.5,
+    "css": ".pshell { background: #e8e8e8 !important; }",
+    /* The pill toggles: a second tap clears the ring, so the loop closes on
+       the plain pill (blurring the button never cleared it). */
     "script": [
       { "wait": 500 }, { "label": "Trigger limit order error" },
-      { "wait": 2600 }, { "eval": "document.activeElement && document.activeElement.blur()" }
+      { "wait": 2600 }, { "label": "Trigger limit order error" }
     ]
   },
   "fractional-shares-banner": {
-    "fill": 0.6, "focus": "[aria-label=\"Expand fractional shares banner\"], [aria-label=\"Collapse banner\"]", "pad": 0, "seconds": 5,
+    "focus": "[aria-label=\"Expand fractional shares banner\"], [aria-label=\"Collapse banner\"]",
+    "fill": 0.95, "ar": 0.64, "pad": 0, "seconds": 5.5,
+    "css": ".pshell { background: #e8e8e8 !important; }",
     "script": [{ "wait": 500 }, { "label": "Expand fractional shares banner" }, { "wait": 2200 }, { "label": "Collapse banner" }]
   },
-  "alert-creation": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
-  "order-placement-boxed": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
-  "order-placed-animation": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
-  "fractional-order-flow": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
+  /* Only the candlesticks, moving slightly on the live price — no range
+     changes. The whole chart stays visible (isolated, so no bezel or price
+     text) because the candles themselves are static here: the movement is
+     the dotted "now" line riding the price. The card is framed on the
+     candles, so that line crosses it and its pill falls outside. */
+  "alert-creation": {
+    "focus": "svg[viewBox=\"0 0 393 188\"]", "frame": "svg[viewBox=\"0 0 393 188\"] > g:first-of-type",
+    "isolate": "#000", "fill": 0.8, "ar": 0.84, "pad": 0, "seconds": 6.6
+  },
+  /* Only DASH and its live price: the two-line text column (found by its
+     text — it is nothing but inline styles), isolated so neither the bid/ask
+     pill under it nor the icon beside it comes along. Three ticks of the
+     2.2s price clock. */
+  "order-placement-boxed": {
+    "focus": "js:[...document.querySelectorAll('span')].filter(e => e.children.length === 0 && e.textContent.trim() === 'DASH').map(e => e.parentElement)",
+    "isolate": "#000", "fill": 0.8, "ar": 0.6, "pad": 0, "seconds": 6.6
+  },
+  /* Only the success mark, isolated from its caption. Its own loop is
+     dur + 2600 = 4.6s, so one cycle loops seamlessly from any phase.
+     The css flattens its 3D pop to the same beat in 2D: a preserve-3d layer
+     under a perspective (and the phone's drop-shadow filter) is rasterized
+     without antialiasing, which is what stair-stepped the ring. */
+  "order-placed-animation": {
+    "focus": ".opa-badge", "isolate": "#000", "fill": 0.5, "ar": 1.22, "pad": 0, "seconds": 4.6,
+    "css": ".opa-phone { filter: none !important; } .opa-screen { perspective: none !important; } .opa-badge { transform-style: flat !important; animation-name: op-pop2d !important; } @keyframes op-pop2d { 0% { transform: scale(1); } 22% { transform: scale(1.15); } 48% { transform: scale(0.95); } 72% { transform: scale(1.03); } 100% { transform: scale(1); } }"
+  },
+  /* Only the swap toggle between Total amount and Share quantity. Each tap
+     spins the drawn arrows a half turn as they push apart (the swap), and
+     the green arc draws round it and clears again. Two taps, back to start. */
+  "fractional-order-flow": {
+    "focus": "[aria-label=\"Swap amount and quantity\"]",
+    "isolate": "#e8e8e8", "fill": 0.46, "ar": 1.0, "pad": 0, "seconds": 5,
+    "script": [
+      { "wait": 700 }, { "click": "[aria-label=\"Swap amount and quantity\"]" },
+      { "wait": 2300 }, { "click": "[aria-label=\"Swap amount and quantity\"]" }
+    ]
+  },
   "options-strategy-builder": {
-    "fill": 0.82, "focus": ".wshell", "pad": 20, "seconds": 6,
+    "fill": 0.92, "ar": 0.86, "focus": ".wshell", "pad": 0, "seconds": 6.5,
     "script": [
       { "wait": 700 }, { "label": "Increase Quantity" }, { "wait": 450 }, { "label": "Increase Quantity" },
       { "wait": 1900 }, { "label": "Decrease Quantity" }, { "wait": 450 }, { "label": "Decrease Quantity" }
     ]
   },
   "option-chain": {
-    "fill": 0.85, "focus": ".oc-root", "pad": 16, "maxH": 300, "seconds": 6,
+    "fill": 0.92, "ar": 0.58, "focus": ".oc-root", "pad": 0, "seconds": 6,
+    "cut": { "sel": ".oc-row", "n": 7, "within": ".oc-scroll" },
     "script": [{ "wait": 900 }, { "label": "Put" }, { "wait": 2600 }, { "label": "Call" }]
   },
+  /* Only the Quantity box — its unit prefix, the count and the arrows —
+     counting 10 up to 13 and back down, so the loop ends where it began. */
   "stock-order-entry": {
-    "fill": 0.82, "focus": ".wshell", "pad": 20, "seconds": 6,
+    "focus": ".ob-stepper:has(input[aria-label=\"Quantity\"])", "isolate": "#0f1719",
+    "fill": 0.66, "ar": 0.5, "pad": 0, "seconds": 8,
     "script": [
-      { "wait": 700 }, { "label": "Increase Quantity" }, { "wait": 450 }, { "label": "Increase Quantity" },
-      { "wait": 1900 }, { "label": "Decrease Quantity" }, { "wait": 450 }, { "label": "Decrease Quantity" }
+      { "wait": 600 }, { "label": "Increase Quantity" }, { "wait": 550 }, { "label": "Increase Quantity" }, { "wait": 550 }, { "label": "Increase Quantity" },
+      { "wait": 1300 }, { "label": "Decrease Quantity" }, { "wait": 550 }, { "label": "Decrease Quantity" }, { "wait": 550 }, { "label": "Decrease Quantity" },
+      { "wait": 500 }, { "leave": 1 }, { "eval": "document.activeElement && document.activeElement.blur()" }
     ]
   },
-  "beam-ring": { "focus": ".bd-cta", "fill": 0.45, "pad": 0 },
+  "beam-ring": { "focus": ".bd-cta", "fill": 0.72, "ar": 0.62, "pad": 0 },
   "notive-quote": { "focus": "img[alt=\"iPhone\"]", "fill": 0.92, "pad": 0 },
-  /* The ticket opens on the $175 call. A price click replaces that leg,
-     the next adds a second leg, and clicking a selected price removes it —
-     so 185, +175, -185 shows all three and ends where it began. */
+  /* Only the leg rows, on the legs panel's own ground. The opening $175 leg
+     is priced unlike the same strike picked off the chain, so `pre` swaps it
+     for the chain's one first: then the loop — +180, +165 to three rows,
+     -180, -165 back to one — ends exactly where it starts. */
   "chain-to-order": {
-    "fill": 0.84, "focus": ".ob-shell, [aria-label^=\"Buy 18\"], [aria-label^=\"Buy 17\"], [aria-label^=\"Sell 18\"], [aria-label^=\"Sell 17\"]",
-    "pad": 18, "seconds": 6,
+    "focus": ".ob-legs", "isolate": "#0f1719", "fill": 0.84, "ar": 0.5, "pad": 0, "seconds": 6.4,
+    "pre": [
+      { "click": "[aria-label^=\"Buy 180 call\"]" }, { "wait": 700 },
+      { "click": "[aria-label^=\"Buy 175 call\"]" }, { "wait": 700 },
+      { "click": "[aria-label^=\"Buy 180 call\"]" }, { "wait": 1200 }
+    ],
     "script": [
-      { "wait": 700 }, { "click": "[aria-label^=\"Buy 185 call\"]" },
-      { "wait": 1500 }, { "click": "[aria-label^=\"Buy 175 call\"]" },
-      { "wait": 1800 }, { "click": "[aria-label^=\"Buy 185 call\"]" }
+      { "wait": 600 }, { "click": "[aria-label^=\"Buy 180 call\"]" },
+      { "wait": 1000 }, { "click": "[aria-label^=\"Buy 165 call\"]" },
+      { "wait": 1700 }, { "click": "[aria-label^=\"Buy 180 call\"]" },
+      { "wait": 1000 }, { "click": "[aria-label^=\"Buy 165 call\"]" }
     ]
   },
-  /* The glass tours all four logos — Meta, Microsoft, Apple, Google — and
-     returns to where it rests, driven by pointer events so it moves exactly
-     as a drag does. */
+  /* Only the four logos, drifting — no magnifier. The logos rest at 10% and
+     only the glass shows them lit, so the thumbnail brings them to full
+     strength itself. One 9s drift cycle (DRIFT_MS), so it loops seamlessly. */
   "holdings-empty-state": {
-    "focus": ".he-card", "fill": 0.55, "pad": 0, "seconds": 6,
-    "script": [{ "wait": 500 }, { "eval": "(async()=>{const L=document.querySelector('.he-lens'),C=document.querySelector('.he-card').getBoundingClientRect(),b=L.getBoundingClientRect();const home=[b.left+b.width/2-C.left,b.top+b.height/2-C.top];const P=[home,[143,97],[97,97],[97,143],[143,143],home];const sl=ms=>new Promise(r=>setTimeout(r,ms));const fire=(t,x,y,tgt)=>(tgt||window).dispatchEvent(new PointerEvent(t,{bubbles:true,cancelable:true,composed:true,pointerId:1,isPrimary:true,pointerType:'mouse',button:0,buttons:t==='pointerup'?0:1,clientX:C.left+x,clientY:C.top+y}));fire('pointerdown',home[0],home[1],L);for(let i=1;i<P.length;i++){const[a,c]=[P[i-1],P[i]];const t0=performance.now();for(;;){const u=Math.min(1,(performance.now()-t0)/520);const e=u<.5?4*u*u*u:1-Math.pow(-2*u+2,3)/2;fire('pointermove',a[0]+(c[0]-a[0])*e,a[1]+(c[1]-a[1])*e);if(u>=1)break;await sl(16);}if(i<P.length-1)await sl(420);}fire('pointerup',home[0],home[1]);})()" }]
+    "focus": ".he-scene:not(.he-scene--lit) .he-grid", "isolate": "#000",
+    "css": ".he-lens { display: none !important; } .he-logo img { opacity: 1 !important; }",
+    "fill": 0.78, "ar": 1.06, "pad": 0, "seconds": 9, "crf": 23
   }
 };
+
 

@@ -106,33 +106,163 @@ async function launch(scale) {
   };
 }
 
+/* ---- the cursor ----
+   tcosta.com/wspoc's interaction clips show the pointer: it comes in, settles
+   on the control, clicks, moves to the next, and leaves. A control that
+   changes with nothing touching it reads as a screen recording of a bug. The
+   headless screencast never draws a cursor, so this draws one: the macOS
+   arrow, fixed-position, appended to <html> (so `isolate`'s `body *` rule
+   never hides it), animated in the page with requestAnimationFrame along a
+   minimum-jerk-ish ease while Node walks the real pointer under it so hover
+   states light as it arrives.
+
+   `cursor` here is the frame the clip is cropped to, in CSS px: the pointer
+   enters from just below that frame and leaves the same way, so every loop
+   starts and ends with no cursor in the picture. A target hidden by
+   `isolate` is still clicked programmatically, with no cursor. */
+let cursor = { frame: null, shown: false, x: 0, y: 0, enabled: true };
+const CURSOR_SVG = `<svg width="17" height="21" viewBox="0 0 24 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35)) drop-shadow(0 0 .5px rgba(0,0,0,.25))">
+  <path d="M5.5 3.21V22.8c0 .45.54.67.85.36l4.88-4.86 3.02 6.48c.13.28.47.4.75.27l1.85-.86c.28-.13.4-.47.27-.75l-3.01-6.42h6.9c.45 0 .67-.55.35-.86L6.35 2.85c-.31-.31-.85-.09-.85.36Z" fill="#000" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>`;
+const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const travelMs = (d) => Math.round(Math.max(360, Math.min(720, 200 + d * 1.1)));
+
+async function cursorInstall() {
+  await evaluate(`(() => {
+    if (window.__recCursor) return;
+    const el = document.createElement('div');
+    el.id = '__rec-cursor';
+    el.style.cssText = 'position:fixed;left:0;top:0;z-index:2147483647;pointer-events:none;will-change:transform;opacity:0;visibility:visible';
+    el.innerHTML = ${JSON.stringify(CURSOR_SVG)};
+    document.documentElement.appendChild(el);
+    // the arrow's tip is at (5.5, 3.2) of a 24x30 box drawn 17x21 — offset so the tip sits on the point
+    const TIP = [5.5 * 17 / 24, 3.2 * 21 / 30];
+    const put = (x, y) => { el.style.transform = 'translate3d(' + (x - TIP[0]) + 'px,' + (y - TIP[1]) + 'px,0)'; };
+    const ease = ${ease.toString()};
+    let cur = [0, 0];
+    window.__recCursor = {
+      show(x, y) { cur = [x, y]; put(x, y); el.style.opacity = '1'; },
+      hide() { el.style.opacity = '0'; },
+      to(x, y, ms) {
+        return new Promise((done) => {
+          const [x0, y0] = cur, t0 = performance.now();
+          const tick = (now) => {
+            const t = Math.min(1, (now - t0) / ms), k = ease(t);
+            cur = [x0 + (x - x0) * k, y0 + (y - y0) * k];
+            put(cur[0], cur[1]);
+            if (t < 1) requestAnimationFrame(tick); else done();
+          };
+          requestAnimationFrame(tick);
+        });
+      },
+    };
+  })()`);
+}
+
+/* Where the cursor waits when it is out of the picture: below the frame,
+   a little to the right of where it is going. */
+const cursorHome = (x) => {
+  const f = cursor.frame;
+  return f ? [Math.min(f[0] + f[2] - 8, x + Math.min(120, f[2] * 0.2)), f[1] + f[3] + 28] : [x + 120, 9999];
+};
+
+/* Move the drawn cursor and the real pointer together to (x, y). */
+async function cursorMove(x, y) {
+  if (!cursor.shown) {
+    const [hx, hy] = cursorHome(x);
+    await evaluate(`window.__recCursor.show(${hx}, ${hy})`);
+    cursor.x = hx; cursor.y = hy; cursor.shown = true;
+  }
+  const d = Math.hypot(x - cursor.x, y - cursor.y);
+  if (d < 1.5) return;
+  const ms = travelMs(d);
+  const anim = evaluate(`window.__recCursor.to(${x}, ${y}, ${ms})`);
+  // the real pointer follows the same curve, so hover fires as the arrow lands
+  const steps = Math.max(4, Math.round(ms / 45));
+  const [x0, y0] = [cursor.x, cursor.y];
+  for (let i = 1; i <= steps; i++) {
+    const k = ease(i / steps);
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: x0 + (x - x0) * k, y: y0 + (y - y0) * k });
+    await sleep(ms / steps);
+  }
+  await anim;
+  cursor.x = x; cursor.y = y;
+}
+
+/* Take the cursor out of the frame and off the pointer's hover. */
+async function cursorLeave() {
+  if (!cursor.shown) return;
+  const [hx, hy] = cursorHome(cursor.x);
+  const ms = travelMs(Math.hypot(hx - cursor.x, hy - cursor.y));
+  await evaluate(`window.__recCursor.to(${hx}, ${hy}, ${ms})`);
+  await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 0, y: 0 });
+  await evaluate(`window.__recCursor.hide()`);
+  cursor.shown = false;
+}
+
 async function act(step) {
   if (step.wait) return sleep(step.wait);
-  if (step.click || step.label) {
-    // `label` matches a control's aria-label or its text; `click` is a selector.
-    // Real pointer events at the element's centre, so hover/press states fire too.
+  // `leave`: take the pointer off the page, so a hover state set by the last
+  // click lets go and the loop ends looking the way it started
+  if (step.leave) {
+    if (cursor.enabled) return cursorLeave();
+    return send("Input.dispatchMouseEvent", { type: "mouseMoved", x: 0, y: 0 });
+  }
+  if (step.click || step.label || step.text) {
+    // `label` matches a control's aria-label or its whole text; `text` finds
+    // the element whose own text is exactly this and clicks its nearest
+    // button (a menu item whose button also holds a description line);
+    // `click` is a selector. Real pointer events at the element's centre, so
+    // hover/press states fire too.
     const find = step.label
       ? `[...document.querySelectorAll('button,[role=button],[role=tab],[aria-label]')].find(e =>
            (e.getAttribute('aria-label') || e.textContent || '').trim() === ${JSON.stringify(step.label)})`
+      : step.text
+      ? `(() => { const t = [...document.querySelectorAll('body *')].find(e =>
+           e.children.length === 0 && e.textContent.trim() === ${JSON.stringify(step.text)});
+           return t && (t.closest('button,[role=button],[role=menuitem],a') || t); })()`
       : `document.querySelector(${JSON.stringify(step.click)})`;
     // Poll for it: a piece may still be hydrating when its script starts.
+    // An element hidden by `isolate` can't be hit by a pointer event — the
+    // click falls through to the empty page (chain-to-order's price pills,
+    // clicked while only the ticket shows) — so a hidden target has its own
+    // click() fired instead.
     let v = null;
     for (let tries = 0; tries < 30 && !v; tries++) {
       const r = await evaluate(`(() => { const el = ${find};
-        if (!el) return null; const b = el.getBoundingClientRect();
-        return JSON.stringify([b.left + b.width / 2, b.top + b.height / 2]); })()`);
+        if (!el) return null;
+        if (getComputedStyle(el).visibility === 'hidden') { el.click(); return 'clicked'; }
+        const b = el.getBoundingClientRect();
+        return JSON.stringify([b.left + b.width / 2, b.top + b.height / 2, b.width, b.height]); })()`);
       v = r.result?.result?.value;
       if (!v) await sleep(100);
     }
-    if (!v) throw new Error(`no element for ${step.label || step.click}`);
-    const [x, y] = JSON.parse(v);
-    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x, y });
-    await sleep(60);
+    if (v === "clicked") return;
+    if (!v) throw new Error(`no element for ${step.label || step.text || step.click}`);
+    let [x, y, w, h] = JSON.parse(v);
+    if (cursor.enabled) {
+      // a hand lands a touch right of and below dead centre, not on it
+      x += Math.min(5, w * 0.12); y += Math.min(3, h * 0.12);
+      await cursorMove(x, y);
+      await sleep(140); // a beat on the control before the press
+    } else {
+      await send("Input.dispatchMouseEvent", { type: "mouseMoved", x, y });
+      await sleep(60);
+    }
     await send("Input.dispatchMouseEvent", { type: "mousePressed", x, y, button: "left", clickCount: 1 });
     await sleep(90);
     await send("Input.dispatchMouseEvent", { type: "mouseReleased", x, y, button: "left", clickCount: 1 });
   }
   if (step.eval) await evaluate(step.eval);
+}
+
+/* A whole script: the steps, then the cursor leaves the frame. */
+async function run(steps, withCursor) {
+  cursor.enabled = withCursor;
+  cursor.shown = false;
+  if (withCursor) await cursorInstall();
+  for (const step of steps || []) await act(step);
+  if (withCursor) await cursorLeave();
 }
 
 const profile = mkdtempSync(join(tmpdir(), "record-work-"));
@@ -165,9 +295,17 @@ console.log(FFMPEG ? `encoder: x264 (${FFMPEG})` : "encoder: AVFoundation hardwa
 const KEEP = process.env.KEEP_FRAMES; // keep each clip's source frames here, for measuring quality
 
 /* The union box of everything matching `sel`, in CSS px, or null. */
+/* `focus` is a CSS selector, or `js:<expression>` returning the element(s) —
+   for a target with nothing stable to select on (a price block that is
+   only inline styles). Selectors on inline `style` don't work: React
+   serialises them without the spaces a hand-written selector expects. */
+const focusExpr = (sel) => sel.startsWith("js:")
+  ? `[].concat(${sel.slice(3)}).filter(Boolean)`
+  : `[...document.querySelectorAll(${JSON.stringify(sel)})]`;
+
 const measure = async (sel) => {
   const r = await evaluate(`(() => {
-    const els = [...document.querySelectorAll(${JSON.stringify(sel)})]
+    const els = ${focusExpr(sel)}
       .map(e => e.getBoundingClientRect()).filter(b => b.width && b.height);
     if (!els.length) return null;
     return JSON.stringify([Math.min(...els.map(b => b.left)), Math.min(...els.map(b => b.top)),
@@ -176,6 +314,42 @@ const measure = async (sel) => {
   const v = r.result?.result?.value;
   return v ? JSON.parse(v) : null;
 };
+
+/* Per-piece page preparation, identical in both passes so the measured box
+   and the recorded one agree.
+
+   `isolate: "<bg>"` shows ONLY the focus element: everything else on the
+   page goes `visibility: hidden` (layout untouched, so nothing moves) and the
+   page ground becomes <bg>. Cropping around a component let whatever sat
+   next to it into the card — the phone bezel beside a chart, the bid/ask
+   pill under a price, field borders round a toggle. Hiding the rest is the
+   only way a thumbnail can be the component and nothing else.
+   `css` is raw CSS for anything else a thumbnail needs (a hidden magnifier,
+   logos at full strength). */
+async function prepare(cfg, focus) {
+  if (cfg.isolate) {
+    /* Marked continuously, not once. A piece that remounts its tree (the
+       order-placed screen does, every cycle, via key={run}) replaces the
+       marked element with an unmarked copy, and isolation then hides the
+       very thing the card is of — that card went black mid-loop. */
+    await evaluate(`(() => {
+      const mark = () => { for (const e of ${focusExpr(focus)}) if (!e.hasAttribute('data-rec-focus')) e.setAttribute('data-rec-focus', ''); };
+      mark();
+      new MutationObserver(mark).observe(document.body, { childList: true, subtree: true });
+    })()`);
+  }
+  const css = [
+    cfg.css || "",
+    cfg.isolate
+      ? `html, html[data-embed], html[data-embed] body, body { background: ${cfg.isolate} !important; }
+         body * { visibility: hidden !important; }
+         [data-rec-focus], [data-rec-focus] * { visibility: visible !important; }`
+      : "",
+  ].join("\n");
+  if (css.trim()) {
+    await evaluate(`(() => { const st = document.createElement('style'); st.textContent = ${JSON.stringify(css)}; document.head.appendChild(st); })()`);
+  }
+}
 
 /* Navigate, then wait for the component to actually be on the page before
    the settle. A fixed sleep alone let a slow load start a recording against
@@ -207,7 +381,15 @@ for (const p of pieces) {
   // screens pad only vertically, since their content already runs edge to edge
   // and horizontal padding would frame the bezel.
   const [padX, padY] = Array.isArray(cfg.pad) ? cfg.pad : [cfg.pad ?? 28, cfg.pad ?? 28];
-  const runScript = async () => { for (const step of cfg.script || []) await act(step); };
+  /* The cursor is drawn for any scripted piece unless `cursor: false` — a
+     piece whose targets are hidden under `isolate` gets none anyway. */
+  const withCursor = cfg.cursor !== false && (cfg.script || []).length > 0;
+  const runScript = () => run(cfg.script, withCursor);
+  /* `pre` steps run before anything is measured or recorded, to put a piece
+     in the state its loop returns to — chain-to-order's opening leg is priced
+     differently from the same strike picked off the chain, so a loop that
+     starts on it can never end on it. Never with a cursor: nothing is filming. */
+  const runPre = () => run(cfg.pre, false);
 
   /* Pass 1 — measure. Play the clip once with nothing recording and track the
      component's box the whole way through, keeping the union, so a banner
@@ -221,19 +403,43 @@ for (const p of pieces) {
     const closeMeasure = await launch(1);
     await send("Emulation.setDeviceMetricsOverride", { width: p.w, height: p.h, deviceScaleFactor: 1, mobile: false });
     if (!(await open(p, focus))) { await closeMeasure(); continue; }
+    await prepare(cfg, focus);
+    await runPre().catch(() => {});
     let sampling = true;
     const sampler = (async () => {
       while (sampling) {
-        const b = await measure(focus);
+        // `frame` (default: focus) is what the card is framed on; `focus` is
+        // what stays visible under `isolate`. They differ for the candles:
+        // the moving "now" line must stay visible, but the frame is the candles
+        const b = await measure(cfg.frame ?? focus);
         if (b) box = box ? [Math.min(box[0], b[0]), Math.min(box[1], b[1]), Math.max(box[2], b[2]), Math.max(box[3], b[3])] : b;
         await sleep(120);
       }
     })();
+    cursor.frame = null; // nothing is filming; the cursor may enter from anywhere
     const s1 = runScript().catch(() => {});
     await sleep(seconds * 1000);
     await s1;
     sampling = false;
     await sampler;
+    /* `cut: { sel, n, within }` ends the frame at the bottom of the n-th
+       element matching `sel` that sits fully inside `within` (a scroller),
+       so a table too tall for the card is cut between rows, never through
+       one. Measured here, on the same page state the clip will start in. */
+    if (box && cfg.cut) {
+      const r = await evaluate(`(() => {
+        const c = ${JSON.stringify(cfg.cut)};
+        const within = c.within ? document.querySelector(c.within) : null;
+        const top = within ? within.getBoundingClientRect().top : -Infinity;
+        const rows = [...document.querySelectorAll(c.sel)].map(e => e.getBoundingClientRect())
+          .filter(b => b.height && b.top >= top - 0.5).sort((a, b) => a.top - b.top);
+        const row = rows[Math.min(rows.length, c.n) - 1];
+        return row ? row.bottom : null;
+      })()`);
+      const bottom = r.result?.result?.value;
+      if (bottom) box[3] = Math.min(box[3], bottom);
+      else console.error(`  ! ${p.slug}: cut found no ${cfg.cut.sel}; frame not cut`);
+    }
     await closeMeasure();
   }
   if (!box) {
@@ -248,17 +454,29 @@ for (const p of pieces) {
      whichever binds): tcosta.com/wspoc's cards sit their component well inside
      the frame with room around it, and framing edge to edge read as "too
      zoomed in". Then `pad`, then the aspect clamp, then kept inside the page. */
-  const fill = cfg.fill ?? 0.62;
+  // `fill`: one share, or [x, y]
+  const [fillX, fillY] = Array.isArray(cfg.fill) ? cfg.fill : [cfg.fill ?? 0.62, cfg.fill ?? 0.62];
   const bw = box[2] - box[0], bh = box[3] - box[1];
   const cx = (box[0] + box[2]) / 2, cy = (box[1] + box[3]) / 2;
-  let fw0 = bw / fill + padX * 2, fh0 = bh / fill + padY * 2;
-  const MIN_AR = 0.55, MAX_AR = 1.7;
-  if (fh0 / fw0 < MIN_AR) fh0 = fw0 * MIN_AR;
-  if (fh0 / fw0 > MAX_AR) fw0 = fh0 / MAX_AR;
+  let fw0 = bw / fillX + padX * 2, fh0 = bh / fillY + padY * 2;
+  if (cfg.ar) {
+    /* Exact card proportion (height / width). tcosta.com/wspoc's still cards
+       are all 930x639, and a small component fills most of one — so a lone
+       icon gets a full-size card with the icon large in it, rather than a
+       card shrunk to the icon's own shape. The short side grows to fit. */
+    if (fh0 / fw0 < cfg.ar) fh0 = fw0 * cfg.ar;
+    else fw0 = fh0 / cfg.ar;
+  } else {
+    // per-piece `minAr` for a deliberately wide strip
+    const MIN_AR = cfg.minAr ?? 0.55, MAX_AR = 1.7;
+    if (fh0 / fw0 < MIN_AR) fh0 = fw0 * MIN_AR;
+    if (fh0 / fw0 > MAX_AR) fw0 = fh0 / MAX_AR;
+  }
   fw0 = Math.min(fw0, p.w); fh0 = Math.min(fh0, p.h);
   // slide, don't shrink, when the frame runs off an edge — keeps the size
   const x0 = Math.round(Math.max(0, Math.min(p.w - fw0, cx - fw0 / 2)));
-  const y0 = Math.round(Math.max(0, Math.min(p.h - fh0, cy - fh0 / 2)));
+  // a `cut` frame ends on the cut: anchored to its bottom, the spare height goes above
+  const y0 = Math.round(Math.max(0, Math.min(p.h - fh0, cfg.cut ? box[3] + padY - fh0 : cy - fh0 / 2)));
   const cw = Math.round(fw0);
   const ch = Math.round(fh0);
   const W = OUT_W;
@@ -269,7 +487,8 @@ for (const p of pieces) {
      viewport clip, is a pinch-zoom: static text re-rasterises but an
      animating layer is just its 1x bitmap scaled up, which is what made the
      order-placed ring stair-step. */
-  const density = Math.min(6, Math.max(1, Math.ceil((OUT_W / cw) * 2) / 2));
+  // capped at 14: the swap toggle is 41px across and asks for ~13
+  const density = Math.min(14, Math.max(1, Math.ceil((OUT_W / cw) * 2) / 2));
 
   /* Pass 2 — record, clipped: only the frame rectangle is rendered into the
      screencast, at the launch density, and the page never sees it. */
@@ -285,6 +504,12 @@ for (const p of pieces) {
   if (!(await open(p, focus))) {
     await close();
     console.error(`  ✗ ${p.slug}: component never rendered for recording — skipped, old thumbnail kept`);
+    continue;
+  }
+  await prepare(cfg, focus);
+  try { await runPre(); } catch (e) {
+    await close();
+    console.error(`  ✗ ${p.slug}: pre — ${e.message} — skipped, old thumbnail kept`);
     continue;
   }
   /* backdrop-filter off while recording (KEEP_BLUR=1 to leave it on). It is
@@ -312,6 +537,7 @@ for (const p of pieces) {
      frames — and at q100 JPEG adds no banding the encoder doesn't. */
   await send("Page.startScreencast", { format: process.env.SC_FORMAT || "jpeg", quality: 100, everyNthFrame: 1, maxWidth: 8192, maxHeight: 8192 });
   let scriptError = null;
+  cursor.frame = [x0, y0, cw, ch]; // the cursor enters and leaves through the frame's bottom edge
   const s2 = runScript().catch((e) => { scriptError = e; });
   await sleep(seconds * 1000);
   await s2;
@@ -359,11 +585,16 @@ for (const p of pieces) {
        free here — on bits, which aren't. yuv420p + faststart for every
        browser, and a keyframe every 2s so a card that starts mid-scroll gets
        a picture quickly. */
+    /* Tagged BT.709 explicitly (tcosta.com's clips are): from JPEG frames
+       ffmpeg otherwise writes bt470bg, and a browser honouring that tag
+       renders the colours a touch off the poster's. Per-piece `crf` for the
+       one clip that drifts large bitmaps (Holdings at 18 was 1.7 MB). */
     execFileSync(FFMPEG, [
       "-y", "-hide_banner", "-loglevel", "error",
       "-framerate", String(FPS), "-i", join(dir, "%06d" + EXT),
-      "-vf", `scale=${W}:${H}:flags=lanczos,format=yuv420p`,
-      "-c:v", "libx264", "-preset", "veryslow", "-tune", "animation", "-crf", "18",
+      "-vf", `scale=${W}:${H}:flags=lanczos:out_color_matrix=bt709:out_range=tv,format=yuv420p`,
+      "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", "-color_range", "tv",
+      "-c:v", "libx264", "-preset", "veryslow", "-tune", "animation", "-crf", String(cfg.crf ?? 18),
       // aq-mode 3 biases bits toward dark flat areas, where 8-bit gradients band
       "-x264-params", "aq-mode=3",
       "-g", String(FPS * 2), "-movflags", "+faststart", "-an", tmpMp4,
@@ -380,27 +611,40 @@ for (const p of pieces) {
   /* Poster: the first frame nothing is changing on, not frame zero. Frame zero
      can land mid-tick — an odometer half-rolled — and the poster is what a
      card shows before its video plays, and all it shows with reduced motion. */
+  /* A cursor piece's poster is its resting state after the cursor has left —
+     the last settled frame — never a frame with the arrow parked on it. */
   const poster = join(ROOT, "public/thumbs", `${p.slug}.webp`);
   execFileSync("python3", ["-c", `
 import sys, os
 from PIL import Image, ImageChops
-d, out, W, H = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
+d, out, W, H, mode = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), sys.argv[5]
 names = sorted(n for n in os.listdir(d) if n.endswith((".png", ".jpg")))
 from PIL import ImageStat
 small = lambda n: Image.open(os.path.join(d, n)).convert("L").resize((120, 120))
-# a settled frame from a third of the way in: past any start-up, and the
-# first one not changing from its neighbour and not a flat colour
-pick = names[len(names) // 3]
-start = len(names) // 3
-prev = small(names[start])
-for n in names[start + 1:]:
-    cur = small(n)
-    if ImageChops.difference(prev, cur).getbbox() is None and ImageStat.Stat(cur).stddev[0] > 2:
+if mode == "end":
+    # last frame not changing from the one before it and not a flat colour
+    pick = names[-1]
+    nxt = small(names[-1])
+    for n in reversed(names[:-1]):
+        cur = small(n)
+        if ImageChops.difference(nxt, cur).getbbox() is None and ImageStat.Stat(cur).stddev[0] > 2:
+            break
         pick = n
-        break
-    prev = cur
+        nxt = cur
+else:
+    # a settled frame from a third of the way in: past any start-up, and the
+    # first one not changing from its neighbour and not a flat colour
+    pick = names[len(names) // 3]
+    start = len(names) // 3
+    prev = small(names[start])
+    for n in names[start + 1:]:
+        cur = small(n)
+        if ImageChops.difference(prev, cur).getbbox() is None and ImageStat.Stat(cur).stddev[0] > 2:
+            pick = n
+            break
+        prev = cur
 Image.open(os.path.join(d, pick)).convert("RGB").resize((W, H), Image.LANCZOS).save(out, "WEBP", quality=80, method=6)
-`, dir, poster, String(W), String(H)]);
+`, dir, poster, String(W), String(H), withCursor ? "end" : "third"]);
   manifest[p.slug] = { w: W, h: H, seconds };
   const kb = (f) => Math.round(statSync(f).size / 1024);
   console.log(`${p.slug.padEnd(26)} ${W}x${H}  ${density}x -> ${fw}px wide${fw < W - 2 ? " (UPSCALED)" : ""}  ${frames.length} painted  mp4 ${kb(mp4)} KB`);

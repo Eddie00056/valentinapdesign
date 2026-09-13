@@ -315,6 +315,61 @@ function FieldValue({
   );
 }
 
+/* The swap toggle, drawn rather than the old 198px PNG so it stays sharp at
+   any size and can move. Geometry is measured off that PNG: a 40px white
+   disc with a hairline rim, and two 1.4px square-cap arrows — up on the
+   left, down on the right. The pair is exactly point-symmetric about the
+   disc centre (20.35),
+   so a half turn lands it exactly back on itself: each tap spins it 180°
+   (the swap), while the arrows push out along their own direction and
+   settle, so the tap reads as the two values trading places. */
+function SwapGlyph({ turns, reduced }: { turns: number; reduced: boolean }) {
+  const spin = reduced ? { duration: 0 } : { type: "spring", visualDuration: 0.5, bounce: 0.18 } as const;
+  const nudge = (dy: number) =>
+    reduced
+      ? {}
+      : {
+          animate: { y: turns ? [0, dy, 0] : 0 },
+          transition: { duration: 0.42, times: [0, 0.35, 1], ease: "easeInOut" as const },
+        };
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        position: "absolute",
+        left: 0.35,
+        top: 0.35,
+        width: 40.7,
+        height: 40.7,
+        borderRadius: "50%",
+        background: "#FFFFFF",
+        boxShadow: "0 0 0 0.75px #E9E9E9, 0 1px 5px rgba(0,0,0,0.05)",
+        pointerEvents: "none",
+      }}
+    >
+      <motion.svg
+        width="40.7"
+        height="40.7"
+        viewBox="0 0 40.7 40.7"
+        fill="none"
+        style={{ display: "block", overflow: "visible", transformOrigin: "50% 50%" }}
+        initial={false}
+        animate={{ rotate: turns * 180 }}
+        transition={spin}
+      >
+        <motion.g key={`u${turns}`} {...nudge(-2)} stroke="#1E1E21" strokeWidth={1.45} strokeLinecap="butt" strokeLinejoin="miter">
+          <path d="M 17.33 11.45 V 20.95" />
+          <path d="M 12.93 15.85 L 17.33 11.45 L 21.73 15.85" />
+        </motion.g>
+        <motion.g key={`d${turns}`} {...nudge(2)} stroke="#1E1E21" strokeWidth={1.45} strokeLinecap="butt" strokeLinejoin="miter">
+          <path d="M 23.37 19.75 V 29.25" />
+          <path d="M 18.97 24.85 L 23.37 29.25 L 27.77 24.85" />
+        </motion.g>
+      </motion.svg>
+    </div>
+  );
+}
+
 export function FractionalOrderFlow({
   bgOpacity = 0.3,
   livePrice = true,
@@ -335,6 +390,8 @@ export function FractionalOrderFlow({
   /* A field you have just tapped into is "selected": the first key
      replaces it rather than appending, as iOS does with a select-all. */
   const [fresh, setFresh] = useState(false);
+  /* Half turns of the swap glyph — one per tap */
+  const [swapTurns, setSwapTurns] = useState(0);
   const reduced = useReducedMotion();
   const spring = reduced ? { duration: 0 } : SPRING;
   /* The first field trades places on an order-type change: the old one clears
@@ -967,7 +1024,12 @@ export function FractionalOrderFlow({
                       </div>
 
                       <div
-                        onClick={() => (keyboard ? closePad() : focusField("amount"))}
+                        role="button"
+                        aria-label="Swap amount and quantity"
+                        onClick={() => {
+                          setSwapTurns((n) => n + 1);
+                          keyboard ? closePad() : focusField("amount");
+                        }}
                         style={{
                           position: "absolute",
                           left: 298,
@@ -982,11 +1044,7 @@ export function FractionalOrderFlow({
                           borderRadius: "50%",
                         }}
                       >
-                        <img
-                          src={`${P}/fof-swap.png`}
-                          alt="Swap amount and quantity"
-                          style={{ position: "absolute", left: -4.01, top: -4.14, width: 49.68, height: 49.68, display: "block", pointerEvents: "none" }}
-                        />
+                        <SwapGlyph turns={swapTurns} reduced={!!reduced} />
                         {keyboard && focus === "amount" && (
                           <svg width="43.399" height="43.399" viewBox="-1 -1 43.399 43.399" fill="none" style={{ position: "absolute", left: -1, top: -1, overflow: "visible" }} aria-hidden="true">
                             <path d="M 0.39 16.7 A 20.7 20.7 0 0 1 41.01 16.7" stroke="#227C20" strokeWidth="1" fill="none" />
