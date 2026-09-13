@@ -216,7 +216,7 @@ N[11] = {"kind": "ownership", "bg": "black", "reveal": 8, "dim": True}
 # ---- case study 1: order entry --------------------------------------------
 N[12] = {"kind": "titlecard", "bg": "black", "kicker": "Case study", "title": "Order entry\nmodernization", "fs": 120}
 N[13] = D("Background")
-N[14] = {"kind": "media", "bg": "black", "panels": [P(0, 50, LIGHT_PANEL)],
+N[14] = {"kind": "media", "bg": "black", "cornerInk": "dark", "panels": [P(0, 50, LIGHT_PANEL)],
          "labels": [{"text": "Regular trading platforms", "x": 26.5, "y": 22.3, "tone": "dark"},
                     {"text": "Advanced trading platforms", "x": 77.05, "y": 22.3}],
          "shots": [crop(14, 'a', 3, 24.3, 47, 73.8), crop(14, 'b', 51.4, 24.3, 98, 74.2)]}
@@ -305,12 +305,19 @@ WIDGET_CALLOUTS = {
 N[31] = {"kind": "media", "bg": "black", "heading": "What data do we show?",
          "labels": [{"text": "Current widget layout", "x": 50, "y": 21.5}],
          "shots": [dict(widget(29, 34.93, 34.815, 65.07, 61.204), annot=WIDGET_CALLOUTS)]}
+_SX, _SW32 = 61.5, 27  # slide 32: the stacked tickets' left edge and width (%)
 N[32] = {"kind": "media", "bg": "black", "heading": "What data do we show?",
          "panels": [P(0, 50, "#0e0e0e", 16)],
          "labels": [{"text": "Current widget design", "x": 25, "y": 22.6},
                     {"text": "Updated widget design", "x": 75, "y": 22.6}],
          "shots": [place(crop(32, 'a', 8.9, 25.1, 39.2, 51.7), 4, 42, cy=57)],
-         "live": [live("stock-order-entry", 55, 30, 40, 54, css=TICKET_BG + NO_HEADER, fit=CARD, init="symbolFirst")]}
+         # the updated ticket builds down the right half, one click per stage:
+         # the quote row, then the quote + its fields, then the whole ticket
+         "steps": 2,
+         "live": [dict(live("stock-order-entry", _SX, y, _SW32, h, css=TICKET_BG + NO_HEADER, fit=CARD, mode="width",
+                            init=init), s=k, rise=True, stack=True)
+                  for k, (init, y, h) in enumerate((("ticketQuote", 27, 8), ("ticketQty", 35.82, 25),
+                                                    ("ticketFull", 59.99, 34)))]}
 N[33] = S("How do we make the option trade\nexperience faster?", "Reducing time to trade")
 N[34] = S("What are options?")
 N[35] = {"kind": "twocol", "bg": "black", "panels": [P(0, 50, DARK_PANEL)],
@@ -416,7 +423,7 @@ N[65]["fs"] = 80
 N[66] = S("1 Feature.", bg="white", corner="Design challenge", fw=600)
 N[67] = S("1 Feature. 2 Personas.", bg="white", corner="Design challenge", fw=600)
 N[68] = S("1 Feature. 2 Personas. 2 Design languages", bg="white", corner="Design challenge", fw=600)
-N[69] = {"kind": "cards", "bg": "white", "heading": "Trader types",
+N[69] = {"kind": "cards", "bg": "white", "corner": "Trader types",
          "panels": [P(0, 50, LIGHT_PANEL)],
          "cards": [
              {"x": 14.32, "y": 37.2, "w": 25, "tone": "white", "title": "Regular trader", "points": [
@@ -481,38 +488,38 @@ N[82] = {"kind": "goals", "bg": "white", "plain": True, "cards": [
     dict(GOAL_CARDS[0], x=8.9, y=38, w=40, h=20, icon=None), dict(GOAL_CARDS[1], x=51.1, y=38, w=40, h=20, icon=None)]}
 
 WIZ = ("Original", "multi", "page", "wizard", "order", "entry")
-N[83] = {"kind": "media", "bg": "canvas", "heading": "Original design",
+N[83] = {"kind": "media", "bg": "canvas", "corner": "Original design",
          "labels": [{"text": "Original multi page wizard order entry", "x": 47.45, "y": 19.6, "size": "lg"}],
          "shots": [crop(83, 'a', 0, 22.0, 100, 92.0, strip=WIZ)]}
-N[84] = {"kind": "media", "bg": "canvas", "heading": "Original design",
+N[84] = {"kind": "media", "bg": "canvas", "corner": "Original design",
          "labels": [{"text": "Original multi page wizard order entry", "x": 47.45, "y": 17.1, "size": "lg"}],
          "shots": [crop(84, 'a', 0, 19.6, 100, 92.0, strip=WIZ)]}
-N[85] = {"kind": "media", "bg": "white", "heading": "Original design",
+N[85] = {"kind": "media", "bg": "white", "corner": "Original design",
          "panels": [P(0, 64.27, CANVAS)],
          "labels": [{"text": "Original multi page wizard order entry", "x": 26.85, "y": 15.3, "size": "lg"},
                     {"text": "Suggested design", "x": 82.5, "y": 15.3, "size": "lg"}],
          "shots": [crop(85, 'a', 0, 17.7, 64.27, 94.0, strip=WIZ)],
          "live": [live("fractional-order-flow", 72.08, 18.4, 21.11, 73.11, css=FOF_BG, fit=".fof-frame", vh=1000)]}
-N[86] = {"kind": "media", "bg": "white", "heading": "How does an advanced trader place an order?",
+N[86] = {"kind": "media", "bg": "white", "corner": "How does an advanced trader place an order?",
          "panels": [P(50, 50, LIGHT_PANEL)],
          "labels": [{"text": "Old design", "x": 28.45, "y": 15.5}],
          "shots": [crop(86, 'a', 16.2, 17.8, 37.4, 90.4, strip=("Old", "design", "Updated"))]}
-N[87] = {"kind": "media", "bg": "white", "heading": "Happy path", "heading2": {"text": "Happy path", "x": 52.6},
+N[87] = {"kind": "media", "bg": "white", "corner": "Happy path", "corner2": {"text": "Happy path", "x": 55.2},
          "panels": [P(50, 50, LIGHT_PANEL)],
          "labels": [{"text": "Old design", "x": 26.99, "y": 13.2}, {"text": "Updated design", "x": 73.57, "y": 13.2}],
          "shots": [crop(87, 'a', 16.2, 17.8, 37.4, 90.4, strip=("Old", "design", "Updated"))],
          "live": [live("order-placement-boxed-single", 64.22, 15.19, 18.7, 74.13, css=PHONE_BG, fit=PHONE, vh=1000)]}
-N[88] = {"kind": "numbered", "bg": "white", "kicker": "Design process",
+N[88] = {"kind": "numbered", "bg": "white", "corner": "Design process",
          "items": ["Happy path design", "Order type navigation", "Symbol discoverability"], "active": [1]}
-N[89] = {"kind": "media", "bg": "white", "heading": "Navigating edge cases",
+N[89] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "shots": [crop(89, 'a', 33.7, 28.5, 66.2, 100)]}
-N[90] = {"kind": "media", "bg": "white", "heading": "Navigating edge cases",
+N[90] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "labels": [{"text": "V1", "x": 31.45, "y": 34.4}, {"text": "V2", "x": 73.25, "y": 34.4}],
          "shots": [crop(90, 'a', 14.1, 37.4, 47.6, 100, strip=("V", "1", "V2")),
                    crop(90, 'b', 55.8, 37.4, 89.3, 100, strip=("V", "1", "V2"))]}
-N[91] = {"kind": "media", "bg": "white", "heading": "Navigating edge cases",
+N[91] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "shots": [crop(91, 'a', 32.5, 25.2, 66.5, 100)]}
-N[92] = {"kind": "media", "bg": "white", "heading": "Navigating edge cases",
+N[92] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "panels": [P(50, 50, LIGHT_PANEL)],
          "shots": [crop(92, 'a', 14.0, 16.8, 36.3, 90.4), crop(92, 'b', 59.5, 22.5, 91.0, 75.0)]}
 N[93] = D("Final designs", bg="white", tone="green")
@@ -549,6 +556,13 @@ N[100] = {"kind": "figures", "bg": "white", "tone": "green", "layout": "top",
 N[101] = D("Reflections", bg="white", tone="green")
 N[102] = D("")
 N[103] = raster(103)
+
+# every content slide titles top-left (the deck renders kicker/heading/corner
+# as one .gd-corner); these have no title copy yet, so they get a placeholder
+# (cover, title cards, dividers and 53's big "Then vs Now" are left without)
+for n in [*range(3, 12), 14, 15, 17, 18, 34, 35, 39, 46, 47, 54, 56, 82, 95, 96, 97, 99, 100]:
+    assert not any(k in N[n] for k in ("corner", "kicker", "heading")), n
+    N[n]["corner"] = "Title"
 
 for e in N.values():  # slides with a step-by-step build
     for sh in e.get("shots", []):

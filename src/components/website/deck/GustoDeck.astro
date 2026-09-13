@@ -26,6 +26,8 @@ const OWN = "/website/case/gusto/own/";
 const isOn = (active: any, i: number) =>
   active === "all" || (Array.isArray(active) && active.includes(i));
 const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
+const title = (s: Slide): string | undefined =>
+  s.corner ?? s.heading ?? (s.kind === "titlecard" ? undefined : s.kicker);
 ---
 
 <section class="gd w-wrap">
@@ -62,7 +64,32 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                     style={`left:${p.x}%;width:${p.w}%;top:${p.y}%;background:${p.c}`}
                   />
                 ))}
-                {s.corner && <p class="gd-corner">{s.corner}</p>}
+                {/* every slide title is this one top-left element — whatever the
+                    data calls it (corner / kicker / heading); a title card's
+                    kicker stays inside its card */}
+                {s.kind === "metrics" ? (
+                  <div class="gd-corner-row">
+                    <p class="gd-corner">{title(s)}</p>
+                    {/* the clock is its own box: in ?edit it can be dragged and resized */}
+                    <div class="gd-metrics-clock">
+                      <InlineClock
+                        client:visible
+                        size={26}
+                        borderColor="rgba(255,255,255,0.4)"
+                        handColor="#fff"
+                        dotColor="#fff"
+                        dotBorder="#fff"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  title(s) && <p class:list={["gd-corner", s.cornerInk && `is-${s.cornerInk}`]}>{title(s)}</p>
+                )}
+                {s.corner2 && (
+                  <p class="gd-corner" style={`left:${s.corner2.x}%`}>
+                    {s.corner2.text}
+                  </p>
+                )}
                 {s.raster ? (
                   <img
                     class="gd-raster"
@@ -96,13 +123,11 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                     {s.shot && <Shot {...s.shot} />}
                   </>
                 ) : s.kind === "statement" || s.kind === "quote" ? (
-                  <div class:list={["gd-statement", { "is-quote": s.kind === "quote" }]}>
-                    {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
+                  <div class:list={["gd-statement", { "is-quote": s.kind === "quote", "is-top": s.kicker }]}>
                     <p class="gd-statement-t" style={[fs(s), s.fw && `font-weight:${s.fw}`].filter(Boolean).join(";") || undefined}>{s.text}</p>
                   </div>
                 ) : s.kind === "numbered" ? (
                   <div class:list={["gd-numbered", s.size && `is-${s.size}`]}>
-                    {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
                     <ol>
                       {s.items.map((it: string, i: number) => (
                         <li class:list={[{ "is-dim": !isOn(s.active, i) }]}>
@@ -115,21 +140,6 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                   </div>
                 ) : s.kind === "metrics" ? (
                   <div class="gd-metrics">
-                    <div class="gd-metrics-head">
-                      {/* the title is the plain slide title — same element, same styling as every other */}
-                      <p class="gd-kicker">{s.kicker}</p>
-                      {/* the clock is its own box: in ?edit it can be dragged and resized */}
-                      <div class="gd-metrics-clock">
-                        <InlineClock
-                          client:visible
-                          size={26}
-                          borderColor="rgba(255,255,255,0.4)"
-                          handColor="#fff"
-                          dotColor="#fff"
-                          dotBorder="#fff"
-                        />
-                      </div>
-                    </div>
                     <div class="gd-metrics-row">
                       <p class="gd-metrics-t">{s.items[0].text}</p>
                       <p class="gd-metrics-t">{s.items[1].text}</p>
@@ -137,7 +147,6 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                   </div>
                 ) : s.kind === "checklist" ? (
                   <div class="gd-checklist">
-                    {s.heading && <p class="gd-media-h">{s.heading}</p>}
                     <div class="gd-cl-cols">
                       {s.cols.map((col: any) => (
                         <div class="gd-cl-col">
@@ -182,7 +191,6 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                   </div>
                 ) : s.kind === "journey" ? (
                   <div class="gd-journey">
-                    {s.kicker && <p class="gd-kicker">{s.kicker}</p>}
                     <div class:list={["gd-journey-row", { "has-active": s.active >= 0 }]}>
                       {s.steps.map((st: string, i: number) => (
                         <>
@@ -218,7 +226,6 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                   </div>
                 ) : s.kind === "cards" ? (
                   <div class="gd-media">
-                    {s.heading && <p class="gd-media-h">{s.heading}</p>}
                     {s.cards.map((c: any) => (
                       <div
                         class:list={["gd-card", `tone-${c.tone || "white"}`]}
@@ -254,12 +261,6 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                   </div>
                 ) : s.kind === "media" ? (
                   <div class="gd-media">
-                    {s.heading && <p class="gd-media-h">{s.heading}</p>}
-                    {s.heading2 && (
-                      <p class="gd-media-h" style={`left:${s.heading2.x}%`}>
-                        {s.heading2.text}
-                      </p>
-                    )}
                     {s.bigTitle && (
                       <p class="gd-media-big">
                         {s.bigTitle}
@@ -391,7 +392,13 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                     {s.reveal >= 5 && (
                       <div class="gd-own-icons">
                         <div class="gd-own-card gd-own-icon">
-                          <img src={`${OWN}rt-chip.webp`} alt="" class="is-chip" />
+                          {/* drawn, not the old rt-chip.webp crop — that bitmap carried
+                              the export's darker backdrop, a box on the card */}
+                          <span class="gd-own-chip">
+                            <span class="gd-pill">
+                              <b>$271.01</b> <i>+$3.64 +3.09%</i>
+                            </span>
+                          </span>
                           <span>Real time streaming</span>
                         </div>
                         <div class="gd-own-card gd-own-icon">
@@ -432,8 +439,9 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
                   const vh = l.fit ? l.vh : Math.round(bh / k);
                   return (
                     <div
-                      class:list={["gd-live", { "is-clip": l.clip, "gd-fade": l.s }]}
+                      class:list={["gd-live", { "is-clip": l.clip, "gd-fade": l.s != null, "is-rise": l.rise }]}
                       data-s={l.s ?? undefined}
+                      data-stack={l.stack ? "" : undefined}
                       style={`left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%`}
                     >
                       <iframe
@@ -665,7 +673,9 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
          beside it. Clip (clip-path clips hit-testing too) to the card's
          column only: vertically it stays open, so a card that grows after
          it was measured — an entry spring, a bracket order opening, a
-         dropdown — is never cut. */
+         dropdown — is never cut. A "width" card sits on the rect's top and
+         only grows down, so its top is closed just above the card: open,
+         it swallowed clicks on a card stacked above it (slide 32). */
       if (f.dataset.clip) {
         wrap.style.clipPath = "";
         return;
@@ -673,7 +683,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
       const cw = r.width * k;
       const cl = (bw - cw) / 2;
       const m = 20;
-      wrap.style.clipPath = `inset(-2000px ${bw - cl - cw - m}px -2000px ${cl - m}px)`;
+      const top = byWidth ? -m : -2000;
+      wrap.style.clipPath = `inset(${top}px ${bw - cl - cw - m}px -2000px ${cl - m}px)`;
     };
     /* Named per-slide actions run inside a prototype after it has loaded —
        putting it in the state the slide shows. Kept here, not in the
@@ -723,51 +734,78 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
         w.AudioContext = undefined;
         w.webkitAudioContext = undefined;
       },
-      /* slide 32: the stock ticket discloses itself as you present. First
-         only the symbol; clicking it opens the rest of the ticket; from
-         there the ticket's own "+ Bracket order" works as on its page.
-         The card's top edge stays put while it grows. */
-      symbolFirst: (w, d) => {
-        const shell = d.querySelector<HTMLElement>(".wshell");
-        const deckEl = d.querySelector<HTMLElement>(".ob-deck");
-        const pill = d.querySelector<HTMLElement>(".st-id");
-        if (!shell || !deckEl || !pill) return;
-        const st = d.createElement("style");
-        st.textContent = `
-          html.deck-sym .st-body > :not(.st-quote),
-          html.deck-sym .ob-card > :not(.st-body) { display: none !important; }
-          html.deck-sym .st-id { cursor: pointer; }
-          .deck-rest { animation: deck-in .45s cubic-bezier(.2,.8,.2,1) both; }
-          @keyframes deck-in { from { opacity: 0; translate: 0 -6px; } }
-        `;
-        d.head.appendChild(st);
-        const top0 = shell.getBoundingClientRect().top;
-        let shift = 0;
-        const pin = () => {
-          const drift = shell.getBoundingClientRect().top - top0;
-          if (Math.abs(drift) < 0.5) return;
-          shift -= drift;
-          deckEl.style.translate = `0 ${shift}px`;
-        };
-        new (w.ResizeObserver as typeof ResizeObserver)(pin).observe(shell);
-        d.documentElement.classList.add("deck-sym");
-        pin();
-        pill.addEventListener(
-          "click",
-          (e) => {
-            if (!d.documentElement.classList.contains("deck-sym")) return;
-            e.preventDefault();
-            e.stopPropagation();
-            d.documentElement.classList.remove("deck-sym");
-            d.querySelectorAll<HTMLElement>(".st-body > :not(.st-quote), .ob-card > :not(.st-body)").forEach(
-              (el) => el.classList.add("deck-rest"),
-            );
-            pin();
-          },
-          true,
-        );
-      },
+      /* slide 32: three copies of the stock ticket, each cut down to one
+         stage of the build — the quote row; the quote + its fields; all of
+         it. The card's top edge stays put if it changes height (hiding
+         rows, or the full one's own "+ Bracket order"). */
+      ticketQuote: (w, d) =>
+        trimTicket(w, d, ".st-body > :not(.st-quote), .ob-card > :not(.st-body)"),
+      ticketQty: (w, d) =>
+        trimTicket(
+          w,
+          d,
+          ".st-body > :not(.st-quote):not(:has(.ob-params)), .ob-card > :not(.st-body)",
+        ),
+      ticketFull: (w, d) => trimTicket(w, d, ""),
     };
+    /* A [data-stack] column of live cards (slide 32) reflows like a list:
+       each card sits a gap below the one above it, so one growing (a Limit
+       price row opening) pushes the rest down instead of overlapping them.
+       Measured every time a card's size changes, so it follows the spring. */
+    function restack(slide: HTMLElement | null | undefined) {
+      if (!slide) return;
+      const cards = [...slide.querySelectorAll<HTMLElement>(".gd-live[data-stack]")].map((wrap) => {
+        const f = wrap.querySelector("iframe");
+        const card = f?.contentDocument?.querySelector<HTMLElement>(".wshell");
+        return {
+          wrap,
+          top: (parseFloat(wrap.style.top) / 100) * H, // the card sits on its rect's top
+          h: card ? card.getBoundingClientRect().height * parseFloat(f!.style.zoom || "1") : 0,
+        };
+      });
+      if (cards.some((c) => !c.h)) return;
+      // the gaps give way (24 → 8) before the last card runs off the slide
+      const room = H - 16 - cards[0].top - cards.reduce((a, c) => a + c.h, 0);
+      const gap = Math.max(8, Math.min(24, room / (cards.length - 1)));
+      let bottom = cards[0].top + cards[0].h;
+      cards.slice(1).forEach((c) => {
+        const shift = Math.max(0, bottom + gap - c.top);
+        c.wrap.style.marginTop = shift ? `${shift}px` : "";
+        bottom = c.top + shift + c.h;
+      });
+    }
+    function trimTicket(w: any, d: Document, hide: string) {
+      const shell = d.querySelector<HTMLElement>(".wshell");
+      const deckEl = d.querySelector<HTMLElement>(".ob-deck");
+      if (!shell || !deckEl) return;
+      const top0 = shell.getBoundingClientRect().top;
+      if (hide) {
+        const st = d.createElement("style");
+        st.textContent = `${hide} { display: none !important; }`;
+        d.head.appendChild(st);
+      }
+      let shift = 0;
+      const pin = () => {
+        const drift = shell.getBoundingClientRect().top - top0;
+        if (Math.abs(drift) < 0.5) return;
+        shift -= drift;
+        deckEl.style.translate = `0 ${shift}px`;
+      };
+      new (w.ResizeObserver as typeof ResizeObserver)(() => {
+        pin();
+        restack((w.frameElement as HTMLElement | null)?.closest<HTMLElement>(".gd-slide"));
+      }).observe(shell);
+      pin();
+      /* stacked copies: a menu opened in one would drop behind the copy
+         below, so its frame comes to the front while a menu is open (the
+         menu's own scrim takes the next outside click, which closes it) */
+      const wrap = (w.frameElement as HTMLElement | null)?.parentElement;
+      if (!wrap) return;
+      const raise = () => {
+        wrap.style.zIndex = d.querySelector(".ob-dd-scrim, [role=listbox], [role=dialog]") ? "5" : "";
+      };
+      new (w.MutationObserver as typeof MutationObserver)(raise).observe(d.body, { childList: true, subtree: true });
+    }
     const runInit = (f: HTMLIFrameElement) => {
       const name = f.dataset.init;
       if (!name || f.dataset.inited) return;
@@ -1182,12 +1220,11 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     text-align: center;
     padding: 0 4%;
   }
-  .gd-statement:has(> .gd-kicker) {
+  /* the order-entry statements hang from the old centred-title line: the
+     text keeps the spot it had under that title (438 + its 27px line + 9px) */
+  .gd-statement.is-top {
     justify-content: flex-start;
-    padding-top: var(--gd-title-y);
-  }
-  .gd-statement .gd-kicker {
-    margin-bottom: 9px; /* the gap dialled in by hand on 20/21, now for all */
+    padding-top: calc(var(--gd-title-y) + 36px);
   }
   .gd-statement-t {
     margin: 0;
@@ -1206,13 +1243,6 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     flex-direction: column;
     justify-content: center;
     padding-left: 10%;
-  }
-  .gd-numbered:has(> .gd-kicker) {
-    justify-content: flex-start;
-    padding-top: var(--gd-title-y);
-  }
-  .gd-numbered .gd-kicker {
-    margin-bottom: 40px;
   }
   .gd-numbered ol {
     margin: 0;
@@ -1365,10 +1395,8 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-top: var(--gd-title-y);
-  }
-  .gd-journey .gd-kicker {
-    margin-bottom: 8px; /* the gap dialled in by hand on 22/23, now for all */
+    /* where the row sat under the old centred title */
+    padding-top: calc(var(--gd-title-y) + 35px);
   }
   .gd-journey-row {
     display: flex;
@@ -1617,6 +1645,22 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
   .gd-slide--black .gd-corner {
     color: rgba(255, 255, 255, 0.62);
   }
+  /* a title sitting on a light panel of a dark slide (14) */
+  .gd-slide .gd-corner.is-dark {
+    color: rgba(0, 0, 0, 0.55);
+  }
+  .gd-corner-row {
+    position: absolute;
+    left: 5.2%;
+    top: 7.2%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1;
+  }
+  .gd-corner-row .gd-corner {
+    position: static;
+  }
 
   /* ---- metrics (26) ---- */
   .gd-metrics {
@@ -1625,20 +1669,11 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: var(--gd-title-y);
+    /* where the row sat under the old centred title + clock line */
+    padding-top: calc(var(--gd-title-y) + 36px);
   }
-  .gd-metrics .gd-kicker {
-    margin: 0 0 9px;
-  }
-  /* the clock hangs to the left of the title, so the title itself stays
-     centred on the same line as every other slide's */
-  .gd-metrics-head {
-    position: relative;
-  }
+  /* 26's clock follows its title; the title keeps the shared left edge */
   .gd-metrics-clock {
-    position: absolute;
-    right: calc(100% + 12px);
-    top: calc(50% - 13px - 4.5px); /* centred on the title line (the title has a 9px bottom margin) */
     line-height: 0;
   }
   .gd-metrics-row {
@@ -1840,6 +1875,15 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
   .gd-slide :global(.gd-fade[data-s].is-on) {
     transition-delay: calc(var(--d, 0) * 1ms);
   }
+  /* ...and ones that also rise into place, top to bottom (slide 32) */
+  .gd-slide :global(.gd-fade.is-rise[data-s]) {
+    transition:
+      opacity 0.5s ease,
+      translate 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .gd-slide :global(.gd-fade.is-rise[data-s]:not(.is-on)) {
+    translate: 0 -16px;
+  }
   .gd-connectors {
     position: absolute;
     inset: 0;
@@ -1954,8 +1998,16 @@ const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
     width: 108px;
     height: auto;
   }
-  .gd-own-icon img.is-chip {
-    width: 220px;
+  /* same box the 220×51 chip image had, so the tile keeps its height */
+  .gd-own-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 51px;
+  }
+  .gd-own-chip .gd-pill {
+    font-size: 15px;
+    padding: 5px 10px;
   }
   .gd-own-icon span {
     font-size: 21px;

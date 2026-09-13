@@ -18,56 +18,65 @@
   "n": 3,
   "kind": "ownership",
   "bg": "black",
-  "reveal": 1
+  "reveal": 1,
+  "corner": "Title"
  },
  {
   "n": 4,
   "kind": "ownership",
   "bg": "black",
-  "reveal": 2
+  "reveal": 2,
+  "corner": "Title"
  },
  {
   "n": 5,
   "kind": "ownership",
   "bg": "black",
-  "reveal": 3
+  "reveal": 3,
+  "corner": "Title"
  },
  {
   "n": 6,
   "kind": "ownership",
   "bg": "black",
-  "reveal": 4
+  "reveal": 4,
+  "corner": "Title"
  },
  {
   "n": 7,
   "kind": "ownership",
   "bg": "black",
-  "reveal": 5
+  "reveal": 5,
+  "corner": "Title"
  },
  {
   "n": 8,
   "kind": "ownership",
   "bg": "black",
-  "reveal": 6
+  "reveal": 6,
+  "corner": "Title"
  },
  {
   "n": 9,
   "kind": "ownership",
   "bg": "black",
-  "reveal": 7
+  "reveal": 7,
+  "corner": "Title"
  },
  {
   "n": 10,
   "kind": "ownership",
   "bg": "black",
-  "reveal": 8
+  "reveal": 8,
+  "corner": "Title"
  },
  {
   "n": 11,
   "kind": "ownership",
   "bg": "black",
   "reveal": 8,
-  "dim": true
+  "dim": true,
+  "corner": "Title"
  },
  {
   "n": 12,
@@ -88,6 +97,7 @@
   "n": 14,
   "kind": "media",
   "bg": "black",
+  "cornerInk": "dark",
   "panels": [
    {
     "x": 0,
@@ -122,13 +132,15 @@
     "y": 24.3,
     "w": 46.6
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 15,
   "kind": "statement",
   "bg": "black",
-  "text": "Questrade was experiencing slower\ngrowth among the active traders."
+  "text": "Questrade was experiencing slower\ngrowth among the active traders.",
+  "corner": "Title"
  },
  {
   "n": 16,
@@ -140,7 +152,8 @@
  {
   "n": 17,
   "bg": "black",
-  "raster": "017.webp"
+  "raster": "017.webp",
+  "corner": "Title"
  },
  {
   "n": 18,
@@ -172,7 +185,8 @@
     "fit": ".wshell",
     "vh": 960
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 19,
@@ -474,18 +488,55 @@
     "w": 42
    }
   ],
+  "steps": 2,
   "live": [
    {
     "page": "stock-order-entry",
-    "x": 55,
-    "y": 30,
-    "w": 40,
-    "h": 54,
+    "x": 61.5,
+    "y": 27,
+    "w": 27,
+    "h": 8,
     "vw": 1280,
     "css": ".ob-stage{background:none!important}.wshell-bar{display:none!important}",
-    "init": "symbolFirst",
+    "mode": "width",
+    "init": "ticketQuote",
     "fit": ".wshell",
-    "vh": 960
+    "vh": 960,
+    "s": 0,
+    "rise": true,
+    "stack": true
+   },
+   {
+    "page": "stock-order-entry",
+    "x": 61.5,
+    "y": 35.82,
+    "w": 27,
+    "h": 25,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}.wshell-bar{display:none!important}",
+    "mode": "width",
+    "init": "ticketQty",
+    "fit": ".wshell",
+    "vh": 960,
+    "s": 1,
+    "rise": true,
+    "stack": true
+   },
+   {
+    "page": "stock-order-entry",
+    "x": 61.5,
+    "y": 59.99,
+    "w": 27,
+    "h": 34,
+    "vw": 1280,
+    "css": ".ob-stage{background:none!important}.wshell-bar{display:none!important}",
+    "mode": "width",
+    "init": "ticketFull",
+    "fit": ".wshell",
+    "vh": 960,
+    "s": 2,
+    "rise": true,
+    "stack": true
    }
   ]
  },
@@ -500,7 +551,8 @@
   "n": 34,
   "kind": "statement",
   "bg": "black",
-  "text": "What are options?"
+  "text": "What are options?",
+  "corner": "Title"
  },
  {
   "n": 35,
@@ -515,7 +567,8 @@
    }
   ],
   "left": "Single-leg / Option = 🍔",
-  "right": "Multi-leg / Strategy = 🍔🥤🍟"
+  "right": "Multi-leg / Strategy = 🍔🥤🍟",
+  "corner": "Title"
  },
  {
   "n": 36,
@@ -573,7 +626,8 @@
     "y": 11.8,
     "w": 40.5
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 40,
@@ -774,7 +828,8 @@
     "fit": ".wshell",
     "vh": 960
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 47,
@@ -792,7 +847,8 @@
     "fit": ".wshell",
     "vh": 960
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 48,
@@ -987,7 +1043,8 @@
     "fit": ".wsp-screen",
     "vh": 900
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 55,
@@ -1019,7 +1076,8 @@
     "85%",
     "Satisfaction score during the closed beta"
    ]
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 57,
@@ -1159,7 +1217,7 @@
   "n": 69,
   "kind": "cards",
   "bg": "white",
-  "heading": "Trader types",
+  "corner": "Trader types",
   "panels": [
    {
     "x": 0,
@@ -1742,13 +1800,14 @@
     "icon": null,
     "text": "Allow traders to place\na fractional trade"
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 83,
   "kind": "media",
   "bg": "canvas",
-  "heading": "Original design",
+  "corner": "Original design",
   "labels": [
    {
     "text": "Original multi page wizard order entry",
@@ -1770,7 +1829,7 @@
   "n": 84,
   "kind": "media",
   "bg": "canvas",
-  "heading": "Original design",
+  "corner": "Original design",
   "labels": [
    {
     "text": "Original multi page wizard order entry",
@@ -1792,7 +1851,7 @@
   "n": 85,
   "kind": "media",
   "bg": "white",
-  "heading": "Original design",
+  "corner": "Original design",
   "panels": [
    {
     "x": 0,
@@ -1841,7 +1900,7 @@
   "n": 86,
   "kind": "media",
   "bg": "white",
-  "heading": "How does an advanced trader place an order?",
+  "corner": "How does an advanced trader place an order?",
   "panels": [
    {
     "x": 50,
@@ -1870,10 +1929,10 @@
   "n": 87,
   "kind": "media",
   "bg": "white",
-  "heading": "Happy path",
-  "heading2": {
+  "corner": "Happy path",
+  "corner2": {
    "text": "Happy path",
-   "x": 52.6
+   "x": 55.2
   },
   "panels": [
    {
@@ -1921,7 +1980,7 @@
   "n": 88,
   "kind": "numbered",
   "bg": "white",
-  "kicker": "Design process",
+  "corner": "Design process",
   "items": [
    "Happy path design",
    "Order type navigation",
@@ -1935,7 +1994,7 @@
   "n": 89,
   "kind": "media",
   "bg": "white",
-  "heading": "Navigating edge cases",
+  "corner": "Navigating edge cases",
   "shots": [
    {
     "src": "089a",
@@ -1949,7 +2008,7 @@
   "n": 90,
   "kind": "media",
   "bg": "white",
-  "heading": "Navigating edge cases",
+  "corner": "Navigating edge cases",
   "labels": [
    {
     "text": "V1",
@@ -1981,7 +2040,7 @@
   "n": 91,
   "kind": "media",
   "bg": "white",
-  "heading": "Navigating edge cases",
+  "corner": "Navigating edge cases",
   "shots": [
    {
     "src": "091a",
@@ -1995,7 +2054,7 @@
   "n": 92,
   "kind": "media",
   "bg": "white",
-  "heading": "Navigating edge cases",
+  "corner": "Navigating edge cases",
   "panels": [
    {
     "x": 50,
@@ -2081,7 +2140,8 @@
     "fit": ".fof-frame",
     "vh": 1000
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 96,
@@ -2123,7 +2183,8 @@
     "y": 29.6,
     "w": 30.1
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 97,
@@ -2165,7 +2226,8 @@
     "fit": ".opa-badge, .opa-caption",
     "vh": 1000
    }
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 98,
@@ -2190,7 +2252,8 @@
     "$33M",
     "total value traded"
    ]
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 100,
@@ -2211,7 +2274,8 @@
     "$33M",
     "total value traded"
    ]
-  ]
+  ],
+  "corner": "Title"
  },
  {
   "n": 101,
