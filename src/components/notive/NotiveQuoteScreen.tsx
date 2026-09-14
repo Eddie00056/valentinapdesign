@@ -335,6 +335,11 @@ export function NotiveQuoteScreen({
     borderRadius: { duration: 0 },
   } as const;
   const fracGlyphPop = { type: "spring", visualDuration: 0.22, bounce: 0, delay: 0.05 } as const;
+  /* The block under the banner slides on the card's own open spring, so the
+     two arrive together (motion.dev: `layout="position"` animates position
+     only, by transform; `LayoutGroup` measures it in the same pass as the
+     `layoutId` card). */
+  const slideSpring = { type: "spring", visualDuration: 0.3, bounce: 0 } as const;
   const openFrac = () => {
     setFracOpen(true);
     setFracSettled(false);
@@ -463,7 +468,7 @@ export function NotiveQuoteScreen({
                   className="nq-frac-glyph"
                   style={{ position: "relative", zIndex: 4, lineHeight: 0 }}
                 >
-                  <img src={MARK_SRC} alt="" width={9} height={9} />
+                  <img src={MARK_SRC} alt="" width={12} height={12} />
                 </motion.span>
               </motion.div>
             )}
@@ -516,7 +521,7 @@ export function NotiveQuoteScreen({
             lineHeight: 0,
           }}
         >
-          <AppleIcon size={20} />
+          <AppleIcon size={15} /> {/* 20 / 1.3 — "the icon looks the same size as the background" */}
         </span>
         <span style={{ fontSize: 12, fontWeight: 400, lineHeight: "16px", color: HEAD_NAME }}>
           {NAME}
@@ -572,18 +577,24 @@ export function NotiveQuoteScreen({
   );
 
   const banner = (
-    /* Outer slot owns the layout height so the content below follows the
-       collapse immediately; the inner `layoutId` box floats on top of it and
-       morphs to / from the header chip. */
+    /* The slot is mounted at its FINAL geometry (40 tall, 12 under the nav
+       row) and never tweens on open. It used to animate height / marginTop
+       0 -> 40 / 12 alongside the card's shared-layout morph, and that is
+       what made the open hitch: Motion measures a `layoutId` target once,
+       on mount — an ancestor whose margin then tweens moves the real box
+       12px after the target was taken, so the card "almost got there,
+       stopped, jumped". With the slot static the target is true from frame
+       one, and the content below slides via its own `layout="position"`
+       animation (see the render), measured in the same LayoutGroup pass.
+       On CLOSE the slot still tweens shut — that is real layout, not
+       projection, so the block below follows it frame by frame and the
+       chip's target (the nav-row slot) never moves. */
     <AnimatePresence initial={false}>
       {fracOpen && (
         <motion.div
           key="nq-frac-slot"
-          initial={{ height: 0, marginTop: 0 }}
-          animate={{ height: 40, marginTop: 12 }}
           exit={{ height: 0, marginTop: 0, transition: { duration: 0.12, ease: [0.4, 0, 0.2, 1] } }}
-          transition={{ duration: 0.17, ease: [0.4, 0, 0.2, 1] }}
-          style={{ position: "relative", marginLeft: -24, marginRight: -24 }}
+          style={{ position: "relative", marginLeft: -24, marginRight: -24, height: 40, marginTop: 12 }}
         >
           <motion.div
             layoutId="nq-frac-card"
@@ -634,7 +645,7 @@ export function NotiveQuoteScreen({
                 animate={{ scale: 1, opacity: 1, transition: fracGlyphPop }}
                 style={{ display: "block" }}
               >
-                <img src={MARK_SRC} alt="" width={9} height={9} />
+                <img src={MARK_SRC} alt="" width={12} height={12} />
               </motion.span>
             </motion.span>
 
@@ -886,12 +897,14 @@ export function NotiveQuoteScreen({
             <LayoutGroup>
               {header}
               {banner}
-              {quote}
+              <motion.div layout="position" transition={{ layout: slideSpring }}>
+                {quote}
+                {chart}
+                {rail}
+                {statsCard}
+                {about}
+              </motion.div>
             </LayoutGroup>
-            {chart}
-            {rail}
-            {statsCard}
-            {about}
           </div>
         </PhoneFrame>
       </div>

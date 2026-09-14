@@ -191,14 +191,16 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* 9px: it was 12 (a third of the box, the banner page's proportion) and
-   the user asked for it "shrunk by 1.3" (2026-09-13). It stays 9 in the
-   expanded banner too: the glyph carries its own `layoutId`, so any size
-   difference between the two states would be animated. */
+/* 12px: a third of the box, the banner page's proportion (22 in 66), and
+   the star's 12px of ink beside it. (A "shrink the icon by 1.3" on
+   2026-09-13 was about the Apple mark in the tile, not this one — it was
+   briefly 9.) It stays 12 in the expanded banner too: the glyph carries
+   its own `layoutId`, so any size difference between the two states would
+   be animated. */
 .nq-frac-glyph img {
   display: block;
-  width: 9px;
-  height: 9px;
+  width: 12px;
+  height: 12px;
 }
 
 /* ---- Buy / Sell ----
