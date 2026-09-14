@@ -262,7 +262,7 @@ export const THUMBS: Record<
      2.2s price clock. */
   "order-placement-boxed": {
     "focus": "js:[...document.querySelectorAll('span')].filter(e => e.children.length === 0 && (e.textContent.trim() === 'DASH' || e.textContent.trim() === 'Apple')).map(e => e.parentElement)",
-    "isolate": "#000", "fill": 0.4, "ar": 0.6, "pad": 0, "seconds": 6.6,
+    "isolate": "#000", "fill": 0.4, "ar": 0.6, "pad": 0, "seconds": 6.6, "outW": 1800,
     /* The card reads "Apple" with the Apple mark (user's ask, thumbnail only —
        the piece itself still trades DASH): the mark is the shared glyph from
        glasslab/icons.tsx, set inline before the symbol. React leaves both
@@ -317,14 +317,16 @@ export const THUMBS: Record<
     ]
   },
   "beam-ring": { "focus": ".bd-cta", "fill": 0.24, "ar": 0.62, "pad": 0 },
-  /* The quote block and the price line chart, on a flat ground — no phone:
-     the Apple mark and name, the ticking price, the change line with its
-     fractional glass icon, then the chart. Not the Search/Close buttons.
-     Everything moves on the same clock tick. */
+  /* The Apple mark and name, the ticking price (no "USD"), then the price
+     line chart, on a flat ground — no phone, no change line, no fractional
+     icon (user's picks). The change row is collapsed so the chart sits
+     right under the price. Everything moves on the same clock tick. */
   "notive-quote": {
-    "focus": "js:(() => { const p = [...document.querySelectorAll('.nq-root *')].find(e => e.style && e.style.fontSize === '35px'); if (!p) return []; const row = p.parentElement, ticker = row.previousElementSibling; return [ticker.children[0], ticker.children[1], row, row.nextElementSibling, document.querySelector('.nq-root svg[viewBox^=\"0 0 386\"]')]; })()",
-    "isolate": "#e8e8e8", "fill": 0.6, "pad": 0, "seconds": 6.6
+    "focus": "js:(() => { const p = [...document.querySelectorAll('.nq-root *')].find(e => e.style && e.style.fontSize === '35px'); if (!p) return []; const ticker = p.parentElement.previousElementSibling; return [ticker.children[0], ticker.children[1], p, document.querySelector('.nq-root svg[viewBox^=\"0 0 386\"]')]; })()",
+    "isolate": "#e8e8e8", "fill": 0.68, "pad": 0, "seconds": 6.6,
+    "pre": [{ "eval": "(() => { const p = [...document.querySelectorAll('.nq-root *')].find(e => e.style && e.style.fontSize === '35px'); const row = p && p.parentElement.nextElementSibling; if (row) row.style.display = 'none'; })()" }]
   },
+
   /* Only the leg rows, on the legs panel's own ground. The opening $175 leg
      is priced unlike the same strike picked off the chain, so `pre` swaps it
      for the chain's one first: then the loop — +180, +165 to three rows,

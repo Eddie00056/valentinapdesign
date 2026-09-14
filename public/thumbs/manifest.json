@@ -20,8 +20,8 @@
     "seconds": 6.6
   },
   "order-placement-boxed": {
-    "w": 1200,
-    "h": 718,
+    "w": 1800,
+    "h": 1078,
     "seconds": 6.6
   },
   "order-placed-animation": {
@@ -56,7 +56,7 @@
   },
   "notive-quote": {
     "w": 1200,
-    "h": 1138,
+    "h": 1024,
     "seconds": 6.6
   },
   "chain-to-order": {
