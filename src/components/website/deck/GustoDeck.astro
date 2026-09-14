@@ -972,15 +972,16 @@ const title = (s: Slide): string | undefined =>
       new (w.MutationObserver as typeof MutationObserver)(raise).observe(d.body, { childList: true, subtree: true });
     }
     const runInit = (f: HTMLIFrameElement) => {
+      if (f.dataset.inited) return;
       const name = f.dataset.init;
-      if (!name || f.dataset.inited) return;
       try {
         // "a,b": several actions on one frame (slide 79 freezes the price walk beside its own set-up)
-        for (const n of name.split(",")) INIT[n.trim()]?.(f.contentWindow, f.contentDocument!);
-        f.dataset.inited = "1";
+        if (name) for (const n of name.split(",")) INIT[n.trim()]?.(f.contentWindow, f.contentDocument!);
       } catch {
         /* same-origin always; a missing element just leaves the default state */
       }
+      // set up (with or without an action) — an `arrive` alone (slide 76's banner) waits on this
+      f.dataset.inited = "1";
     };
     /* data-arrive: an action that plays when you land on the slide (not when
        it preloads as a neighbour). Held until the frame's own set-up has had

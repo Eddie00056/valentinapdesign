@@ -210,7 +210,8 @@
         "y": 22.5,
         "size": "lg"
       }
-    ]
+    ],
+    "cornerInk": "dark"
   },
   {
     "n": 16,
@@ -401,7 +402,7 @@
       {
         "src": "027a",
         "x": 0,
-        "y": 0,
+        "y": 0.09,
         "w": 100
       }
     ],
@@ -410,7 +411,7 @@
       {
         "text": "Current widget layout",
         "x": 50.03,
-        "y": 25.71,
+        "y": 25.8,
         "size": "lg"
       }
     ]
@@ -423,7 +424,7 @@
       {
         "src": "028a",
         "x": 0,
-        "y": 0,
+        "y": 0.09,
         "w": 100
       }
     ],
@@ -432,7 +433,7 @@
       {
         "text": "Current widget layout",
         "x": 50.03,
-        "y": 25.71,
+        "y": 25.8,
         "size": "lg"
       }
     ]
@@ -512,7 +513,7 @@
     "labels": [
       {
         "text": "Updated widget design",
-        "x": 50.02,
+        "x": 50.03,
         "y": 25.8,
         "size": "lg",
         "s": 0
@@ -1036,7 +1037,7 @@
   {
     "n": 55,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "055a",
@@ -1050,7 +1051,7 @@
   {
     "n": 56,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "056a",
@@ -1117,7 +1118,7 @@
   {
     "n": 60,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "060a",
@@ -1131,7 +1132,7 @@
   {
     "n": 61,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "061a",
@@ -1145,7 +1146,7 @@
   {
     "n": 62,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "062a",
@@ -1159,7 +1160,7 @@
   {
     "n": 63,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "063a",
@@ -1173,7 +1174,7 @@
   {
     "n": 64,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "064a",
@@ -1187,7 +1188,7 @@
   {
     "n": 65,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "065a",
@@ -1201,7 +1202,7 @@
   {
     "n": 66,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "066b",
@@ -1215,7 +1216,7 @@
   {
     "n": 67,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "067a",
@@ -1229,7 +1230,7 @@
   {
     "n": 68,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "068a",
@@ -1243,7 +1244,7 @@
   {
     "n": 69,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "069a",
@@ -1257,7 +1258,7 @@
   {
     "n": 70,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "070a",
@@ -1482,7 +1483,7 @@
     ],
     "live": [
       {
-        "page": "alert-creation?banner=open",
+        "page": "alert-creation",
         "x": 56.62,
         "y": 34.0,
         "w": 34.75,
@@ -1492,7 +1493,8 @@
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
         "css": ".acs-root{background:none!important}",
-        "clip": true
+        "clip": true,
+        "arrive": "openFractional"
       }
     ]
   },
@@ -1512,7 +1514,7 @@
   {
     "n": 78,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "078a",
@@ -1535,7 +1537,7 @@
   {
     "n": 79,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "079a",
@@ -1615,14 +1617,6 @@
         "size": "lg"
       }
     ],
-    "shots": [
-      {
-        "src": "081a",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ],
     "live": [
       {
         "page": "order-placement-boxed",
@@ -1646,9 +1640,10 @@
         "vh": 1000,
         "fit": "img[src*=\"iphone\"]",
         "css": ".phone-stage{background:none!important}",
-        "init": "openFractional"
+        "arrive": "openFractional"
       }
-    ]
+    ],
+    "corner": "Help traders placing a trade"
   },
   {
     "n": 82,
