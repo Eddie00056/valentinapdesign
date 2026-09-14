@@ -1181,54 +1181,67 @@
     "n": 74,
     "kind": "media",
     "bg": "black",
-    "shots": [
+    "corner": "Help traders find the correct symbol",
+    "labels": [
       {
-        "src": "074full",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "text": "Original design",
+        "x": 18.36,
+        "y": 37.2,
+        "size": "lg"
+      },
+      {
+        "text": "Beta release",
+        "x": 49.97,
+        "y": 37.2,
+        "size": "lg"
+      },
+      {
+        "text": "Public release",
+        "x": 81.59,
+        "y": 37.2,
+        "size": "lg"
       }
     ],
     "live": [
       {
         "page": "notive-quote",
-        "x": 7.19,
-        "y": 31.85,
-        "w": 21.72,
-        "h": 72.78,
+        "x": 7.13,
+        "y": 40.0,
+        "w": 22.45,
+        "h": 60.0,
         "vw": 1280,
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}",
         "init": "notiveOriginal,freeze",
         "clip": true
       },
       {
         "page": "notive-quote",
-        "x": 38.75,
-        "y": 32.42,
+        "x": 38.74,
+        "y": 40.0,
         "w": 22.45,
-        "h": 75.26,
+        "h": 60.0,
         "vw": 1280,
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}",
         "init": "notiveBeta,freeze",
         "clip": true
       },
       {
         "page": "notive-quote",
-        "x": 70.26,
-        "y": 32.69,
-        "w": 23.75,
-        "h": 74.07,
+        "x": 70.37,
+        "y": 40.0,
+        "w": 22.45,
+        "h": 60.0,
         "vw": 1280,
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-panel{display:none!important}",
         "init": "freeze",
         "clip": true
       }

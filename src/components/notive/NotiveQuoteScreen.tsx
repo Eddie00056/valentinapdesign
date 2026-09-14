@@ -188,7 +188,7 @@ function Panel({
      on request (user, 2026-09-14: "remove the white card and make all the
      content have 16px left and right padding … from the mockup"). */
   return (
-    <div style={{ marginTop }}>
+    <div className="nq-panel" style={{ marginTop }}>
       <div style={{ fontSize: 19, fontWeight: 600, lineHeight: "26px", color: INK }}>{title}</div>
       {children}
     </div>
