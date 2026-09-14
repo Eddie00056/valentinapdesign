@@ -452,6 +452,7 @@ const title = (s: Slide): string | undefined =>
                         data-pad={l.pad || 0}
                         data-mode={l.mode || ""}
                         data-init={l.init || ""}
+                        data-arrive={l.arrive || undefined}
                         data-clip={l.clip ? "1" : ""}
                         data-bw={bw}
                         data-bh={bh}
@@ -765,6 +766,25 @@ const title = (s: Slide): string | undefined =>
         };
         pick();
       },
+      /* slide 86's set-up, done while the slide is still a neighbour: a Limit
+         order with its quantity field focused and empty, the pad open */
+      fracHintSetup: (w, d) => {
+        INIT.limitOrder(w, d);
+        let tries = 0;
+        const go = () => {
+          const label = [...d.querySelectorAll<HTMLElement>("span")].find((e) => e.textContent === "Share quantity");
+          const limitOn = [...d.querySelectorAll<HTMLElement>("span")].some((e) => e.textContent === "Limit price");
+          if (!label || !limitOn) return tries++ < 80 && w.setTimeout(go, 25);
+          label.parentElement!.click();
+        };
+        go();
+      },
+      /* ...and on arrival 1.5 is typed at a readable pace: the value complete,
+         the hint, the blue field and the pill ring come up together */
+      fracHintType: (w) =>
+        [["1", 0], [".", 380], ["5", 860]].forEach(([key, ms]) =>
+          w.setTimeout(() => w.dispatchEvent(new w.KeyboardEvent("keydown", { key, bubbles: true })), ms),
+        ),
       // the order-placed animation chimes when its check lands; a deck is
       // no place for a sound nobody asked for
       // stop the live price walk: the quote holds still on this slide
@@ -901,10 +921,28 @@ const title = (s: Slide): string | undefined =>
         /* same-origin always; a missing element just leaves the default state */
       }
     };
+    /* data-arrive: an action that plays when you land on the slide (not when
+       it preloads as a neighbour). Held until the frame's own set-up has had
+       time to finish; leaving the slide reloads the frame so it plays again. */
+    const runArrive = (f: HTMLIFrameElement) => {
+      const name = f.dataset.arrive;
+      if (!name || f.dataset.arrived || !f.dataset.inited) return;
+      f.dataset.arrived = "1";
+      const wait = Math.max(0, 900 - (performance.now() - parseFloat(f.dataset.initAt || "0")));
+      window.setTimeout(() => {
+        try {
+          INIT[name]?.(f.contentWindow, f.contentDocument!);
+        } catch {
+          /* same-origin always */
+        }
+      }, wait + 300);
+    };
     const reveal = (f: HTMLIFrameElement) =>
       place(f).then(() => {
         runInit(f);
+        f.dataset.initAt = String(performance.now());
         f.classList.add("is-in");
+        if (f.closest(".gd-slide") === slides[i - 1]) runArrive(f);
       });
     const unmount = (f: HTMLIFrameElement) => {
       if (!f.getAttribute("src")) return;
@@ -926,6 +964,12 @@ const title = (s: Slide): string | undefined =>
     /* Leaving a slide resets any chain-to-order prototype that was used
        (ticket open, confirmation up), so it's fresh next time. */
     const resetUsed = (n: number) => {
+      slides[n - 1]?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe[data-arrive]").forEach((f) => {
+        if (!f.dataset.arrived || !f.getAttribute("src")) return;
+        delete f.dataset.arrived;
+        unmount(f);
+        mount(f);
+      });
       slides[n - 1]?.querySelectorAll<HTMLIFrameElement>('.gd-live iframe[data-init="chainFirst"]').forEach((f) => {
         const d = f.contentDocument;
         const used = d && (d.querySelector(".ctt-ticket")?.childElementCount || d.querySelector(".ob-modal-wrap *, .ob-toast-item"));
@@ -962,6 +1006,7 @@ const title = (s: Slide): string | undefined =>
       warm(i + 2);
       warm(i - 1);
       syncLive();
+      if (arrived) slides[i - 1]?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe[data-arrive]").forEach(runArrive);
       // backstop: anything that finished loading without being placed
       slides[i - 1]
         ?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe")
