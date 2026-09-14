@@ -6,12 +6,12 @@
   },
   "limit-order-error": {
     "w": 1200,
-    "h": 912,
+    "h": 854,
     "seconds": 5.5
   },
   "fractional-shares-banner": {
     "w": 1200,
-    "h": 662,
+    "h": 640,
     "seconds": 5.5
   },
   "alert-creation": {
@@ -46,7 +46,7 @@
   },
   "stock-order-entry": {
     "w": 1200,
-    "h": 600,
+    "h": 602,
     "seconds": 8
   },
   "beam-ring": {

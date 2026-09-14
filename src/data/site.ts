@@ -220,7 +220,7 @@ export const THUMBS: Record<
      the black page — and his dark ones at #0a–#14 with a few phone pieces on
      true black. One soft grey for every light piece here.
      Size (`fill`, measured off tcosta.com/wspoc's cards and confirmed by the
-     user twice): a button, toggle or icon takes 25–45% of the card's width;
+     user twice): a button, toggle or icon takes 18–30% of the card's width;
      a widget, table or phone screen about 60–75%. Never edge to edge. */
   /* Card shape (`ar`, height per width) is chosen per piece and deliberately
      VARIED. One shared shape (930x639 for everything small) made every card
@@ -230,11 +230,11 @@ export const THUMBS: Record<
      cards, round or square ones tall cards; the component stays large in
      each (`fill`). */
   "stock-option-toggle": {
-    "focus": "button.lbl", "fill": 0.3, "ar": 0.6, "pad": 0, "seconds": 5.5,
+    "focus": "button.lbl", "fill": 0.2, "ar": 0.6, "pad": 0, "seconds": 5.5,
     "script": [{ "wait": 500 }, { "label": "Option" }, { "wait": 2100 }, { "label": "Stock" }]
   },
   "limit-order-error": {
-    "focus": "[aria-label=\"Trigger limit order error\"]", "fill": 0.4, "ar": 0.76, "pad": 0, "seconds": 5.5,
+    "focus": "[aria-label=\"Trigger limit order error\"]", "fill": 0.28, "ar": 0.76, "pad": 0, "seconds": 5.5,
     "css": ".pshell { background: #e8e8e8 !important; }",
     /* The pill toggles: a second tap clears the ring, so the loop closes on
        the plain pill (blurring the button never cleared it). */
@@ -245,7 +245,7 @@ export const THUMBS: Record<
   },
   "fractional-shares-banner": {
     "focus": "[aria-label=\"Expand fractional shares banner\"], [aria-label=\"Collapse banner\"]",
-    "fill": 0.7, "ar": 0.64, "pad": 0, "seconds": 5.5,
+    "fill": 0.55, "ar": 0.64, "pad": 0, "seconds": 5.5,
     "css": ".pshell { background: #e8e8e8 !important; }",
     "script": [{ "wait": 500 }, { "label": "Expand fractional shares banner" }, { "wait": 2200 }, { "label": "Collapse banner" }]
   },
@@ -288,7 +288,7 @@ export const THUMBS: Record<
      the green arc draws round it and clears again. Two taps, back to start. */
   "fractional-order-flow": {
     "focus": "[aria-label=\"Swap amount and quantity\"]",
-    "isolate": "#e8e8e8", "fill": 0.3, "ar": 1.0, "pad": 0, "seconds": 5, "cursor": false,
+    "isolate": "#e8e8e8", "fill": 0.18, "ar": 1.0, "pad": 0, "seconds": 5, "cursor": false,
     "css": "[aria-label=\"Swap amount and quantity\"] > svg { display: none !important; }",
     "script": [
       { "wait": 700 }, { "click": "[aria-label=\"Swap amount and quantity\"]" },
@@ -322,7 +322,7 @@ export const THUMBS: Record<
      counting 10 up to 13 and back down, so the loop ends where it began. */
   "stock-order-entry": {
     "focus": ".ob-stepper:has(input[aria-label=\"Quantity\"])", "isolate": "#0f1719",
-    "fill": 0.45, "ar": 0.5, "pad": 0, "seconds": 8,
+    "fill": 0.32, "ar": 0.5, "pad": 0, "seconds": 8,
     "script": [
       { "wait": 600 }, { "label": "Increase Quantity" }, { "wait": 550 }, { "label": "Increase Quantity" }, { "wait": 550 }, { "label": "Increase Quantity" },
       { "wait": 1300 }, { "label": "Decrease Quantity" }, { "wait": 550 }, { "label": "Decrease Quantity" }, { "wait": 550 }, { "label": "Decrease Quantity" },
