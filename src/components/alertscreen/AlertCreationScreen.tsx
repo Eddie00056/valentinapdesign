@@ -704,7 +704,7 @@ export function AlertCreationScreen({
               {/* chart — tick-driven candlesticks (Robinhood "advanced" style):
                   static session candles, a forming candle that builds on each
                   tick, and a dotted "now" price line + axis pill. */}
-              <div style={{ position: "relative", width: "calc(100% + 48px)", margin: "16px -24px 0", minHeight: 188 }}>
+              <div className="acs-chart-wrap" style={{ position: "relative", width: "calc(100% + 48px)", margin: "16px -24px 0", minHeight: 188 }}>
                 <LiveCandleChart
                   w={393}
                   h={188}
