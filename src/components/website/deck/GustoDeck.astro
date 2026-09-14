@@ -335,7 +335,7 @@ const title = (s: Slide): string | undefined =>
                     {(s.videos || []).map((v: any) => (
                       <video
                         class="gd-media-shot"
-                        style={`left:${v.x}%;top:${v.y}%;width:${v.w}%`}
+                        style={`left:${v.x}%;top:${v.y}%;width:${v.w}%${v.clip ? `;clip-path:inset(${v.clip.join("% ")}%)` : ""}`}
                         src={`/website/case/gusto/videos/${v.src}`}
                         autoplay
                         loop

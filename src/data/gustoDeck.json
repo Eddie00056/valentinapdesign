@@ -606,20 +606,18 @@
     "n": 38,
     "kind": "media",
     "bg": "black",
-    "shots": [
-      {
-        "src": "038a",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ],
     "videos": [
       {
         "src": "questrade.mp4",
-        "x": 8.1,
-        "y": 9.5,
-        "w": 82.77
+        "x": 10,
+        "y": 10.6,
+        "w": 80,
+        "clip": [
+          3,
+          1.2,
+          3,
+          0
+        ]
       }
     ],
     "corner": "Reduce time to trade"
