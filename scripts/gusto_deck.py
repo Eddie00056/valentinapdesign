@@ -588,16 +588,28 @@ N[96] = {"kind": "media", "bg": "white", "labels": FRAC_LABELS,
                   for x, init in ((35.63, None), (67.5, "limitOrder"))]}
 _T97 = (20.68, 62.78, 31.56, 83.98)  # the "Order sent" tile
 _P97 = (63.2, 14.0, 84.7, 88.9)      # the phone: the live order-placement screen
-# the alert screen's symbol, price and candles alone (the gallery clip's section) on
-# a black tile: the rows around them and the phone frame are hidden, the page is black
-ACS_CHART = ('html,body,html[data-embed],html[data-embed] body{background:#000!important}'
-             '.acs-root{background:none!important}img[src*="iphone"]{visibility:hidden!important}'
-             '.acs-scroll>:not(:nth-child(2)):not(:nth-child(3)){visibility:hidden!important}')
+# the alert screen's symbol, price and candles alone (the gallery clip's section), on
+# the card's own ground: the rows around them and the phone are hidden, and the white
+# type is re-inked dark. The price digits set their colour inline (white, or the
+# up/down flash), so only the white wrappers' spans are re-inked and a flash still shows.
+# (the page's own light theme paints .acs-root white with an id selector, and the screen
+# is an inline #000 on the scroll's parent — both need outranking)
+ACS_CHART = ('#bg-wrap .acs-root.acs-root.acs-root.acs-root,.acs-root,:has(>.acs-scroll){background:none!important}'
+             'img[src*="iphone"]{visibility:hidden!important}'
+             '.acs-scroll>:not(:nth-child(2)):not(:nth-child(3)){visibility:hidden!important}'
+             '[data-type="heading"]{color:#0e0e0e}'
+             '.acs-scroll>:nth-child(2) div[style*="255, 255, 255"] span,'
+             '.acs-scroll>:nth-child(2) div[style*="#ffffff"] span{color:#0e0e0e}')
 CANDLES = live("alert-creation", 14.1, 16.3, 24.0, 28.4, css=ACS_CHART,
                fit=".acs-scroll>:nth-child(2),.acs-scroll>:nth-child(3)", vh=1000, clip=True, pad=12)
+# the order-placed mark and caption on the card's ground: no phone, no page, the ring
+# track and captions re-inked for a light ground
+OPA_LIGHT = ('.opa-stage{background:none!important}.opa-phone{filter:none!important}'
+             '.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}'
+             '.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}')
 N[97] = {"kind": "media", "bg": "white", "corner": "Advanced trading platform",
          "shots": [crop(97, 'a', 0, 0, 100, 100, wipe=(_T97, _SW, _P97))],
-         "live": [CANDLES, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_BG,
+         "live": [CANDLES, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_LIGHT,
                        fit=".opa-badge, .opa-caption", vh=1000, clip=True, pad=26, init="mute"),
                   live("order-placement", 63.45, 14.24, 20.94, 74.39, css=PHONE_BG, fit=PHONE, vh=1000)]}
 N[98] = D("Impact", bg="white", tone="green")
