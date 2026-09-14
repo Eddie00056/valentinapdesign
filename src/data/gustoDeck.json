@@ -1617,42 +1617,80 @@
     "n": 91,
     "kind": "media",
     "bg": "black",
-    "shots": [
+    "boxes": [
       {
-        "src": "091full",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "x": 2.76,
+        "y": 4.01,
+        "w": 46.72,
+        "h": 44.82,
+        "c": "#f7f7f7"
+      },
+      {
+        "x": 2.76,
+        "y": 51.02,
+        "w": 46.72,
+        "h": 44.84,
+        "c": "#f7f7f7"
+      },
+      {
+        "x": 50.47,
+        "y": 3.98,
+        "w": 46.7,
+        "h": 91.95,
+        "c": "#f7f7f7"
+      },
+      {
+        "x": 14.11,
+        "y": 8.49,
+        "w": 24.01,
+        "h": 35.86,
+        "c": "#000000"
+      },
+      {
+        "x": 16.04,
+        "y": 55.51,
+        "w": 20.17,
+        "h": 35.86,
+        "c": "#000000"
       }
     ],
     "live": [
       {
-        "page": "fractional-order-flow",
-        "x": 21.01,
-        "y": 16.3,
-        "w": 12.36,
-        "h": 20.19,
+        "page": "alert-creation",
+        "x": 18.68,
+        "y": 20.09,
+        "w": 14.89,
+        "h": 12.66,
         "vw": 1280,
         "vh": 1000,
-        "fit": "[aria-label=\"Swap amount and quantity\"]",
-        "pad": 20,
+        "fit": "svg[viewBox=\"0 0 393 188\"]",
         "clip": true,
-        "css": ".fof-stage{background:none!important}",
-        "init": "swapLoop"
+        "css": ".acs-root{background:none!important}body *{visibility:hidden!important}svg[viewBox=\"0 0 393 188\"],svg[viewBox=\"0 0 393 188\"] *{visibility:visible!important}"
       },
       {
         "page": "order-placed-animation",
-        "x": 20.68,
-        "y": 62.78,
-        "w": 10.89,
-        "h": 21.2,
+        "x": 22.37,
+        "y": 66.78,
+        "w": 7.5,
+        "h": 13.33,
         "vw": 1280,
         "vh": 1000,
         "fit": ".opa-badge",
         "pad": 10,
         "clip": true,
-        "css": ".opa-stage{background:none!important}",
+        "css": ".opa-stage{background:none!important}body *{visibility:hidden!important}.opa-badge,.opa-badge *{visibility:visible!important}.opa-glow,.opa-ripple,.opa-ripple2,.opa-ring-fill{display:none!important}.opa-phone{filter:none!important}.opa-screen{perspective:none!important}.opa-badge{transform-style:flat!important;animation-name:op-pop2d!important;animation-timing-function:cubic-bezier(0.33,0,0.2,1)!important}@keyframes op-pop2d{0%{transform:scale(1)}38%{transform:scale(1.12)}70%{transform:scale(0.97)}100%{transform:scale(1)}}",
         "init": "mute"
+      },
+      {
+        "page": "order-placement-boxed",
+        "x": 63.3,
+        "y": 14.2,
+        "w": 21.2,
+        "h": 74.5,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".phone-stage{background:none!important}"
       }
     ]
   },
