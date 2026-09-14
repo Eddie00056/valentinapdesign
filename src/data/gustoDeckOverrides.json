@@ -121,5 +121,16 @@
       "orig": "Company goal",
       "text": "QUESTRADE GOAL"
     }
+  },
+  "81": {
+    "_slide": {
+      "hidden": true
+    }
+  },
+  "82": {
+    "t.gd-corner:0": {
+      "orig": "Title",
+      "text": "SCOPE"
+    }
   }
 }
