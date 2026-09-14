@@ -161,12 +161,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "013full",
+        "src": "013a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Problem"
   },
   {
     "n": 14,
@@ -174,12 +175,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "014full",
+        "src": "014a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Solution"
   },
   {
     "n": 15,
@@ -187,10 +189,26 @@
     "bg": "black",
     "shots": [
       {
-        "src": "015full",
+        "src": "015a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Questrade platforms",
+    "labels": [
+      {
+        "text": "Regular trading platforms",
+        "x": 25.13,
+        "y": 22.31,
+        "size": "lg",
+        "tone": "dark"
+      },
+      {
+        "text": "Advanced trading platforms",
+        "x": 75.14,
+        "y": 22.5,
+        "size": "lg"
       }
     ]
   },
@@ -200,7 +218,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "016full",
+        "src": "016a",
         "x": 0,
         "y": 0,
         "w": 100
@@ -213,7 +231,8 @@
         "y": 14.72,
         "w": 74.65
       }
-    ]
+    ],
+    "corner": "Current legacy platform"
   },
   {
     "n": 17,
@@ -247,12 +266,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "019full",
+        "src": "019a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Existing client sentiment"
   },
   {
     "n": 20,
@@ -260,12 +280,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "020full",
+        "src": "020a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Pivoting the research"
   },
   {
     "n": 21,
@@ -273,12 +294,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "021full",
+        "src": "021a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Problem"
   },
   {
     "n": 22,
@@ -341,12 +363,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "025full",
+        "src": "025a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Reducing time to trade"
   },
   {
     "n": 26,
@@ -354,10 +377,19 @@
     "bg": "black",
     "shots": [
       {
-        "src": "026full",
+        "src": "026a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Reducing time to trade",
+    "labels": [
+      {
+        "text": "Current widget layout",
+        "x": 50.03,
+        "y": 25.8,
+        "size": "lg"
       }
     ]
   },
@@ -367,10 +399,19 @@
     "bg": "black",
     "shots": [
       {
-        "src": "027full",
+        "src": "027a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Reducing time to trade",
+    "labels": [
+      {
+        "text": "Current widget layout",
+        "x": 50.03,
+        "y": 25.71,
+        "size": "lg"
       }
     ]
   },
@@ -380,10 +421,19 @@
     "bg": "black",
     "shots": [
       {
-        "src": "028full",
+        "src": "028a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Reducing time to trade",
+    "labels": [
+      {
+        "text": "Current widget layout",
+        "x": 50.03,
+        "y": 25.71,
+        "size": "lg"
       }
     ]
   },
@@ -393,10 +443,19 @@
     "bg": "black",
     "shots": [
       {
-        "src": "029full",
+        "src": "029a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Reducing time to trade",
+    "labels": [
+      {
+        "text": "Current widget layout",
+        "x": 50.03,
+        "y": 25.8,
+        "size": "lg"
       }
     ]
   },
@@ -406,10 +465,19 @@
     "bg": "black",
     "shots": [
       {
-        "src": "030full",
+        "src": "030a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Reducing time to trade",
+    "labels": [
+      {
+        "text": "Current widget layout",
+        "x": 50.03,
+        "y": 25.8,
+        "size": "lg"
       }
     ]
   },
@@ -419,20 +487,21 @@
     "bg": "black",
     "shots": [
       {
-        "src": "031a",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "src": "031b",
+        "x": 0.57,
+        "y": -2.54,
+        "w": 98.11
       }
     ],
     "labels": [
       {
         "text": "Current widget layout",
-        "x": 50.02,
-        "y": 29.8,
+        "x": 50.03,
+        "y": 25.8,
         "size": "lg"
       }
-    ]
+    ],
+    "corner": "Reducing time to trade"
   },
   {
     "n": 32,
@@ -444,7 +513,7 @@
       {
         "text": "Updated widget design",
         "x": 50.02,
-        "y": 29.8,
+        "y": 25.8,
         "size": "lg",
         "s": 0
       }
@@ -453,15 +522,16 @@
       {
         "page": "stock-order-entry",
         "x": 35.62,
-        "y": 26.3,
+        "y": 28.46,
         "w": 28.81,
         "h": 49.35,
         "vw": 1280,
         "vh": 960,
         "fit": ".wshell",
-        "css": ".ob-stage{background:none!important}",
+        "css": ".ob-stage{background:none!important;align-items:flex-start!important}",
         "step": "openBracket",
-        "unstep": "closeBracket"
+        "unstep": "closeBracket",
+        "mode": "width"
       }
     ]
   },
@@ -471,12 +541,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "033full",
+        "src": "033a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Reducing time to trade"
   },
   {
     "n": 34,
@@ -510,12 +581,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "036full",
+        "src": "036a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Reducing time to trade"
   },
   {
     "n": 37,
@@ -536,7 +608,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "038full",
+        "src": "038a",
         "x": 0,
         "y": 0,
         "w": 100
@@ -549,7 +621,8 @@
         "y": 9.5,
         "w": 82.77
       }
-    ]
+    ],
+    "corner": "Reduce time to trade"
   },
   {
     "n": 39,
@@ -557,12 +630,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "039full",
+        "src": "039a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "The problem"
   },
   {
     "n": 40,
@@ -570,12 +644,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "040full",
+        "src": "040a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "The solution"
   },
   {
     "n": 41,
@@ -583,10 +658,19 @@
     "bg": "black",
     "shots": [
       {
-        "src": "041full",
+        "src": "041a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Reducing time to trade",
+    "labels": [
+      {
+        "text": "Existing widget",
+        "x": 24.6,
+        "y": 28.55,
+        "size": "lg"
       }
     ]
   },
@@ -596,7 +680,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "042full",
+        "src": "042a",
         "x": 0,
         "y": 0,
         "w": 100
@@ -637,6 +721,13 @@
         "w": 8.8,
         "h": 2.6,
         "c": "#000000"
+      },
+      {
+        "x": 59.3,
+        "y": 20.9,
+        "w": 8.8,
+        "h": 2.6,
+        "c": "#000000"
       }
     ],
     "labels": [
@@ -646,8 +737,22 @@
         "y": 67.4,
         "size": "sm",
         "wrap": true
+      },
+      {
+        "text": "Existing widget",
+        "x": 24.6,
+        "y": 28.55,
+        "size": "lg"
+      },
+      {
+        "text": "Stocks only\nwidget",
+        "x": 63.35,
+        "y": 21.1,
+        "size": "sm",
+        "wrap": true
       }
-    ]
+    ],
+    "corner": "Reducing time to trade"
   },
   {
     "n": 43,
@@ -655,7 +760,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "043full",
+        "src": "043a",
         "x": 0,
         "y": 0,
         "w": 100
@@ -675,7 +780,8 @@
         "clip": true,
         "init": "chainFirst"
       }
-    ]
+    ],
+    "corner": "Reducing time to trade"
   },
   {
     "n": 44,
@@ -683,7 +789,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "044full",
+        "src": "044a",
         "x": 0,
         "y": 0,
         "w": 100
@@ -700,6 +806,15 @@
         "vh": 960,
         "fit": ".wshell",
         "css": ".ob-stage{background:none!important}"
+      }
+    ],
+    "corner": "MVP vs final vision",
+    "labels": [
+      {
+        "text": "MVP",
+        "x": 24.66,
+        "y": 22.38,
+        "size": "lg"
       }
     ]
   },
@@ -709,7 +824,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "045full",
+        "src": "045a",
         "x": 0,
         "y": 0,
         "w": 100
@@ -727,6 +842,21 @@
         "fit": ".wshell",
         "css": ".ob-stage{background:none!important}"
       }
+    ],
+    "corner": "MVP vs final vision",
+    "labels": [
+      {
+        "text": "MVP",
+        "x": 24.66,
+        "y": 22.38,
+        "size": "lg"
+      },
+      {
+        "text": "Final vision",
+        "x": 74.38,
+        "y": 22.9,
+        "size": "lg"
+      }
     ]
   },
   {
@@ -735,10 +865,25 @@
     "bg": "black",
     "shots": [
       {
-        "src": "046full",
+        "src": "046a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Maximizing workspace efficiency",
+    "labels": [
+      {
+        "text": "Existing client workspace",
+        "x": 25.01,
+        "y": 25.09,
+        "size": "lg"
+      },
+      {
+        "text": "Redesigned workspace layout",
+        "x": 75.01,
+        "y": 24.6,
+        "size": "lg"
       }
     ]
   },
@@ -748,10 +893,25 @@
     "bg": "black",
     "shots": [
       {
-        "src": "047full",
+        "src": "047a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Maximizing workspace efficiency",
+    "labels": [
+      {
+        "text": "Initial design",
+        "x": 24.91,
+        "y": 25.74,
+        "size": "lg"
+      },
+      {
+        "text": "Updated design",
+        "x": 74.97,
+        "y": 25.49,
+        "size": "lg"
       }
     ]
   },
@@ -774,10 +934,25 @@
     "bg": "black",
     "shots": [
       {
-        "src": "049full",
+        "src": "049a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Final designs",
+    "labels": [
+      {
+        "text": "Then",
+        "x": 24.88,
+        "y": 22.16,
+        "size": "lg"
+      },
+      {
+        "text": "Now",
+        "x": 74.22,
+        "y": 21.94,
+        "size": "lg"
       }
     ]
   },
@@ -866,12 +1041,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "055full",
+        "src": "055a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Problem"
   },
   {
     "n": 56,
@@ -879,12 +1055,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "056full",
+        "src": "056a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Solution"
   },
   {
     "n": 57,
@@ -945,12 +1122,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "060full",
+        "src": "060a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Research"
   },
   {
     "n": 61,
@@ -958,12 +1136,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "061full",
+        "src": "061a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Problem"
   },
   {
     "n": 62,
@@ -971,12 +1150,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "062full",
+        "src": "062a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Design challenge"
   },
   {
     "n": 63,
@@ -984,12 +1164,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "063full",
+        "src": "063a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Design challenge"
   },
   {
     "n": 64,
@@ -997,12 +1178,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "064full",
+        "src": "064a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Design challenge"
   },
   {
     "n": 65,
@@ -1010,12 +1192,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "065full",
+        "src": "065a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Persona types"
   },
   {
     "n": 66,
@@ -1023,12 +1206,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "066a",
+        "src": "066b",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "2 platforms = 2 design languages"
   },
   {
     "n": 67,
@@ -1036,12 +1220,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "067full",
+        "src": "067a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Project scope"
   },
   {
     "n": 68,
@@ -1049,12 +1234,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "068full",
+        "src": "068a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Project scope"
   },
   {
     "n": 69,
@@ -1062,12 +1248,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "069full",
+        "src": "069a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "The challenge"
   },
   {
     "n": 70,
@@ -1075,12 +1262,13 @@
     "bg": "black",
     "shots": [
       {
-        "src": "070full",
+        "src": "070a",
         "x": 0,
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "corner": "Goal"
   },
   {
     "n": 71,
@@ -1329,10 +1517,20 @@
     "bg": "black",
     "shots": [
       {
-        "src": "078full",
+        "src": "078a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Helping traders place a fractional trade",
+    "labels": [
+      {
+        "text": "Original order entry wizard",
+        "x": 47.96,
+        "y": 22.96,
+        "size": "lg",
+        "tone": "dark"
       }
     ]
   },
@@ -1342,10 +1540,27 @@
     "bg": "black",
     "shots": [
       {
-        "src": "079full",
+        "src": "079a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "corner": "Original design",
+    "labels": [
+      {
+        "text": "Original order entry wizard",
+        "x": 28.38,
+        "y": 17.87,
+        "size": "lg",
+        "tone": "dark"
+      },
+      {
+        "text": "Suggested design",
+        "x": 82.11,
+        "y": 15.56,
+        "size": "lg",
+        "tone": "dark"
       }
     ]
   },
