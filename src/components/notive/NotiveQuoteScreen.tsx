@@ -375,8 +375,8 @@ export function NotiveQuoteScreen({
 
   /* Header. The rows and the type scale are alert-creation's — the house
      header (see alertscreen-palette): the glasslab icon set at the content
-     top, 16 down to an 18/600 heading, 4 down to the 18/600 price with the
-     14/400 change beside it, centred on the price's midline. What the
+     top, 16 down to an 18/600 heading, 4 down to the 18/600 price with its
+     USD tag, 4 down to the 14/400 change on its own line. What the
      Wealthsimple capture the user sent (IMG_0253, 2026-09-13) contributes
      is the layout around that: Back at the left with Watchlist + Alert at
      the right, the 32px logo tile beside the name, a "USD" tag after the
@@ -474,8 +474,8 @@ export function NotiveQuoteScreen({
 
       {/* Ticker block — alert-creation's own rows and scale: a 16px gap
           under the nav row, the heading at 18/600, and 4px below it the
-          price at 18/600 with the 14/400 change beside it, centred on one
-          midline. The logo tile beside the name and the
+          price at 18/600 with its USD tag centred beside it, then the
+          14/400 change on its own line. The logo tile beside the name and the
           "USD" tag are the capture's; everything else is the house
           header. */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16 }}>
@@ -501,11 +501,10 @@ export function NotiveQuoteScreen({
         </span>
       </div>
 
-      {/* Price and the text beside it are centred on one midline, not
-          bottom-aligned in 22px boxes the way alert-creation stacks its own
-          — the user marked the two as "not aligned at all" with a line
-          through the price's middle, and centring is what that line asks
-          for. Line-height 1 on every part so the boxes are the glyphs. */}
+      {/* Price and its USD tag centred on one midline, not bottom-aligned
+          in 22px boxes the way alert-creation stacks its own — the user
+          marked that as "not aligned at all" with a line through the
+          price's middle. Line-height 1 on both so the boxes are the glyphs. */}
       <div style={{ display: "flex", gap: 4, alignItems: "center", marginTop: 4 }}>
         <Rolling
           value={"$" + money(price)}
@@ -518,10 +517,14 @@ export function NotiveQuoteScreen({
           }}
         />
         <span style={{ ...beside, color: MUTED }}>USD</span>
-        <span style={{ ...beside, color: changeColor, transition: "color 520ms ease" }}>
-          {sign}${money(Math.abs(change))} ({sign}
-          {pct.toFixed(2)}%) {active.since}
-        </span>
+      </div>
+
+      {/* The change on its own line under the price (user, 2026-09-13:
+          "move this below the ticket price"), at the same 4px step the
+          rows above use. */}
+      <div style={{ ...beside, marginTop: 4, color: changeColor, transition: "color 520ms ease" }}>
+        {sign}${money(Math.abs(change))} ({sign}
+        {pct.toFixed(2)}%) {active.since}
       </div>
     </div>
   );
