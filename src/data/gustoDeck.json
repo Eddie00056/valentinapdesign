@@ -1271,13 +1271,44 @@
   {
     "n": 76,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
+    "corner": "Help traders find the correct symbol",
+    "labels": [
+      {
+        "text": "Original quote page",
+        "x": 26.88,
+        "y": 31.2,
+        "size": "lg"
+      },
+      {
+        "text": "Updated quote page",
+        "x": 74.0,
+        "y": 31.2,
+        "size": "lg"
+      }
+    ],
     "shots": [
       {
-        "src": "076full",
+        "src": "076a",
         "x": 0,
-        "y": 0,
-        "w": 100
+        "y": 33.2,
+        "w": 50
+      }
+    ],
+    "live": [
+      {
+        "page": "alert-creation",
+        "x": 56.62,
+        "y": 34.0,
+        "w": 34.75,
+        "h": 66.0,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".acs-root{background:none!important}",
+        "init": "openFractional",
+        "clip": true
       }
     ]
   },
