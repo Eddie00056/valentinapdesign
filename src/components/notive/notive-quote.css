@@ -44,27 +44,38 @@
    Rebuilt against a Wealthsimple quote screenshot (2026-09-13): its sizes,
    weights, spacing and colours, in the house face. The typeface stays Open
    Sans on request ("make sure you don't change the font type"). */
-/* The nav row's icon buttons are glasslab's mobile icon set (Back /
-   Watchlist / Alert — one set, shared with the alert-creation header). The
-   set's fill is a white-alpha gradient tuned for a near-black bar, which
-   vanishes on this light ground, so it is re-tuned here to the range pill's
-   material (`.nq-tf-pill`): the same white, the same tight shadow, and
-   `.nq-glass`'s dark masked rim in place of the white one. Geometry, glyph
-   size, hit area and press state are the library's, untouched. Specificity
-   (0,3,0) is what it takes to beat the set's own `.btn--mobile.btn--icon`
-   pair. */
+/* The nav row's four icons — Back, the fractional chip, Watchlist, Alert
+   — wear one glass material: the `GLASS.light` spec from the user's
+   `GlassAlertButton.jsx` (2026-09-13, "make all of them look like glass
+   design now … keep the same font, widths etc"). Fill, rim, shadow, blur
+   and icon ink are that file's values verbatim; the geometry (the set's
+   32px box, 16px glyph, hit area, press state) stays the library's.
+
+   The rim is the file's `0.5px solid rgba(255,255,255,.65)` border, drawn
+   as an inset box-shadow so the 32px box doesn't grow by the border and the
+   rim sits exactly at the bounds ("never clip: the material's rim lives at
+   the bounds"); the set's own masked `::before` ring is switched off so
+   there is one rim, not two. `.nq-frac` shares the rule because the
+   fractional chip is a Motion shared-layout box that can't carry the
+   `.btn` classes (its radius and size animate into the banner, and the
+   set's `:active` scale would fight that) — its mark stays the fractional
+   blue on the same shell. Specificity (0,3,0) is what it takes to beat the
+   set's `.btn--mobile.btn--icon` pair. */
+.nq-root .btn--mobile.btn--icon,
+.nq-root .nq-frac {
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.65),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(20px) saturate(180%);
+}
 .nq-root .btn--mobile.btn--icon {
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 2px 8px rgba(20, 28, 24, 0.08);
-  color: #000;
+  color: #32302f;
 }
 .nq-root .btn--mobile.btn--icon::before {
-  background: linear-gradient(
-    270deg,
-    rgba(0, 0, 0, 0.07) 0%,
-    rgba(0, 0, 0, 0) 24.61%,
-    rgba(0, 0, 0, 0.05) 100%
-  );
+  background: none;
 }
 
 /* Scrollbar off — the 24px left/right padding has to read as symmetric, and
@@ -123,16 +134,10 @@
 
 /* ---- the fractional card ----
    Its compact state sits in the nav row beside the star, at the star's
-   size and stroke, but in the fractional BLUE: a solid disc in the tint
-   with the blue mark — the same material as the expanded banner it morphs
-   into, so the shared-layout transition changes shape only. No rim, no
-   shadow, no glass: the solid version the user asked for earlier in the
-   day, brought back ("make it blue again like we had before, keep it in
-   the same position", 2026-09-13) after a pass that dressed it like the
-   star. Blue, not the screen's green: fractional is one accent across both
-   prototypes. */
+   size and stroke, on the same glass shell as the star (the rule above),
+   with the mark in the fractional BLUE — one accent across both
+   prototypes. The expanded banner it morphs into keeps its solid tint. */
 .nq-frac {
-  background: #eaf1fd;
   color: #0066db;
 }
 

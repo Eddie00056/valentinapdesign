@@ -391,15 +391,16 @@ export function NotiveQuoteScreen({
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         {/* The shared mobile icon set (glasslab) — the same Back / Watchlist
             / Alert the alert-creation header renders, at the set's own 32px
-            box and 16px glyph. Their fill is re-tuned for this light ground
-            in notive-quote.css; the geometry is the library's. */}
+            box and 16px glyph. Their material is the user's GLASS.light
+            spec, applied in notive-quote.css; the geometry is the
+            library's. */}
         <BackButton variant="light" />
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {/* The compact half of the fractional card, in the slot
               alert-creation gives it: left of Watchlist, a fixed 32px box
               (the icon set's) so the row never reflows as the card morphs in
-              and out. The chip is the fractional blue, at the star's size and
-              stroke — see `.nq-frac`. */}
+              and out. The chip is the star's glass shell with the mark in
+              the fractional blue — see `.nq-frac`. */}
           <div style={{ width: 32, height: 32, flex: "none", position: "relative" }}>
             {!fracOpen && (
               <motion.div
