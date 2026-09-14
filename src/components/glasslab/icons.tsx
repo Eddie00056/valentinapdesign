@@ -74,20 +74,24 @@ export function SearchIcon() {
    the remainder being antialiasing. An earlier hand-drawn version sat at
    r 7.5 with a 2 stroke — 11% small and a quarter too light — which is
    exactly why it read as a different icon next to the real one. */
-export function FractionalIcon() {
+/* `stroke` is in 24-grid units. The default, 2.8, is the fractional order
+   flow's own mark (measured off its PNG — see the notive-quote memory);
+   pass the set's 1.8 where the mark sits in a row with the star and bell,
+   or it reads a weight heavier than its neighbours. */
+export function FractionalIcon({ stroke = 2.8 }: { stroke?: number } = {}) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M18.31 9.87A8.46 8.46 0 1 0 9.85 18.33L9.85 9.87Z"
         stroke="currentColor"
-        strokeWidth="2.8"
+        strokeWidth={stroke}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M22.45 14A8.45 8.45 0 0 1 14 22.45L14 14Z"
         stroke="currentColor"
-        strokeWidth="2.8"
+        strokeWidth={stroke}
         strokeLinecap="round"
         strokeLinejoin="round"
       />

@@ -376,7 +376,7 @@ export function NotiveQuoteScreen({
   /* Header. The rows and the type scale are alert-creation's — the house
      header (see alertscreen-palette): the glasslab icon set at the content
      top, 16 down to an 18/600 heading, 4 down to the 18/600 price with the
-     14/400 change beside it in matching 22px bottom-aligned boxes. What the
+     14/400 change beside it, centred on the price's midline. What the
      Wealthsimple capture the user sent (IMG_0253, 2026-09-13) contributes
      is the layout around that: Back at the left with Watchlist + Alert at
      the right, the 32px logo tile beside the name, a "USD" tag after the
@@ -389,15 +389,11 @@ export function NotiveQuoteScreen({
      row, as alert-creation places it (user, 2026-09-13: "next to the star
      on the left … match the colour and format of the star"). The face is Open
      Sans throughout (user: "don't change the font type"). */
-  /* The 14/400 text beside the price — alert-creation's `data-type="body"`
-     cell: a 22px box, bottom-aligned, line-height 1. */
+  /* The 14/400 text beside the price, alert-creation's body scale. */
   const beside: CSSProperties = {
     fontSize: 14,
     fontWeight: 400,
     lineHeight: 1,
-    height: 22,
-    display: "flex",
-    alignItems: "flex-end",
     whiteSpace: "pre",
   };
 
@@ -456,7 +452,7 @@ export function NotiveQuoteScreen({
                   className="nq-frac-glyph"
                   style={{ position: "relative", zIndex: 4, lineHeight: 0 }}
                 >
-                  <FractionalIcon />
+                  <FractionalIcon stroke={1.8} />
                 </motion.span>
               </motion.div>
             )}
@@ -478,8 +474,8 @@ export function NotiveQuoteScreen({
 
       {/* Ticker block — alert-creation's own rows and scale: a 16px gap
           under the nav row, the heading at 18/600, and 4px below it the
-          price at 18/600 with the 14/400 change beside it, both bottom-
-          aligned in 22px boxes. The logo tile beside the name and the
+          price at 18/600 with the 14/400 change beside it, centred on one
+          midline. The logo tile beside the name and the
           "USD" tag are the capture's; everything else is the house
           header. */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16 }}>
@@ -505,18 +501,18 @@ export function NotiveQuoteScreen({
         </span>
       </div>
 
-      <div style={{ display: "flex", gap: 4, alignItems: "flex-end", marginTop: 4 }}>
+      {/* Price and the text beside it are centred on one midline, not
+          bottom-aligned in 22px boxes the way alert-creation stacks its own
+          — the user marked the two as "not aligned at all" with a line
+          through the price's middle, and centring is what that line asks
+          for. Line-height 1 on every part so the boxes are the glyphs. */}
+      <div style={{ display: "flex", gap: 4, alignItems: "center", marginTop: 4 }}>
         <Rolling
           value={"$" + money(price)}
           style={{
             fontSize: 18,
             fontWeight: 600,
             lineHeight: 1,
-            /* 22px box, bottom-aligned, exactly as alert-creation sizes
-               its price cells — the 14px change beside it shares the box
-               so the two sit on one line. */
-            height: 22,
-            alignItems: "flex-end",
             color: priceColor,
             transition: "color 760ms cubic-bezier(.4,0,.2,1)",
           }}
@@ -593,7 +589,7 @@ export function NotiveQuoteScreen({
                 animate={{ scale: 1, opacity: 1, transition: fracGlyphPop }}
                 style={{ display: "block" }}
               >
-                <FractionalIcon />
+                <FractionalIcon stroke={1.8} />
               </motion.span>
             </motion.span>
 

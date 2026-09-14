@@ -158,13 +158,15 @@
   pointer-events: none;
 }
 
-/* 16px — the icon set's glyph size, so the mark matches the star and bell
-   beside it. It stays 16 in the expanded banner too: the glyph carries its
-   own `layoutId`, so any size difference between the two states would be
-   animated, and there is nothing to gain from that. */
+/* 14px, not the set's nominal 16: the star's path spans 18 of its 24 grid
+   (12px of ink at 16), the pie spans 21 — at 14 its ink is 12.25px, so the
+   two marks read the same size side by side. It stays 14 in the expanded
+   banner too: the glyph carries its own `layoutId`, so any size difference
+   between the two states would be animated, and there is nothing to gain
+   from that. The stroke is passed as 1.8 (the set's) at the call sites. */
 .nq-frac-glyph svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 /* ---- Buy / Sell ----
