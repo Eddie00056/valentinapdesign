@@ -1041,8 +1041,9 @@
         "vh": 1000,
         "fit": "img[src*=\"iphone\"]",
         "mode": "width",
-        "css": ".nq-root,.phone-stage{background:none!important}",
-        "init": "notiveOriginal"
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+        "init": "notiveOriginal,freeze",
+        "clip": true
       }
     ]
   },
@@ -1069,8 +1070,9 @@
         "vh": 1000,
         "fit": "img[src*=\"iphone\"]",
         "mode": "width",
-        "css": ".nq-root,.phone-stage{background:none!important}",
-        "init": "notiveOriginal"
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+        "init": "notiveOriginal,freeze",
+        "clip": true
       },
       {
         "page": "notive-quote",
@@ -1082,8 +1084,9 @@
         "vh": 1000,
         "fit": "img[src*=\"iphone\"]",
         "mode": "width",
-        "css": ".nq-root,.phone-stage{background:none!important}",
-        "init": "notiveBeta"
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+        "init": "notiveBeta,freeze",
+        "clip": true
       }
     ]
   },
@@ -1097,6 +1100,22 @@
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "notive-quote",
+        "x": 70.26,
+        "y": 32.69,
+        "w": 23.75,
+        "h": 74.07,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".nq-root,.phone-stage{background:none!important}",
+        "init": "freeze",
+        "clip": true
       }
     ]
   },
@@ -1123,21 +1142,6 @@
         "x": 0,
         "y": 0,
         "w": 100
-      }
-    ],
-    "live": [
-      {
-        "page": "alert-creation",
-        "x": 54.76,
-        "y": 23.61,
-        "w": 37.88,
-        "h": 76.39,
-        "vw": 1280,
-        "vh": 1000,
-        "mode": "width",
-        "fit": "img[src*=\"iphone\"]",
-        "css": ".acs-root{background:none!important}",
-        "init": "openFractional"
       }
     ]
   },
