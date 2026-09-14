@@ -275,7 +275,7 @@ const title = (s: Slide): string | undefined =>
                     ))}
                     {(s.labels || []).map((l: any) => (
                       <p
-                        class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade"]}
+                        class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade", l.wrap && "is-wrap"]}
                         data-s={l.s ?? undefined}
                         style={`left:${l.x}%;top:${l.y ?? 19}%`}
                       >
@@ -1948,6 +1948,11 @@ const title = (s: Slide): string | undefined =>
   .gd-slide--canvas .gd-media-l,
   .gd-media-l.tone-dark {
     color: rgba(0, 0, 0, 0.72);
+  }
+  .gd-media-l.is-wrap {
+    white-space: pre-line;
+    max-width: 9em;
+    line-height: 1.3;
   }
   .gd-media-l-accent {
     color: #e5484d;
