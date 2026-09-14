@@ -1,23 +1,27 @@
 /* valentinapdesign.com Worker.
 
-   Serves the static site exactly as before (env.ASSETS) and adds two things:
-   /api/comments, the pinned review comments on the /work prototypes, stored
-   in D1; and /thumbs/*.mp4 with byte-range support (see serveClip).
-   wrangler.jsonc routes only those here first, so every other request is
-   still answered by the asset layer without touching this code.
+   Serves the static site exactly as before (env.ASSETS) and adds three
+   things: /api/comments, the pinned review comments on the /work
+   prototypes; /api/deck-notes, private per-slide notes on the presentation
+   deck; both stored in D1. And /thumbs/*.mp4 with byte-range support (see
+   serveClip). wrangler.jsonc routes only those here first, so every other
+   request is still answered by the asset layer without touching this code.
 
    Permissions, as agreed:
-   - anyone can read and post;
+   - anyone can read and post a comment;
    - a browser can delete the comments it posted (proved by a random token it
      keeps, stored here only as a SHA-256);
    - the owner, holding OWNER_PASSCODE (a Worker secret), can delete any
      comment and clear a page. With no secret set, owner actions are refused.
+   - deck notes are owner-only for BOTH read and write — nothing there is
+     ever served to a request without the passcode.
 */
 
 const PAGE = /^\/work\/[a-z0-9-]+$/;
 const TOKEN = /^[A-Za-z0-9_-]{16,128}$/;
 const MAX_BODY = 1000;
 const MAX_NAME = 40;
+const MAX_NOTE = 20000;
 const RATE_WINDOW_MS = 10 * 60 * 1000;
 const RATE_MAX = 30;
 
@@ -72,6 +76,39 @@ async function api(req, env, url) {
 
   if (url.pathname === "/api/owner" && req.method === "POST") {
     return json({ owner });
+  }
+
+  if (url.pathname === "/api/deck-notes") {
+    if (!owner) return json({ error: "owner only" }, 403);
+
+    if (req.method === "GET") {
+      const { results } = await db.prepare("SELECT n, body, updated_at FROM deck_notes ORDER BY n ASC").all();
+      const notes = {};
+      for (const r of results) notes[r.n] = { body: r.body, updatedAt: r.updated_at };
+      return json({ notes });
+    }
+
+    if (req.method === "PUT") {
+      const b = await readJson(req);
+      if (!b) return json({ error: "bad body" }, 400);
+      const n = Number(b.n);
+      if (!Number.isInteger(n) || n < 1 || n > 1000) return json({ error: "bad slide" }, 400);
+      const body = typeof b.body === "string" ? b.body.trim() : "";
+      if (body.length > MAX_NOTE) return json({ error: "too long" }, 400);
+      const now = Date.now();
+      if (!body) {
+        await db.prepare("DELETE FROM deck_notes WHERE n = ?").bind(n).run();
+      } else {
+        await db
+          .prepare(
+            "INSERT INTO deck_notes (n, body, updated_at) VALUES (?, ?, ?) " +
+              "ON CONFLICT(n) DO UPDATE SET body = excluded.body, updated_at = excluded.updated_at",
+          )
+          .bind(n, body, now)
+          .run();
+      }
+      return json({ n, body, updatedAt: now });
+    }
   }
 
   if (url.pathname === "/api/comments") {

@@ -41,7 +41,7 @@ const title = (s: Slide): string | undefined =>
       <span class="gd-play-text">
         <span class="gd-play-label">Play the presentation</span>
         <span class="gd-play-sub"
-          >{COUNT} slides · ← → to move · ⤢ for fullscreen</span
+          >{COUNT} slides · ← → to move · ⤢ for fullscreen · N for notes</span
         >
       </span>
     </button>
@@ -452,6 +452,7 @@ const title = (s: Slide): string | undefined =>
                         data-pad={l.pad || 0}
                         data-mode={l.mode || ""}
                         data-init={l.init || ""}
+                        data-arrive={l.arrive || undefined}
                         data-clip={l.clip ? "1" : ""}
                         data-bw={bw}
                         data-bh={bh}
@@ -475,13 +476,22 @@ const title = (s: Slide): string | undefined =>
       >
       <div class="gd-bar">
         <span class="gd-count" aria-live="polite">1 / {COUNT}</span>
-        <button class="gd-fs" type="button" aria-label="Toggle fullscreen">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round"
-            ><path d="M8 3H4v4M16 3h4v4M8 21H4v-4M16 21h4v-4"></path></svg
-          >
-        </button>
+        <div class="gd-bar-actions">
+          <button class="gd-notes" type="button" aria-label="Slide notes (private)" aria-pressed="false">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round"
+              ><path d="M6 3h8l5 5v13H6z"></path><path d="M14 3v5h5"></path><path d="M9 12h6M9 16h4"></path></svg
+            >
+          </button>
+          <button class="gd-fs" type="button" aria-label="Toggle fullscreen">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+              stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round"
+              ><path d="M8 3H4v4M16 3h4v4M8 21H4v-4M16 21h4v-4"></path></svg
+            >
+          </button>
+        </div>
       </div>
       <div class="gd-progress"><span></span></div>
     </div>
@@ -496,6 +506,7 @@ const title = (s: Slide): string | undefined =>
 <script>
   import { applyOverrides } from "./deckOverrides";
   import type { Overrides } from "./deckOverrides";
+  import { mountNotes } from "./deckNotes";
 
   const stage = document.querySelector<HTMLElement>(".gd-stage");
   if (stage) {
@@ -513,6 +524,8 @@ const title = (s: Slide): string | undefined =>
     const fsBtn = stage.querySelector<HTMLButtonElement>(".gd-fs")!;
     const prevBtn = stage.querySelector<HTMLButtonElement>(".gd-edge--prev")!;
     const nextBtn = stage.querySelector<HTMLButtonElement>(".gd-edge--next")!;
+    const notesBtn = stage.querySelector<HTMLButtonElement>(".gd-notes")!;
+    const notesUI = mountNotes(stage);
 
     const W = 1920;
     const H = 1080;
@@ -765,6 +778,25 @@ const title = (s: Slide): string | undefined =>
         };
         pick();
       },
+      /* slide 86's set-up, done while the slide is still a neighbour: a Limit
+         order with its quantity field focused and empty, the pad open */
+      fracHintSetup: (w, d) => {
+        INIT.limitOrder(w, d);
+        let tries = 0;
+        const go = () => {
+          const label = [...d.querySelectorAll<HTMLElement>("span")].find((e) => e.textContent === "Share quantity");
+          const limitOn = [...d.querySelectorAll<HTMLElement>("span")].some((e) => e.textContent === "Limit price");
+          if (!label || !limitOn) return tries++ < 80 && w.setTimeout(go, 25);
+          label.parentElement!.click();
+        };
+        go();
+      },
+      /* ...and on arrival 1.5 is typed at a readable pace: the "." brings up
+         the hint, the blue field and the pill ring together */
+      fracHintType: (w) =>
+        [["1", 0], [".", 380], ["5", 860]].forEach(([key, ms]) =>
+          w.setTimeout(() => w.dispatchEvent(new w.KeyboardEvent("keydown", { key, bubbles: true })), ms),
+        ),
       // the order-placed animation chimes when its check lands; a deck is
       // no place for a sound nobody asked for
       // stop the live price walk: the quote holds still on this slide
@@ -901,10 +933,28 @@ const title = (s: Slide): string | undefined =>
         /* same-origin always; a missing element just leaves the default state */
       }
     };
+    /* data-arrive: an action that plays when you land on the slide (not when
+       it preloads as a neighbour). Held until the frame's own set-up has had
+       time to finish; leaving the slide reloads the frame so it plays again. */
+    const runArrive = (f: HTMLIFrameElement) => {
+      const name = f.dataset.arrive;
+      if (!name || f.dataset.arrived || !f.dataset.inited) return;
+      f.dataset.arrived = "1";
+      const wait = Math.max(0, 900 - (performance.now() - parseFloat(f.dataset.initAt || "0")));
+      window.setTimeout(() => {
+        try {
+          INIT[name]?.(f.contentWindow, f.contentDocument!);
+        } catch {
+          /* same-origin always */
+        }
+      }, wait + 300);
+    };
     const reveal = (f: HTMLIFrameElement) =>
       place(f).then(() => {
         runInit(f);
+        f.dataset.initAt = String(performance.now());
         f.classList.add("is-in");
+        if (f.closest(".gd-slide") === slides[i - 1]) runArrive(f);
       });
     const unmount = (f: HTMLIFrameElement) => {
       if (!f.getAttribute("src")) return;
@@ -926,6 +976,12 @@ const title = (s: Slide): string | undefined =>
     /* Leaving a slide resets any chain-to-order prototype that was used
        (ticket open, confirmation up), so it's fresh next time. */
     const resetUsed = (n: number) => {
+      slides[n - 1]?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe[data-arrive]").forEach((f) => {
+        if (!f.dataset.arrived || !f.getAttribute("src")) return;
+        delete f.dataset.arrived;
+        unmount(f);
+        mount(f);
+      });
       slides[n - 1]?.querySelectorAll<HTMLIFrameElement>('.gd-live iframe[data-init="chainFirst"]').forEach((f) => {
         const d = f.contentDocument;
         const used = d && (d.querySelector(".ctt-ticket")?.childElementCount || d.querySelector(".ob-modal-wrap *, .ob-toast-item"));
@@ -943,6 +999,7 @@ const title = (s: Slide): string | undefined =>
       const arrived = next !== i || !started;
       const from = i;
       i = next;
+      notesUI.setSlide(i);
       if (from !== i) resetUsed(from);
       if (arrived) setBuild(i, stage.classList.contains("gd-edit") ? steps(i) : (nextBuild ?? 0));
       nextBuild = null;
@@ -962,6 +1019,7 @@ const title = (s: Slide): string | undefined =>
       warm(i + 2);
       warm(i - 1);
       syncLive();
+      if (arrived) slides[i - 1]?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe[data-arrive]").forEach(runArrive);
       // backstop: anything that finished loading without being placed
       slides[i - 1]
         ?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe")
@@ -1070,6 +1128,8 @@ const title = (s: Slide): string | undefined =>
         show(order()[order().length - 1] ?? count);
       } else if (k === "f" || k === "F") {
         fsBtn.click();
+      } else if (k === "n" || k === "N") {
+        notesBtn.click();
       }
     });
 
@@ -2207,7 +2267,14 @@ const title = (s: Slide): string | undefined =>
     font-variant-numeric: tabular-nums;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
-  .gd-fs {
+  .gd-bar-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .gd-fs,
+  .gd-notes {
+    position: relative;
     display: grid;
     place-items: center;
     width: 1.9rem;
@@ -2219,8 +2286,24 @@ const title = (s: Slide): string | undefined =>
     cursor: pointer;
     transition: background 0.15s ease;
   }
-  .gd-fs:hover {
+  .gd-fs:hover,
+  .gd-notes:hover,
+  .gd-notes[aria-pressed="true"] {
     background: rgba(255, 255, 255, 0.26);
+  }
+  /* a lit dot means the CURRENT slide already has a note — only ever shown
+     once the owner has signed in and the deck knows; a signed-out visitor
+     never sees it, since `notes` stays empty until /api/deck-notes 200s. */
+  .gd-notes.has-note::after {
+    content: "";
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--w-accent);
+    box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.55);
   }
   .gd-progress {
     position: absolute;
@@ -2238,6 +2321,139 @@ const title = (s: Slide): string | undefined =>
     transform-origin: left;
     transform: scaleX(0);
     transition: transform 0.25s ease;
+  }
+
+  /* The notes panel + sign-in card are built at runtime (deckNotes.ts) and
+     appended straight into .gd-stage rather than written by this template,
+     so they carry no astro-cid — these rules stay :global(). Living inside
+     .gd-stage keeps them on screen through both native fullscreen and
+     ?solo (anything outside the fullscreened element just isn't rendered). */
+  :global(.gd-notes-panel) {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    bottom: 3.4rem;
+    z-index: 20;
+    width: min(19rem, calc(100% - 1.5rem));
+    display: flex;
+    flex-direction: column;
+    padding: 0.7rem 0.8rem 0.8rem;
+    border-radius: 12px;
+    background: rgba(12, 13, 16, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(18px) saturate(1.15);
+    -webkit-backdrop-filter: blur(18px) saturate(1.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    color: #f2f2f8;
+    font-family: var(--gd-font);
+    animation: gdNotesIn 0.2s ease both;
+  }
+  @keyframes gdNotesIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  :global(.gd-notes-head) {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  :global(.gd-notes-title) {
+    font-size: 0.8125rem;
+    font-weight: 600;
+  }
+  :global(.gd-notes-lock) {
+    font-size: 0.6875rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  :global(.gd-notes-close) {
+    margin-left: auto;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+  :global(.gd-notes-close:hover) {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.08);
+  }
+  :global(.gd-notes-field) {
+    flex: 1;
+    min-height: 0;
+    resize: none;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.35);
+    color: #f2f2f8;
+    font: inherit;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    padding: 0.55rem 0.6rem;
+    outline: none;
+  }
+  :global(.gd-notes-field:focus) {
+    border-color: var(--w-accent);
+  }
+  :global(.gd-notes-status) {
+    margin-top: 0.4rem;
+    min-height: 1em;
+    font-size: 0.6875rem;
+    color: rgba(255, 255, 255, 0.45);
+    text-align: right;
+  }
+  :global(.gd-notes-status.is-error) {
+    color: #ff7d9b;
+  }
+  :global(.gd-notes-blurb) {
+    margin: 0 0 0.6rem;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.5;
+  }
+  :global(.gd-notes-pass) {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.35);
+    color: #f2f2f8;
+    font: inherit;
+    font-size: 0.8125rem;
+    padding: 0.5rem 0.6rem;
+    outline: none;
+  }
+  :global(.gd-notes-pass:focus) {
+    border-color: var(--w-accent);
+  }
+  :global(.gd-notes-row) {
+    margin-top: 0.5rem;
+  }
+  :global(.gd-notes-unlock) {
+    width: 100%;
+    height: 1.9rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--w-accent);
+    color: #04150c;
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    cursor: pointer;
+  }
+  :global(.gd-notes-unlock:hover) {
+    filter: brightness(1.08);
   }
 
   /* ---- play facade ---- */
