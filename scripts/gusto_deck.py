@@ -459,17 +459,16 @@ N[69] = {"kind": "cards", "bg": "white", "corner": "Trader types",
                  "Wants to mitigate risk", "Has some understanding of industry rules and limitations"]}]}
 N[70] = {"kind": "media", "bg": "white", "corner": "2 Platforms = 2 Design languages",
          "panels": [P(0, 50, LIGHT_PANEL)],
-         "labels": [{"text": "Regular trading platforms", "x": 25, "y": 34.6},
-                    {"text": "Advanced trading platforms", "x": 75, "y": 34.6}],
-         # regular = the fractional quote screen, advanced = the dark quote screen; both
-         # live, at the PDF phones' own bezel rects, bleeding off the bottom
-         "live": [live("notive-quote", 12.49, 39.2, 25.1, 60.8, css=NQ_BG, fit=PHONE, vh=1000, mode="width"),
-                  live("alert-creation", 62.93, 38.36, 24.25, 61.64, css=ACS_BG, fit=PHONE, vh=1000, mode="width")]}
-N[71] = {"kind": "checklist", "bg": "white", "corner": "Project scope", "panels": [P(0, 50, LIGHT_PANEL)], "cols": [NORTH]}
-N[72] = {"kind": "checklist", "bg": "white", "corner": "Project scope", "panels": [P(0, 50, LIGHT_PANEL)], "cols": [NORTH, MVP]}
-N[73] = S("How might we make investing\naccessible to new investors without\nslowing down advanced traders?",
-          bg="white", corner="The challenge", fw=600)
-N[74] = D("Design process", bg="white", tone="green", fs=125)
+         # captions 5px above the phones (sm box 18px; phones' top edge at 35.28% = 381px)
+         "labels": [{"text": "Regular trading platforms", "x": 25, "y": 33.15},
+                    {"text": "Advanced trading platforms", "x": 75, "y": 33.15}],
+         # regular = the light quote screen, advanced = the dark quote screen; both live,
+         # at slide 80's phone size centred in their halves, bleeding off the bottom, with
+         # every fractional part hidden (this slide is about the two design languages)
+         "live": [live("notive-quote", 8.35, 35.28, 33.3, 64.72, fit=PHONE, vh=1000, mode="width",
+                       css=NQ_BG + ".nq-banner,.nq-frac-slot{display:none!important}"),
+                  live("alert-creation", 58.35, 35.28, 33.3, 64.72, fit=PHONE, vh=1000, mode="width",
+                       css=ACS_BG + "div:has(> .acs-frac-card){display:none!important}")]}
 
 _goal_icons = [cardimg(75, 'i1', 4260, 20.2, 11.8, y=34.2, radius=0, key=False),
                cardimg(75, 'i2', 4262, 65.7, 9.2, y=32.6, radius=0, key=False)]
@@ -528,12 +527,22 @@ N[79] = releases_live(3)
 # the live quote screen, as the slide draws it: large, bleeding off the bottom
 # both quote screens side by side, same size as when they were a slide each: the
 # plain one, then with its fractional banner open (81 is hidden in the overrides)
-N[80] = {"kind": "media", "bg": "white", "corner": "How do I find the right symbol?",
-         "live": [live("alert-creation", x, 35.28, 33.3, 64.72, css=ACS_BG, fit=PHONE, vh=1000, mode="width",
-                       init=init) for x, init in ((14.7, None), (52.0, "openFractional"))]}
-N[81] = {"kind": "media", "bg": "white", "corner": "How do I find the right symbol?",
-         "live": [live("alert-creation", 33.38, 35.28, 33.3, 64.72, css=ACS_BG, fit=PHONE, vh=1000, mode="width",
-                       init="openFractional")]}
+# slides 80-81: the dark quote screen built up the way 77-79 are — the
+# original alone, then original + updated (its fractional banner open) at
+# the same fixed columns; captions on top, their ~25px box ending 5px
+# above the phones' top edge (35.28% = 381px on the 1080 canvas)
+DARK_COLS = ((14.7, "Original design", None), (52.0, "Updated design", "openFractional"))
+
+
+def dark_releases(k):
+    return {"kind": "media", "bg": "white", "corner": "How do I find the right symbol?",
+            "labels": [{"text": t, "x": round(x + 16.65, 2), "y": 32.5, "size": "lg"} for x, t, _ in DARK_COLS[:k]],
+            "live": [live("alert-creation", x, 35.28, 33.3, 64.72, css=ACS_BG, fit=PHONE, vh=1000, mode="width",
+                          init=init) for x, _, init in DARK_COLS[:k]]}
+
+
+N[80] = dark_releases(1)
+N[81] = dark_releases(2)
 N[82] = {"kind": "goals", "bg": "white", "plain": True, "cards": [
     dict(GOAL_CARDS[0], x=8.9, y=38, w=40, h=20, icon=None), dict(GOAL_CARDS[1], x=51.1, y=38, w=40, h=20, icon=None)]}
 
@@ -607,7 +616,7 @@ N[96] = {"kind": "media", "bg": "white", "labels": FRAC_LABELS,
          "live": [live("fractional-order-flow", x, 30.13, 27.9, 69.87, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init=init)
                   for x, init in ((35.63, None), (67.5, "limitOrder"))]}
 _T97 = (20.68, 62.78, 31.56, 83.98)  # the "Order sent" tile
-_P97 = (63.2, 14.0, 84.7, 88.9)      # the phone: the live order-placement screen
+_P97 = (63.2, 14.0, 84.7, 88.9)      # the phone: the live boxed order-placement screen
 # the alert screen's symbol, price and candles alone (the gallery clip's section), on
 # the card's own ground: the rows around them and the phone are hidden, and the white
 # type is re-inked dark. The price digits set their colour inline (white, or the
@@ -620,10 +629,20 @@ ACS_CHART = ('#bg-wrap .acs-root.acs-root.acs-root.acs-root,.acs-root,:has(>.acs
              '[data-type="heading"]{color:#0e0e0e}'
              '.acs-scroll>:nth-child(2) div[style*="255, 255, 255"] span,'
              '.acs-scroll>:nth-child(2) div[style*="#ffffff"] span{color:#0e0e0e}'
-             # no fade on the older candles: full opacity, and the cool tints back to the live colours
+             # no fade on the older candles: full opacity, and every candle, the "now" line and its
+             # pill in the light-theme greens / reds (Notive's palette: the light reference), the
+             # pill's text white on the darker green, and the change line + price flash in the
+             # Notive header tones. Both the live and the cool tints map, and the inline colours
+             # in both their hex and rgb() serialisations.
              'svg[viewBox="0 0 393 188"] g{opacity:1!important}'
-             '[stroke="#7ED37B"]{stroke:#48d597!important}[fill="#7ED37B"]{fill:#48d597!important}'
-             '[stroke="#FF9E7E"]{stroke:#ff557d!important}[fill="#FF9E7E"]{fill:#ff557d!important}')
+             '[stroke="#48d597"],[stroke="#7ED37B"]{stroke:#389b3c!important}[fill="#48d597"],[fill="#7ED37B"]{fill:#389b3c!important}'
+             '[stroke="#ff557d"],[stroke="#FF9E7E"]{stroke:#b3261e!important}[fill="#ff557d"],[fill="#FF9E7E"]{fill:#b3261e!important}'
+             'text[fill="#04150c"]{fill:#ffffff!important}'
+             '.acs-scroll>:nth-child(2) [style*="#48d597"],.acs-scroll>:nth-child(2) [style*="72, 213, 151"]{color:#477746!important}'
+             '.acs-scroll>:nth-child(2) [style*="#ff557d"],.acs-scroll>:nth-child(2) [style*="255, 85, 125"]{color:#c02416!important}'
+             # the digit wrappers rest on inline white with a 760ms colour transition: re-inked dark
+             # too, so a flash fades dark -> green/red rather than from white (washed on this ground)
+             '.acs-scroll>:nth-child(2) div[style*="255, 255, 255"],.acs-scroll>:nth-child(2) div[style*="#ffffff"]{color:#0e0e0e!important}')
 CANDLES = live("alert-creation", 14.1, 16.3, 24.0, 28.4, css=ACS_CHART,
                fit=".acs-scroll>:nth-child(2),.acs-scroll>:nth-child(3)", vh=1000, clip=True, pad=12)
 # the order-placed mark and caption on the card's ground: no phone, no page, the ring
@@ -635,8 +654,9 @@ N[97] = {"kind": "media", "bg": "white", "corner": "Advanced trading platform",
          "shots": [crop(97, 'a', 0, 0, 100, 100, wipe=(_T97, _SW, _P97))],
          "live": [CANDLES, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_LIGHT,
                        fit=".opa-badge, .opa-caption", vh=1000, clip=True, pad=26, init="mute"),
-                  # the ticket's phone, cut a row under Sell / Buy: the empty screen below ran long
-                  live("order-placement", 63.45, 14.24, 20.94, 62.3, css=PHONE_BG, fit=PHONE, vh=1000, mode="width", clip=True)]}
+                  # the boxed ticket's phone, whole: its Sell / Buy sit at the screen's foot, so the
+                  # rect is the PDF phone's full height (the old ticket was cut a row under its buttons)
+                  live("order-placement-boxed", 63.45, 14.24, 20.94, 75.8, css=PHONE_BG, fit=PHONE, vh=1000, mode="width", clip=True)]}
 N[98] = D("Impact", bg="white", tone="green")
 N[99] = {"kind": "figures", "bg": "white", "tone": "green", "layout": "top",
          "items": [["60K", "increase in trading volume"], ["$33M", "total value traded"]]}

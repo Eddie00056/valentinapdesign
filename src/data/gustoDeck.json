@@ -1287,35 +1287,35 @@
    {
     "text": "Regular trading platforms",
     "x": 25,
-    "y": 34.6
+    "y": 33.15
    },
    {
     "text": "Advanced trading platforms",
     "x": 75,
-    "y": 34.6
+    "y": 33.15
    }
   ],
   "live": [
    {
     "page": "notive-quote",
-    "x": 12.49,
-    "y": 39.2,
-    "w": 25.1,
-    "h": 60.8,
+    "x": 8.35,
+    "y": 35.28,
+    "w": 33.3,
+    "h": 64.72,
     "vw": 1280,
-    "css": ".nq-root,.phone-stage{background:none!important}",
+    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
     "mode": "width",
     "fit": "img[src*=\"iphone\"]",
     "vh": 1000
    },
    {
     "page": "alert-creation",
-    "x": 62.93,
-    "y": 38.36,
-    "w": 24.25,
-    "h": 61.64,
+    "x": 58.35,
+    "y": 35.28,
+    "w": 33.3,
+    "h": 64.72,
     "vw": 1280,
-    "css": ".acs-root{background:none!important}",
+    "css": ".acs-root{background:none!important}div:has(> .acs-frac-card){display:none!important}",
     "mode": "width",
     "fit": "img[src*=\"iphone\"]",
     "vh": 1000
@@ -1835,6 +1835,34 @@
     "mode": "width",
     "fit": "img[src*=\"iphone\"]",
     "vh": 1000
+   }
+  ],
+  "labels": [
+   {
+    "text": "Original design",
+    "x": 31.35,
+    "y": 32.5,
+    "size": "lg"
+   }
+  ]
+ },
+ {
+  "n": 81,
+  "kind": "media",
+  "bg": "white",
+  "corner": "How do I find the right symbol?",
+  "live": [
+   {
+    "page": "alert-creation",
+    "x": 14.7,
+    "y": 35.28,
+    "w": 33.3,
+    "h": 64.72,
+    "vw": 1280,
+    "css": ".acs-root{background:none!important}",
+    "mode": "width",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
    },
    {
     "page": "alert-creation",
@@ -1849,26 +1877,19 @@
     "fit": "img[src*=\"iphone\"]",
     "vh": 1000
    }
-  ]
- },
- {
-  "n": 81,
-  "kind": "media",
-  "bg": "white",
-  "corner": "How do I find the right symbol?",
-  "live": [
+  ],
+  "labels": [
    {
-    "page": "alert-creation",
-    "x": 33.38,
-    "y": 35.28,
-    "w": 33.3,
-    "h": 64.72,
-    "vw": 1280,
-    "css": ".acs-root{background:none!important}",
-    "mode": "width",
-    "init": "openFractional",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
+    "text": "Original design",
+    "x": 31.35,
+    "y": 32.5,
+    "size": "lg"
+   },
+   {
+    "text": "Updated design",
+    "x": 68.65,
+    "y": 32.5,
+    "size": "lg"
    }
   ]
  },
@@ -2352,7 +2373,7 @@
     "w": 24.0,
     "h": 28.4,
     "vw": 1280,
-    "css": "#bg-wrap .acs-root.acs-root.acs-root.acs-root,.acs-root,:has(>.acs-scroll){background:none!important}img[src*=\"iphone\"]{visibility:hidden!important}.acs-scroll>:not(:nth-child(2)):not(:nth-child(3)){visibility:hidden!important}[data-type=\"heading\"]{color:#0e0e0e}.acs-scroll>:nth-child(2) div[style*=\"255, 255, 255\"] span,.acs-scroll>:nth-child(2) div[style*=\"#ffffff\"] span{color:#0e0e0e}svg[viewBox=\"0 0 393 188\"] g{opacity:1!important}[stroke=\"#7ED37B\"]{stroke:#48d597!important}[fill=\"#7ED37B\"]{fill:#48d597!important}[stroke=\"#FF9E7E\"]{stroke:#ff557d!important}[fill=\"#FF9E7E\"]{fill:#ff557d!important}",
+    "css": "#bg-wrap .acs-root.acs-root.acs-root.acs-root,.acs-root,:has(>.acs-scroll){background:none!important}img[src*=\"iphone\"]{visibility:hidden!important}.acs-scroll>:not(:nth-child(2)):not(:nth-child(3)){visibility:hidden!important}[data-type=\"heading\"]{color:#0e0e0e}.acs-scroll>:nth-child(2) div[style*=\"255, 255, 255\"] span,.acs-scroll>:nth-child(2) div[style*=\"#ffffff\"] span{color:#0e0e0e}svg[viewBox=\"0 0 393 188\"] g{opacity:1!important}[stroke=\"#48d597\"],[stroke=\"#7ED37B\"]{stroke:#389b3c!important}[fill=\"#48d597\"],[fill=\"#7ED37B\"]{fill:#389b3c!important}[stroke=\"#ff557d\"],[stroke=\"#FF9E7E\"]{stroke:#b3261e!important}[fill=\"#ff557d\"],[fill=\"#FF9E7E\"]{fill:#b3261e!important}text[fill=\"#04150c\"]{fill:#ffffff!important}.acs-scroll>:nth-child(2) [style*=\"#48d597\"],.acs-scroll>:nth-child(2) [style*=\"72, 213, 151\"]{color:#477746!important}.acs-scroll>:nth-child(2) [style*=\"#ff557d\"],.acs-scroll>:nth-child(2) [style*=\"255, 85, 125\"]{color:#c02416!important}.acs-scroll>:nth-child(2) div[style*=\"255, 255, 255\"],.acs-scroll>:nth-child(2) div[style*=\"#ffffff\"]{color:#0e0e0e!important}",
     "pad": 12,
     "clip": true,
     "fit": ".acs-scroll>:nth-child(2),.acs-scroll>:nth-child(3)",
@@ -2373,11 +2394,11 @@
     "vh": 1000
    },
    {
-    "page": "order-placement",
+    "page": "order-placement-boxed",
     "x": 63.45,
     "y": 14.24,
     "w": 20.94,
-    "h": 62.3,
+    "h": 75.8,
     "vw": 1280,
     "css": ".phone-stage{background:none!important}",
     "mode": "width",
