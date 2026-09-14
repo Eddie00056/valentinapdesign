@@ -683,8 +683,16 @@ export function NotiveQuoteScreen({
      ones without the banner keeps their rails level); the gallery never asks */
   const [chartH, setChartH] = useState(CHART_H);
   useEffect(() => {
-    const v = Number(new URLSearchParams(window.location.search).get("chartH"));
+    const q = new URLSearchParams(window.location.search);
+    const v = Number(q.get("chartH"));
     if (v >= 80) setChartH(v);
+    /* ?static: the quote holds still (a slide that shows a state, not a
+       market) — the shared clock is stopped and cannot be restarted */
+    if (q.has("static")) {
+      const h = pxHub();
+      clearInterval(h.timer);
+      h.restart = () => {};
+    }
   }, []);
   const chart = (
     /* Full bleed: the artboard runs the line clean off both edges, so the

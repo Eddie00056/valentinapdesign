@@ -160,6 +160,12 @@ export function AlertCreationScreen({
     if (!fracSettled) return;
     setFracOpen(false);
   };
+  /* ?banner=open: a slide that shows the banner as a state, not as a thing
+     that just happened — opened before the page is revealed */
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("banner") === "open") openFrac();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   /* inline approximation of the glass `light` icon button (glass-button.css
      .dark .btn--light) so the morphing card can *be* the resting icon. */
   // Match the mobile GlassButton (watchlist / alert) exactly: 66deg fill +

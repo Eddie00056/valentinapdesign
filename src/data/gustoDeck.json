@@ -419,10 +419,18 @@
     "bg": "black",
     "shots": [
       {
-        "src": "031full",
+        "src": "031a",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "labels": [
+      {
+        "text": "Current widget layout",
+        "x": 50.02,
+        "y": 29.8,
+        "size": "lg"
       }
     ]
   },
@@ -437,7 +445,8 @@
         "text": "Updated widget design",
         "x": 50.02,
         "y": 29.8,
-        "size": "lg"
+        "size": "lg",
+        "s": 0
       }
     ],
     "live": [
@@ -1101,7 +1110,7 @@
     ],
     "live": [
       {
-        "page": "notive-quote",
+        "page": "notive-quote?static",
         "x": 7.13,
         "y": 45.0,
         "w": 22.45,
@@ -1137,7 +1146,7 @@
     ],
     "live": [
       {
-        "page": "notive-quote",
+        "page": "notive-quote?static",
         "x": 7.13,
         "y": 45.0,
         "w": 22.45,
@@ -1151,7 +1160,7 @@
         "clip": true
       },
       {
-        "page": "notive-quote",
+        "page": "notive-quote?static",
         "x": 38.74,
         "y": 45.0,
         "w": 22.45,
@@ -1193,7 +1202,7 @@
     ],
     "live": [
       {
-        "page": "notive-quote",
+        "page": "notive-quote?static",
         "x": 7.13,
         "y": 45.0,
         "w": 22.45,
@@ -1207,7 +1216,7 @@
         "clip": true
       },
       {
-        "page": "notive-quote",
+        "page": "notive-quote?static",
         "x": 38.74,
         "y": 45.0,
         "w": 22.45,
@@ -1221,7 +1230,7 @@
         "clip": true
       },
       {
-        "page": "notive-quote?chartH=186",
+        "page": "notive-quote?chartH=186&static",
         "x": 70.37,
         "y": 45.0,
         "w": 22.45,
@@ -1287,7 +1296,7 @@
     ],
     "live": [
       {
-        "page": "alert-creation",
+        "page": "alert-creation?banner=open",
         "x": 56.62,
         "y": 34.0,
         "w": 34.75,
@@ -1297,7 +1306,6 @@
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
         "css": ".acs-root{background:none!important}",
-        "init": "openFractional",
         "clip": true
       }
     ]
@@ -1638,10 +1646,10 @@
       },
       {
         "page": "fractional-order-flow",
-        "x": 19.94,
-        "y": 16.33,
-        "w": 12.36,
-        "h": 20.19,
+        "x": 23.23,
+        "y": 21.28,
+        "w": 5.78,
+        "h": 10.28,
         "vw": 1280,
         "vh": 1000,
         "fit": "[aria-label=\"Swap amount and quantity\"]",
