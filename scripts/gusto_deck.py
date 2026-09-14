@@ -588,20 +588,33 @@ N[89] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "labels": [{"text": "Label", "x": 50.64, "y": 29.56, "size": "lg"}],
          # the edge cases run on the live fractional order flow, opened on a Limit order
          "live": [live("fractional-order-flow", 35.61, 32.43, 30.07, 67.57, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder")]}
-N[90] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
-         "labels": [{"text": "V1", "x": 31.45, "y": 34.4}, {"text": "V2", "x": 73.25, "y": 34.4}],
-         # the two error wordings, static (no ticking, no typing): the fractional order flow's
-         # ?fractionError state on a Limit order with 0.5 typed in, exported from the page with
-         # the quote frozen at $300.00, at the phones' old rects (top-aligned, bleeding off)
-         "shots": [asset(f"090-limit-error-{v}", f"fractional-limit-error-{v}.png", x, 31.01, 38.2, quality=92)
-                   for x, v in ((16.05, "v1"), (57.71, "v2"))]}
-# the same Limit screen as the V1/V2 slide (?static: quote frozen at $300.00), at their phone
-# size and height, centred; on arrival 1.5 is completed in the quantity and the blue hint +
-# the limit-order-error ring round the order pill play together
-N[91] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
-         "labels": [{"text": "Label", "x": 50, "y": 34.4, "size": "lg"}],  # placeholder
-         "live": [dict(live("fractional-order-flow?fractionError=hint&static", 50 - 31.01 / 2, 38.2, 31.01, 61.8, css=FOF_BG,
-                            fit=".fof-frame", vh=1000, mode="width", init="fracHintSetup"), arrive="fracHintType")]}
+# the Limit-quantity edge case built up across the three RELEASES columns, the
+# way 77-79 are: V1, then V1 + V2 (the two error wordings, static exports of the
+# fractional order flow's ?fractionError state with 0.5 typed in, the quote
+# frozen at $300.00), then the final design live (?static: quote frozen), which
+# types 1.5 on arrival so the blue hint and the ring round the order pill play
+# together. Page 90 is V1 alone, an inserted slide (no PDF page of its own)
+# adds V2, page 91 adds the final. Phones top-aligned at 38.2%, bleeding off the
+# bottom; captions above them, centred on their columns.
+EDGE_COLS = ((4.14, "V1"), (35.75, "V2"), (67.37, "Final design"))
+EDGE_W = 28.44
+EDGE_SHOTS = [asset(f"090-limit-error-{v}", f"fractional-limit-error-{v}.png", x, EDGE_W, 38.2, quality=92)
+              for (x, _), v in zip(EDGE_COLS, ("v1", "v2"))]
+
+
+def edge_cases(k):
+    e = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
+         "labels": [{"text": t, "x": round(x + EDGE_W / 2, 2), "y": 35.28} for x, t in EDGE_COLS[:k]],
+         "shots": EDGE_SHOTS[:k]}
+    if k == 3:
+        e["live"] = [dict(live("fractional-order-flow?fractionError=hint&static", EDGE_COLS[2][0], 38.2, EDGE_W, 61.8, css=FOF_BG,
+                               fit=".fof-frame", vh=1000, mode="width", init="fracHintSetup"), arrive="fracHintType")]
+    return e
+
+
+N[90] = edge_cases(1)
+INSERT_AFTER[90] = [edge_cases(2)]
+N[91] = edge_cases(3)
 N[92] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "panels": [P(50, 50, LIGHT_PANEL)],
          "shots": [crop(92, 'a', 14.0, 16.8, 36.3, 90.4), crop(92, 'b', 59.5, 22.5, 91.0, 75.0)]}

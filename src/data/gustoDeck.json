@@ -2165,27 +2165,16 @@
   "labels": [
    {
     "text": "V1",
-    "x": 31.45,
-    "y": 34.4
-   },
-   {
-    "text": "V2",
-    "x": 73.25,
-    "y": 34.4
+    "x": 18.36,
+    "y": 35.28
    }
   ],
   "shots": [
    {
     "src": "090-limit-error-v1",
-    "x": 16.05,
+    "x": 4.14,
     "y": 38.2,
-    "w": 31.01
-   },
-   {
-    "src": "090-limit-error-v2",
-    "x": 57.71,
-    "y": 38.2,
-    "w": 31.01
+    "w": 28.44
    }
   ]
  },
@@ -2196,18 +2185,73 @@
   "corner": "Navigating edge cases",
   "labels": [
    {
-    "text": "Label",
-    "x": 50,
-    "y": 34.4,
-    "size": "lg"
+    "text": "V1",
+    "x": 18.36,
+    "y": 35.28
+   },
+   {
+    "text": "V2",
+    "x": 49.97,
+    "y": 35.28
+   }
+  ],
+  "shots": [
+   {
+    "src": "090-limit-error-v1",
+    "x": 4.14,
+    "y": 38.2,
+    "w": 28.44
+   },
+   {
+    "src": "090-limit-error-v2",
+    "x": 35.75,
+    "y": 38.2,
+    "w": 28.44
+   }
+  ]
+ },
+ {
+  "n": 93,
+  "kind": "media",
+  "bg": "white",
+  "corner": "Navigating edge cases",
+  "labels": [
+   {
+    "text": "V1",
+    "x": 18.36,
+    "y": 35.28
+   },
+   {
+    "text": "V2",
+    "x": 49.97,
+    "y": 35.28
+   },
+   {
+    "text": "Final design",
+    "x": 81.59,
+    "y": 35.28
+   }
+  ],
+  "shots": [
+   {
+    "src": "090-limit-error-v1",
+    "x": 4.14,
+    "y": 38.2,
+    "w": 28.44
+   },
+   {
+    "src": "090-limit-error-v2",
+    "x": 35.75,
+    "y": 38.2,
+    "w": 28.44
    }
   ],
   "live": [
    {
     "page": "fractional-order-flow?fractionError=hint&static",
-    "x": 34.495,
+    "x": 67.37,
     "y": 38.2,
-    "w": 31.01,
+    "w": 28.44,
     "h": 61.8,
     "vw": 1280,
     "css": ".fof-stage{background:none!important}",
@@ -2220,7 +2264,7 @@
   ]
  },
  {
-  "n": 93,
+  "n": 94,
   "kind": "media",
   "bg": "white",
   "corner": "Navigating edge cases",
@@ -2248,7 +2292,7 @@
   ]
  },
  {
-  "n": 94,
+  "n": 95,
   "kind": "divider",
   "bg": "white",
   "text": "Final designs",
@@ -2256,14 +2300,14 @@
   "tone": "green"
  },
  {
-  "n": 95,
+  "n": 96,
   "kind": "divider",
   "bg": "white",
   "text": "",
   "size": "lg"
  },
  {
-  "n": 96,
+  "n": 97,
   "kind": "media",
   "bg": "white",
   "shots": [
@@ -2315,7 +2359,7 @@
   ]
  },
  {
-  "n": 97,
+  "n": 98,
   "kind": "media",
   "bg": "white",
   "labels": [
@@ -2373,7 +2417,7 @@
   "corner": "Title"
  },
  {
-  "n": 98,
+  "n": 99,
   "kind": "media",
   "bg": "white",
   "corner": "Advanced trading platform",
@@ -2426,7 +2470,7 @@
   ]
  },
  {
-  "n": 99,
+  "n": 100,
   "kind": "divider",
   "bg": "white",
   "text": "Impact",
@@ -2434,7 +2478,7 @@
   "tone": "green"
  },
  {
-  "n": 100,
+  "n": 101,
   "kind": "figures",
   "bg": "white",
   "tone": "green",
@@ -2452,7 +2496,7 @@
   "corner": "Title"
  },
  {
-  "n": 101,
+  "n": 102,
   "kind": "figures",
   "bg": "white",
   "tone": "green",
@@ -2474,7 +2518,7 @@
   "corner": "Title"
  },
  {
-  "n": 102,
+  "n": 103,
   "kind": "divider",
   "bg": "white",
   "text": "Reflections",
@@ -2482,14 +2526,14 @@
   "tone": "green"
  },
  {
-  "n": 103,
+  "n": 104,
   "kind": "divider",
   "bg": "black",
   "text": "",
   "size": "lg"
  },
  {
-  "n": 104,
+  "n": 105,
   "bg": "black",
   "raster": "103.webp"
  }
