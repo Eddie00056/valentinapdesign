@@ -572,6 +572,7 @@ SWITCH_ICON = live("switch-icon", 21.0, 16.3, 12.4, 20.2, css=".si-stage{backgro
 _S95 = (6.4, 65.4, 45.9, 81.4)       # the white strip holding the banner icon
 N[95] = {"kind": "media", "bg": "white",
          "shots": [crop(95, 'a', 0, 0, 100, 100, wipe=(_P95, _S95, _SW))],
+         "corner": "Novice trading platform",
          # the banner on the card's own ground, unfurling by itself
          "live": [SWITCH_ICON, live("fractional-shares-banner", 6.4, 65.4, 39.5, 16.0, 760,
                                     css=".pshell,.pshell-stage{background:none!important}", clip=True, init="bannerLoop"),
@@ -605,7 +606,7 @@ N[103] = raster(103)
 # every content slide titles top-left (the deck renders kicker/heading/corner
 # as one .gd-corner); these have no title copy yet, so they get a placeholder
 # (cover, title cards, dividers and 53's big "Then vs Now" are left without)
-for n in [*range(3, 12), 14, 15, 17, 18, 34, 35, 39, 47, 54, 56, 82, 95, 96, 97, 99, 100]:
+for n in [*range(3, 12), 14, 15, 17, 18, 34, 35, 39, 47, 54, 56, 82, 96, 97, 99, 100]:
     assert not any(k in N[n] for k in ("corner", "kicker", "heading")), n
     N[n]["corner"] = "Title"
 

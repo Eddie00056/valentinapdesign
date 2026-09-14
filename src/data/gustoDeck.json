@@ -2221,6 +2221,7 @@
     "w": 100
    }
   ],
+  "corner": "Novice trading platform",
   "live": [
    {
     "page": "switch-icon",
@@ -2258,8 +2259,7 @@
     "fit": ".fof-frame",
     "vh": 1000
    }
-  ],
-  "corner": "Title"
+  ]
  },
  {
   "n": 96,
