@@ -663,7 +663,8 @@
         "vh": 900,
         "fit": ".wsp-screen",
         "css": "",
-        "clip": true
+        "clip": true,
+        "init": "chainFirst"
       }
     ]
   },
