@@ -55,14 +55,11 @@
    as an inset box-shadow so the 32px box doesn't grow by the border and the
    rim sits exactly at the bounds ("never clip: the material's rim lives at
    the bounds"); the set's own masked `::before` ring is switched off so
-   there is one rim, not two. `.nq-frac` shares the rule because the
-   fractional chip is a Motion shared-layout box that can't carry the
-   `.btn` classes (its radius and size animate into the banner, and the
-   set's `:active` scale would fight that) — its mark stays the fractional
-   blue on the same shell. Specificity (0,3,0) is what it takes to beat the
-   set's `.btn--mobile.btn--icon` pair. */
-.nq-root .btn--mobile.btn--icon,
-.nq-root .nq-frac {
+   there is one rim, not two. The fractional chip is NOT in this rule — it
+   is the fractional-shares banner's blue chip, see `.nq-frac`. Specificity
+   (0,3,0) is what it takes to beat the set's `.btn--mobile.btn--icon`
+   pair. */
+.nq-root .btn--mobile.btn--icon {
   background: rgba(255, 255, 255, 0.55);
   box-shadow:
     inset 0 0 0 0.5px rgba(255, 255, 255, 0.65),
@@ -133,21 +130,44 @@
 }
 
 /* ---- the fractional card ----
-   Its compact state sits in the nav row beside the star, at the star's
-   size and stroke, on the same glass shell as the star (the rule above),
-   with the mark in the fractional BLUE — one accent across both
-   prototypes. The expanded banner it morphs into keeps its solid tint. */
+   Its compact state is /work/fractional-shares-banner's chip, by value
+   (`glasslab/FractionalSharesBanner.tsx`: GLASS + ring + STROKE_BASE) —
+   user, 2026-09-13: "that's not the blue we had prior … it should be
+   this; just reuse that icon". Three layers: white glass under a 10% blue
+   wash, the blue gradient rim at half strength, and the library's real
+   `.inner-stroke--blue` nested inside (same gradient as that file's
+   STROKE_BASE). The mark is that page's `mark.png`. It sits in the nav row
+   at the star's 32px box; the expanded banner keeps its solid tint. It
+   can't carry the `.btn` classes: it is a Motion shared-layout box whose
+   radius and size animate into the banner. */
 .nq-frac {
-  color: #0066db;
+  background: rgba(255, 255, 255, 0.5);
+  background-image: linear-gradient(rgba(0, 102, 219, 0.1), rgba(0, 102, 219, 0.1));
+}
+.nq-frac::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0.5;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(273.75deg, #6c9be6 3.96%, #b2e1f5 34.23%, #6291dc 98.29%);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
-/* 14px, not the set's nominal 16: the star's path spans 18 of its 24 grid
-   (12px of ink at 16), the pie spans 21 — at 14 its ink is 12.25px, so the
-   two marks read the same size side by side. It stays 14 in the expanded
+/* The banner page draws its mark at a third of its 66px pill; a third of
+   this 32px box is ~11, but the star beside it puts down 12px of ink, so
+   14 keeps the two reading the same size. It stays 14 in the expanded
    banner too: the glyph carries its own `layoutId`, so any size difference
-   between the two states would be animated, and there is nothing to gain
-   from that. The stroke is passed as 1.8 (the set's) at the call sites. */
-.nq-frac-glyph svg {
+   between the two states would be animated. */
+.nq-frac-glyph img {
+  display: block;
   width: 14px;
   height: 14px;
 }
