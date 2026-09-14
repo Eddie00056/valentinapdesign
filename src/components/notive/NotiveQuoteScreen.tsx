@@ -465,7 +465,8 @@ export function NotiveQuoteScreen({
           (2026-09-13, a 402pt frame at 2x, measured in pt and used as px):
           18 under the nav row, the 32px logo tile with the name at 12/400
           grey centred on it; 10 from the tile to the price's cap top; the
-          price at 40/600 (its cap is 29, stems 5.5 — Open Sans 600 at 40)
+          price at 600 (the artboard's 40 — cap 29, stems 5.5 — since
+          reduced to 34 on request)
           with "USD" at 15/600 on the same baseline, 7 to its left edge;
           then the change at 14/600, its baseline 24 under the price's.
           The face is Open Sans throughout, as ever. */}
@@ -492,15 +493,17 @@ export function NotiveQuoteScreen({
         </span>
       </div>
 
-      {/* The odometer's cells are 1.15em boxes: at 40px the digits' cap top
-          sits 10px below the cell top and their baseline 7.5px above its
-          bottom — so no margin puts the cap top 10 under the tile, and the
-          USD tag's padding lifts its baseline onto the price's. */}
-      <div style={{ display: "flex", alignItems: "flex-end" }}>
+      {/* 34, down from the artboard's 40 (user, 2026-09-13: "reduce the
+          hero price font"). The odometer's cells are 1.15em boxes: at 34px
+          the digits' cap top sits 8.4px below the cell top and their
+          baseline 6.4px above its bottom — the 2px margin keeps the cap top
+          10 under the tile, and the USD tag's padding lifts its baseline
+          onto the price's. */}
+      <div style={{ display: "flex", alignItems: "flex-end", marginTop: 2 }}>
         <Rolling
           value={"$" + money(price)}
           style={{
-            fontSize: 40,
+            fontSize: 34,
             fontWeight: 600,
             lineHeight: 1,
             color: priceColor,
@@ -512,7 +515,7 @@ export function NotiveQuoteScreen({
             fontSize: 15,
             fontWeight: 600,
             lineHeight: 1,
-            paddingBottom: 5.5,
+            paddingBottom: 4.5,
             marginLeft: 7,
             color: INK,
           }}
@@ -523,7 +526,7 @@ export function NotiveQuoteScreen({
 
       <div
         style={{
-          marginTop: 4,
+          marginTop: 5, // keeps the artboard's 24px baseline-to-baseline under the smaller price
           fontSize: 14,
           fontWeight: 600,
           lineHeight: 1,
