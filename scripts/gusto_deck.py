@@ -588,9 +588,16 @@ N[96] = {"kind": "media", "bg": "white", "labels": FRAC_LABELS,
                   for x, init in ((35.63, None), (67.5, "limitOrder"))]}
 _T97 = (20.68, 62.78, 31.56, 83.98)  # the "Order sent" tile
 _P97 = (63.2, 14.0, 84.7, 88.9)      # the phone: the live order-placement screen
-N[97] = {"kind": "media", "bg": "white",
+# the alert screen's symbol, price and candles alone (the gallery clip's section) on
+# a black tile: the rows around them and the phone frame are hidden, the page is black
+ACS_CHART = ('html,body,html[data-embed],html[data-embed] body{background:#000!important}'
+             '.acs-root{background:none!important}img[src*="iphone"]{visibility:hidden!important}'
+             '.acs-scroll>:not(:nth-child(2)):not(:nth-child(3)){visibility:hidden!important}')
+CANDLES = live("alert-creation", 14.1, 16.3, 24.0, 28.4, css=ACS_CHART,
+               fit=".acs-scroll>:nth-child(2),.acs-scroll>:nth-child(3)", vh=1000, clip=True, pad=12)
+N[97] = {"kind": "media", "bg": "white", "corner": "Advanced trading platform",
          "shots": [crop(97, 'a', 0, 0, 100, 100, wipe=(_T97, _SW, _P97))],
-         "live": [SWITCHER, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_BG,
+         "live": [CANDLES, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_BG,
                        fit=".opa-badge, .opa-caption", vh=1000, clip=True, pad=26, init="mute"),
                   live("order-placement", 63.45, 14.24, 20.94, 74.39, css=PHONE_BG, fit=PHONE, vh=1000)]}
 N[98] = D("Impact", bg="white", tone="green")
@@ -606,7 +613,7 @@ N[103] = raster(103)
 # every content slide titles top-left (the deck renders kicker/heading/corner
 # as one .gd-corner); these have no title copy yet, so they get a placeholder
 # (cover, title cards, dividers and 53's big "Then vs Now" are left without)
-for n in [*range(3, 12), 14, 15, 17, 18, 34, 35, 39, 47, 54, 56, 82, 96, 97, 99, 100]:
+for n in [*range(3, 12), 14, 15, 17, 18, 34, 35, 39, 47, 54, 56, 82, 96, 99, 100]:
     assert not any(k in N[n] for k in ("corner", "kicker", "heading")), n
     N[n]["corner"] = "Title"
 

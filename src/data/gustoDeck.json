@@ -2323,6 +2323,7 @@
   "n": 97,
   "kind": "media",
   "bg": "white",
+  "corner": "Advanced trading platform",
   "shots": [
    {
     "src": "097a",
@@ -2333,16 +2334,16 @@
   ],
   "live": [
    {
-    "page": "fractional-order-flow",
-    "x": 21.0,
+    "page": "alert-creation",
+    "x": 14.1,
     "y": 16.3,
-    "w": 12.4,
-    "h": 20.2,
+    "w": 24.0,
+    "h": 28.4,
     "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "pad": 30,
+    "css": "html,body,html[data-embed],html[data-embed] body{background:#000!important}.acs-root{background:none!important}img[src*=\"iphone\"]{visibility:hidden!important}.acs-scroll>:not(:nth-child(2)):not(:nth-child(3)){visibility:hidden!important}",
+    "pad": 12,
     "clip": true,
-    "fit": "[aria-label=\"Swap amount and quantity\"]",
+    "fit": ".acs-scroll>:nth-child(2),.acs-scroll>:nth-child(3)",
     "vh": 1000
    },
    {
@@ -2370,8 +2371,7 @@
     "fit": "img[src*=\"iphone\"]",
     "vh": 1000
    }
-  ],
-  "corner": "Title"
+  ]
  },
  {
   "n": 98,
