@@ -708,6 +708,13 @@ const title = (s: Slide): string | undefined =>
       // slide 81: the quote screen with its fractional banner already open
       openFractional: (_w, d) =>
         d.querySelector<HTMLElement>('[aria-label="Fractional shares"]')?.click(),
+      // slide 32: the stock ticket with its bracket order already attached
+      openBracket: (_w, d) => {
+        const btn = [...d.querySelectorAll<HTMLElement>("button")].find((b) =>
+          b.textContent?.includes("Bracket order"),
+        );
+        btn?.click();
+      },
       /* slide 79, "Beta release": the entry's css hides the open banner
          (the state stays open, so the chip never mounts — the tag is the
          fractional affordance here) and this sets a "Fractional" tag beside

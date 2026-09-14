@@ -1,1719 +1,1563 @@
 [
- {
-  "n": 1,
-  "kind": "cover",
-  "bg": "black",
-  "title": "Valentina Padure",
-  "sub": "Portfolio presentation"
- },
- {
-  "n": 2,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 1,
-  "corner": "Title"
- },
- {
-  "n": 3,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 2,
-  "corner": "Title"
- },
- {
-  "n": 4,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 3,
-  "corner": "Title"
- },
- {
-  "n": 5,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 4,
-  "corner": "Title"
- },
- {
-  "n": 6,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 5,
-  "corner": "Title"
- },
- {
-  "n": 7,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 6,
-  "corner": "Title"
- },
- {
-  "n": 8,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 7,
-  "corner": "Title"
- },
- {
-  "n": 9,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 8,
-  "corner": "Title"
- },
- {
-  "n": 10,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 8,
-  "dim": true,
-  "corner": "Title"
- },
- {
-  "n": 11,
-  "kind": "titlecard",
-  "bg": "black",
-  "kicker": "Case study",
-  "title": "Order entry\nmodernization",
-  "fs": 120
- },
- {
-  "n": 12,
-  "kind": "divider",
-  "bg": "black",
-  "text": "Background",
-  "size": "lg"
- },
- {
-  "n": 13,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "013full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 14,
-  "kind": "statement",
-  "bg": "black",
-  "text": "Launch a new, modernized trading platform",
-  "kicker": "Solution"
- },
- {
-  "n": 15,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "015full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 16,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "016full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 17,
-  "kind": "role",
-  "bg": "black",
-  "rows": [
-   [
-    "My role",
-    "Lead Designer for the order entry widget"
-   ],
-   [
-    "Design Timeline",
-    "6 months"
-   ],
-   [
-    "Team",
-    "2 Engineering teams\n1 UX Researcher"
-   ]
-  ],
-  "live": [
-   {
-    "page": "stock-order-entry",
-    "x": 55,
-    "y": 22,
-    "w": 36,
-    "h": 60,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}",
-    "fit": ".wshell",
-    "vh": 960
-   }
-  ],
-  "corner": "Title"
- },
- {
-  "n": 18,
-  "kind": "divider",
-  "bg": "black",
-  "text": "The journey",
-  "size": "lg"
- },
- {
-  "n": 19,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "019full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 20,
-  "kind": "statement",
-  "bg": "black",
-  "text": "Led foundational research with active traders\nto evaluate the full trading journey.",
-  "kicker": "Pivoting the research"
- },
- {
-  "n": 21,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "021full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 22,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "022full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 23,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "023full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 24,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "024full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 25,
-  "kind": "metrics",
-  "bg": "black",
-  "kicker": "Success metrics",
-  "items": [
-   {
-    "text": "Reduce time to\ntrade by 15%"
-   },
-   {
-    "text": "Reduce number of\nclicks by 30%"
-   }
-  ]
- },
- {
-  "n": 26,
-  "kind": "divider",
-  "bg": "black",
-  "text": "How?",
-  "size": "lg"
- },
- {
-  "n": 27,
-  "kind": "statement",
-  "bg": "black",
-  "text": "What data do we show and how?",
-  "kicker": "Reducing time to trade"
- },
- {
-  "n": 28,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "028full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 29,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "029full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 30,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "030full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 31,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "031full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 32,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "032full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 33,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "033full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 34,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "034full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 35,
-  "kind": "statement",
-  "bg": "black",
-  "text": "How do we make the option trade\nexperience faster?",
-  "kicker": "Reducing time to trade"
- },
- {
-  "n": 36,
-  "kind": "statement",
-  "bg": "black",
-  "text": "What are options?",
-  "corner": "Title"
- },
- {
-  "n": 37,
-  "kind": "twocol",
-  "bg": "black",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50,
-    "y": 0,
-    "c": "#111116"
-   }
-  ],
-  "left": "Single-leg / Option = 🍔",
-  "right": "Multi-leg / Strategy = 🍔🥤🍟",
-  "corner": "Title"
- },
- {
-  "n": 38,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "038full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 39,
-  "kind": "statement",
-  "bg": "black",
-  "text": "The journey between finding an option and\nplacing an option trade was broken",
-  "kicker": "Reducing time to trade"
- },
- {
-  "n": 40,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "040full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 41,
-  "kind": "media",
-  "bg": "black",
-  "heading": "Reduce time to trade",
-  "shots": [
-   {
-    "src": "041a",
-    "x": 10.4,
-    "y": 13.2,
-    "w": 79.2
-   }
-  ]
- },
- {
-  "n": 42,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "042full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 43,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "043full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 44,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "044full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 45,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "045full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 46,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "046full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 47,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "047full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 48,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "048full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 49,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "049full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 50,
-  "kind": "media",
-  "bg": "black",
-  "corner": "Product vision",
-  "labels": [
-   {
-    "text": "V1",
-    "x": 23.02,
-    "y": 23
-   },
-   {
-    "text": "V2",
-    "x": 64.27,
-    "y": 23
-   }
-  ],
-  "shots": [
-   {
-    "src": "046-atlas-strategy-builder",
-    "x": 40.42,
-    "y": 27.78,
-    "w": 47.71
-   }
-  ],
-  "live": [
-   {
-    "page": "options-strategy-builder",
-    "x": 11.875,
-    "y": 27.78,
-    "w": 22.29,
-    "h": 40,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}",
-    "mode": "width",
-    "fit": ".wshell",
-    "vh": 960
-   }
-  ]
- },
- {
-  "n": 51,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "051full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 52,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "052full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 53,
-  "kind": "divider",
-  "bg": "black",
-  "text": "Final designs",
-  "size": "lg"
- },
- {
-  "n": 54,
-  "kind": "media",
-  "bg": "black",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "054full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 55,
-  "bg": "black",
-  "raster": "055.webp",
-  "live": [
-   {
-    "page": "chain-to-order",
-    "x": 12.2,
-    "y": 8.3,
-    "w": 75.3,
-    "h": 83.6,
-    "vw": 1440,
-    "css": "",
-    "clip": true,
-    "fit": ".wsp-screen",
-    "vh": 900
-   }
-  ],
-  "corner": "Title"
- },
- {
-  "n": 56,
-  "kind": "divider",
-  "bg": "black",
-  "text": "Impact",
-  "size": "lg"
- },
- {
-  "n": 57,
-  "kind": "figures",
-  "bg": "black",
-  "tone": "mint",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50,
-    "y": 0,
-    "c": "#111116"
-   }
-  ],
-  "split": true,
-  "items": [
-   [
-    "60%",
-    "faster to place trades"
-   ],
-   [
-    "85%",
-    "Satisfaction score during the closed beta"
-   ]
-  ],
-  "corner": "Title"
- },
- {
-  "n": 58,
-  "kind": "divider",
-  "bg": "black",
-  "text": "Reflections",
-  "size": "lg"
- },
- {
-  "n": 59,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "059full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 60,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "060full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 61,
-  "kind": "statement",
-  "bg": "white",
-  "text": "Introduce fractional trading",
-  "corner": "Solution"
- },
- {
-  "n": 62,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "062full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 63,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "063full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 64,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "064full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 65,
-  "kind": "media",
-  "bg": "white",
-  "corner": "Research",
-  "shots": [
-   {
-    "src": "065a",
-    "x": 31.6,
-    "y": 19.4,
-    "w": 37.2
-   }
-  ]
- },
- {
-  "n": 66,
-  "kind": "statement",
-  "bg": "white",
-  "text": "Traders need affordable and flexible\nways to trade.",
-  "fw": 600,
-  "corner": "Problem",
-  "fs": 80
- },
- {
-  "n": 67,
-  "kind": "statement",
-  "bg": "white",
-  "text": "1 Feature.",
-  "fw": 600,
-  "corner": "Design challenge"
- },
- {
-  "n": 68,
-  "kind": "statement",
-  "bg": "white",
-  "text": "1 Feature. 2 Personas.",
-  "fw": 600,
-  "corner": "Design challenge"
- },
- {
-  "n": 69,
-  "kind": "statement",
-  "bg": "white",
-  "text": "1 Feature. 2 Personas. 2 Design languages",
-  "fw": 600,
-  "corner": "Design challenge"
- },
- {
-  "n": 70,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "070full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 71,
-  "kind": "media",
-  "bg": "white",
-  "corner": "2 Platforms = 2 Design languages",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50,
-    "y": 0,
-    "c": "#f2f2f2"
-   }
-  ],
-  "labels": [
-   {
-    "text": "Regular trading platforms",
-    "x": 25,
-    "y": 33.15
-   },
-   {
-    "text": "Advanced trading platforms",
-    "x": 75,
-    "y": 33.15
-   }
-  ],
-  "live": [
-   {
-    "page": "notive-quote",
-    "x": 8.35,
-    "y": 35.28,
-    "w": 33.3,
-    "h": 64.72,
-    "vw": 1280,
-    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
-    "mode": "width",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   },
-   {
-    "page": "alert-creation",
-    "x": 58.35,
-    "y": 35.28,
-    "w": 33.3,
-    "h": 64.72,
-    "vw": 1280,
-    "css": ".acs-root{background:none!important}div:has(> .acs-frac-card){display:none!important}",
-    "mode": "width",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   }
-  ]
- },
- {
-  "n": 72,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "072full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 73,
-  "kind": "checklist",
-  "bg": "white",
-  "corner": "Project scope",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50,
-    "y": 0,
-    "c": "#f2f2f2"
-   }
-  ],
-  "cols": [
-   {
-    "title": "North star",
-    "sections": [
-     {
-      "label": "Symbol availability",
-      "items": [
-       [
-        "US symbols",
-        true
-       ],
-       [
-        "CAD symbols",
-        true
-       ]
-      ]
-     },
-     {
-      "label": "Supported order types",
-      "items": [
-       [
-        "Market orders",
-        true
-       ],
-       [
-        "Limit orders",
-        true
-       ]
-      ]
-     },
-     {
-      "label": "Supported action types",
-      "items": [
-       [
-        "Buy orders",
-        true
-       ],
-       [
-        "Sell orders",
-        true
-       ]
-      ]
-     },
-     {
-      "label": "Order management",
-      "items": [
-       [
-        "Order placement",
-        true
-       ],
-       [
-        "Order modification",
-        true
-       ]
-      ]
-     }
+  {
+    "n": 1,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "001full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
     ]
-   },
-   {
-    "title": "MVP scope",
-    "sections": [
-     {
-      "label": "Symbol availability",
-      "items": [
-       [
-        "US symbols",
-        true
-       ],
-       [
-        "CAD symbols",
-        true
-       ]
-      ]
-     },
-     {
-      "label": "Supported order types",
-      "items": [
-       [
-        "Market orders",
-        true
-       ],
-       [
-        "Limit orders",
-        false
-       ]
-      ]
-     },
-     {
-      "label": "Supported action types",
-      "items": [
-       [
-        "Buy orders",
-        true
-       ],
-       [
-        "Sell orders",
-        false
-       ]
-      ]
-     },
-     {
-      "label": "Order management",
-      "items": [
-       [
-        "Order placement",
-        true
-       ],
-       [
-        "Order modification",
-        false
-       ]
-      ]
-     }
+  },
+  {
+    "n": 2,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "002full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
     ]
-   }
-  ]
- },
- {
-  "n": 74,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "074full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 75,
-  "kind": "goals",
-  "bg": "white",
-  "corner": "Goal",
-  "cards": [
-   {
-    "x": 5.8,
-    "y": 25.95,
-    "w": 40.57,
-    "h": 45.05,
-    "icon": null,
-    "text": "Help traders discover\nfractional symbols"
-   },
-   {
-    "x": 50.02,
-    "y": 25.95,
-    "w": 40.57,
-    "h": 45.05,
-    "icon": null,
-    "text": "Allow traders to place\na fractional trade"
-   }
-  ],
-  "live": [
-   {
-    "page": "order-placed-animation",
-    "x": 65.7,
-    "y": 34.59,
-    "w": 9.2,
-    "h": 15.35,
-    "vw": 1280,
-    "css": ".opa-stage{background:none!important}",
-    "init": "mute",
-    "pad": 14,
-    "clip": true,
-    "fit": ".opa-badge",
-    "vh": 1000
-   },
-   {
-    "page": "holdings-empty-state",
-    "x": 21.5,
-    "y": 34.59,
-    "w": 9.2,
-    "h": 15.35,
-    "vw": 1280,
-    "css": ".he-root{background:none!important}",
-    "fit": ".he-card",
-    "vh": 1000
-   }
-  ]
- },
- {
-  "n": 76,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "076full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 77,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "077full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 78,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "078full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 79,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "079full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 80,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "080full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 81,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "081full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 82,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "082full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 83,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "083full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 84,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "084full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 85,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "085full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 86,
-  "kind": "media",
-  "bg": "white",
-  "corner": "Happy path",
-  "panels": [
-   {
-    "x": 50,
-    "w": 50,
-    "y": 0,
-    "c": "#f2f2f2"
-   }
-  ],
-  "labels": [
-   {
-    "text": "Old design",
-    "x": 26.99,
-    "y": 13.2
-   },
-   {
-    "text": "Updated design",
-    "x": 73.57,
-    "y": 13.2
-   }
-  ],
-  "live": [
-   {
-    "page": "order-placement-boxed",
-    "x": 16.09,
-    "y": 15.84,
-    "w": 21.79,
-    "h": 78.7,
-    "vw": 1280,
-    "css": ".phone-stage{background:none!important}.opb-frac-btn{visibility:hidden!important}",
-    "init": "quantityOnly",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   },
-   {
-    "page": "order-placement-boxed",
-    "x": 62.67,
-    "y": 15.84,
-    "w": 21.79,
-    "h": 78.7,
-    "vw": 1280,
-    "css": ".phone-stage{background:none!important}",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   }
-  ]
- },
- {
-  "n": 87,
-  "kind": "media",
-  "bg": "white",
-  "corner": "NEEDS REVIEW",
-  "shots": [
-   {
-    "src": "087full",
-    "x": 0,
-    "y": 0,
-    "w": 100
-   }
-  ]
- },
- {
-  "n": 88,
-  "kind": "media",
-  "bg": "white",
-  "corner": "Navigating edge cases",
-  "labels": [
-   {
-    "text": "Label",
-    "x": 50.64,
-    "y": 29.56,
-    "size": "lg"
-   }
-  ],
-  "live": [
-   {
-    "page": "fractional-order-flow",
-    "x": 35.61,
-    "y": 32.43,
-    "w": 30.07,
-    "h": 67.57,
-    "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "mode": "width",
-    "init": "limitOrder",
-    "fit": ".fof-frame",
-    "vh": 1000
-   }
-  ]
- },
- {
-  "n": 89,
-  "kind": "media",
-  "bg": "white",
-  "corner": "Navigating edge cases",
-  "labels": [
-   {
-    "text": "V1",
-    "x": 31.45,
-    "y": 34.4
-   },
-   {
-    "text": "V2",
-    "x": 73.25,
-    "y": 34.4
-   }
-  ],
-  "shots": [
-   {
-    "src": "090-limit-error-v1",
-    "x": 16.05,
-    "y": 38.2,
-    "w": 31.01
-   },
-   {
-    "src": "090-limit-error-v2",
-    "x": 57.71,
-    "y": 38.2,
-    "w": 31.01
-   }
-  ]
- },
- {
-  "n": 90,
-  "kind": "media",
-  "bg": "white",
-  "corner": "Navigating edge cases",
-  "labels": [
-   {
-    "text": "Label",
-    "x": 50,
-    "y": 34.4,
-    "size": "lg"
-   }
-  ],
-  "live": [
-   {
-    "page": "fractional-order-flow?fractionError=hint&hintShares=1.5&static",
-    "x": 34.495,
-    "y": 38.2,
-    "w": 31.01,
-    "h": 61.8,
-    "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "mode": "width",
-    "init": "fracHintSetup",
-    "fit": ".fof-frame",
-    "vh": 1000,
-    "arrive": "fracHintType"
-   }
-  ]
- },
- {
-  "n": 91,
-  "kind": "media",
-  "bg": "white",
-  "corner": "Navigating edge cases",
-  "panels": [
-   {
-    "x": 50,
-    "w": 50,
-    "y": 0,
-    "c": "#f2f2f2"
-   }
-  ],
-  "shots": [
-   {
-    "src": "091a",
-    "x": 14.0,
-    "y": 16.8,
-    "w": 22.3
-   },
-   {
-    "src": "091b",
-    "x": 59.5,
-    "y": 22.5,
-    "w": 31.5
-   }
-  ]
- },
- {
-  "n": 92,
-  "kind": "divider",
-  "bg": "white",
-  "text": "Final designs",
-  "size": "lg",
-  "tone": "green"
- },
- {
-  "n": 93,
-  "kind": "divider",
-  "bg": "white",
-  "text": "",
-  "size": "lg"
- },
- {
-  "n": 94,
-  "kind": "media",
-  "bg": "white",
-  "boxes": [
-   {
-    "x": 2.75,
-    "y": 13.0,
-    "w": 46.75,
-    "h": 40.4,
-    "c": "#f7f7f7"
-   },
-   {
-    "x": 2.75,
-    "y": 55.6,
-    "w": 46.75,
-    "h": 40.4,
-    "c": "#f7f7f7"
-   },
-   {
-    "x": 50.5,
-    "y": 13.0,
-    "w": 46.75,
-    "h": 83.0,
-    "c": "#f7f7f7"
-   }
-  ],
-  "corner": "Novice trading platform",
-  "live": [
-   {
-    "page": "switch-icon",
-    "x": 21.0,
-    "y": 23.1,
-    "w": 12.4,
-    "h": 20.2,
-    "vw": 1280,
-    "css": ".si-stage{background:none!important}",
-    "init": "switchLoop",
-    "pad": 30,
-    "clip": true,
-    "fit": "[aria-label=\"Switch\"]",
-    "vh": 1000
-   },
-   {
-    "page": "fractional-shares-banner",
-    "x": 6.4,
-    "y": 67.8,
-    "w": 39.5,
-    "h": 16.0,
-    "vw": 760,
-    "css": ".pshell,.pshell-stage{background:none!important}",
-    "init": "bannerLoop",
-    "clip": true
-   },
-   {
-    "page": "fractional-order-flow",
-    "x": 63.94,
-    "y": 16.6,
-    "w": 22.55,
-    "h": 75.8,
-    "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "fit": ".fof-frame",
-    "vh": 1000
-   }
-  ]
- },
- {
-  "n": 95,
-  "kind": "media",
-  "bg": "white",
-  "labels": [
-   {
-    "text": "Market non-fractional",
-    "x": 18.25,
-    "y": 27.2
-   },
-   {
-    "text": "Market fractional",
-    "x": 50.35,
-    "y": 27.2
-   },
-   {
-    "text": "Limit non-fractional",
-    "x": 82.05,
-    "y": 27.2
-   }
-  ],
-  "shots": [
-   {
-    "src": "095a",
-    "x": 2.0,
-    "y": 29.6,
-    "w": 30.1
-   }
-  ],
-  "live": [
-   {
-    "page": "fractional-order-flow",
-    "x": 35.63,
-    "y": 30.13,
-    "w": 27.9,
-    "h": 69.87,
-    "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "mode": "width",
-    "fit": ".fof-frame",
-    "vh": 1000
-   },
-   {
-    "page": "fractional-order-flow",
-    "x": 67.5,
-    "y": 30.13,
-    "w": 27.9,
-    "h": 69.87,
-    "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "mode": "width",
-    "init": "limitOrder",
-    "fit": ".fof-frame",
-    "vh": 1000
-   }
-  ],
-  "corner": "Title"
- },
- {
-  "n": 96,
-  "kind": "media",
-  "bg": "white",
-  "corner": "Advanced trading platform",
-  "boxes": [
-   {
-    "x": 2.75,
-    "y": 13.0,
-    "w": 46.75,
-    "h": 40.4,
-    "c": "#f7f7f7"
-   },
-   {
-    "x": 2.75,
-    "y": 55.6,
-    "w": 46.75,
-    "h": 40.4,
-    "c": "#f7f7f7"
-   },
-   {
-    "x": 50.5,
-    "y": 13.0,
-    "w": 46.75,
-    "h": 83.0,
-    "c": "#f7f7f7"
-   }
-  ],
-  "live": [
-   {
-    "page": "typed-error",
-    "x": 4.1,
-    "y": 19.0,
-    "w": 44.0,
-    "h": 28.4,
-    "vw": 845,
-    "css": ".te-stage{background:none!important}.te-block{color:#c02416!important}",
-    "clip": true
-   },
-   {
-    "page": "order-placed-animation",
-    "x": 20.68,
-    "y": 65.2,
-    "w": 10.88,
-    "h": 21.2,
-    "vw": 1280,
-    "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}",
-    "init": "mute",
-    "pad": 26,
-    "clip": true,
-    "fit": ".opa-badge, .opa-caption",
-    "vh": 1000
-   },
-   {
-    "page": "order-placement-boxed",
-    "x": 63.45,
-    "y": 16.6,
-    "w": 20.94,
-    "h": 75.8,
-    "vw": 1280,
-    "css": ".phone-stage{background:none!important}",
-    "mode": "width",
-    "clip": true,
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   }
-  ]
- },
- {
-  "n": 97,
-  "kind": "divider",
-  "bg": "white",
-  "text": "Impact",
-  "size": "lg",
-  "tone": "green"
- },
- {
-  "n": 98,
-  "kind": "figures",
-  "bg": "white",
-  "tone": "green",
-  "layout": "top",
-  "items": [
-   [
-    "60K",
-    "increase in trading volume"
-   ],
-   [
-    "$33M",
-    "total value traded"
-   ]
-  ],
-  "corner": "Title"
- },
- {
-  "n": 99,
-  "kind": "figures",
-  "bg": "white",
-  "tone": "green",
-  "layout": "top",
-  "award": [
-   "UX Design Awards",
-   "Fall 2025 Nominee"
-  ],
-  "items": [
-   [
-    "60K",
-    "increase in trading volume"
-   ],
-   [
-    "$33M",
-    "total value traded"
-   ]
-  ],
-  "corner": "Title"
- },
- {
-  "n": 100,
-  "kind": "divider",
-  "bg": "white",
-  "text": "Reflections",
-  "size": "lg",
-  "tone": "green"
- },
- {
-  "n": 101,
-  "kind": "divider",
-  "bg": "black",
-  "text": "",
-  "size": "lg"
- },
- {
-  "n": 102,
-  "bg": "black",
-  "raster": "102.webp"
- }
+  },
+  {
+    "n": 3,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "003full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 4,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "004full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 5,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "005full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 6,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "006full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 7,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "007full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 8,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "008full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 9,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "009full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 10,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "010full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 11,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "011full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 12,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "012full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 13,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "013full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 14,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "014full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 15,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "015full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 16,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "016full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 17,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "017full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "stock-order-entry",
+        "x": 55,
+        "y": 22,
+        "w": 36,
+        "h": 60,
+        "vw": 1280,
+        "vh": 960,
+        "fit": ".wshell",
+        "css": ".ob-stage{background:none!important}"
+      }
+    ]
+  },
+  {
+    "n": 18,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "018full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 19,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "019full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 20,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "020full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 21,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "021full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 22,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "022full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 23,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "023full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 24,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "024full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 25,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "025full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 26,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "026full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 27,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "027full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 28,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "028full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 29,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "029full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 30,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "030full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 31,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "031full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 32,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "032full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "stock-order-entry",
+        "x": 35.62,
+        "y": 26.3,
+        "w": 28.81,
+        "h": 49.35,
+        "vw": 1280,
+        "vh": 960,
+        "fit": ".wshell",
+        "css": ".ob-stage{background:none!important}",
+        "init": "openBracket"
+      }
+    ]
+  },
+  {
+    "n": 33,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "033full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 34,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "034full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 35,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "035full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 36,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "036full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 37,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "037full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 38,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "038full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 39,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "039full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 40,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "040full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 41,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "041full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 42,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "042full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "stock-order-entry",
+        "x": 67.12,
+        "y": 9.07,
+        "w": 24.99,
+        "h": 27.5,
+        "vw": 1280,
+        "vh": 960,
+        "fit": ".wshell",
+        "mode": "width",
+        "init": "freeze",
+        "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}"
+      },
+      {
+        "page": "options-strategy-builder",
+        "x": 67.14,
+        "y": 49.51,
+        "w": 24.95,
+        "h": 34.04,
+        "vw": 1280,
+        "vh": 960,
+        "fit": ".wshell",
+        "mode": "width",
+        "init": "freeze",
+        "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}"
+      }
+    ]
+  },
+  {
+    "n": 43,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "043full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "chain-to-order",
+        "x": 13.28,
+        "y": 14.91,
+        "w": 68.35,
+        "h": 76.3,
+        "vw": 1440,
+        "vh": 900,
+        "fit": ".wsp-screen",
+        "css": "",
+        "clip": true
+      }
+    ]
+  },
+  {
+    "n": 44,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "044full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "options-strategy-builder",
+        "x": 8.75,
+        "y": 25.05,
+        "w": 31.82,
+        "h": 43.42,
+        "vw": 1280,
+        "vh": 960,
+        "fit": ".wshell",
+        "css": ".ob-stage{background:none!important}"
+      }
+    ]
+  },
+  {
+    "n": 45,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "045full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "options-strategy-builder",
+        "x": 8.75,
+        "y": 25.05,
+        "w": 31.82,
+        "h": 43.42,
+        "vw": 1280,
+        "vh": 960,
+        "fit": ".wshell",
+        "css": ".ob-stage{background:none!important}"
+      }
+    ]
+  },
+  {
+    "n": 46,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "046full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 47,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "047full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 48,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "048full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 49,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "049full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 50,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "050full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 51,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "051full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 52,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "052full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 53,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "053full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 54,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "054full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 55,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "055full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 56,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "056full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 57,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "057full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 58,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "058full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 59,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "059full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 60,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "060full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 61,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "061full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 62,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "062full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 63,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "063full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 64,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "064full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 65,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "065full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 66,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "066full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "notive-quote",
+        "x": 11.98,
+        "y": 35,
+        "w": 25.99,
+        "h": 65,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "mode": "width",
+        "css": ".nq-root,.phone-stage{background:none!important}"
+      },
+      {
+        "page": "alert-creation",
+        "x": 63.85,
+        "y": 35,
+        "w": 25.16,
+        "h": 65,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "mode": "width",
+        "css": ".acs-root{background:none!important}div:has(> .acs-frac-card){display:none!important}"
+      }
+    ]
+  },
+  {
+    "n": 67,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "067full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 68,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "068full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 69,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "069full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 70,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "070full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 71,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "071full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 72,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "072full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "notive-quote",
+        "x": 7.19,
+        "y": 31.85,
+        "w": 21.72,
+        "h": 72.78,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "mode": "width",
+        "css": ".nq-root,.phone-stage{background:none!important}",
+        "init": "notiveOriginal"
+      }
+    ]
+  },
+  {
+    "n": 73,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "073full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "notive-quote",
+        "x": 7.19,
+        "y": 31.85,
+        "w": 21.72,
+        "h": 72.78,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "mode": "width",
+        "css": ".nq-root,.phone-stage{background:none!important}",
+        "init": "notiveOriginal"
+      },
+      {
+        "page": "notive-quote",
+        "x": 38.75,
+        "y": 32.42,
+        "w": 22.45,
+        "h": 75.26,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "mode": "width",
+        "css": ".nq-root,.phone-stage{background:none!important}",
+        "init": "notiveBeta"
+      }
+    ]
+  },
+  {
+    "n": 74,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "074full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "notive-quote",
+        "x": 7.19,
+        "y": 31.85,
+        "w": 21.72,
+        "h": 72.78,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "mode": "width",
+        "css": ".nq-root,.phone-stage{background:none!important}",
+        "init": "notiveOriginal"
+      },
+      {
+        "page": "notive-quote",
+        "x": 38.75,
+        "y": 32.42,
+        "w": 22.45,
+        "h": 75.26,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "mode": "width",
+        "css": ".nq-root,.phone-stage{background:none!important}",
+        "init": "notiveBeta"
+      },
+      {
+        "page": "notive-quote",
+        "x": 70.26,
+        "y": 32.69,
+        "w": 23.75,
+        "h": 74.07,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "mode": "width",
+        "css": ".nq-root,.phone-stage{background:none!important}"
+      }
+    ]
+  },
+  {
+    "n": 75,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "075full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 76,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "076full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 77,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "077full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 78,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "078full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 79,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "079full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 80,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "080full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "order-placement",
+        "x": 16.25,
+        "y": 18.03,
+        "w": 21.2,
+        "h": 72.18,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "mode": "width",
+        "css": ".phone-stage{background:none!important}"
+      }
+    ]
+  },
+  {
+    "n": 81,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "081full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "order-placement-boxed",
+        "x": 16.25,
+        "y": 18.03,
+        "w": 21.2,
+        "h": 72.18,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".phone-stage{background:none!important}.opb-frac-btn{visibility:hidden!important}",
+        "init": "quantityOnly"
+      },
+      {
+        "page": "order-placement-boxed",
+        "x": 62.97,
+        "y": 17.66,
+        "w": 21.2,
+        "h": 72.18,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".phone-stage{background:none!important}"
+      }
+    ]
+  },
+  {
+    "n": 82,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "082full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 83,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "083full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "fractional-order-flow",
+        "x": 33.74,
+        "y": 25,
+        "w": 32.47,
+        "h": 70,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".fof-frame",
+        "mode": "width",
+        "css": ".fof-stage{background:none!important}",
+        "init": "limitOrder"
+      }
+    ]
+  },
+  {
+    "n": 84,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "084full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "fractional-order-flow",
+        "x": 14.11,
+        "y": 28,
+        "w": 33.49,
+        "h": 70,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".fof-frame",
+        "mode": "width",
+        "css": ".fof-stage{background:none!important}",
+        "init": "limitOrder"
+      }
+    ]
+  },
+  {
+    "n": 85,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "085full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 86,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "086full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "fractional-order-flow",
+        "x": 38,
+        "y": 20,
+        "w": 25,
+        "h": 75,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".fof-frame",
+        "mode": "width",
+        "css": ".fof-stage{background:none!important}"
+      },
+      {
+        "page": "fractional-order-flow",
+        "x": 68,
+        "y": 20,
+        "w": 25,
+        "h": 75,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".fof-frame",
+        "mode": "width",
+        "css": ".fof-stage{background:none!important}",
+        "init": "limitOrder"
+      }
+    ]
+  },
+  {
+    "n": 87,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "087full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 88,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "088full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 89,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "089full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 90,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "090full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 91,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "091full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 92,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "092full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 93,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "093full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 94,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "094full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 95,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "095full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 96,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "096full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  },
+  {
+    "n": 97,
+    "kind": "media",
+    "bg": "black",
+    "shots": [
+      {
+        "src": "097full",
+        "x": 0,
+        "y": 0,
+        "w": 100
+      }
+    ]
+  }
 ]
