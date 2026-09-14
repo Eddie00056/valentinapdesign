@@ -510,8 +510,11 @@ N[79]["live"] = [live("notive-quote", 40.1, 35.3, 20.75, 43.5, css=NQ_BG, fit=PH
                 live("fractional-order-flow", 72.2, 35.2, 20.85, 43.6, css=FOF_BG, fit=".fof-frame",
                       vh=1000, mode="width", clip=True)]
 # the live quote screen, as the slide draws it: large, bleeding off the bottom
+# both quote screens side by side, same size as when they were a slide each: the
+# plain one, then with its fractional banner open (81 is hidden in the overrides)
 N[80] = {"kind": "media", "bg": "white", "corner": "How do I find the right symbol?",
-         "live": [live("alert-creation", 33.38, 35.28, 33.3, 64.72, css=ACS_BG, fit=PHONE, vh=1000, mode="width")]}
+         "live": [live("alert-creation", x, 35.28, 33.3, 64.72, css=ACS_BG, fit=PHONE, vh=1000, mode="width",
+                       init=init) for x, init in ((14.7, None), (52.0, "openFractional"))]}
 N[81] = {"kind": "media", "bg": "white", "corner": "How do I find the right symbol?",
          "live": [live("alert-creation", 33.38, 35.28, 33.3, 64.72, css=ACS_BG, fit=PHONE, vh=1000, mode="width",
                        init="openFractional")]}
@@ -563,10 +566,15 @@ _P95 = (62.9, 5.2, 87.8, 94.0)       # the phone
 _SW = (21.0, 16.3, 33.4, 36.5)       # the switcher icon (both collages)
 SWITCHER = live("fractional-order-flow", 21.0, 16.3, 12.4, 20.2, css=FOF_BG,
                 fit='[aria-label="Swap amount and quantity"]', vh=1000, clip=True, pad=30)
+# slide 95's switcher is the standalone SwitchIcon piece (/work/switch-icon), tapping itself
+SWITCH_ICON = live("switch-icon", 21.0, 16.3, 12.4, 20.2, css=".si-stage{background:none!important}",
+                   fit='[aria-label="Switch"]', vh=1000, clip=True, pad=30, init="switchLoop")
 _S95 = (6.4, 65.4, 45.9, 81.4)       # the white strip holding the banner icon
 N[95] = {"kind": "media", "bg": "white",
          "shots": [crop(95, 'a', 0, 0, 100, 100, wipe=(_P95, _S95, _SW))],
-         "live": [SWITCHER, live("fractional-shares-banner", 6.4, 65.4, 39.5, 16.0, 760, css=WHITE_BG, clip=True),
+         # the banner on the card's own ground, unfurling by itself
+         "live": [SWITCH_ICON, live("fractional-shares-banner", 6.4, 65.4, 39.5, 16.0, 760,
+                                    css=".pshell,.pshell-stage{background:none!important}", clip=True, init="bannerLoop"),
                   live("fractional-order-flow", 63.94, 7.04, 22.55, 83.45, css=FOF_BG, fit=".fof-frame", vh=1000)]}
 FRAC_LABELS = [{"text": "Market non-fractional", "x": 18.25, "y": 27.2},
                {"text": "Market fractional", "x": 50.35, "y": 27.2},

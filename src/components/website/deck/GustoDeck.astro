@@ -695,6 +695,16 @@ const title = (s: Slide): string | undefined =>
       // slide 81: the quote screen with its fractional banner already open
       openFractional: (_w, d) =>
         d.querySelector<HTMLElement>('[aria-label="Fractional shares"]')?.click(),
+      /* slide 95: the amount / quantity switcher, tapping itself — the
+         arrowheads flip every two seconds. The frame's own timer, so it
+         dies with the slide. */
+      switchLoop: (w, d) => {
+        const tick = () => {
+          d.querySelector<HTMLElement>('[aria-label="Switch"]')?.click();
+          w.setTimeout(tick, 2000);
+        };
+        w.setTimeout(tick, 1200);
+      },
       /* the fractional order flow, opened on a Limit order (89–91, 96): the
          order-type pill's own menu, picked the way a tap would */
       limitOrder: (w, d) => {
@@ -746,6 +756,18 @@ const title = (s: Slide): string | undefined =>
         // close the ticket: picking a price in the chain brings it back
         const close = d.querySelector<HTMLElement>(".ctt-ticket .wshell-actions .wshell-btn:not(.wshell-linkout)");
         close?.click();
+      },
+      /* slide 95: the fractional shares banner unfurling by itself — the
+         piece's own `auto` cadence (open at 600ms, then every 2400ms), done
+         by tapping it, so the gallery page stays interactive. */
+      bannerLoop: (w, d) => {
+        let on = false;
+        const step = () => {
+          on = !on;
+          d.querySelector<HTMLElement>(`[aria-label="${on ? "Expand fractional shares banner" : "Collapse banner"}"]`)?.click();
+          w.setTimeout(step, 2400);
+        };
+        w.setTimeout(step, 600);
       },
       mute: (w) => {
         w.AudioContext = undefined;

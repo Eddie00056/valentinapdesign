@@ -1,0 +1,19 @@
+---
+import Bare from "../../layouts/Bare.astro";
+import SwitchIcon from "../../components/switchicon/SwitchIcon";
+---
+
+<Bare title="Switch icon" bg="#ffffff">
+  <div class="si-stage">
+    <SwitchIcon client:load />
+  </div>
+
+  <style>
+    .si-stage {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</Bare>

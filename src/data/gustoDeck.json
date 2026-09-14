@@ -1810,13 +1810,26 @@
   "live": [
    {
     "page": "alert-creation",
-    "x": 33.38,
+    "x": 14.7,
     "y": 35.28,
     "w": 33.3,
     "h": 64.72,
     "vw": 1280,
     "css": ".acs-root{background:none!important}",
     "mode": "width",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
+   },
+   {
+    "page": "alert-creation",
+    "x": 52.0,
+    "y": 35.28,
+    "w": 33.3,
+    "h": 64.72,
+    "vw": 1280,
+    "css": ".acs-root{background:none!important}",
+    "mode": "width",
+    "init": "openFractional",
     "fit": "img[src*=\"iphone\"]",
     "vh": 1000
    }
@@ -2210,16 +2223,17 @@
   ],
   "live": [
    {
-    "page": "fractional-order-flow",
+    "page": "switch-icon",
     "x": 21.0,
     "y": 16.3,
     "w": 12.4,
     "h": 20.2,
     "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
+    "css": ".si-stage{background:none!important}",
+    "init": "switchLoop",
     "pad": 30,
     "clip": true,
-    "fit": "[aria-label=\"Swap amount and quantity\"]",
+    "fit": "[aria-label=\"Switch\"]",
     "vh": 1000
    },
    {
@@ -2229,7 +2243,8 @@
     "w": 39.5,
     "h": 16.0,
     "vw": 760,
-    "css": "html,body,html[data-embed],html[data-embed] body{background:#fff!important}",
+    "css": ".pshell,.pshell-stage{background:none!important}",
+    "init": "bannerLoop",
     "clip": true
    },
    {
