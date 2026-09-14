@@ -1206,6 +1206,29 @@
         "y": 0,
         "w": 100
       }
+    ],
+    "live": [
+      {
+        "page": "alert-creation",
+        "x": 52.0,
+        "y": 21.0,
+        "w": 42.0,
+        "h": 81.0,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".acs-root{background:none!important}",
+        "init": "openFractional"
+      }
+    ],
+    "labels": [
+      {
+        "text": "Updated quote page",
+        "x": 73.7,
+        "y": 19,
+        "tone": "dark"
+      }
     ]
   },
   {
@@ -1394,28 +1417,36 @@
     "live": [
       {
         "page": "fractional-order-flow",
-        "x": 38,
-        "y": 20,
-        "w": 25,
-        "h": 75,
+        "x": 58,
+        "y": 16,
+        "w": 32,
+        "h": 30,
         "vw": 1280,
         "vh": 1000,
         "fit": ".fof-frame",
-        "mode": "width",
         "css": ".fof-stage{background:none!important}"
       },
       {
-        "page": "fractional-order-flow",
-        "x": 68,
-        "y": 20,
-        "w": 25,
-        "h": 75,
-        "vw": 1280,
+        "page": "fractional-shares-banner",
+        "x": 58,
+        "y": 50,
+        "w": 32,
+        "h": 26,
+        "vw": 760,
         "vh": 1000,
-        "fit": ".fof-frame",
-        "mode": "width",
-        "css": ".fof-stage{background:none!important}",
-        "init": "limitOrder"
+        "fit": ".pshell-stage",
+        "css": ".pshell,.pshell-stage{background:none!important}",
+        "init": "bannerLoop",
+        "clip": true
+      }
+    ],
+    "boxes": [
+      {
+        "x": 56,
+        "y": 18,
+        "w": 36,
+        "h": 64,
+        "c": "#000000"
       }
     ]
   },
@@ -1442,6 +1473,33 @@
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "alert-creation",
+        "x": 30,
+        "y": 12,
+        "w": 40,
+        "h": 38,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".acs-root{background:none!important}"
+      },
+      {
+        "page": "order-placed-animation",
+        "x": 38,
+        "y": 55,
+        "w": 24,
+        "h": 30,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".opa-badge",
+        "pad": 14,
+        "clip": true,
+        "css": ".opa-stage{background:none!important}",
+        "init": "mute"
       }
     ]
   },
