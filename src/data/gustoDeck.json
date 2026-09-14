@@ -218,19 +218,6 @@
         "y": 0,
         "w": 100
       }
-    ],
-    "live": [
-      {
-        "page": "stock-order-entry",
-        "x": 55,
-        "y": 22,
-        "w": 36,
-        "h": 60,
-        "vw": 1280,
-        "vh": 960,
-        "fit": ".wshell",
-        "css": ".ob-stage{background:none!important}"
-      }
     ]
   },
   {
@@ -742,6 +729,20 @@
         "y": 0,
         "w": 100
       }
+    ],
+    "live": [
+      {
+        "page": "chain-to-order",
+        "x": 14.06,
+        "y": 8.98,
+        "w": 71.88,
+        "h": 81.95,
+        "vw": 1440,
+        "vh": 900,
+        "fit": ".wsp-screen",
+        "css": "",
+        "clip": true
+      }
     ]
   },
   {
@@ -950,32 +951,6 @@
         "y": 0,
         "w": 100
       }
-    ],
-    "live": [
-      {
-        "page": "notive-quote",
-        "x": 11.98,
-        "y": 35,
-        "w": 25.99,
-        "h": 65,
-        "vw": 1280,
-        "vh": 1000,
-        "fit": "img[src*=\"iphone\"]",
-        "mode": "width",
-        "css": ".nq-root,.phone-stage{background:none!important}"
-      },
-      {
-        "page": "alert-creation",
-        "x": 63.85,
-        "y": 35,
-        "w": 25.16,
-        "h": 65,
-        "vw": 1280,
-        "vh": 1000,
-        "fit": "img[src*=\"iphone\"]",
-        "mode": "width",
-        "css": ".acs-root{background:none!important}div:has(> .acs-frac-card){display:none!important}"
-      }
     ]
   },
   {
@@ -1123,46 +1098,6 @@
         "y": 0,
         "w": 100
       }
-    ],
-    "live": [
-      {
-        "page": "notive-quote",
-        "x": 7.19,
-        "y": 31.85,
-        "w": 21.72,
-        "h": 72.78,
-        "vw": 1280,
-        "vh": 1000,
-        "fit": "img[src*=\"iphone\"]",
-        "mode": "width",
-        "css": ".nq-root,.phone-stage{background:none!important}",
-        "init": "notiveOriginal"
-      },
-      {
-        "page": "notive-quote",
-        "x": 38.75,
-        "y": 32.42,
-        "w": 22.45,
-        "h": 75.26,
-        "vw": 1280,
-        "vh": 1000,
-        "fit": "img[src*=\"iphone\"]",
-        "mode": "width",
-        "css": ".nq-root,.phone-stage{background:none!important}",
-        "init": "notiveBeta"
-      },
-      {
-        "page": "notive-quote",
-        "x": 70.26,
-        "y": 32.69,
-        "w": 23.75,
-        "h": 74.07,
-        "vw": 1280,
-        "vh": 1000,
-        "fit": "img[src*=\"iphone\"]",
-        "mode": "width",
-        "css": ".nq-root,.phone-stage{background:none!important}"
-      }
     ]
   },
   {
@@ -1188,6 +1123,21 @@
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "alert-creation",
+        "x": 54.76,
+        "y": 23.61,
+        "w": 37.88,
+        "h": 76.39,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".acs-root{background:none!important}",
+        "init": "openFractional"
       }
     ]
   },
@@ -1346,21 +1296,6 @@
         "x": 0,
         "y": 0,
         "w": 100
-      }
-    ],
-    "live": [
-      {
-        "page": "fractional-order-flow",
-        "x": 14.11,
-        "y": 28,
-        "w": 33.49,
-        "h": 70,
-        "vw": 1280,
-        "vh": 1000,
-        "fit": ".fof-frame",
-        "mode": "width",
-        "css": ".fof-stage{background:none!important}",
-        "init": "limitOrder"
       }
     ]
   },
