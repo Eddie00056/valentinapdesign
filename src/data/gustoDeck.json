@@ -1180,7 +1180,7 @@
   {
     "n": 74,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "corner": "Help traders find the correct symbol",
     "labels": [
       {
@@ -1198,7 +1198,7 @@
       {
         "text": "Public release",
         "x": 81.59,
-        "y": 37.2,
+        "y": 31.54,
         "size": "lg"
       }
     ],
@@ -1234,9 +1234,9 @@
       {
         "page": "notive-quote",
         "x": 70.37,
-        "y": 40.0,
+        "y": 34.34,
         "w": 22.45,
-        "h": 60.0,
+        "h": 65.66,
         "vw": 1280,
         "vh": 1000,
         "mode": "width",
