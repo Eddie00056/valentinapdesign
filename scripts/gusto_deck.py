@@ -543,8 +543,11 @@ def dark_releases(k):
 
 N[80] = dark_releases(1)
 N[81] = dark_releases(2)
-N[82] = {"kind": "goals", "bg": "white", "plain": True, "cards": [
-    dict(GOAL_CARDS[0], x=8.9, y=38, w=40, h=20, icon=None), dict(GOAL_CARDS[1], x=51.1, y=38, w=40, h=20, icon=None)]}
+# the scope builds up: page 82 shows the first goal alone, and an extra deck
+# slide (no PDF page of its own — see INSERT_AFTER) follows with both
+_SCOPE = [dict(GOAL_CARDS[0], x=8.9, y=38, w=40, h=20, icon=None), dict(GOAL_CARDS[1], x=51.1, y=38, w=40, h=20, icon=None)]
+N[82] = {"kind": "goals", "bg": "white", "plain": True, "cards": _SCOPE[:1]}
+INSERT_AFTER = {82: [{"kind": "goals", "bg": "white", "plain": True, "corner": "Title", "cards": _SCOPE}]}
 
 WIZ = ("Original", "multi", "page", "wizard", "order", "entry")
 N[83] = {"kind": "media", "bg": "canvas", "corner": "Original design",
@@ -617,34 +620,11 @@ N[96] = {"kind": "media", "bg": "white", "labels": FRAC_LABELS,
                   for x, init in ((35.63, None), (67.5, "limitOrder"))]}
 _T97 = (20.68, 62.78, 31.56, 83.98)  # the "Order sent" tile
 _P97 = (63.2, 14.0, 84.7, 88.9)      # the phone: the live boxed order-placement screen
-# the alert screen's symbol, price and candles alone (the gallery clip's section), on
-# the card's own ground: the rows around them and the phone are hidden, and the white
-# type is re-inked dark. The price digits set their colour inline (white, or the
-# up/down flash), so only the white wrappers' spans are re-inked and a flash still shows.
-# (the page's own light theme paints .acs-root white with an id selector, and the screen
-# is an inline #000 on the scroll's parent — both need outranking)
-ACS_CHART = ('#bg-wrap .acs-root.acs-root.acs-root.acs-root,.acs-root,:has(>.acs-scroll){background:none!important}'
-             'img[src*="iphone"]{visibility:hidden!important}'
-             '.acs-scroll>:not(:nth-child(2)):not(:nth-child(3)){visibility:hidden!important}'
-             '[data-type="heading"]{color:#0e0e0e}'
-             '.acs-scroll>:nth-child(2) div[style*="255, 255, 255"] span,'
-             '.acs-scroll>:nth-child(2) div[style*="#ffffff"] span{color:#0e0e0e}'
-             # no fade on the older candles: full opacity, and every candle, the "now" line and its
-             # pill in the light-theme greens / reds (Notive's palette: the light reference), the
-             # pill's text white on the darker green, and the change line + price flash in the
-             # Notive header tones. Both the live and the cool tints map, and the inline colours
-             # in both their hex and rgb() serialisations.
-             'svg[viewBox="0 0 393 188"] g{opacity:1!important}'
-             '[stroke="#48d597"],[stroke="#7ED37B"]{stroke:#389b3c!important}[fill="#48d597"],[fill="#7ED37B"]{fill:#389b3c!important}'
-             '[stroke="#ff557d"],[stroke="#FF9E7E"]{stroke:#b3261e!important}[fill="#ff557d"],[fill="#FF9E7E"]{fill:#b3261e!important}'
-             'text[fill="#04150c"]{fill:#ffffff!important}'
-             '.acs-scroll>:nth-child(2) [style*="#48d597"],.acs-scroll>:nth-child(2) [style*="72, 213, 151"]{color:#477746!important}'
-             '.acs-scroll>:nth-child(2) [style*="#ff557d"],.acs-scroll>:nth-child(2) [style*="255, 85, 125"]{color:#c02416!important}'
-             # the digit wrappers rest on inline white with a 760ms colour transition: re-inked dark
-             # too, so a flash fades dark -> green/red rather than from white (washed on this ground)
-             '.acs-scroll>:nth-child(2) div[style*="255, 255, 255"],.acs-scroll>:nth-child(2) div[style*="#ffffff"]{color:#0e0e0e!important}')
-CANDLES = live("alert-creation", 14.1, 16.3, 24.0, 28.4, css=ACS_CHART,
-               fit=".acs-scroll>:nth-child(2),.acs-scroll>:nth-child(3)", vh=1000, clip=True, pad=12)
+# the boxed ticket's fractional-shares error, typed out on a loop (its own page, so the
+# tile is the text alone), in the light-theme red on the card's ground
+TYPED_ERROR = live("typed-error", 14.1, 16.3, 24.0, 28.4,
+                   css=".te-stage{background:none!important}.te-block{color:#c02416!important}",
+                   fit=".te-block", vh=1000, clip=True, pad=12)
 # the order-placed mark and caption on the card's ground: no phone, no page, the ring
 # track and captions re-inked for a light ground
 OPA_LIGHT = ('.opa-stage{background:none!important}.opa-phone{filter:none!important}'
@@ -652,7 +632,7 @@ OPA_LIGHT = ('.opa-stage{background:none!important}.opa-phone{filter:none!import
              '.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}')
 N[97] = {"kind": "media", "bg": "white", "corner": "Advanced trading platform",
          "shots": [crop(97, 'a', 0, 0, 100, 100, wipe=(_T97, _SW, _P97))],
-         "live": [CANDLES, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_LIGHT,
+         "live": [TYPED_ERROR, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_LIGHT,
                        fit=".opa-badge, .opa-caption", vh=1000, clip=True, pad=26, init="mute"),
                   # the boxed ticket's phone, whole: its Sell / Buy sit at the screen's foot, so the
                   # rect is the PDF phone's full height (the old ticket was cut a row under its buttons)
@@ -680,11 +660,14 @@ for e in N.values():  # slides with a step-by-step build
             if sh["annot"].get("points"):
                 e["steps"] = len(sh["annot"]["points"]) - 1
 assert sorted(N) == list(range(1, 104)), set(range(1, 104)) - set(N)
+# Deck slides are the PDF's pages in order, plus INSERT_AFTER extras spliced
+# in after their page; they are numbered sequentially from there, so every
+# slide after an insertion carries a deck number one past its PDF page — and
+# gustoDeckOverrides.json is keyed by DECK number (shift its keys when adding).
 out = []
-for n in range(1, 104):
-    e = {"n": n}
-    e.update(N[n])
-    out.append(e)
+for p in range(1, 104):
+    for e in [N[p], *INSERT_AFTER.get(p, [])]:
+        out.append({"n": len(out) + 1, **e})
 json.dump(out, open(OUT, "w"), indent=1, ensure_ascii=False)
 
 # prune crops/rasters nothing references any more

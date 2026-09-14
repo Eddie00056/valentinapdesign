@@ -4,6 +4,14 @@
       "hidden": true
     }
   },
+  "14": {
+    "gd-media-l:0": {
+      "dy": 7.4
+    },
+    "gd-media-l:1": {
+      "dy": 9.4
+    }
+  },
   "22": {
     "gd-journey-row:0": {
       "dy": 2,
@@ -82,6 +90,14 @@
       "text": "The biggest revenue product had the worst industry experience"
     }
   },
+  "39": {
+    "gd-media-l:0": {
+      "dy": 11.5
+    },
+    "gd-media-l:1": {
+      "dy": 11.5
+    }
+  },
   "41": {
     "gd-media-shot:0": {
       "sc": 0.529,
@@ -112,6 +128,14 @@
       "text": "REDUCE TIME TO TRADE"
     }
   },
+  "46": {
+    "gd-media-l:0": {
+      "dy": 28.6
+    },
+    "gd-media-l:1": {
+      "dy": 28.6
+    }
+  },
   "48": {
     "_slide": {
       "hidden": true
@@ -120,83 +144,6 @@
   "49": {
     "_slide": {
       "hidden": true
-    }
-  },
-  "59": {
-    "t.gd-corner:0": {
-      "orig": "Company goal",
-      "text": "QUESTRADE GOAL"
-    }
-  },
-  "82": {
-    "t.gd-corner:0": {
-      "orig": "Title",
-      "text": "SCOPE"
-    }
-  },
-  "83": {
-    "gd-media-shot:0": {
-      "dy": 21
-    },
-    "gd-media-l:0": {
-      "dy": 17
-    }
-  },
-  "84": {
-    "_slide": {
-      "hidden": true
-    }
-  },
-  "85": {
-    "gd-media-shot:0": {
-      "dy": 30,
-      "dx": -6
-    },
-    "gd-live:0": {
-      "dy": 35,
-      "dx": 1
-    },
-    "gd-media-l:0": {
-      "dx": 16,
-      "dy": 26
-    },
-    "gd-media-l:1": {
-      "dy": 38.5,
-      "dx": 11
-    }
-  },
-  "96": {
-    "_slide": {
-      "hidden": true
-    }
-  },
-  "75": {
-    "_slide": {
-      "hidden": true
-    }
-  },
-  "14": {
-    "gd-media-l:0": {
-      "dy": 7.4
-    },
-    "gd-media-l:1": {
-      "dy": 9.4
-    }
-  },
-  "39": {
-    "gd-media-l:0": {
-      "dy": 11.5
-    },
-    "gd-media-l:1": {
-      "dy": 11.5
-    }
-  },
-  "46": {
-    "gd-media-l:0": {
-      "dy": 28.6
-    },
-    "gd-media-l:1": {
-      "dy": 28.6
     }
   },
   "50": {
@@ -215,25 +162,84 @@
       "dy": 28.8
     }
   },
-  "86": {
+  "59": {
+    "t.gd-corner:0": {
+      "orig": "Company goal",
+      "text": "QUESTRADE GOAL"
+    }
+  },
+  "75": {
+    "_slide": {
+      "hidden": true
+    }
+  },
+  "82": {
+    "t.gd-corner:0": {
+      "orig": "Title",
+      "text": "SCOPE"
+    }
+  },
+  "83": {
+    "t.gd-corner:0": {
+      "orig": "Title",
+      "text": "SCOPE"
+    }
+  },
+  "84": {
+    "gd-media-shot:0": {
+      "dy": 21
+    },
     "gd-media-l:0": {
-      "dy": 26.6
+      "dy": 17
+    }
+  },
+  "85": {
+    "_slide": {
+      "hidden": true
+    }
+  },
+  "86": {
+    "gd-media-shot:0": {
+      "dy": 30,
+      "dx": -6
+    },
+    "gd-live:0": {
+      "dy": 35,
+      "dx": 1
+    },
+    "gd-media-l:0": {
+      "dx": 16,
+      "dy": 26
+    },
+    "gd-media-l:1": {
+      "dy": 38.5,
+      "dx": 11
     }
   },
   "87": {
     "gd-media-l:0": {
+      "dy": 26.6
+    }
+  },
+  "88": {
+    "gd-media-l:0": {
       "dy": 5.5
     },
     "gd-media-l:1": {
       "dy": 5.5
     }
   },
-  "90": {
+  "91": {
     "gd-media-l:0": {
       "dy": 18
     },
     "gd-media-l:1": {
       "dy": 18
+    }
+  },
+  "97": {
+    "_slide": {
+      "hidden": true
     }
   }
 }
