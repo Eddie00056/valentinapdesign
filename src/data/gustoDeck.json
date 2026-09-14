@@ -906,13 +906,13 @@
   {
     "n": 59,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
-        "src": "059full",
+        "src": "059a",
         "x": 0,
         "y": 0,
-        "w": 100
+        "w": 50
       }
     ],
     "live": [
@@ -1385,10 +1385,18 @@
   {
     "n": 81,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
+    "panels": [
+      {
+        "x": 50,
+        "y": 0,
+        "w": 50,
+        "c": "#f2f2f2"
+      }
+    ],
     "shots": [
       {
-        "src": "081full",
+        "src": "081a",
         "x": 0,
         "y": 0,
         "w": 100
