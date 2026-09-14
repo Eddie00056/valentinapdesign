@@ -457,13 +457,16 @@ export function NotiveQuoteScreen({
         </span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "flex-end", marginTop: 14 }}>
+      <div style={{ display: "flex", alignItems: "flex-end", marginTop: 15 }}>
         <Rolling
           value={"$" + money(price)}
           style={{
-            fontSize: 41,
-            /* 600, not 700: the screenshot's bold has a 5.7px stroke on a
-               29.3px cap, and Open Sans 700 at this size paints 7. */
+            /* 37, down from the 41 the capture measures to: Open Sans's
+               digits are wider and rounder than the app's, and at equal cap
+               height the price read as too big (user, 2026-09-13). 600, not
+               700: the capture's bold has a 5.7px stroke on a 29px cap, and
+               Open Sans 700 paints 7. */
+            fontSize: 37,
             fontWeight: 600,
             lineHeight: 1,
             color: priceColor,
@@ -548,7 +551,6 @@ export function NotiveQuoteScreen({
                 cursor: "pointer",
               }}
             >
-              <span className="inner-stroke inner-stroke--blue" />
               <motion.span
                 layoutId="nq-frac-glyph"
                 className="nq-frac-glyph"

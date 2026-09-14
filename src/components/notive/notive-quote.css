@@ -133,36 +133,15 @@
 }
 
 /* ---- the fractional card ----
-   Carries the fractional order flow's own chip by value (see the icon at
-   the end of FractionalOrderFlow's toolbar row): a white glass disc under a
-   10% blue wash, the blue gradient rim at half strength — which is
-   glass-button.css's `.btn--blue::before` verbatim, hand-inlined over there
-   — and the library's real `.inner-stroke--blue` nested inside. Blue, not
-   the screen's green: fractional is one accent across both prototypes, and
-   matching the order flow is the point. */
+   A solid disc in the fractional tint with the blue mark — the same
+   material as the expanded banner it morphs into, so the shared-layout
+   transition changes shape only. It was the order flow's glass chip (white
+   glass, blue wash, gradient rim, inner highlight); the user asked for a
+   solid colour instead (2026-09-13). Blue, not the screen's green:
+   fractional is one accent across both prototypes. */
 .nq-frac {
-  background: rgba(255, 255, 255, 0.5);
-  background-image: linear-gradient(rgba(0, 102, 219, 0.1), rgba(0, 102, 219, 0.1));
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+  background: #eaf1fd;
   color: #0066db;
-}
-.nq-frac::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  opacity: 0.5;
-  padding: 1px;
-  border-radius: inherit;
-  background: linear-gradient(273.75deg, #6c9be6 3.96%, #b2e1f5 34.23%, #6291dc 98.29%);
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
 }
 
 /* 13px, the size the order flow renders it at. It stays 13 in the expanded
