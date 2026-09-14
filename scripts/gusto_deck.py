@@ -555,7 +555,7 @@ N[86] = {"kind": "media", "bg": "white", "corner": "How does an advanced trader 
          "labels": [{"text": "Old design", "x": 28.45, "y": 15.5}],
          # the old ticket is the live order-placement screen, at the PDF phone's bezel rect
          "live": [live("order-placement", 17.77, 20.09, 18.4, 69.62, css=PHONE_BG, fit=PHONE, vh=1000, mode="width")]}
-N[87] = {"kind": "media", "bg": "white", "corner": "Happy path", "corner2": {"text": "Happy path", "x": 55.2},
+N[87] = {"kind": "media", "bg": "white", "corner": "Happy path",
          "panels": [P(50, 50, LIGHT_PANEL)],
          "labels": [{"text": "Old design", "x": 26.99, "y": 13.2}, {"text": "Updated design", "x": 73.57, "y": 13.2}],
          # both columns are the boxed ticket; "Old design" is the same screen

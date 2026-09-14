@@ -2030,10 +2030,6 @@
   "kind": "media",
   "bg": "white",
   "corner": "Happy path",
-  "corner2": {
-   "text": "Happy path",
-   "x": 55.2
-  },
   "panels": [
    {
     "x": 50,

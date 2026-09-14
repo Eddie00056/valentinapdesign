@@ -704,6 +704,20 @@ const title = (s: Slide): string | undefined =>
       /* slide 79, "Original design": the PDF draws this column as HOOD —
          the quote screen before fractional existed — so the name reads
          Robinhood here; the entry's css hides the chip and the banner. */
+      /* slide 87, "Old design": the boxed ticket as it stood before the
+         shares / dollar switcher — same "Shares quantity" label, but its
+         chevron is gone and the label no longer opens the picker. */
+      quantityOnly: (_w, d) => {
+        const walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT);
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+          if (n.nodeValue?.trim() !== "Shares quantity") continue;
+          const label = n.parentElement;
+          if (!label) continue;
+          label.querySelectorAll("svg").forEach((svg) => (svg.style.display = "none"));
+          label.style.pointerEvents = "none";
+          label.style.cursor = "default";
+        }
+      },
       notiveOriginal: (_w, d) => {
         const walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT);
         for (let n = walker.nextNode(); n; n = walker.nextNode()) {

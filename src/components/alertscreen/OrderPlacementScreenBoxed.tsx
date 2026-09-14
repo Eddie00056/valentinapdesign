@@ -980,7 +980,7 @@ export function OrderPlacementScreenBoxed({
             <div>
               {isLimit ? (
                 // limit orders: units locked to shares, no switcher
-                <span style={{ ...labelStyle, display: "inline-block" }}>Shares</span>
+                <span style={{ ...labelStyle, display: "inline-block" }}>Shares quantity</span>
               ) : (
                 <span
                   role="button"
@@ -1005,7 +1005,7 @@ export function OrderPlacementScreenBoxed({
                     color: qtyMenuOpen ? "#fff" : labelStyle.color,
                   }}
                 >
-                  {effQtyType === "shares" ? "Shares" : "Dollar amount"}
+                  {effQtyType === "shares" ? "Shares quantity" : "Dollar amount"}
                   <ChevronDownIcon color={qtyMenuOpen ? "#fff" : MUTED} />
                 </span>
               )}
