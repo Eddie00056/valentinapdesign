@@ -816,20 +816,41 @@
   "n": 46,
   "kind": "media",
   "bg": "black",
+  "corner": "Product vision",
+  "labels": [
+   {
+    "text": "V1",
+    "x": 23.02,
+    "y": 23
+   },
+   {
+    "text": "V2",
+    "x": 64.27,
+    "y": 23
+   }
+  ],
+  "shots": [
+   {
+    "src": "046-atlas-strategy-builder",
+    "x": 40.42,
+    "y": 27.78,
+    "w": 47.71
+   }
+  ],
   "live": [
    {
     "page": "options-strategy-builder",
-    "x": 26,
-    "y": 12,
-    "w": 48,
-    "h": 76,
+    "x": 11.875,
+    "y": 27.78,
+    "w": 22.29,
+    "h": 40,
     "vw": 1280,
     "css": ".ob-stage{background:none!important}",
+    "mode": "width",
     "fit": ".wshell",
     "vh": 960
    }
-  ],
-  "corner": "Title"
+  ]
  },
  {
   "n": 47,

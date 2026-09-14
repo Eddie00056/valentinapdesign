@@ -104,11 +104,13 @@ def cardimg(n, tag, xref, x, w, y=None, cy=None, radius=30, key=True):
     return {"src": name, "x": x, "y": round(y, 3), "w": w}
 
 
-def asset(name, file, x, w, y, quality=None):
+def asset(name, file, x, w, y, quality=None, trim=False):
     """A component export from the design library (scripts/deck-assets), not the
     PDF: encoded lossless into the crops dir so it keeps its alpha corners."""
     path = f'{CROPS}/{name}.webp'
     im = Image.open(f'{os.path.dirname(os.path.abspath(__file__))}/deck-assets/{file}').convert('RGBA')
+    if trim:  # drop an export's shadow margin: crop to the opaque card
+        im = im.crop(im.split()[3].point(lambda v: 255 if v > 250 else 0).getbbox())
     if quality:  # big screens: lossy keeps the page light
         im.save(path, 'WEBP', quality=quality, method=6)
     else:
@@ -379,8 +381,12 @@ N[45] = {"kind": "media", "bg": "black", "heading": "Reduce time to trade: Optio
          # taken away, and nothing clips — so the order confirmation, which
          # opens over them, shows in full
          "live": [live("chain-to-order", 8, 15, 84, 80, 1440, css=WIDGETS_ONLY, fit=".ctt .wshell", vh=900, pad=18, init="chainFirst")]}
-N[46] = {"kind": "media", "bg": "black",
-         "live": [live("options-strategy-builder", 26, 12, 48, 76, css=TICKET_BG, fit=CARD)]}
+# product vision: V1 is the live options ticket, V2 the strategy builder export, both at
+# 1.2x their CSS size (ticket 357 wide, builder 763), top-aligned and centred as a pair
+N[46] = {"kind": "media", "bg": "black", "corner": "Product vision",
+         "labels": [{"text": "V1", "x": 23.02, "y": 23}, {"text": "V2", "x": 64.27, "y": 23}],
+         "shots": [asset("046-atlas-strategy-builder", "atlas-strategy-builder.png", 40.42, 47.71, 27.78, trim=True)],
+         "live": [live("options-strategy-builder", 11.875, 27.78, 22.29, 40, css=TICKET_BG, fit=CARD, mode="width")]}
 N[47] = {"kind": "media", "bg": "black",
          "live": [live("options-strategy-builder", 5, 16, 44, 70, css=TICKET_BG, fit=CARD)]}
 N[48] = {"kind": "numbered", "bg": "black", "items": PILLARS, "active": [0, 1]}
@@ -591,7 +597,7 @@ N[103] = raster(103)
 # every content slide titles top-left (the deck renders kicker/heading/corner
 # as one .gd-corner); these have no title copy yet, so they get a placeholder
 # (cover, title cards, dividers and 53's big "Then vs Now" are left without)
-for n in [*range(3, 12), 14, 15, 17, 18, 34, 35, 39, 46, 47, 54, 56, 82, 95, 96, 97, 99, 100]:
+for n in [*range(3, 12), 14, 15, 17, 18, 34, 35, 39, 47, 54, 56, 82, 95, 96, 97, 99, 100]:
     assert not any(k in N[n] for k in ("corner", "kicker", "heading")), n
     N[n]["corner"] = "Title"
 
