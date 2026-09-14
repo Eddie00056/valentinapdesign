@@ -446,18 +446,24 @@ export function NotiveQuoteScreen({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  overflow: "hidden",
-                  isolation: "isolate",
                   cursor: "pointer",
                 }}
               >
-                <span className="inner-stroke inner-stroke--blue" />
+                {/* The material lives on this skin, not on the layout box:
+                    the banner page scales its pill on hover / press, and a
+                    scale on a `layoutId` box (re-measured on every price
+                    tick) is the bounce use-motion-for-prototypes warns
+                    about. The skin carries the ring (`::before`) and the
+                    library's blue inner stroke. */}
+                <span className="nq-frac-skin" aria-hidden="true">
+                  <span className="inner-stroke inner-stroke--blue" />
+                </span>
                 <motion.span
                   layoutId="nq-frac-glyph"
                   className="nq-frac-glyph"
                   style={{ position: "relative", zIndex: 4, lineHeight: 0 }}
                 >
-                  <img src={MARK_SRC} alt="" width={14} height={14} />
+                  <img src={MARK_SRC} alt="" width={12} height={12} />
                 </motion.span>
               </motion.div>
             )}
@@ -621,7 +627,7 @@ export function NotiveQuoteScreen({
                 animate={{ scale: 1, opacity: 1, transition: fracGlyphPop }}
                 style={{ display: "block" }}
               >
-                <img src={MARK_SRC} alt="" width={14} height={14} />
+                <img src={MARK_SRC} alt="" width={12} height={12} />
               </motion.span>
             </motion.span>
 

@@ -130,21 +130,42 @@
 }
 
 /* ---- the fractional card ----
-   Its compact state is /work/fractional-shares-banner's chip, by value
-   (`glasslab/FractionalSharesBanner.tsx`: GLASS + ring + STROKE_BASE) —
-   user, 2026-09-13: "that's not the blue we had prior … it should be
-   this; just reuse that icon". Three layers: white glass under a 10% blue
-   wash, the blue gradient rim at half strength, and the library's real
-   `.inner-stroke--blue` nested inside (same gradient as that file's
-   STROKE_BASE). The mark is that page's `mark.png`. It sits in the nav row
-   at the star's 32px box; the expanded banner keeps its solid tint. It
-   can't carry the `.btn` classes: it is a Motion shared-layout box whose
-   radius and size animate into the banner. */
-.nq-frac {
+   Its compact state is /work/fractional-shares-banner's collapsed pill,
+   by value from `glasslab/FractionalSharesBanner.tsx` (user, 2026-09-13:
+   "it should be this … just reuse that icon", then "the code is
+   completely different and both look completely different"). Every static
+   and interactive property of that pill, at the icon set's 32px:
+   - GLASS: white .5 under a 10% blue wash; `blur(18px)`
+   - `ring`: the blue gradient rim, `opacity .5`, 1px, z 2
+   - `stroke`: the white inner highlight = the library's `.inner-stroke--blue`
+   - `shadow`: rest `0 8px 16px .06`, hover `0 12px 24px .10`, press
+     `0 4px 10px .08`
+   - hover: `scale(1.06)` + wash to 17%; press: `scale(.94)`; the same
+     transition curve (`transform .26s cubic-bezier(.34,1.4,.5,1)`)
+   - mark: that page's `mark.png`, at a third of the box as there (22/66)
+   The material sits on `.nq-frac-skin` inside the Motion layout box (see
+   the component comment); the skin's radius inherits the box's, which
+   Motion animates into the banner. The expanded banner keeps its solid
+   tint. */
+.nq-frac-skin {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  isolation: isolate;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.5);
   background-image: linear-gradient(rgba(0, 102, 219, 0.1), rgba(0, 102, 219, 0.1));
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+  transform: scale(1);
+  transition:
+    transform 0.26s cubic-bezier(0.34, 1.4, 0.5, 1),
+    box-shadow 0.2s ease,
+    background-image 0.2s ease;
+  pointer-events: none;
 }
-.nq-frac::before {
+.nq-frac-skin::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -160,16 +181,25 @@
   mask-composite: exclude;
   pointer-events: none;
 }
+.nq-frac:hover .nq-frac-skin {
+  transform: scale(1.06);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  background-image: linear-gradient(rgba(0, 102, 219, 0.17), rgba(0, 102, 219, 0.17));
+}
+.nq-frac:active .nq-frac-skin {
+  transform: scale(0.94);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
 
-/* The banner page draws its mark at a third of its 66px pill; a third of
-   this 32px box is ~11, but the star beside it puts down 12px of ink, so
-   14 keeps the two reading the same size. It stays 14 in the expanded
-   banner too: the glyph carries its own `layoutId`, so any size difference
-   between the two states would be animated. */
+/* 12px: the banner page draws its mark at a third of its 66px pill; a
+   third of this 32px box is ~11, and the star beside it puts down 12px of
+   ink. It stays 12 in the expanded banner too: the glyph carries its own
+   `layoutId`, so any size difference between the two states would be
+   animated. */
 .nq-frac-glyph img {
   display: block;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
 }
 
 /* ---- Buy / Sell ----
