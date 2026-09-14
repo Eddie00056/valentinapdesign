@@ -10,10 +10,10 @@ import "./typed-error.css";
    so the size here is the size on the slide. */
 
 /* Two lines, broken where they come out most even in the caption face
-   (232px / 243px at 20.8px; every other break differs by 37px or more).
-   Each line is centred on its own — sized by a hidden copy of itself, the
-   typed letters anchored at that copy's left edge — so the pair sits
-   symmetric over the mark below it and nothing drifts while typing. */
+   (232px / 243px at 20.8px; every other break differs by 37px or more),
+   left-aligned to one edge in a block the width of the longer line; the
+   block is centred over the mark below it. Each line is sized by a hidden
+   copy of itself, so nothing drifts while typing. */
 export const ERROR_COPY = "Switch to a market order\nto trade fractional shares.";
 
 const CHAR_MS = 42; // one letter

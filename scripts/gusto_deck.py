@@ -614,13 +614,19 @@ SWITCHER = live("fractional-order-flow", 21.0, 16.3, 12.4, 20.2, css=FOF_BG,
 SWITCH_ICON = live("switch-icon", 21.0, 16.3, 12.4, 20.2, css=".si-stage{background:none!important}",
                    fit='[aria-label="Switch"]', vh=1000, clip=True, pad=30, init="switchLoop")
 _S95 = (6.4, 65.4, 45.9, 81.4)       # the white strip holding the banner icon
+# the PDF's three light cards drawn under the corner title (the crops' cards began at 4%,
+# behind it), the tiles re-centred on them; the phone at slide 97's phone height, contained
+_C95 = "#f7f7f7"
+CARDS_UNDER_TITLE = [{"x": 2.75, "y": 13.0, "w": 46.75, "h": 40.4, "c": _C95},
+                     {"x": 2.75, "y": 55.6, "w": 46.75, "h": 40.4, "c": _C95},
+                     {"x": 50.5, "y": 13.0, "w": 46.75, "h": 83.0, "c": _C95}]
 N[95] = {"kind": "media", "bg": "white",
-         "shots": [crop(95, 'a', 0, 0, 100, 100, wipe=(_P95, _S95, _SW))],
+         "boxes": CARDS_UNDER_TITLE,
          "corner": "Novice trading platform",
          # the banner on the card's own ground, unfurling by itself
-         "live": [SWITCH_ICON, live("fractional-shares-banner", 6.4, 65.4, 39.5, 16.0, 760,
+         "live": [{**SWITCH_ICON, "y": 23.1}, live("fractional-shares-banner", 6.4, 67.8, 39.5, 16.0, 760,
                                     css=".pshell,.pshell-stage{background:none!important}", clip=True, init="bannerLoop"),
-                  live("fractional-order-flow", 63.94, 7.04, 22.55, 83.45, css=FOF_BG, fit=".fof-frame", vh=1000)]}
+                  live("fractional-order-flow", 63.94, 16.6, 22.55, 75.8, css=FOF_BG, fit=".fof-frame", vh=1000)]}
 FRAC_LABELS = [{"text": "Market non-fractional", "x": 18.25, "y": 27.2},
                {"text": "Market fractional", "x": 50.35, "y": 27.2},
                {"text": "Limit non-fractional", "x": 82.05, "y": 27.2}]
@@ -637,20 +643,21 @@ _P97 = (63.2, 14.0, 84.7, 88.9)      # the phone: the live boxed order-placement
 # order-placed caption below it. No fit: vw equals the rect's width in slide px (44% of
 # 1920), so the page draws 1:1 and its px are slide px; the rect spans the card (centred on
 # it, like the old chart's) so the one line fits, the page's own stage centring it.
-TYPED_ERROR = live("typed-error", 4.1, 16.3, 44.0, 28.4, vw=845,
+TYPED_ERROR = live("typed-error", 4.1, 19.0, 44.0, 28.4, vw=845,
                    css=".te-stage{background:none!important}.te-block{color:#c02416!important}", clip=True)
 # the order-placed mark and caption on the card's ground: no phone, no page, the ring
 # track and captions re-inked for a light ground
 OPA_LIGHT = ('.opa-stage{background:none!important}.opa-phone{filter:none!important}'
              '.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}'
              '.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}')
+# the same three cards as slide 95, drawn (not cropped) so they start UNDER the corner title
 N[97] = {"kind": "media", "bg": "white", "corner": "Advanced trading platform",
-         "shots": [crop(97, 'a', 0, 0, 100, 100, wipe=(_T97, _SW, _P97))],
-         "live": [TYPED_ERROR, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_LIGHT,
+         "boxes": CARDS_UNDER_TITLE,
+         "live": [TYPED_ERROR, live("order-placed-animation", 20.68, 65.2, 10.88, 21.2, css=OPA_LIGHT,
                        fit=".opa-badge, .opa-caption", vh=1000, clip=True, pad=26, init="mute"),
                   # the boxed ticket's phone, whole: its Sell / Buy sit at the screen's foot, so the
                   # rect is the PDF phone's full height (the old ticket was cut a row under its buttons)
-                  live("order-placement-boxed", 63.45, 14.24, 20.94, 75.8, css=PHONE_BG, fit=PHONE, vh=1000, mode="width", clip=True)]}
+                  live("order-placement-boxed", 63.45, 16.6, 20.94, 75.8, css=PHONE_BG, fit=PHONE, vh=1000, mode="width", clip=True)]}
 N[98] = D("Impact", bg="white", tone="green")
 N[99] = {"kind": "figures", "bg": "white", "tone": "green", "layout": "top",
          "items": [["60K", "increase in trading volume"], ["$33M", "total value traded"]]}
