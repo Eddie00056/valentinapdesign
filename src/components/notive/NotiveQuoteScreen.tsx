@@ -3,6 +3,9 @@ import type { ReactNode } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
 import "./notive-quote.css";
 import "../glasslab/glass-button.css";
+/* alert-creation's keyframes (the bell shake lives there) — keyframes only,
+   no rules, so importing it is side-effect free. */
+import "../alertscreen/alert-screen.css";
 import { PhoneFrame, PhoneStage } from "../alertscreen/PhoneFrame";
 import { walk } from "../alertscreen/chart";
 import { pxHub, PX_BASE, PX_STEP } from "../alertscreen/priceHub";
@@ -278,6 +281,14 @@ export function NotiveQuoteScreen({
   const reduce = useReducedMotion();
 
   const [price, setPrice] = useState(REST);
+  /* Bell taps, counted: alert-creation's bell shakes on every tap, and the
+     count picks alternating keyframe names (`bellShakeA` / `bellShakeB`,
+     identical) so consecutive taps restart the animation — the same
+     mechanism that screen uses. */
+  const [alertN, setAlertN] = useState(0);
+  const bellShake = alertN
+    ? (alertN % 2 ? "bellShakeA" : "bellShakeB") + " 700ms cubic-bezier(.36,.07,.19,.97)"
+    : "none";
   const [dir, setDir] = useState(0);
   const [tf, setTf] = useState(0);
   const flashRef = useRef<number | undefined>(undefined);
@@ -391,7 +402,11 @@ export function NotiveQuoteScreen({
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         {/* The shared mobile icon set (glasslab) — the same Back / Watchlist
             / Alert the alert-creation header renders, at the set's own 32px
-            box and 16px glyph. Their material is the user's GLASS.light
+            box and 16px glyph, with that header's tap motion: the set's
+            press state on all of them, the bell's shake on tap (user,
+            2026-09-13: "match the same motion as alert-creation"), the
+            fractional chip's morph into its banner. Their material is the
+            user's GLASS.light
             spec, applied in notive-quote.css; the geometry is the
             library's. */}
         <BackButton variant="light" />
@@ -458,7 +473,8 @@ export function NotiveQuoteScreen({
             variant="light"
             size="mobile"
             iconOnly
-            style={{ position: "relative", zIndex: 2 }}
+            onClick={() => setAlertN((n) => n + 1)}
+            style={{ position: "relative", zIndex: 2, animation: bellShake }}
           />
         </div>
       </div>
