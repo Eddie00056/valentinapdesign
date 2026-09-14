@@ -187,12 +187,12 @@ function Panel({
     <div
       className="nq-glass nq-card"
       style={{
-        /* Card inset 8.7dp against the content's 24dp, so it reaches
-           15px past the scroller's padding on each side and pulls its own
-           16px back in. */
-        margin: `${marginTop}px -15px 0`,
+        /* The card's edge sits 8 from the screen and its 16px padding
+           puts the text back on the 16 column — every label lines up with
+           the price and the name above. */
+        margin: `${marginTop}px -8px 0`,
         borderRadius: 12,
-        padding: "18px 16px 22px",
+        padding: "16px 16px 20px",
         boxSizing: "border-box",
       }}
     >
@@ -221,8 +221,10 @@ function Facts({
         marginTop,
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
-        columnGap: 12,
-        rowGap: 24,
+        /* Artboard rows pitch at 48 (two lines + 10); label 18 + 4 + value
+           22 + 8 lands at 52. 16 gutter, the column's own unit. */
+        columnGap: 16,
+        rowGap: 8,
       }}
     >
       {rows.flatMap(([la, va, lb, vb], r) =>
@@ -234,7 +236,7 @@ function Facts({
             <div style={{ fontSize: 13, fontWeight: 600, lineHeight: "18px", color: MUTED }}>
               {label}
             </div>
-            <div style={{ fontSize: 16, fontWeight: 400, lineHeight: "22px", color: INK, marginTop: 6 }}>
+            <div style={{ fontSize: 16, fontWeight: 400, lineHeight: "22px", color: INK, marginTop: 4 }}>
               {value}
             </div>
           </div>
@@ -246,7 +248,7 @@ function Facts({
 
 /* Three lines of the blurb at 21px each — the reference truncates there,
    mid-word, with the ellipsis `-webkit-line-clamp` puts in for free. */
-const ABOUT_LINE = 21;
+const ABOUT_LINE = 20; // the artboard's body leading
 const ABOUT_CLAMP = 3;
 const ABOUT =
   "Apple, Inc. engages in the design, manufacture, and sale of smartphones, " +
@@ -402,7 +404,9 @@ export function NotiveQuoteScreen({
      Sans throughout (user: "don't change the font type"). */
   const header = (
     <div className="nq-head">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      {/* -5: the scroller's content edge is 67 below the screen top (plate
+          liner + 50 + 16); the artboard's nav row starts at 62. */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: -5 }}>
         {/* The shared mobile icon set (glasslab) — the same Back / Watchlist
             / Alert the alert-creation header renders, at the set's own 32px
             box and 16px glyph, with that header's tap motion: the set's
@@ -597,7 +601,7 @@ export function NotiveQuoteScreen({
         <motion.div
           key="nq-frac-slot"
           exit={{ height: 0, marginTop: 0, transition: { duration: 0.12, ease: [0.4, 0, 0.2, 1] } }}
-          style={{ position: "relative", marginLeft: -24, marginRight: -24, height: 40, marginTop: 12 }}
+          style={{ position: "relative", marginLeft: -16, marginRight: -16, height: 40, marginTop: 12 }}
         >
           <motion.div
             layoutId="nq-frac-card"
@@ -629,7 +633,7 @@ export function NotiveQuoteScreen({
               display: "flex",
               alignItems: "center",
               gap: 8,
-              padding: "0 24px",
+              padding: "0 16px",
               boxSizing: "border-box",
               background: FRAC_TINT,
               color: FRAC,
@@ -694,9 +698,11 @@ export function NotiveQuoteScreen({
 
   const chart = (
     /* Full bleed: the artboard runs the line clean off both edges, so the
-       chart cancels the scroller's 24px insets rather than sitting inside
-       them. */
-    <div style={{ width: "calc(100% + 48px)", margin: "10px -24px 0" }}>
+       chart cancels the 16px column rather than sitting inside it. 32 under
+       the change line: the artboard has 58 from the change's bottom to the
+       line's first ink, and the box's own top pad plus the line's headroom
+       supply the rest. */
+    <div style={{ width: "calc(100% + 32px)", margin: "32px -16px 0" }}>
       <LiveAreaChart
         w={386}
         h={CHART_H}
@@ -732,7 +738,9 @@ export function NotiveQuoteScreen({
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        marginTop: 36,
+        /* Artboard: 40 from the line's last ink to the pill's top; the
+           chart box's bottom pad carries 16 of it. */
+        marginTop: 24,
       }}
     >
       {TFS.map((t, i) => (
@@ -791,7 +799,7 @@ export function NotiveQuoteScreen({
   );
 
   const statsCard = (
-    <Panel title="Key statistics" marginTop={28}>
+    <Panel title="Key statistics" marginTop={32}>
       <Facts rows={stats} />
     </Panel>
   );
@@ -806,7 +814,7 @@ export function NotiveQuoteScreen({
         initial={false}
         animate={{ height: aboutOpen ? "auto" : ABOUT_LINE * ABOUT_CLAMP }}
         transition={reduce ? { duration: 0 } : { duration: 0.34, ease: [0.4, 0, 0.2, 1] }}
-        style={{ overflow: "hidden", marginTop: 14 }}
+        style={{ overflow: "hidden", marginTop: 12 }}
       >
         <p
           style={{
@@ -829,7 +837,7 @@ export function NotiveQuoteScreen({
         onClick={() => setAboutOpen((v) => !v)}
         aria-expanded={aboutOpen}
         style={{
-          marginTop: 10,
+          marginTop: 12,
           background: "transparent",
           color: UP_CHIP_INK,
           fontSize: 14,
@@ -842,7 +850,7 @@ export function NotiveQuoteScreen({
         {aboutOpen ? "Show less" : "Show more"}
       </button>
 
-      <Facts rows={ABOUT_FACTS} marginTop={22} />
+      <Facts rows={ABOUT_FACTS} marginTop={24} />
     </Panel>
   );
 
@@ -858,11 +866,11 @@ export function NotiveQuoteScreen({
     <div
       style={{
         position: "absolute",
-        left: 24,
-        right: 24,
-        bottom: 28,
+        left: 16,
+        right: 16,
+        bottom: 24,
         /* The scrim is a child so it can bleed to the screen edges while the
-           pills keep their 24px column — hence the negative insets on it. */
+           pills keep the 16px column — hence the negative insets on it. */
         display: "flex",
         gap: 16,
         pointerEvents: "auto",
@@ -896,7 +904,12 @@ export function NotiveQuoteScreen({
           statusColor={INK}
           overlay={actions}
         >
-          <div style={{ paddingBottom: 96 }}>
+          {/* 16px side insets — the "Sec. details" artboard's column (every
+              text band starts at x 16 and ends at 385.5 on its 402 frame).
+              PhoneFrame's scroller pads 24, so this wrapper pulls 8 back on
+              each side and everything inside lays out on the 16 column;
+              full-bleed pieces (chart, banner, scrim) cancel 16, not 24. */}
+          <div style={{ paddingBottom: 96, margin: "0 -8px" }}>
             <LayoutGroup>
               {header}
               {banner}
