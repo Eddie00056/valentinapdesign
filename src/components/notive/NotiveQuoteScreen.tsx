@@ -509,10 +509,13 @@ export function NotiveQuoteScreen({
         <span
           aria-hidden="true"
           style={{
-            width: 32,
-            height: 32,
+            /* 24, down from 32 ("the fill background is too big, shrink
+               it", 2026-09-13) — the 15px mark now fills it the way the
+               artboard's does. Radius scales with it. */
+            width: 24,
+            height: 24,
             flex: "none",
-            borderRadius: 8,
+            borderRadius: 6,
             background: "#000",
             color: "#fff",
             display: "flex",
