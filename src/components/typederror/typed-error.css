@@ -1,0 +1,49 @@
+/* the boxed ticket's inline validation message, typed out on a loop —
+   set like the order-placed caption it sits beside on the slide: the
+   system face at its rendered size (19px × the deck's 1.093 fit), 500,
+   +0.2 tracking */
+.te-block {
+  position: relative;
+  font-family: -apple-system, system-ui, "Helvetica Neue", Helvetica, sans-serif;
+  font-size: 20.8px;
+  font-weight: 500;
+  letter-spacing: 0.22px;
+  line-height: 1.35;
+  color: #ff557d; /* the ticket's DOWN — the field-error red */
+  white-space: pre; /* the copy's own line breaks, nothing else */
+  text-align: left;
+}
+
+/* the finished line, invisible, sizes the block from the first frame so
+   the typed text never reflows or drifts as it grows */
+.te-ghost {
+  visibility: hidden;
+  padding-right: 3px; /* room for the caret after the last glyph */
+}
+.te-live {
+  position: absolute;
+  inset: 0;
+}
+
+/* the caret is the text's own colour, one glyph-stroke wide; it blinks
+   while the line waits and holds solid while the letters land */
+.te-caret {
+  display: inline-block;
+  width: 1.5px;
+  height: 1em;
+  margin-left: 1px;
+  vertical-align: -0.15em;
+  background: currentColor;
+  border-radius: 1px;
+}
+.te-caret--blink {
+  animation: te-blink 1.05s steps(1, end) infinite;
+}
+@keyframes te-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .te-caret { display: none; }
+}

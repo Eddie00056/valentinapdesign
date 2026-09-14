@@ -2385,11 +2385,11 @@
   "live": [
    {
     "page": "typed-error",
-    "x": 14.1,
+    "x": 4.1,
     "y": 16.3,
-    "w": 24.0,
+    "w": 44.0,
     "h": 28.4,
-    "vw": 461,
+    "vw": 845,
     "css": ".te-stage{background:none!important}.te-block{color:#c02416!important}",
     "clip": true
    },
