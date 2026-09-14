@@ -605,7 +605,7 @@
         "fit": ".wshell",
         "mode": "width",
         "init": "freeze",
-        "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}"
+        "css": ".ob-stage{background:none!important}.wshell-actions{display:none!important}.ob-cta-label{font-weight:600!important}"
       },
       {
         "page": "options-strategy-builder",
@@ -1380,6 +1380,20 @@
         "c": "#f2f2f2"
       }
     ],
+    "labels": [
+      {
+        "text": "Old design",
+        "x": 26.85,
+        "y": 14.86,
+        "size": "lg"
+      },
+      {
+        "text": "Updated design",
+        "x": 73.57,
+        "y": 14.86,
+        "size": "lg"
+      }
+    ],
     "shots": [
       {
         "src": "081a",
@@ -1392,7 +1406,7 @@
       {
         "page": "order-placement-boxed",
         "x": 16.25,
-        "y": 18.03,
+        "y": 17.66,
         "w": 21.2,
         "h": 72.18,
         "vw": 1280,
@@ -1410,7 +1424,8 @@
         "vw": 1280,
         "vh": 1000,
         "fit": "img[src*=\"iphone\"]",
-        "css": ".phone-stage{background:none!important}"
+        "css": ".phone-stage{background:none!important}",
+        "init": "openFractional"
       }
     ]
   },
