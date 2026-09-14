@@ -9,7 +9,13 @@ import { pxHub, PX_BASE, PX_STEP } from "../alertscreen/priceHub";
 import type { PriceState } from "../alertscreen/priceHub";
 import { LiveAreaChart } from "../labs/LiveAreaChart";
 import { Rolling } from "../shared/RollingNumber";
-import { StarFilledIcon, BellIcon, FractionalIcon, AppleIcon } from "../glasslab/GlassButton";
+import {
+  BackButton,
+  WatchlistButton,
+  AlertButton,
+  FractionalIcon,
+  AppleIcon,
+} from "../glasslab/GlassButton";
 
 /* Notive — "Quote - Fractional".
  *
@@ -375,10 +381,12 @@ export function NotiveQuoteScreen({
   /* Header, rebuilt 2026-09-13 against the user's Wealthsimple quote
      screenshot (IMG_0253 — an iPhone 16 Pro capture, measured at 3px/pt
      and used 1:1 as px, the way the artboard's dp were). Top to bottom: a
-     44px nav row — a white back disc at the left and a white 80x44 pill
-     at the right holding the watchlist star and the alert bell — 34px
-     down to the 32px logo tile beside the name, the bold 41px price with
-     its USD tag on the same baseline, then the change line, coloured whole.
+     44px nav row — the library's Back at the left, Watchlist + Alert at
+     the right (the capture draws its own 44px white plates; here the row
+     keeps that height and the shared 32px icon set sits centred in it, so
+     the set stays one set across screens) — 34px down to the 32px logo
+     tile beside the name, the bold price with its USD tag on the same
+     baseline, then the change line, coloured whole.
 
      Two departures from the screenshot, both deliberate: the after-hours
      moon at the right of the price was dropped on request ("remove the
@@ -389,7 +397,7 @@ export function NotiveQuoteScreen({
 
      The face stays Open Sans — the user's explicit call ("make sure you
      don't change the font type"); what the screenshot contributes is the
-     scale: 16/400 name, 41/700 price, 16/700 USD tag, 14/600 change line. */
+     scale: 16/400 name, 37/600 price, 16/600 USD tag, 14/600 change line. */
   const header = (
     <div className="nq-head">
       <div
@@ -403,34 +411,14 @@ export function NotiveQuoteScreen({
           marginTop: -3,
         }}
       >
-        <button aria-label="Back" className="nq-nav" style={{ width: 44 }}>
-          {/* 16 x 14 arrow, as measured — ArrowBackIcon's 14-unit path would
-              render 12px wide in a 20px box. Same 2px round-capped stroke as
-              the icon set. */}
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path
-              d="M17 10H3M9 16l-6-6 6-6"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        </button>
-        <div
-          className="nq-nav"
-          style={{ width: 80, justifyContent: "space-between", padding: "0 11px 0 10px" }}
-        >
-          {/* Glyph inks measured at 20 x 19 (star) and 18 x 20 (bell); the
-              set's icons carry their own side bearings on a 24 grid, so both
-              are rendered a size up to fill the boxes the screenshot gives
-              them. */}
-          <button aria-label="Watchlist" className="nq-nav-glyph" style={{ width: 20 }}>
-            <StarFilledIcon size={27} />
-          </button>
-          <button aria-label="Alerts" className="nq-nav-glyph" style={{ width: 18 }}>
-            <BellIcon size={23} />
-          </button>
+        {/* The shared mobile icon set (glasslab) — the same Back / Watchlist
+            / Alert the alert-creation header renders, at the set's own 32px
+            box and 16px glyph. Their fill is re-tuned for this light ground
+            in notive-quote.css; the geometry is the library's. */}
+        <BackButton variant="light" />
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <WatchlistButton variant="light" size="mobile" iconOnly />
+          <AlertButton variant="light" size="mobile" iconOnly />
         </div>
       </div>
 

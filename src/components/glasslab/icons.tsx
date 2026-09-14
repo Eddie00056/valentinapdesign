@@ -18,9 +18,9 @@ export function StarIcon() {
   );
 }
 
-export function StarFilledIcon({ size = 20 }: { size?: number } = {}) {
+export function StarFilledIcon() {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
       <path
         d="M12 3.4l2.7 5.47 6.04.88-4.37 4.26 1.03 6.01L12 17.25l-5.4 2.84 1.03-6.01L3.26 9.75l6.04-.88z"
         fill="currentColor"
@@ -29,9 +29,9 @@ export function StarFilledIcon({ size = 20 }: { size?: number } = {}) {
   );
 }
 
-export function BellIcon({ size = 20 }: { size?: number } = {}) {
+export function BellIcon() {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <path
         d="M18 8.5a6 6 0 1 0-12 0c0 6.5-2.6 8.5-2.6 8.5h17.2S18 15 18 8.5Z"
         stroke="currentColor"

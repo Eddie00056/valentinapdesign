@@ -44,38 +44,27 @@
    Rebuilt against a Wealthsimple quote screenshot (2026-09-13): its sizes,
    weights, spacing and colours, in the house face. The typeface stays Open
    Sans on request ("make sure you don't change the font type"). */
-/* The nav row's two white plates — the back disc and the star + bell pill
-   — 44 tall with black glyphs, and no shadow: on the screenshot's light
-   ground they read as flat white shapes. The disc is a button and the pill
-   is a div holding two; `background` is stated here because the scoped
-   reset above deliberately leaves it alone. */
-.nq-nav {
-  height: 44px;
-  flex: none;
-  box-sizing: border-box;
-  border-radius: 999px;
-  background: #fff;
+/* The nav row's icon buttons are glasslab's mobile icon set (Back /
+   Watchlist / Alert — one set, shared with the alert-creation header). The
+   set's fill is a white-alpha gradient tuned for a near-black bar, which
+   vanishes on this light ground, so it is re-tuned here to the range pill's
+   material (`.nq-tf-pill`): the same white, the same tight shadow, and
+   `.nq-glass`'s dark masked rim in place of the white one. Geometry, glyph
+   size, hit area and press state are the library's, untouched. Specificity
+   (0,3,0) is what it takes to beat the set's own `.btn--mobile.btn--icon`
+   pair. */
+.nq-root .btn--mobile.btn--icon {
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 2px 8px rgba(20, 28, 24, 0.08);
   color: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
 }
-.nq-root button.nq-nav-glyph {
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  color: #000;
-  line-height: 0;
-  flex: none;
-}
-/* The glyph is drawn a size up to fill the box (its path has side bearings
-   on the 24 grid) — as a flex item it would otherwise shrink back to the
-   box. */
-.nq-root button.nq-nav-glyph > svg {
-  flex: none;
+.nq-root .btn--mobile.btn--icon::before {
+  background: linear-gradient(
+    270deg,
+    rgba(0, 0, 0, 0.07) 0%,
+    rgba(0, 0, 0, 0) 24.61%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
 }
 
 /* Scrollbar off — the 24px left/right padding has to read as symmetric, and
