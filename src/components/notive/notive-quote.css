@@ -191,15 +191,14 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* 12px: the banner page draws its mark at a third of its 66px pill; a
-   third of this 32px box is ~11, and the star beside it puts down 12px of
-   ink. It stays 12 in the expanded banner too: the glyph carries its own
-   `layoutId`, so any size difference between the two states would be
-   animated. */
+/* 9px: it was 12 (a third of the box, the banner page's proportion) and
+   the user asked for it "shrunk by 1.3" (2026-09-13). It stays 9 in the
+   expanded banner too: the glyph carries its own `layoutId`, so any size
+   difference between the two states would be animated. */
 .nq-frac-glyph img {
   display: block;
-  width: 12px;
-  height: 12px;
+  width: 9px;
+  height: 9px;
 }
 
 /* ---- Buy / Sell ----

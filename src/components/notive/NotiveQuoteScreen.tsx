@@ -463,7 +463,7 @@ export function NotiveQuoteScreen({
                   className="nq-frac-glyph"
                   style={{ position: "relative", zIndex: 4, lineHeight: 0 }}
                 >
-                  <img src={MARK_SRC} alt="" width={12} height={12} />
+                  <img src={MARK_SRC} alt="" width={9} height={9} />
                 </motion.span>
               </motion.div>
             )}
@@ -483,7 +483,14 @@ export function NotiveQuoteScreen({
           />
         </div>
       </div>
+    </div>
+  );
 
+  /* The quote block is its own piece so the fractional banner can unfurl
+     BETWEEN the nav row and the logo tile (user, 2026-09-13: "the motion
+     should go above the apple icon, not below performance"). */
+  const quote = (
+    <div className="nq-head">
       {/* Quote block, sized off the user's own "Sec. details" artboard
           (2026-09-13, a 402pt frame at 2x, measured in pt and used as px):
           18 under the nav row, the 32px logo tile with the name at 12/400
@@ -627,7 +634,7 @@ export function NotiveQuoteScreen({
                 animate={{ scale: 1, opacity: 1, transition: fracGlyphPop }}
                 style={{ display: "block" }}
               >
-                <img src={MARK_SRC} alt="" width={12} height={12} />
+                <img src={MARK_SRC} alt="" width={9} height={9} />
               </motion.span>
             </motion.span>
 
@@ -879,6 +886,7 @@ export function NotiveQuoteScreen({
             <LayoutGroup>
               {header}
               {banner}
+              {quote}
             </LayoutGroup>
             {chart}
             {rail}
