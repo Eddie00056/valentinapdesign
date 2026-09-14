@@ -599,7 +599,11 @@ ACS_CHART = ('#bg-wrap .acs-root.acs-root.acs-root.acs-root,.acs-root,:has(>.acs
              '.acs-scroll>:not(:nth-child(2)):not(:nth-child(3)){visibility:hidden!important}'
              '[data-type="heading"]{color:#0e0e0e}'
              '.acs-scroll>:nth-child(2) div[style*="255, 255, 255"] span,'
-             '.acs-scroll>:nth-child(2) div[style*="#ffffff"] span{color:#0e0e0e}')
+             '.acs-scroll>:nth-child(2) div[style*="#ffffff"] span{color:#0e0e0e}'
+             # no fade on the older candles: full opacity, and the cool tints back to the live colours
+             'svg[viewBox="0 0 393 188"] g[opacity]{opacity:1!important}'
+             '[stroke="#7ED37B"]{stroke:#48d597!important}[fill="#7ED37B"]{fill:#48d597!important}'
+             '[stroke="#FF9E7E"]{stroke:#ff557d!important}[fill="#FF9E7E"]{fill:#ff557d!important}')
 CANDLES = live("alert-creation", 14.1, 16.3, 24.0, 28.4, css=ACS_CHART,
                fit=".acs-scroll>:nth-child(2),.acs-scroll>:nth-child(3)", vh=1000, clip=True, pad=12)
 # the order-placed mark and caption on the card's ground: no phone, no page, the ring
