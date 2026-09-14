@@ -64,14 +64,9 @@ const DOWN_CHIP_INK = "#b3261e";
 const FRAC = "#0066db";
 const FRAC_TINT = "#eaf1fd";
 
-/* ---- the header's own palette, sampled off the Wealthsimple screenshot
-   the header was rebuilt against (2026-09-13). Pure black for the price,
-   one grey for the name and the USD tag, and a red / green pair for the
-   change line that sit a touch warmer and lower-chroma than the chart's
-   greens below — the app colours the whole line, label included, so the
-   figure never has to carry the hue on its own. */
-const HEAD_INK = "#000000";
-const HEAD_MUTED = "#6d6d6d";
+/* The change line's pair, sampled off the Wealthsimple capture the header
+   was rebuilt against (2026-09-13): a touch warmer and lower-chroma than
+   the chart's greens, and the whole line wears it, label included. */
 const HEAD_UP = "#477746";
 const HEAD_DOWN = "#b03424";
 
@@ -361,7 +356,7 @@ export function NotiveQuoteScreen({
   const fillRgb = up ? UP_RGB : DOWN_RGB;
   const changeColor = up ? HEAD_UP : HEAD_DOWN;
   const chipInk = up ? UP_CHIP_INK : DOWN_CHIP_INK;
-  const priceColor = dir === 0 ? HEAD_INK : dir > 0 ? HEAD_UP : HEAD_DOWN;
+  const priceColor = dir === 0 ? INK : dir > 0 ? HEAD_UP : HEAD_DOWN;
 
   const sign = change >= 0 ? "+" : "−";
   const pct = reference ? (Math.abs(change) / reference) * 100 : 0;
@@ -378,51 +373,116 @@ export function NotiveQuoteScreen({
     ["Market cap", "4.82T", "P/E ratio", "39.60"],
   ];
 
-  /* Header, rebuilt 2026-09-13 against the user's Wealthsimple quote
-     screenshot (IMG_0253 — an iPhone 16 Pro capture, measured at 3px/pt
-     and used 1:1 as px, the way the artboard's dp were). Top to bottom: a
-     44px nav row — the library's Back at the left, Watchlist + Alert at
-     the right (the capture draws its own 44px white plates; here the row
-     keeps that height and the shared 32px icon set sits centred in it, so
-     the set stays one set across screens) — 34px down to the 32px logo
-     tile beside the name, the bold price with its USD tag on the same
-     baseline, then the change line, coloured whole.
+  /* Header. The rows and the type scale are alert-creation's — the house
+     header (see alertscreen-palette): the glasslab icon set at the content
+     top, 16 down to an 18/600 heading, 4 down to the 18/600 price with the
+     14/400 change beside it in matching 22px bottom-aligned boxes. What the
+     Wealthsimple capture the user sent (IMG_0253, 2026-09-13) contributes
+     is the layout around that: Back at the left with Watchlist + Alert at
+     the right, the 32px logo tile beside the name, a "USD" tag after the
+     price, and the change line's colours. A first pass took the capture's
+     41px price and the user sent it back twice ("too big" — then "match
+     the edge mobile dark prototype"); the price is the house 18 now.
 
-     Two departures from the screenshot, both deliberate: the after-hours
-     moon at the right of the price was dropped on request ("remove the
-     icon"), and the compact fractional card keeps its slot at the right of
-     the change line — where the moon sat — because it is the way into the
-     fractional banner. The screenshot draws a second, at-close line; this
-     screen is live mid-session, so it has the one.
+     Left out on request: the capture's after-hours moon ("remove the
+     icon"). The compact fractional card sits left of Watchlist in the nav
+     row, as alert-creation places it (user, 2026-09-13: "next to the star
+     on the left … match the colour and format of the star"). The face is Open
+     Sans throughout (user: "don't change the font type"). */
+  /* The 14/400 text beside the price — alert-creation's `data-type="body"`
+     cell: a 22px box, bottom-aligned, line-height 1. */
+  const beside: CSSProperties = {
+    fontSize: 14,
+    fontWeight: 400,
+    lineHeight: 1,
+    height: 22,
+    display: "flex",
+    alignItems: "flex-end",
+    whiteSpace: "pre",
+  };
 
-     The face stays Open Sans — the user's explicit call ("make sure you
-     don't change the font type"); what the screenshot contributes is the
-     scale: 16/400 name, 37/600 price, 16/600 USD tag, 14/600 change line. */
   const header = (
     <div className="nq-head">
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          height: 44,
-          /* The scroller's content edge sits 67px below the screen top
-             (plate liner + 50 + 16); the screenshot's nav row starts at 64. */
-          marginTop: -3,
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         {/* The shared mobile icon set (glasslab) — the same Back / Watchlist
             / Alert the alert-creation header renders, at the set's own 32px
             box and 16px glyph. Their fill is re-tuned for this light ground
             in notive-quote.css; the geometry is the library's. */}
         <BackButton variant="light" />
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <WatchlistButton variant="light" size="mobile" iconOnly />
-          <AlertButton variant="light" size="mobile" iconOnly />
+          {/* The compact half of the fractional card, in the slot
+              alert-creation gives it: left of Watchlist, a fixed 32px box
+              (the icon set's) so the row never reflows as the card morphs in
+              and out. The chip wears the star's treatment — see `.nq-frac`. */}
+          <div style={{ width: 32, height: 32, flex: "none", position: "relative" }}>
+            {!fracOpen && (
+              <motion.div
+                layoutId="nq-frac-card"
+                className="nq-frac"
+                transition={fracSpringClose}
+                initial={{ opacity: 0 }}
+                /* borderRadius is an explicit animate target, not just a
+                   static style: otherwise shared-layout crossfades it
+                   continuously alongside width/height and the corner reads as
+                   a slow, mushy square -> round instead of an immediate
+                   change. */
+                animate={{ opacity: 1, borderRadius: 999, transition: { duration: 0.2 } }}
+                role="button"
+                tabIndex={0}
+                aria-label="Fractional shares"
+                onClick={openFrac}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    openFrac();
+                  }
+                }}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  /* Under the two buttons (zIndex 2): mid-morph the card
+                     spans the header width and must tuck behind them. */
+                  zIndex: 1,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                  isolation: "isolate",
+                  cursor: "pointer",
+                }}
+              >
+                <motion.span
+                  layoutId="nq-frac-glyph"
+                  className="nq-frac-glyph"
+                  style={{ position: "relative", zIndex: 4, lineHeight: 0 }}
+                >
+                  <FractionalIcon />
+                </motion.span>
+              </motion.div>
+            )}
+          </div>
+          <WatchlistButton
+            variant="light"
+            size="mobile"
+            iconOnly
+            style={{ position: "relative", zIndex: 2 }}
+          />
+          <AlertButton
+            variant="light"
+            size="mobile"
+            iconOnly
+            style={{ position: "relative", zIndex: 2 }}
+          />
         </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 8, height: 32, marginTop: 34 }}>
+      {/* Ticker block — alert-creation's own rows and scale: a 16px gap
+          under the nav row, the heading at 18/600, and 4px below it the
+          price at 18/600 with the 14/400 change beside it, both bottom-
+          aligned in 22px boxes. The logo tile beside the name and the
+          "USD" tag are the capture's; everything else is the house
+          header. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16 }}>
         <span
           aria-hidden="true"
           style={{
@@ -440,115 +500,32 @@ export function NotiveQuoteScreen({
         >
           <AppleIcon size={20} />
         </span>
-        <span style={{ fontSize: 16, fontWeight: 400, lineHeight: "24px", color: HEAD_MUTED }}>
+        <span style={{ fontSize: 18, fontWeight: 600, lineHeight: "22px", color: INK }}>
           {NAME}
         </span>
       </div>
 
-      <div style={{ display: "flex", alignItems: "flex-end", marginTop: 15 }}>
+      <div style={{ display: "flex", gap: 4, alignItems: "flex-end", marginTop: 4 }}>
         <Rolling
           value={"$" + money(price)}
           style={{
-            /* 37, down from the 41 the capture measures to: Open Sans's
-               digits are wider and rounder than the app's, and at equal cap
-               height the price read as too big (user, 2026-09-13). 600, not
-               700: the capture's bold has a 5.7px stroke on a 29px cap, and
-               Open Sans 700 paints 7. */
-            fontSize: 37,
+            fontSize: 18,
             fontWeight: 600,
             lineHeight: 1,
+            /* 22px box, bottom-aligned, exactly as alert-creation sizes
+               its price cells — the 14px change beside it shares the box
+               so the two sit on one line. */
+            height: 22,
+            alignItems: "flex-end",
             color: priceColor,
             transition: "color 760ms cubic-bezier(.4,0,.2,1)",
           }}
         />
-        {/* The odometer's digit cells are 1.15em boxes, so the digits'
-            baseline floats above the box bottom; the padding lifts "USD"
-            onto that same baseline (checked against the render, not the
-            metrics). */}
-        <span
-          style={{
-            fontSize: 16,
-            fontWeight: 600, // its stems measure 2px on the screenshot; 700 here paints 2.4
-            lineHeight: 1,
-            paddingBottom: 5.5,
-            marginLeft: 8,
-            color: HEAD_MUTED,
-          }}
-        >
-          USD
-        </span>
-      </div>
-
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          /* Negative: the 30px chip slot centres the 24px line box 3px
-             down, and the odometer's 1.15em cells leave 6px of box under
-             the digits' baseline. -1 puts the change line's baseline 27px
-             under the price's, as the screenshot has it. */
-          marginTop: -1,
-          fontSize: 14,
-          fontWeight: 600,
-          lineHeight: "24px",
-          color: changeColor,
-          transition: "color 520ms ease",
-          minHeight: 30,
-          whiteSpace: "pre",
-        }}
-      >
-        <span>
+        <span style={{ ...beside, color: MUTED }}>USD</span>
+        <span style={{ ...beside, color: changeColor, transition: "color 520ms ease" }}>
           {sign}${money(Math.abs(change))} ({sign}
           {pct.toFixed(2)}%) {active.since}
         </span>
-        <span style={{ flex: 1 }} />
-
-        {/* The compact half of the fractional card. Fixed 30px slot so the
-            row never reflows as the card morphs in and out of it. */}
-        <div style={{ width: 30, height: 30, flex: "none", position: "relative" }}>
-          {!fracOpen && (
-            <motion.div
-              layoutId="nq-frac-card"
-              className="nq-frac"
-              transition={fracSpringClose}
-              initial={{ opacity: 0 }}
-              /* borderRadius is an explicit animate target, not just a
-                 static style: otherwise shared-layout crossfades it
-                 continuously alongside width/height and the corner reads as
-                 a slow, mushy square -> round instead of an immediate
-                 change. */
-              animate={{ opacity: 1, borderRadius: 999, transition: { duration: 0.2 } }}
-              role="button"
-              tabIndex={0}
-              aria-label="Fractional shares"
-              onClick={openFrac}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  openFrac();
-                }
-              }}
-              style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                overflow: "hidden",
-                isolation: "isolate",
-                cursor: "pointer",
-              }}
-            >
-              <motion.span
-                layoutId="nq-frac-glyph"
-                className="nq-frac-glyph"
-                style={{ position: "relative", zIndex: 4, lineHeight: 0 }}
-              >
-                <FractionalIcon />
-              </motion.span>
-            </motion.div>
-          )}
-        </div>
       </div>
     </div>
   );

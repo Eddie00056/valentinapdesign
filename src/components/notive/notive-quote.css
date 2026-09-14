@@ -122,24 +122,49 @@
 }
 
 /* ---- the fractional card ----
-   A solid disc in the fractional tint with the blue mark — the same
-   material as the expanded banner it morphs into, so the shared-layout
-   transition changes shape only. It was the order flow's glass chip (white
-   glass, blue wash, gradient rim, inner highlight); the user asked for a
-   solid colour instead (2026-09-13). Blue, not the screen's green:
-   fractional is one accent across both prototypes. */
+   Its compact state is one of the nav row's icons and wears exactly what
+   the star beside it wears: the icon set's fill as re-tuned above for this
+   ground (white .78, the tight shadow, the dark masked rim), black glyph.
+   Keep these three values in step with `.nq-root .btn--mobile.btn--icon`.
+   It can't simply carry the `.btn` classes: it is a Motion shared-layout
+   box whose radius and size animate into the banner, and the set's
+   `:active` scale would fight that (see use-motion-for-prototypes). The
+   blue disc it was earlier today was rejected: "don't make it blue, match
+   the colour and format of the star." The expanded banner keeps its own
+   tint. */
 .nq-frac {
-  background: #eaf1fd;
-  color: #0066db;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 2px 8px rgba(20, 28, 24, 0.08);
+  color: #000;
+}
+.nq-frac::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    270deg,
+    rgba(0, 0, 0, 0.07) 0%,
+    rgba(0, 0, 0, 0) 24.61%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
-/* 13px, the size the order flow renders it at. It stays 13 in the expanded
-   banner too: the glyph carries its own `layoutId`, so any size difference
-   between the two states would be animated, and there is nothing to gain
-   from that. */
+/* 16px — the icon set's glyph size, so the mark matches the star and bell
+   beside it. It stays 16 in the expanded banner too: the glyph carries its
+   own `layoutId`, so any size difference between the two states would be
+   animated, and there is nothing to gain from that. */
 .nq-frac-glyph svg {
-  width: 13px;
-  height: 13px;
+  width: 16px;
+  height: 16px;
 }
 
 /* ---- Buy / Sell ----
