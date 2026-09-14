@@ -10,19 +10,29 @@
   letter-spacing: 0.22px;
   line-height: 1.35;
   color: #ff557d; /* the ticket's DOWN — the field-error red */
-  white-space: pre; /* the copy's own line breaks, nothing else */
-  text-align: left;
+  white-space: pre;
+  text-align: center;
 }
 
-/* the finished line, invisible, sizes the block from the first frame so
-   the typed text never reflows or drifts as it grows */
+/* one line each: the row is an inline box the width of its finished
+   text, centred by the block; its hidden ghost holds that width from the
+   first frame, and the typed text sits on the row's left edge, so every
+   line is centred and the letters land from a fixed origin */
+.te-line {
+  display: block;
+}
+.te-row {
+  position: relative;
+  display: inline-block;
+}
 .te-ghost {
   visibility: hidden;
-  padding-right: 3px; /* room for the caret after the last glyph */
 }
 .te-live {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 0;
+  white-space: pre; /* the caret hangs past the row's edge; nothing wraps */
 }
 
 /* the caret is the text's own colour, one glyph-stroke wide; it blinks

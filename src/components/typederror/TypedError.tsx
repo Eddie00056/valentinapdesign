@@ -10,9 +10,10 @@ import "./typed-error.css";
    so the size here is the size on the slide. */
 
 /* Two lines, broken where they come out most even in the caption face
-   (232px / 243px at 20.8px; every other break differs by 37px or more),
-   left-aligned in one box the width of the longer line, so the pair
-   reads as a block and the letters land from a fixed edge. */
+   (232px / 243px at 20.8px; every other break differs by 37px or more).
+   Each line is centred on its own — sized by a hidden copy of itself, the
+   typed letters anchored at that copy's left edge — so the pair sits
+   symmetric over the mark below it and nothing drifts while typing. */
 export const ERROR_COPY = "Switch to a market order\nto trade fractional shares.";
 
 const CHAR_MS = 42; // one letter
@@ -65,7 +66,19 @@ export function TypedError({
     return () => window.clearTimeout(timer.current);
   }, [pass, text, loop, reduced]);
 
-  // the finished line, hidden, sizes the block; the typed text sits on it
+  // each line: its finished self, hidden, sizes and centres a row; the
+  // typed part sits on the row's left edge, the caret after the last
+  // landed letter (it waits at a finished line's end until the break itself
+  // is "typed", then moves to the next row)
+  const lines = text.split("\n");
+  let start = 0;
+  const rows = lines.map((line, i) => {
+    const typed = Math.max(0, Math.min(line.length, n - start));
+    const next = start + line.length + 1;
+    const current = n >= start && (n < next || i === lines.length - 1);
+    start = next;
+    return { line, typed, current };
+  });
   return (
     <motion.div
       className="te-block"
@@ -74,16 +87,24 @@ export function TypedError({
       animate={{ opacity: phase === "clear" ? 0 : 1 }}
       transition={{ duration: phase === "clear" ? CLEAR_MS / 1000 : 0.12, ease: "easeOut" }}
     >
-      <span className="te-ghost" aria-hidden="true">
-        {text}
-      </span>
-      <span className="te-live">
-        {text.slice(0, n)}
-        <span
-          className={"te-caret" + (phase === "typing" ? "" : " te-caret--blink")}
-          aria-hidden="true"
-        />
-      </span>
+      {rows.map(({ line, typed, current }, i) => (
+        <span className="te-line" key={i}>
+          <span className="te-row">
+            <span className="te-ghost" aria-hidden="true">
+              {line}
+            </span>
+            <span className="te-live">
+              {line.slice(0, typed)}
+              {current && (
+                <span
+                  className={"te-caret" + (phase === "typing" ? "" : " te-caret--blink")}
+                  aria-hidden="true"
+                />
+              )}
+            </span>
+          </span>
+        </span>
+      ))}
     </motion.div>
   );
 }
