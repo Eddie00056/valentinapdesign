@@ -702,6 +702,7 @@ export function NotiveQuoteScreen({
        supply the rest. */
     <div style={{ width: "calc(100% + 32px)", margin: "32px -16px 0" }}>
       <LiveAreaChart
+        key={chartH} /* a ?chartH box mounts at its height instead of morphing to it */
         w={386}
         h={chartH}
         padT={CHART_PAD_T}

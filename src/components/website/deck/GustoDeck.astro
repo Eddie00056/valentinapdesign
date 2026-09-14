@@ -1826,8 +1826,11 @@ const title = (s: Slide): string | undefined =>
     color-scheme: normal;
     opacity: 0;
   }
+  /* a frame placed late (a build's third phone, still loading when its
+     click comes) fades in rather than popping */
   .gd-live iframe.is-in {
     opacity: 1;
+    transition: opacity 0.35s ease;
   }
 
   /* ---- panels + corner kicker ---- */
