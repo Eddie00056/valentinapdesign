@@ -12,13 +12,11 @@ import { pxHub, PX_BASE, PX_STEP } from "../alertscreen/priceHub";
 import type { PriceState } from "../alertscreen/priceHub";
 import { LiveAreaChart } from "../labs/LiveAreaChart";
 import { Rolling } from "../shared/RollingNumber";
-import {
-  BackButton,
-  WatchlistButton,
-  AlertButton,
-  FractionalIcon,
-  AppleIcon,
-} from "../glasslab/GlassButton";
+import { BackButton, WatchlistButton, AlertButton, AppleIcon } from "../glasslab/GlassButton";
+
+/* The fractional mark — the same image /work/fractional-shares-banner
+   draws in its chip (the user's call: "just reuse that icon"). */
+const MARK_SRC = "/work/glass/mark.png";
 
 /* Notive — "Quote - Fractional".
  *
@@ -414,8 +412,8 @@ export function NotiveQuoteScreen({
           {/* The compact half of the fractional card, in the slot
               alert-creation gives it: left of Watchlist, a fixed 32px box
               (the icon set's) so the row never reflows as the card morphs in
-              and out. The chip is the star's glass shell with the mark in
-              the fractional blue — see `.nq-frac`. */}
+              and out. The chip is the fractional-shares banner's blue chip
+              with its mark — see `.nq-frac`. */}
           <div style={{ width: 32, height: 32, flex: "none", position: "relative" }}>
             {!fracOpen && (
               <motion.div
@@ -453,12 +451,13 @@ export function NotiveQuoteScreen({
                   cursor: "pointer",
                 }}
               >
+                <span className="inner-stroke inner-stroke--blue" />
                 <motion.span
                   layoutId="nq-frac-glyph"
                   className="nq-frac-glyph"
                   style={{ position: "relative", zIndex: 4, lineHeight: 0 }}
                 >
-                  <FractionalIcon stroke={1.8} />
+                  <img src={MARK_SRC} alt="" width={14} height={14} />
                 </motion.span>
               </motion.div>
             )}
@@ -622,7 +621,7 @@ export function NotiveQuoteScreen({
                 animate={{ scale: 1, opacity: 1, transition: fracGlyphPop }}
                 style={{ display: "block" }}
               >
-                <FractionalIcon stroke={1.8} />
+                <img src={MARK_SRC} alt="" width={14} height={14} />
               </motion.span>
             </motion.span>
 
