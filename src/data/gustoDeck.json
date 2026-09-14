@@ -205,6 +205,14 @@
         "y": 0,
         "w": 100
       }
+    ],
+    "videos": [
+      {
+        "src": "iq-edge-widget.mp4",
+        "x": 12.65,
+        "y": 14.72,
+        "w": 74.65
+      }
     ]
   },
   {
@@ -283,7 +291,17 @@
         "y": 0,
         "w": 100
       }
-    ]
+    ],
+    "boxes": [
+      {
+        "x": 3.2,
+        "y": 6.2,
+        "w": 13.0,
+        "h": 4.2,
+        "c": "#000000"
+      }
+    ],
+    "corner": "Solution"
   },
   {
     "n": 23,
@@ -295,6 +313,12 @@
         "x": 0,
         "y": 0,
         "w": 100
+      },
+      {
+        "src": "023-chart",
+        "x": 40,
+        "y": 60,
+        "w": 20
       }
     ]
   },
@@ -505,6 +529,14 @@
         "y": 0,
         "w": 100
       }
+    ],
+    "videos": [
+      {
+        "src": "questrade.mp4",
+        "x": 8.1,
+        "y": 9.5,
+        "w": 82.77
+      }
     ]
   },
   {
@@ -584,6 +616,23 @@
         "mode": "width",
         "init": "freeze",
         "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}"
+      }
+    ],
+    "boxes": [
+      {
+        "x": 59.3,
+        "y": 67.2,
+        "w": 8.8,
+        "h": 2.6,
+        "c": "#000000"
+      }
+    ],
+    "labels": [
+      {
+        "text": "Option only widget",
+        "x": 63.35,
+        "y": 67.4,
+        "size": "sm"
       }
     ]
   },
@@ -859,6 +908,20 @@
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "fractional-order-flow",
+        "x": 58.54,
+        "y": 9.07,
+        "w": 29.09,
+        "h": 76.3,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".fof-frame",
+        "mode": "width",
+        "css": ".fof-stage{background:none!important}"
       }
     ]
   },

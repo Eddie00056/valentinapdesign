@@ -332,6 +332,17 @@ const title = (s: Slide): string | undefined =>
                         <Shot {...sh} />
                       ),
                     )}
+                    {(s.videos || []).map((v: any) => (
+                      <video
+                        class="gd-media-shot"
+                        style={`left:${v.x}%;top:${v.y}%;width:${v.w}%`}
+                        src={`/website/case/gusto/videos/${v.src}`}
+                        autoplay
+                        loop
+                        muted
+                        playsinline
+                      />
+                    ))}
                     {s.connectors && (
                       <svg class="gd-connectors" viewBox="0 0 1920 1080" aria-hidden="true">
                         {s.connectors.map((c: any) => (
@@ -1020,6 +1031,13 @@ const title = (s: Slide): string | undefined =>
         const n = parseInt(el.dataset.n || "0", 10);
         el.hidden = n !== i && !neighbours.has(n);
         el.classList.toggle("is-near", neighbours.has(n));
+        /* `autoplay` alone doesn't reliably start a <video> that begins
+           inside a `hidden` article — kick it explicitly once the slide
+           it belongs to is actually shown, and pause it off-slide. */
+        el.querySelectorAll<HTMLVideoElement>("video").forEach((v) => {
+          if (n === i) requestAnimationFrame(() => v.play().catch(() => {}));
+          else v.pause();
+        });
       });
       warm(i);
       warm(i + 1);
@@ -1792,7 +1810,7 @@ const title = (s: Slide): string | undefined =>
     letter-spacing: 0.02em;
     text-transform: uppercase;
     color: rgba(0, 0, 0, 0.55);
-    z-index: 1;
+    z-index: 2;
   }
   .gd-slide--black .gd-corner {
     color: rgba(255, 255, 255, 0.62);
@@ -1923,7 +1941,7 @@ const title = (s: Slide): string | undefined =>
     letter-spacing: 0;
     white-space: nowrap;
     color: rgba(255, 255, 255, 0.82);
-    z-index: 1;
+    z-index: 2;
   }
   .gd-slide--white .gd-media-l,
   .gd-slide--canvas .gd-media-l,
@@ -1938,6 +1956,7 @@ const title = (s: Slide): string | undefined =>
     box-sizing: border-box;
     border-radius: 22px;
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+    z-index: 1;
   }
   /* ---- annotated image (slide 30): path built one line per click ---- */
   .gd-annot {
