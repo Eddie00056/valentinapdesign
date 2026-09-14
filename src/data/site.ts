@@ -216,7 +216,10 @@ export const THUMBS: Record<
 > = {
   /* Grounds: his light cards sit at #e4–#ec, never white — white glares on
      the black page — and his dark ones at #0a–#14 with a few phone pieces on
-     true black. One soft grey for every light piece here. */
+     true black. One soft grey for every light piece here.
+     Size (`fill`, measured off tcosta.com/wspoc's cards and confirmed by the
+     user twice): a button, toggle or icon takes 25–45% of the card's width;
+     a widget, table or phone screen about 60–75%. Never edge to edge. */
   /* Card shape (`ar`, height per width) is chosen per piece and deliberately
      VARIED. One shared shape (930x639 for everything small) made every card
      the same height, and a masonry of equal heights is just rows — the thing
@@ -225,11 +228,11 @@ export const THUMBS: Record<
      cards, round or square ones tall cards; the component stays large in
      each (`fill`). */
   "stock-option-toggle": {
-    "focus": "button.lbl", "fill": 0.8, "ar": 0.6, "pad": 0, "seconds": 5.5,
+    "focus": "button.lbl", "fill": 0.45, "ar": 0.6, "pad": 0, "seconds": 5.5,
     "script": [{ "wait": 500 }, { "label": "Option" }, { "wait": 2100 }, { "label": "Stock" }]
   },
   "limit-order-error": {
-    "focus": "[aria-label=\"Trigger limit order error\"]", "fill": 0.72, "ar": 0.76, "pad": 0, "seconds": 5.5,
+    "focus": "[aria-label=\"Trigger limit order error\"]", "fill": 0.4, "ar": 0.76, "pad": 0, "seconds": 5.5,
     "css": ".pshell { background: #e8e8e8 !important; }",
     /* The pill toggles: a second tap clears the ring, so the loop closes on
        the plain pill (blurring the button never cleared it). */
@@ -240,7 +243,7 @@ export const THUMBS: Record<
   },
   "fractional-shares-banner": {
     "focus": "[aria-label=\"Expand fractional shares banner\"], [aria-label=\"Collapse banner\"]",
-    "fill": 0.95, "ar": 0.64, "pad": 0, "seconds": 5.5,
+    "fill": 0.7, "ar": 0.64, "pad": 0, "seconds": 5.5,
     "css": ".pshell { background: #e8e8e8 !important; }",
     "script": [{ "wait": 500 }, { "label": "Expand fractional shares banner" }, { "wait": 2200 }, { "label": "Collapse banner" }]
   },
@@ -250,17 +253,24 @@ export const THUMBS: Record<
      the dotted "now" line riding the price. The card is framed on the
      candles, so that line crosses it and its pill falls outside. */
   "alert-creation": {
-    "focus": "svg[viewBox=\"0 0 393 188\"]", "frame": "svg[viewBox=\"0 0 393 188\"] > g:first-of-type",
-    "isolate": "#000", "fill": 0.5, "ar": 0.84, "pad": 0, "seconds": 6.6
+    "focus": "svg[viewBox=\"0 0 393 188\"]",
+    "isolate": "#000", "fill": 0.62, "ar": 0.84, "pad": 0, "seconds": 6.6
   },
   /* Only DASH and its live price: the two-line text column (found by its
      text — it is nothing but inline styles), isolated so neither the bid/ask
      pill under it nor the icon beside it comes along. Three ticks of the
      2.2s price clock. */
   "order-placement-boxed": {
-    "focus": "js:[...document.querySelectorAll('span')].filter(e => e.children.length === 0 && e.textContent.trim() === 'DASH').map(e => e.parentElement)",
+    "focus": "js:[...document.querySelectorAll('span')].filter(e => e.children.length === 0 && (e.textContent.trim() === 'DASH' || e.textContent.trim() === 'Apple')).map(e => e.parentElement)",
     "isolate": "#000", "fill": 0.4, "ar": 0.6, "pad": 0, "seconds": 6.6,
-    "pre": [{ "eval": "window.__pxHub && window.__pxHub.restart(1100)" }]
+    /* The card reads "Apple" with the Apple mark (user's ask, thumbnail only —
+       the piece itself still trades DASH): the mark is the shared glyph from
+       glasslab/icons.tsx, set inline before the symbol. React leaves both
+       alone since the symbol text never changes between renders. */
+    "pre": [
+      { "eval": "window.__pxHub && window.__pxHub.restart(1100)" },
+      { "eval": "(() => { const s = [...document.querySelectorAll('span')].find(e => e.children.length === 0 && e.textContent.trim() === 'DASH'); if (!s || s.previousSibling) return; s.textContent = 'Apple'; const i = document.createElement('span'); i.style.cssText = 'display:inline-flex;vertical-align:-3px;margin-right:7px;color:#fff'; i.innerHTML = '<svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\"><path d=\"M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.088-4.61 1.088zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701z\" fill=\"currentColor\"/></svg>'; s.parentElement.insertBefore(i, s); })()" }
+    ]
   },
   /* Only the success mark, isolated from its caption. Its own loop is
      dur + 2600 = 4.6s, so one cycle loops seamlessly from any phase.
@@ -269,14 +279,14 @@ export const THUMBS: Record<
      without antialiasing, which is what stair-stepped the ring. */
   "order-placed-animation": {
     "focus": ".opa-badge", "isolate": "#000", "fill": 0.5, "ar": 1.22, "pad": 0, "seconds": 4.6, "outW": 1800, "crf": 16,
-    "css": ".opa-phone { filter: none !important; } .opa-screen { perspective: none !important; } .opa-badge { transform-style: flat !important; animation-name: op-pop2d !important; } @keyframes op-pop2d { 0% { transform: scale(1); } 22% { transform: scale(1.15); } 48% { transform: scale(0.95); } 72% { transform: scale(1.03); } 100% { transform: scale(1); } }"
+    "css": ".opa-glow, .opa-ripple, .opa-ripple2, .opa-ring-fill { display: none !important; } .opa-phone { filter: none !important; } .opa-screen { perspective: none !important; } .opa-badge { transform-style: flat !important; animation-name: op-pop2d !important; } @keyframes op-pop2d { 0% { transform: scale(1); } 22% { transform: scale(1.15); } 48% { transform: scale(0.95); } 72% { transform: scale(1.03); } 100% { transform: scale(1); } }"
   },
   /* Only the swap toggle between Total amount and Share quantity. Each tap
      spins the drawn arrows a half turn as they push apart (the swap), and
      the green arc draws round it and clears again. Two taps, back to start. */
   "fractional-order-flow": {
     "focus": "[aria-label=\"Swap amount and quantity\"]",
-    "isolate": "#e8e8e8", "fill": 0.46, "ar": 1.0, "pad": 0, "seconds": 5, "cursor": false,
+    "isolate": "#e8e8e8", "fill": 0.3, "ar": 1.0, "pad": 0, "seconds": 5, "cursor": false,
     "css": "[aria-label=\"Swap amount and quantity\"] > svg { display: none !important; }",
     "script": [
       { "wait": 700 }, { "click": "[aria-label=\"Swap amount and quantity\"]" },
@@ -284,14 +294,14 @@ export const THUMBS: Record<
     ]
   },
   "options-strategy-builder": {
-    "fill": 0.92, "ar": 0.86, "focus": ".wshell", "pad": 0, "seconds": 6.5,
+    "fill": 0.72, "ar": 0.86, "focus": ".wshell", "pad": 0, "seconds": 6.5,
     "script": [
       { "wait": 700 }, { "label": "Increase Quantity" }, { "wait": 450 }, { "label": "Increase Quantity" },
       { "wait": 1900 }, { "label": "Decrease Quantity" }, { "wait": 450 }, { "label": "Decrease Quantity" }
     ]
   },
   "option-chain": {
-    "fill": 0.92, "ar": 0.58, "focus": ".oc-root", "pad": 0, "seconds": 6,
+    "fill": 0.75, "ar": 0.58, "focus": ".oc-root", "pad": 0, "seconds": 6,
     "cut": { "sel": ".oc-row", "n": 7, "within": ".oc-scroll" },
     "script": [{ "wait": 900 }, { "label": "Put" }, { "wait": 2600 }, { "label": "Call" }]
   },
@@ -299,7 +309,7 @@ export const THUMBS: Record<
      counting 10 up to 13 and back down, so the loop ends where it began. */
   "stock-order-entry": {
     "focus": ".ob-stepper:has(input[aria-label=\"Quantity\"])", "isolate": "#0f1719",
-    "fill": 0.66, "ar": 0.5, "pad": 0, "seconds": 8,
+    "fill": 0.45, "ar": 0.5, "pad": 0, "seconds": 8,
     "script": [
       { "wait": 600 }, { "label": "Increase Quantity" }, { "wait": 550 }, { "label": "Increase Quantity" }, { "wait": 550 }, { "label": "Increase Quantity" },
       { "wait": 1300 }, { "label": "Decrease Quantity" }, { "wait": 550 }, { "label": "Decrease Quantity" }, { "wait": 550 }, { "label": "Decrease Quantity" },
@@ -307,18 +317,20 @@ export const THUMBS: Record<
     ]
   },
   "beam-ring": { "focus": ".bd-cta", "fill": 0.24, "ar": 0.62, "pad": 0 },
-  /* Only the price line chart and the ticking price above it, on a flat
-     ground — no phone. Both move on the same clock tick. */
+  /* The quote block and the price line chart, on a flat ground — no phone:
+     the Apple mark and name, the ticking price, the change line with its
+     fractional glass icon, then the chart. Not the Search/Close buttons.
+     Everything moves on the same clock tick. */
   "notive-quote": {
-    "focus": "js:[document.querySelector('.nq-root svg[viewBox^=\"0 0 386\"]'), ...[...document.querySelectorAll('.nq-root *')].filter(e => e.style && e.style.fontSize === '35px').map(e => e.parentElement)]",
-    "isolate": "#e8e8e8", "fill": 0.72, "pad": 0, "seconds": 6.6
+    "focus": "js:(() => { const p = [...document.querySelectorAll('.nq-root *')].find(e => e.style && e.style.fontSize === '35px'); if (!p) return []; const row = p.parentElement, ticker = row.previousElementSibling; return [ticker.children[0], ticker.children[1], row, row.nextElementSibling, document.querySelector('.nq-root svg[viewBox^=\"0 0 386\"]')]; })()",
+    "isolate": "#e8e8e8", "fill": 0.6, "pad": 0, "seconds": 6.6
   },
   /* Only the leg rows, on the legs panel's own ground. The opening $175 leg
      is priced unlike the same strike picked off the chain, so `pre` swaps it
      for the chain's one first: then the loop — +180, +165 to three rows,
      -180, -165 back to one — ends exactly where it starts. */
   "chain-to-order": {
-    "focus": ".ob-legs", "isolate": "#0f1719", "fill": 0.84, "ar": 0.5, "pad": 0, "seconds": 6.4,
+    "focus": ".ob-legs", "isolate": "#0f1719", "fill": 0.6, "ar": 0.5, "pad": 0, "seconds": 6.4,
     "pre": [
       { "click": "[aria-label^=\"Buy 180 call\"]" }, { "wait": 700 },
       { "click": "[aria-label^=\"Buy 175 call\"]" }, { "wait": 700 },

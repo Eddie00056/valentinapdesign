@@ -1,17 +1,17 @@
 {
   "stock-option-toggle": {
     "w": 1200,
-    "h": 720,
+    "h": 728,
     "seconds": 5.5
   },
   "limit-order-error": {
     "w": 1200,
-    "h": 908,
+    "h": 912,
     "seconds": 5.5
   },
   "fractional-shares-banner": {
     "w": 1200,
-    "h": 768,
+    "h": 662,
     "seconds": 5.5
   },
   "alert-creation": {
@@ -26,7 +26,7 @@
   },
   "order-placed-animation": {
     "w": 1800,
-    "h": 2192,
+    "h": 2198,
     "seconds": 4.6
   },
   "fractional-order-flow": {
@@ -36,12 +36,12 @@
   },
   "options-strategy-builder": {
     "w": 1200,
-    "h": 1032,
+    "h": 1030,
     "seconds": 6.5
   },
   "option-chain": {
     "w": 1200,
-    "h": 698,
+    "h": 696,
     "seconds": 6
   },
   "stock-order-entry": {
@@ -56,12 +56,12 @@
   },
   "notive-quote": {
     "w": 1200,
-    "h": 1028,
+    "h": 1138,
     "seconds": 6.6
   },
   "chain-to-order": {
     "w": 1200,
-    "h": 600,
+    "h": 598,
     "seconds": 6.4
   },
   "holdings-empty-state": {
