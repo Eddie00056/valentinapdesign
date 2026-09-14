@@ -42,7 +42,15 @@ type Props = {
   priceInterval?: number;
   /** ms the "Placing your order" spinner holds before "done". */
   sendDelay?: number;
+  /** The fractional-limit edge case (presentation slide): a Limit quantity may
+      be typed as a fraction, and a fraction is refused with this variant's
+      message. Off by default. Also read from `?fractionError=v1|v2`. */
+  fractionError?: "v1" | "v2";
 };
+
+const ERROR_RED = "#D23F52";
+const fractionMessage = (v: "v1" | "v2", qty: string) =>
+  v === "v1" ? `Please use market order to trade ${qty} shares` : "To place a fractional trade use Market orders";
 
 const num = (s: string) => {
   const n = parseFloat(String(s).replace(/[^0-9.]/g, ""));
@@ -375,6 +383,7 @@ export function FractionalOrderFlow({
   livePrice = true,
   priceInterval = 1900,
   sendDelay = 1600,
+  fractionError,
 }: Props) {
   const [screen, setScreen] = useState<Screen>("entry");
   const [side, setSide] = useState<"Buy" | "Sell">("Buy");
@@ -402,6 +411,15 @@ export function FractionalOrderFlow({
   const [price, setPrice] = useState(300);
   const [spread, setSpread] = useState(0.04);
   const [spreadUp, setSpreadUp] = useState(0.02);
+  const [fracErr, setFracErr] = useState(fractionError);
+  const fracErrRef = useRef(fracErr);
+  fracErrRef.current = fracErr;
+  /* the deck asks for the edge case in the page URL; the gallery page never does */
+  useEffect(() => {
+    if (fractionError) return;
+    const v = new URLSearchParams(window.location.search).get("fractionError");
+    if (v === "v1" || v === "v2") setFracErr(v);
+  }, [fractionError]);
 
   const screenRef = useRef(screen);
   screenRef.current = screen;
@@ -445,7 +463,7 @@ export function FractionalOrderFlow({
     const f = focusRef.current;
     const replace = freshRef.current;
     /* a price has cents; a limit is placed in whole shares */
-    const places = f === "limit" ? 2 : f === "qty" ? 0 : Infinity;
+    const places = f === "limit" ? 2 : f === "qty" ? (fracErrRef.current ? 3 : 0) : Infinity;
     const edit = (a: string) => {
       if (replace) a = "";
       if (ch === "del") return a.slice(0, -1);
@@ -510,9 +528,11 @@ export function FractionalOrderFlow({
   const rate = isLimit ? limitPx : RATE;
   const shares = isLimit ? num(qty) : num(amount) / RATE;
   const amt = isLimit ? shares * limitPx : num(amount);
-  const ready = amt > 0;
+  /* the edge case: a fraction typed into a Limit quantity is refused */
+  const qtyFraction = isLimit && !!fracErr && num(qty) % 1 !== 0;
+  const ready = amt > 0 && !qtyFraction;
   /* a limit's quantity is whole shares, so the pad's "." has nothing to do */
-  const wholeShares = isLimit && focus === "qty";
+  const wholeShares = isLimit && focus === "qty" && !fracErr;
   const isEntry = screen === "entry";
   const isReview = screen === "review";
   const isSending = screen === "sending";
@@ -759,12 +779,14 @@ export function FractionalOrderFlow({
                 </div>
               </div>
 
-              {/* toolbar */}
+              {/* toolbar — 16px optical gap above (price digits to pills; the price's
+                  30px line box ends 2px under this bar's top, all of it empty) and 16px
+                  below (pills to the first field): was 20 / 20 */}
               <div
                 style={{
                   position: "absolute",
                   left: 0,
-                  top: 122,
+                  top: 118,
                   width: 402,
                   height: 56,
                   background: "#F9F9F9",
@@ -974,7 +996,7 @@ export function FractionalOrderFlow({
 
               {/* fields — Market: amount (+ swap) / quantity. Limit: price /
                   quantity. Rows that stay slide on layout. */}
-              <div style={{ position: "absolute", left: 24, top: 186, width: 354, display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ position: "absolute", left: 24, top: 178, width: 354, display: "flex", flexDirection: "column", gap: 8 }}>
                 <AnimatePresence initial={false} mode="popLayout">
                   {isLimit && (
                     <motion.div
@@ -1061,7 +1083,9 @@ export function FractionalOrderFlow({
                     onClick={isLimit ? () => focusField("qty") : undefined}
                     style={{
                       ...fieldBase,
-                      boxShadow: ring(isLimit && keyboard && focus === "qty"),
+                      boxShadow: qtyFraction
+                        ? `0 0 0 1.5px ${ERROR_RED}, 0px 4px 26px 0px rgba(0,0,0,0.05)`
+                        : ring(isLimit && keyboard && focus === "qty"),
                       transition: "box-shadow 0.18s ease",
                       cursor: isLimit ? "text" : "default",
                     }}
@@ -1075,6 +1099,26 @@ export function FractionalOrderFlow({
                       </div>
                     )}
                   </motion.div>
+
+                  {qtyFraction && fracErr && (
+                    <motion.div
+                      key="qty-error"
+                      role="alert"
+                      layout="position"
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4, transition: swapOut }}
+                      transition={spring}
+                      style={{ display: "flex", alignItems: "center", gap: 6, marginTop: -2, fontSize: 12, lineHeight: "18px", color: ERROR_RED }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+                        <circle cx="8" cy="8" r="6.9" stroke={ERROR_RED} strokeWidth="1.2" />
+                        <path d="M8 4.6v4.2" stroke={ERROR_RED} strokeWidth="1.4" strokeLinecap="round" />
+                        <circle cx="8" cy="11.2" r="0.85" fill={ERROR_RED} />
+                      </svg>
+                      <span>{fractionMessage(fracErr, qty)}</span>
+                    </motion.div>
+                  )}
 
                   <motion.div
                     key="margin"

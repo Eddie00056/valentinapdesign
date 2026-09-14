@@ -1823,6 +1823,14 @@
   "kind": "media",
   "bg": "white",
   "corner": "How do I find the right symbol?",
+  "labels": [
+   {
+    "text": "Original design",
+    "x": 31.35,
+    "y": 32.5,
+    "size": "lg"
+   }
+  ],
   "live": [
    {
     "page": "alert-creation",
@@ -1836,14 +1844,6 @@
     "fit": "img[src*=\"iphone\"]",
     "vh": 1000
    }
-  ],
-  "labels": [
-   {
-    "text": "Original design",
-    "x": 31.35,
-    "y": 32.5,
-    "size": "lg"
-   }
   ]
  },
  {
@@ -1851,6 +1851,20 @@
   "kind": "media",
   "bg": "white",
   "corner": "How do I find the right symbol?",
+  "labels": [
+   {
+    "text": "Original design",
+    "x": 31.35,
+    "y": 32.5,
+    "size": "lg"
+   },
+   {
+    "text": "Updated design",
+    "x": 68.65,
+    "y": 32.5,
+    "size": "lg"
+   }
+  ],
   "live": [
    {
     "page": "alert-creation",
@@ -1877,20 +1891,6 @@
     "fit": "img[src*=\"iphone\"]",
     "vh": 1000
    }
-  ],
-  "labels": [
-   {
-    "text": "Original design",
-    "x": 31.35,
-    "y": 32.5,
-    "size": "lg"
-   },
-   {
-    "text": "Updated design",
-    "x": 68.65,
-    "y": 32.5,
-    "size": "lg"
-   }
   ]
  },
  {
@@ -1915,6 +1915,7 @@
   "kind": "goals",
   "bg": "white",
   "plain": true,
+  "corner": "Title",
   "cards": [
    {
     "x": 8.9,
@@ -1932,8 +1933,7 @@
     "icon": null,
     "text": "Allow traders to place\na fractional trade"
    }
-  ],
-  "corner": "Title"
+  ]
  },
  {
   "n": 84,
@@ -2097,9 +2097,9 @@
     "h": 78.7,
     "vw": 1280,
     "css": ".phone-stage{background:none!important}.opb-frac-btn{visibility:hidden!important}",
+    "init": "quantityOnly",
     "fit": "img[src*=\"iphone\"]",
-    "vh": 1000,
-    "init": "quantityOnly"
+    "vh": 1000
    },
    {
     "page": "order-placement-boxed",
@@ -2174,32 +2174,18 @@
     "y": 34.4
    }
   ],
-  "live": [
+  "shots": [
    {
-    "page": "fractional-order-flow",
+    "src": "090-limit-error-v1",
     "x": 16.05,
     "y": 38.2,
-    "w": 31.01,
-    "h": 61.8,
-    "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "mode": "width",
-    "init": "limitOrder",
-    "fit": ".fof-frame",
-    "vh": 1000
+    "w": 31.01
    },
    {
-    "page": "fractional-order-flow",
+    "src": "090-limit-error-v2",
     "x": 57.71,
     "y": 38.2,
-    "w": 31.01,
-    "h": 61.8,
-    "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "mode": "width",
-    "init": "limitOrder",
-    "fit": ".fof-frame",
-    "vh": 1000
+    "w": 31.01
    }
   ]
  },

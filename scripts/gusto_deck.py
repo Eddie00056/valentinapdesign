@@ -469,6 +469,11 @@ N[70] = {"kind": "media", "bg": "white", "corner": "2 Platforms = 2 Design langu
                        css=NQ_BG + ".nq-banner,.nq-frac-slot{display:none!important}"),
                   live("alert-creation", 58.35, 35.28, 33.3, 64.72, fit=PHONE, vh=1000, mode="width",
                        css=ACS_BG + "div:has(> .acs-frac-card){display:none!important}")]}
+N[71] = {"kind": "checklist", "bg": "white", "corner": "Project scope", "panels": [P(0, 50, LIGHT_PANEL)], "cols": [NORTH]}
+N[72] = {"kind": "checklist", "bg": "white", "corner": "Project scope", "panels": [P(0, 50, LIGHT_PANEL)], "cols": [NORTH, MVP]}
+N[73] = S("How might we make investing\naccessible to new investors without\nslowing down advanced traders?",
+          bg="white", corner="The challenge", fw=600)
+N[74] = D("Design process", bg="white", tone="green", fs=125)
 
 _goal_icons = [cardimg(75, 'i1', 4260, 20.2, 11.8, y=34.2, radius=0, key=False),
                cardimg(75, 'i2', 4262, 65.7, 9.2, y=32.6, radius=0, key=False)]
@@ -585,7 +590,11 @@ N[89] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "live": [live("fractional-order-flow", 35.61, 32.43, 30.07, 67.57, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder")]}
 N[90] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "labels": [{"text": "V1", "x": 31.45, "y": 34.4}, {"text": "V2", "x": 73.25, "y": 34.4}],
-         "live": [live("fractional-order-flow", x, 38.2, 31.01, 61.8, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder") for x in (16.05, 57.71)]}
+         # the two error wordings, static (no ticking, no typing): the fractional order flow's
+         # ?fractionError state on a Limit order with 0.5 typed in, exported from the page with
+         # the quote frozen at $300.00, at the phones' old rects (top-aligned, bleeding off)
+         "shots": [asset(f"090-limit-error-{v}", f"fractional-limit-error-{v}.png", x, 31.01, 38.2, quality=92)
+                   for x, v in ((16.05, "v1"), (57.71, "v2"))]}
 N[91] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "labels": [{"text": "Label", "x": 50.21, "y": 26.66, "size": "lg"}],  # placeholder
          "live": [live("fractional-order-flow", 34.52, 29.53, 31.38, 70.47, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder")]}
