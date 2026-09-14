@@ -305,16 +305,16 @@ export const THUMBS: Record<
   /* The bid and ask pills lighting under the pointer and being picked. Only
      chain-to-order's copy of the chain picks (a ticket listens there), so
      the clip is filmed from that page with everything but the chain hidden.
-     Bid 180 (sell), ask 185 (buy), then both again to unpick: the chain
+     Bid then ask on the 185 row, then both again to unpick: the chain
      ends with no pill lit, as it began. */
   "option-chain": {
     "page": "/work/chain-to-order",
     "fill": 0.75, "ar": 0.58, "focus": ".oc-root", "isolate": "#141414", "pad": 0, "seconds": 8.5,
     "cut": { "sel": ".oc-row", "n": 7, "within": ".oc-scroll" },
     "script": [
-      { "wait": 600 }, { "click": "[aria-label^=\"Sell 180 call\"]" },
-      { "wait": 1300 }, { "click": "[aria-label^=\"Buy 185 call\"]" },
-      { "wait": 1600 }, { "click": "[aria-label^=\"Sell 180 call\"]" },
+      { "wait": 700 }, { "click": "[aria-label^=\"Sell 185 call\"]" },
+      { "wait": 1500 }, { "click": "[aria-label^=\"Buy 185 call\"]" },
+      { "wait": 1800 }, { "click": "[aria-label^=\"Sell 185 call\"]" },
       { "wait": 900 }, { "click": "[aria-label^=\"Buy 185 call\"]" }
     ]
   },

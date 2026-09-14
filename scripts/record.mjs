@@ -400,85 +400,117 @@ for (const p of pieces) {
      fails to render its component gets one more try; after that the piece is
      skipped and its existing thumbnail kept — never replaced by a clip of
      the wrong thing. */
-  let box = null;
-  for (let attempt = 0; attempt < 2 && !box; attempt++) {
-    const closeMeasure = await launch(1);
-    await send("Emulation.setDeviceMetricsOverride", { width: p.w, height: p.h, deviceScaleFactor: 1, mobile: false });
-    if (!(await open(p, focus, cfg))) { await closeMeasure(); continue; }
-    await prepare(cfg, focus);
-    await runPre().catch(() => {});
-    let sampling = true;
-    const sampler = (async () => {
-      while (sampling) {
-        // `frame` (default: focus) is what the card is framed on; `focus` is
-        // what stays visible under `isolate`. They differ for the candles:
-        // the moving "now" line must stay visible, but the frame is the candles
-        const b = await measure(cfg.frame ?? focus);
-        if (b) box = box ? [Math.min(box[0], b[0]), Math.min(box[1], b[1]), Math.max(box[2], b[2]), Math.max(box[3], b[3])] : b;
-        await sleep(120);
+  /* Pass 1 — measure, at a given viewport. Play the clip once with nothing
+     recording and track the component's box the whole way through, keeping
+     the union, so a banner that expands or a ticket that opens is inside the
+     frame at its largest rather than clipped to how it looked on the first
+     frame. A page that fails to render its component gets one more try;
+     after that the piece is skipped and its existing thumbnail kept — never
+     replaced by a clip of the wrong thing. */
+  const measurePass = async (vw, vh) => {
+    let box = null;
+    for (let attempt = 0; attempt < 2 && !box; attempt++) {
+      const closeMeasure = await launch(1);
+      await send("Emulation.setDeviceMetricsOverride", { width: vw, height: vh, deviceScaleFactor: 1, mobile: false });
+      if (!(await open(p, focus, cfg))) { await closeMeasure(); continue; }
+      await prepare(cfg, focus);
+      await runPre().catch(() => {});
+      let sampling = true;
+      const sampler = (async () => {
+        while (sampling) {
+          // `frame` (default: focus) is what the card is framed on; `focus` is
+          // what stays visible under `isolate`. They differ for the candles:
+          // the moving "now" line must stay visible, but the frame is the candles
+          const b = await measure(cfg.frame ?? focus);
+          if (b) box = box ? [Math.min(box[0], b[0]), Math.min(box[1], b[1]), Math.max(box[2], b[2]), Math.max(box[3], b[3])] : b;
+          await sleep(120);
+        }
+      })();
+      cursor.frame = null; // nothing is filming; the cursor may enter from anywhere
+      const s1 = runScript().catch(() => {});
+      await sleep(seconds * 1000);
+      await s1;
+      sampling = false;
+      await sampler;
+      /* `cut: { sel, n, within }` ends the frame at the bottom of the n-th
+         element matching `sel` that sits fully inside `within` (a scroller),
+         so a table too tall for the card is cut between rows, never through
+         one. Measured here, on the same page state the clip will start in. */
+      if (box && cfg.cut) {
+        const r = await evaluate(`(() => {
+          const c = ${JSON.stringify(cfg.cut)};
+          const within = c.within ? document.querySelector(c.within) : null;
+          const top = within ? within.getBoundingClientRect().top : -Infinity;
+          const rows = [...document.querySelectorAll(c.sel)].map(e => e.getBoundingClientRect())
+            .filter(b => b.height && b.top >= top - 0.5).sort((a, b) => a.top - b.top);
+          const row = rows[Math.min(rows.length, c.n) - 1];
+          return row ? row.bottom : null;
+        })()`);
+        const bottom = r.result?.result?.value;
+        if (bottom) box[3] = Math.min(box[3], bottom);
+        else console.error(`  ! ${p.slug}: cut found no ${cfg.cut.sel}; frame not cut`);
       }
-    })();
-    cursor.frame = null; // nothing is filming; the cursor may enter from anywhere
-    const s1 = runScript().catch(() => {});
-    await sleep(seconds * 1000);
-    await s1;
-    sampling = false;
-    await sampler;
-    /* `cut: { sel, n, within }` ends the frame at the bottom of the n-th
-       element matching `sel` that sits fully inside `within` (a scroller),
-       so a table too tall for the card is cut between rows, never through
-       one. Measured here, on the same page state the clip will start in. */
-    if (box && cfg.cut) {
-      const r = await evaluate(`(() => {
-        const c = ${JSON.stringify(cfg.cut)};
-        const within = c.within ? document.querySelector(c.within) : null;
-        const top = within ? within.getBoundingClientRect().top : -Infinity;
-        const rows = [...document.querySelectorAll(c.sel)].map(e => e.getBoundingClientRect())
-          .filter(b => b.height && b.top >= top - 0.5).sort((a, b) => a.top - b.top);
-        const row = rows[Math.min(rows.length, c.n) - 1];
-        return row ? row.bottom : null;
-      })()`);
-      const bottom = r.result?.result?.value;
-      if (bottom) box[3] = Math.min(box[3], bottom);
-      else console.error(`  ! ${p.slug}: cut found no ${cfg.cut.sel}; frame not cut`);
+      // `maxH` keeps only the top of a component too tall to read at card size
+      if (box && cfg.maxH) box[3] = Math.min(box[3], box[1] + cfg.maxH);
+      await closeMeasure();
     }
-    await closeMeasure();
-  }
-  if (!box) {
-    console.error(`  ✗ ${p.slug}: nothing matched ${focus} after 2 tries — skipped, old thumbnail kept`);
-    continue;
-  }
-  let close;
-  // `maxH` keeps only the top of a component too tall to read at card size
-  if (cfg.maxH) box[3] = Math.min(box[3], box[1] + cfg.maxH);
+    return box;
+  };
 
   /* Frame. `fill` is the share of the card the component takes (per axis,
      whichever binds): tcosta.com/wspoc's cards sit their component well inside
      the frame with room around it, and framing edge to edge read as "too
      zoomed in". Then `pad`, then the aspect clamp, then kept inside the page. */
-  // `fill`: one share, or [x, y]
-  const [fillX, fillY] = Array.isArray(cfg.fill) ? cfg.fill : [cfg.fill ?? 0.62, cfg.fill ?? 0.62];
-  const bw = box[2] - box[0], bh = box[3] - box[1];
-  const cx = (box[0] + box[2]) / 2, cy = (box[1] + box[3]) / 2;
-  let fw0 = bw / fillX + padX * 2, fh0 = bh / fillY + padY * 2;
-  if (cfg.ar) {
-    /* Exact card proportion (height / width). tcosta.com/wspoc's still cards
-       are all 930x639, and a small component fills most of one — so a lone
-       icon gets a full-size card with the icon large in it, rather than a
-       card shrunk to the icon's own shape. The short side grows to fit. */
-    if (fh0 / fw0 < cfg.ar) fh0 = fw0 * cfg.ar;
-    else fw0 = fh0 / cfg.ar;
-  } else {
-    // per-piece `minAr` for a deliberately wide strip
-    const MIN_AR = cfg.minAr ?? 0.55, MAX_AR = 1.7;
-    if (fh0 / fw0 < MIN_AR) fh0 = fw0 * MIN_AR;
-    if (fh0 / fw0 > MAX_AR) fw0 = fh0 / MAX_AR;
+  const frameFor = (box, vw, vh) => {
+    // `fill`: one share, or [x, y]
+    const [fillX, fillY] = Array.isArray(cfg.fill) ? cfg.fill : [cfg.fill ?? 0.62, cfg.fill ?? 0.62];
+    const bw = box[2] - box[0], bh = box[3] - box[1];
+    const cx = (box[0] + box[2]) / 2, cy = (box[1] + box[3]) / 2;
+    let fw0 = bw / fillX + padX * 2, fh0 = bh / fillY + padY * 2;
+    if (cfg.ar) {
+      /* Exact card proportion (height / width). tcosta.com/wspoc's still cards
+         are all 930x639, and a small component fills most of one — so a lone
+         icon gets a full-size card with the icon large in it, rather than a
+         card shrunk to the icon's own shape. The short side grows to fit. */
+      if (fh0 / fw0 < cfg.ar) fh0 = fw0 * cfg.ar;
+      else fw0 = fh0 / cfg.ar;
+    } else {
+      // per-piece `minAr` for a deliberately wide strip
+      const MIN_AR = cfg.minAr ?? 0.55, MAX_AR = 1.7;
+      if (fh0 / fw0 < MIN_AR) fh0 = fw0 * MIN_AR;
+      if (fh0 / fw0 > MAX_AR) fw0 = fh0 / MAX_AR;
+    }
+    const needW = fw0, needH = fh0;
+    fw0 = Math.min(fw0, vw); fh0 = Math.min(fh0, vh);
+    // slide, don't shrink, when the frame runs off an edge — keeps the size
+    const x0 = Math.round(Math.max(0, Math.min(vw - fw0, cx - fw0 / 2)));
+    // a `cut` frame ends on the cut: anchored to its bottom, the spare height goes above
+    const y0 = Math.round(Math.max(0, Math.min(vh - fh0, cfg.cut ? box[3] + padY - fh0 : cy - fh0 / 2)));
+    return { fw0, fh0, x0, y0, needW, needH };
+  };
+
+  let box = await measurePass(p.w, p.h);
+  if (!box) {
+    console.error(`  ✗ ${p.slug}: nothing matched ${focus} after 2 tries — skipped, old thumbnail kept`);
+    continue;
   }
-  fw0 = Math.min(fw0, p.w); fh0 = Math.min(fh0, p.h);
-  // slide, don't shrink, when the frame runs off an edge — keeps the size
-  const x0 = Math.round(Math.max(0, Math.min(p.w - fw0, cx - fw0 / 2)));
-  // a `cut` frame ends on the cut: anchored to its bottom, the spare height goes above
-  const y0 = Math.round(Math.max(0, Math.min(p.h - fh0, cfg.cut ? box[3] + padY - fh0 : cy - fh0 / 2)));
+  let close;
+  let VW = p.w, VH = p.h;
+  let F = frameFor(box, VW, VH);
+  /* The frame can be larger than the piece's preview viewport — a small
+     control at a small fill wants a lot of ground around it. It used to be
+     clamped to the viewport, which silently pinned every fill under ~0.5 on
+     the toggle to one identical, too-large framing. Now the viewport grows
+     to hold the frame and the piece is measured again at that size, since
+     a centred stage lays out against its viewport. */
+  if (F.needW > VW + 0.5 || F.needH > VH + 0.5) {
+    VW = Math.max(VW, Math.ceil(F.needW) + 2);
+    VH = Math.max(VH, Math.ceil(F.needH) + 2);
+    const again = await measurePass(VW, VH);
+    if (again) box = again;
+    F = frameFor(box, VW, VH);
+  }
+  const { fw0, fh0, x0, y0 } = F;
   const cw = Math.round(fw0);
   const ch = Math.round(fh0);
   // `outW` for a piece whose thin coloured strokes need more chroma resolution
@@ -502,7 +534,7 @@ for (const p of pieces) {
      height in CSS px. Undocumented, and passing all CSS px silently captured
      the empty stage up and to the left of the component. */
   await send("Emulation.setDeviceMetricsOverride", {
-    width: p.w, height: p.h, deviceScaleFactor: 0, mobile: false,
+    width: VW, height: VH, deviceScaleFactor: 0, mobile: false,
     viewport: { x: x0 * density, y: y0 * density, width: cw, height: ch, scale: 1 },
   });
   if (!(await open(p, focus, cfg))) {

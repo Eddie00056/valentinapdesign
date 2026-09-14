@@ -1,17 +1,17 @@
 {
   "stock-option-toggle": {
     "w": 1200,
-    "h": 728,
+    "h": 720,
     "seconds": 5.5
   },
   "limit-order-error": {
     "w": 1200,
-    "h": 854,
+    "h": 914,
     "seconds": 5.5
   },
   "fractional-shares-banner": {
     "w": 1200,
-    "h": 640,
+    "h": 768,
     "seconds": 5.5
   },
   "alert-creation": {
@@ -66,7 +66,7 @@
   },
   "holdings-empty-state": {
     "w": 1200,
-    "h": 1264,
+    "h": 1272,
     "seconds": 9
   }
 }
