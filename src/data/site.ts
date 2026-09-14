@@ -210,6 +210,8 @@ export const THUMBS: Record<
     crf?: number;
     /** Clip width; 1200 unless thin coloured strokes need the chroma resolution. */
     outW?: number;
+    /** Record from this page instead of the piece's own (a widget that only picks where a ticket listens). */
+    page?: string;
     pre?: Record<string, string | number>[];
     script?: Record<string, string | number>[];
   }
@@ -228,7 +230,7 @@ export const THUMBS: Record<
      cards, round or square ones tall cards; the component stays large in
      each (`fill`). */
   "stock-option-toggle": {
-    "focus": "button.lbl", "fill": 0.45, "ar": 0.6, "pad": 0, "seconds": 5.5,
+    "focus": "button.lbl", "fill": 0.3, "ar": 0.6, "pad": 0, "seconds": 5.5,
     "script": [{ "wait": 500 }, { "label": "Option" }, { "wait": 2100 }, { "label": "Stock" }]
   },
   "limit-order-error": {
@@ -278,8 +280,8 @@ export const THUMBS: Record<
      under a perspective (and the phone's drop-shadow filter) is rasterized
      without antialiasing, which is what stair-stepped the ring. */
   "order-placed-animation": {
-    "focus": ".opa-badge", "isolate": "#000", "fill": 0.5, "ar": 1.22, "pad": 0, "seconds": 4.6, "outW": 1800, "crf": 16,
-    "css": ".opa-glow, .opa-ripple, .opa-ripple2, .opa-ring-fill { display: none !important; } .opa-phone { filter: none !important; } .opa-screen { perspective: none !important; } .opa-badge { transform-style: flat !important; animation-name: op-pop2d !important; } @keyframes op-pop2d { 0% { transform: scale(1); } 22% { transform: scale(1.15); } 48% { transform: scale(0.95); } 72% { transform: scale(1.03); } 100% { transform: scale(1); } }"
+    "focus": ".opa-badge", "isolate": "#000", "fill": 0.32, "ar": 1.0, "pad": 0, "seconds": 4.6, "crf": 16,
+    "css": ".opa-glow, .opa-ripple, .opa-ripple2, .opa-ring-fill { display: none !important; } .opa-phone { filter: none !important; } .opa-screen { perspective: none !important; } .opa-badge { transform-style: flat !important; animation-name: op-pop2d !important; } @keyframes op-pop2d { 0% { transform: scale(1); } 38% { transform: scale(1.12); } 70% { transform: scale(0.97); } 100% { transform: scale(1); } } .opa-badge { animation-timing-function: cubic-bezier(0.33, 0, 0.2, 1) !important; }"
   },
   /* Only the swap toggle between Total amount and Share quantity. Each tap
      spins the drawn arrows a half turn as they push apart (the swap), and
@@ -300,10 +302,21 @@ export const THUMBS: Record<
       { "wait": 1900 }, { "label": "Decrease Quantity" }, { "wait": 450 }, { "label": "Decrease Quantity" }
     ]
   },
+  /* The bid and ask pills lighting under the pointer and being picked. Only
+     chain-to-order's copy of the chain picks (a ticket listens there), so
+     the clip is filmed from that page with everything but the chain hidden.
+     Bid 180 (sell), ask 185 (buy), then both again to unpick: the chain
+     ends with no pill lit, as it began. */
   "option-chain": {
-    "fill": 0.75, "ar": 0.58, "focus": ".oc-root", "pad": 0, "seconds": 6,
+    "page": "/work/chain-to-order",
+    "fill": 0.75, "ar": 0.58, "focus": ".oc-root", "isolate": "#141414", "pad": 0, "seconds": 8.5,
     "cut": { "sel": ".oc-row", "n": 7, "within": ".oc-scroll" },
-    "script": [{ "wait": 900 }, { "label": "Put" }, { "wait": 2600 }, { "label": "Call" }]
+    "script": [
+      { "wait": 600 }, { "click": "[aria-label^=\"Sell 180 call\"]" },
+      { "wait": 1300 }, { "click": "[aria-label^=\"Buy 185 call\"]" },
+      { "wait": 1600 }, { "click": "[aria-label^=\"Sell 180 call\"]" },
+      { "wait": 900 }, { "click": "[aria-label^=\"Buy 185 call\"]" }
+    ]
   },
   /* Only the Quantity box — its unit prefix, the count and the arrows —
      counting 10 up to 13 and back down, so the loop ends where it began. */
@@ -351,7 +364,7 @@ export const THUMBS: Record<
   "holdings-empty-state": {
     "focus": ".he-scene:not(.he-scene--lit) .he-grid", "isolate": "#000",
     "css": ".he-lens { display: none !important; } .he-logo img { opacity: 1 !important; }",
-    "fill": 0.26, "ar": 1.06, "pad": 0, "seconds": 9, "crf": 23
+    "fill": 0.18, "ar": 1.06, "pad": 0, "seconds": 9, "crf": 23
   }
 };
 

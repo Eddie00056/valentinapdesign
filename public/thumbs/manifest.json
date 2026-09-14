@@ -25,8 +25,8 @@
     "seconds": 6.6
   },
   "order-placed-animation": {
-    "w": 1800,
-    "h": 2198,
+    "w": 1200,
+    "h": 1200,
     "seconds": 4.6
   },
   "fractional-order-flow": {
@@ -41,8 +41,8 @@
   },
   "option-chain": {
     "w": 1200,
-    "h": 696,
-    "seconds": 6
+    "h": 694,
+    "seconds": 8.5
   },
   "stock-order-entry": {
     "w": 1200,
@@ -66,7 +66,7 @@
   },
   "holdings-empty-state": {
     "w": 1200,
-    "h": 1274,
+    "h": 1264,
     "seconds": 9
   }
 }

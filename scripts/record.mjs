@@ -355,9 +355,11 @@ async function prepare(cfg, focus) {
    the settle. A fixed sleep alone let a slow load start a recording against
    an empty page: options-strategy-builder once came out as a single blank
    frame because its script ran before the widget existed. */
-async function open(p, focus) {
+async function open(p, focus, cfg = {}) {
   for (let attempt = 0; attempt < 2; attempt++) {
-    await send("Page.navigate", { url: `${BASE}${p.href}?embed` });
+    // `page` records a piece from another page — the option chain picks
+    // quotes only where a ticket listens (chain-to-order)
+    await send("Page.navigate", { url: `${BASE}${cfg.page ?? p.href}?embed` });
     for (let i = 0; i < 60; i++) {
       if (await measure(focus)) {
         await sleep(SETTLE_MS);
@@ -402,7 +404,7 @@ for (const p of pieces) {
   for (let attempt = 0; attempt < 2 && !box; attempt++) {
     const closeMeasure = await launch(1);
     await send("Emulation.setDeviceMetricsOverride", { width: p.w, height: p.h, deviceScaleFactor: 1, mobile: false });
-    if (!(await open(p, focus))) { await closeMeasure(); continue; }
+    if (!(await open(p, focus, cfg))) { await closeMeasure(); continue; }
     await prepare(cfg, focus);
     await runPre().catch(() => {});
     let sampling = true;
@@ -503,7 +505,7 @@ for (const p of pieces) {
     width: p.w, height: p.h, deviceScaleFactor: 0, mobile: false,
     viewport: { x: x0 * density, y: y0 * density, width: cw, height: ch, scale: 1 },
   });
-  if (!(await open(p, focus))) {
+  if (!(await open(p, focus, cfg))) {
     await close();
     console.error(`  ✗ ${p.slug}: component never rendered for recording — skipped, old thumbnail kept`);
     continue;
