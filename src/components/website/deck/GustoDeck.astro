@@ -464,6 +464,8 @@ const title = (s: Slide): string | undefined =>
                         data-mode={l.mode || ""}
                         data-init={l.init || ""}
                         data-arrive={l.arrive || undefined}
+                        data-step={l.step || undefined}
+                        data-unstep={l.unstep || undefined}
                         data-clip={l.clip ? "1" : ""}
                         data-bw={bw}
                         data-bh={bh}
@@ -570,11 +572,30 @@ const title = (s: Slide): string | undefined =>
     const steps = (n: number) => parseInt(slides[n - 1]?.dataset.steps || "0", 10);
     let build = 0;
     let nextBuild: number | null = null;
+    /* A live frame can take part in a build: `step` is the INIT that plays
+       when the build reaches 1 (slide 32's bracket order attaching, at the
+       click, so it animates in), `unstep` the one that undoes it going back.
+       Off-slide frames are never stepped, and a frame that loads late picks
+       the state up when it is revealed. */
+    const applyStep = (f: HTMLIFrameElement) => {
+      if (!f.dataset.step || !f.dataset.loaded) return;
+      const on = f.closest(".gd-slide") === slides[i - 1] && build >= 1;
+      if (on === !!f.dataset.stepped) return;
+      try {
+        const name = on ? f.dataset.step : f.dataset.unstep;
+        if (name) INIT[name]?.(f.contentWindow, f.contentDocument!);
+      } catch {
+        /* same-origin always */
+      }
+      if (on) f.dataset.stepped = "1";
+      else delete f.dataset.stepped;
+    };
     const setBuild = (n: number, v: number) => {
       build = v;
       slides[n - 1]?.querySelectorAll<HTMLElement | SVGElement>("[data-s]").forEach((el) =>
         el.classList.toggle("is-on", parseInt(el.dataset.s || "0", 10) <= v),
       );
+      slides[n - 1]?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe[data-step]").forEach(applyStep);
     };
     const step = (dir: number) => {
       const max = steps(i);
@@ -726,6 +747,8 @@ const title = (s: Slide): string | undefined =>
         );
         btn?.click();
       },
+      // ...and taken off again (the build step going back)
+      closeBracket: (_w, d) => d.querySelector<HTMLElement>('[aria-label="Remove bracket order"]')?.click(),
       /* slide 79, "Beta release": the entry's css hides the open banner
          (the state stays open, so the chip never mounts — the tag is the
          fractional affordance here) and this sets a "Fractional" tag beside
@@ -978,6 +1001,7 @@ const title = (s: Slide): string | undefined =>
     const reveal = (f: HTMLIFrameElement) =>
       place(f).then(() => {
         runInit(f);
+        applyStep(f);
         f.dataset.initAt = String(performance.now());
         f.classList.add("is-in");
         if (f.closest(".gd-slide") === slides[i - 1]) runArrive(f);
@@ -987,6 +1011,7 @@ const title = (s: Slide): string | undefined =>
       f.classList.remove("is-in");
       delete f.dataset.loaded;
       delete f.dataset.inited;
+      delete f.dataset.stepped;
       f.removeAttribute("src");
     };
     let neighbours = new Set<number>();

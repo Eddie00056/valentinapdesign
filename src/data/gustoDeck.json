@@ -430,12 +430,14 @@
     "n": 32,
     "kind": "media",
     "bg": "black",
-    "shots": [
+    "steps": 1,
+    "corner": "Reducing time to trade",
+    "labels": [
       {
-        "src": "032full",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "text": "Updated widget design",
+        "x": 50.02,
+        "y": 29.8,
+        "size": "lg"
       }
     ],
     "live": [
@@ -449,7 +451,8 @@
         "vh": 960,
         "fit": ".wshell",
         "css": ".ob-stage{background:none!important}",
-        "init": "openBracket"
+        "step": "openBracket",
+        "unstep": "closeBracket"
       }
     ]
   },
