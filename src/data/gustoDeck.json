@@ -1239,13 +1239,22 @@
   {
     "n": 75,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
+    "corner": "Help traders find the correct symbol",
+    "labels": [
+      {
+        "text": "Original quote page",
+        "x": 26.88,
+        "y": 31.2,
+        "size": "lg"
+      }
+    ],
     "shots": [
       {
-        "src": "075full",
+        "src": "075a",
         "x": 0,
-        "y": 0,
-        "w": 100
+        "y": 33.2,
+        "w": 50
       }
     ]
   },
