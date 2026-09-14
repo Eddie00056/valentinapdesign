@@ -617,7 +617,7 @@ const title = (s: Slide): string | undefined =>
             st.textContent =
               "html,body,html[data-embed],html[data-embed] body{background:transparent!important}" +
               // page chrome that isn't the work: the dev toolbar (localhost) and the review-comments button
-              "astro-dev-toolbar,.cmt-root{display:none!important}" +
+              "astro-dev-toolbar,.cmt-root,.back,.oc-back{display:none!important}" +
               (f.dataset.css || "");
             d.head.appendChild(st);
             f.contentWindow!.addEventListener("keydown", (e) => {
