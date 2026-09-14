@@ -42,15 +42,98 @@ type Props = {
   priceInterval?: number;
   /** ms the "Placing your order" spinner holds before "done". */
   sendDelay?: number;
-  /** The fractional-limit edge case (presentation slide): a Limit quantity may
-      be typed as a fraction, and a fraction is refused with this variant's
-      message. Off by default. Also read from `?fractionError=v1|v2`. */
-  fractionError?: "v1" | "v2";
+  /** The fractional-limit edge case (presentation slides): a Limit quantity may
+      be typed as a fraction, and a fraction is refused — v1/v2 with a red
+      error, `hint` with a blue nudge to Market and a ring drawn round the
+      order-type pill. Off by default. Also read from `?fractionError=`. */
+  fractionError?: "v1" | "v2" | "hint";
 };
 
+const HINT_BLUE = "#1682FF";
+
+/* The limit-order-error ring (/work/limit-order-error), sized to this pill:
+   a stroke traces the perimeter from above the chevron, then hands over to a
+   solid ring with one soft pulse. */
+function PillRing({ on, w, h }: { on: boolean; w: number; h: number }) {
+  const [drawn, setDrawn] = useState(false);
+  const [glow, setGlow] = useState(false);
+  useEffect(() => {
+    if (!on) {
+      setDrawn(false);
+      setGlow(false);
+      return;
+    }
+    const t1 = window.setTimeout(() => {
+      setDrawn(true);
+      setGlow(true);
+    }, 320);
+    const t2 = window.setTimeout(() => setGlow(false), 370);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [on]);
+  if (!w || !h) return null;
+  const o = 2; // ring sits this far outside the pill
+  const sw = 2;
+  const W = w + 2 * o;
+  const H = h + 2 * o;
+  const t = sw / 2;
+  const r = H / 2 - t;
+  const d = `M${W - r - 6} ${t} H${W - t - r} A${r} ${r} 0 0 1 ${W - t - r} ${H - t} H${r + t} A${r} ${r} 0 0 1 ${r + t} ${t} Z`;
+  return (
+    <>
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: -o,
+          borderRadius: 1000,
+          border: `${sw}px solid ${HINT_BLUE}`,
+          pointerEvents: "none",
+          opacity: drawn ? 1 : 0,
+          boxShadow: glow ? "0 0 0 0px rgba(22,130,255,0.28)" : "0 0 0 7px rgba(22,130,255,0)",
+          transition: drawn ? "opacity 0.12s linear, box-shadow 0.44s cubic-bezier(0.2,0.7,0.3,1)" : "opacity 0.1s linear",
+        }}
+      />
+      <svg
+        aria-hidden="true"
+        width={W}
+        height={H}
+        viewBox={`0 0 ${W} ${H}`}
+        fill="none"
+        style={{ position: "absolute", left: -o, top: -o, pointerEvents: "none", overflow: "visible" }}
+      >
+        <path
+          d={d}
+          stroke={HINT_BLUE}
+          strokeWidth={sw}
+          strokeLinecap="round"
+          pathLength={100}
+          style={{
+            strokeDasharray: "101 100",
+            strokeDashoffset: on ? 0 : 102,
+            opacity: on && !drawn ? 1 : 0,
+            transition: on
+              ? "stroke-dashoffset 0.32s cubic-bezier(0.3,0.02,0.2,1), opacity 0.1s linear"
+              : "stroke-dashoffset 0.32s cubic-bezier(0.5,0,0.75,0), opacity 0.1s linear 0.27s",
+          }}
+        />
+      </svg>
+    </>
+  );
+}
+
 const ERROR_RED = "#D23F52";
-const fractionMessage = (v: "v1" | "v2", qty: string) =>
-  v === "v1" ? `Please use market order to trade ${qty} shares` : "To place a fractional trade use Market orders";
+const fractionMessage = (v: "v1" | "v2" | "hint", qty: string, hintShares?: string | null) => {
+  if (v === "v1") return `Please use market order to trade ${qty} shares`;
+  if (v === "v2") return "To place a fractional trade use Market orders";
+  /* names the quantity in the field. The hint is up from the "." on, before
+     its digit exists: a slide that knows what it will type passes the whole
+     value up front (?hintShares), so the message never rewrites itself */
+  const shares = hintShares || String(num(qty));
+  return `Switch to market order to buy ${shares} shares, as limit orders don’t support fractional trading yet.`;
+};
 
 const num = (s: string) => {
   const n = parseFloat(String(s).replace(/[^0-9.]/g, ""));
@@ -286,6 +369,7 @@ function FieldValue({
   selected = false,
   prefix = "$",
   roll = false,
+  tone = "#227C20",
 }: {
   value: string;
   caret: boolean;
@@ -293,6 +377,8 @@ function FieldValue({
   prefix?: string;
   /** roll changed digits like the quote does (a value that moves on its own) */
   roll?: boolean;
+  /** caret colour: the focus green, or the field's state colour */
+  tone?: string;
 }) {
   return (
     <div style={{ display: "flex", alignItems: "center", height: 24, cursor: "text" }}>
@@ -314,7 +400,7 @@ function FieldValue({
             width: 2,
             height: 19,
             marginLeft: 1,
-            background: "#227C20",
+            background: tone,
             animation: "fof-blink 1.06s step-end infinite",
           }}
         />
@@ -418,8 +504,26 @@ export function FractionalOrderFlow({
   useEffect(() => {
     if (fractionError) return;
     const v = new URLSearchParams(window.location.search).get("fractionError");
-    if (v === "v1" || v === "v2") setFracErr(v);
+    if (v === "v1" || v === "v2" || v === "hint") setFracErr(v);
   }, [fractionError]);
+  /* ?static: the quote holds still (a slide that shows a state, not a market) */
+  const [still, setStill] = useState(false);
+  const [hintShares, setHintShares] = useState<string | null>(null);
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    if (q.has("static")) setStill(true);
+    setHintShares(q.get("hintShares"));
+  }, []);
+  /* the order-type pill's size, for the hint ring */
+  const pillRef = useRef<HTMLButtonElement>(null);
+  const [pill, setPill] = useState({ w: 0, h: 0 });
+  useEffect(() => {
+    const el = pillRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setPill({ w: el.offsetWidth, h: el.offsetHeight }));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const screenRef = useRef(screen);
   screenRef.current = screen;
@@ -445,7 +549,7 @@ export function FractionalOrderFlow({
   };
 
   useEffect(() => {
-    if (!livePrice) return;
+    if (!livePrice || still) return;
     const id = window.setInterval(() => {
       if (screenRef.current !== "entry") return;
       setPrice((p) => {
@@ -457,7 +561,7 @@ export function FractionalOrderFlow({
       setSpreadUp(half());
     }, priceInterval);
     return () => clearInterval(id);
-  }, [livePrice, priceInterval]);
+  }, [livePrice, priceInterval, still]);
 
   const tap = (ch: string) => {
     const f = focusRef.current;
@@ -529,7 +633,9 @@ export function FractionalOrderFlow({
   const shares = isLimit ? num(qty) : num(amount) / RATE;
   const amt = isLimit ? shares * limitPx : num(amount);
   /* the edge case: a fraction typed into a Limit quantity is refused */
-  const qtyFraction = isLimit && !!fracErr && num(qty) % 1 !== 0;
+  /* v1/v2 refuse a real fraction; the hint answers the "." itself, the moment
+     a fraction starts being typed */
+  const qtyFraction = isLimit && !!fracErr && (fracErr === "hint" ? qty.includes(".") : num(qty) % 1 !== 0);
   const ready = amt > 0 && !qtyFraction;
   /* a limit's quantity is whole shares, so the pad's "." has nothing to do */
   const wholeShares = isLimit && focus === "qty" && !fracErr;
@@ -818,7 +924,9 @@ export function FractionalOrderFlow({
                     <Chevron />
                   </button>
                   <div style={{ position: "relative" }}>
+                    <PillRing on={qtyFraction && fracErr === "hint"} w={pill.w} h={pill.h} />
                     <motion.button
+                      ref={pillRef}
                       layout
                       transition={spring}
                       onClick={() => {
@@ -1084,7 +1192,7 @@ export function FractionalOrderFlow({
                     style={{
                       ...fieldBase,
                       boxShadow: qtyFraction
-                        ? `0 0 0 1.5px ${ERROR_RED}, 0px 4px 26px 0px rgba(0,0,0,0.05)`
+                        ? `0 0 0 1.5px ${fracErr === "hint" ? HINT_BLUE : ERROR_RED}, 0px 4px 26px 0px rgba(0,0,0,0.05)`
                         : ring(isLimit && keyboard && focus === "qty"),
                       transition: "box-shadow 0.18s ease",
                       cursor: isLimit ? "text" : "default",
@@ -1092,7 +1200,7 @@ export function FractionalOrderFlow({
                   >
                     <span style={fieldLabel}>Share quantity</span>
                     {isLimit ? (
-                      <FieldValue prefix="" value={qty} caret={keyboard && focus === "qty"} />
+                      <FieldValue prefix="" value={qty} caret={keyboard && focus === "qty"} tone={qtyFraction && fracErr === "hint" ? HINT_BLUE : undefined} />
                     ) : (
                       <div style={{ display: "flex", alignItems: "center", height: 24 }}>
                         <span style={fieldValue}>{shares ? shares.toFixed(3) : ""}</span>
@@ -1108,15 +1216,27 @@ export function FractionalOrderFlow({
                       initial={{ opacity: 0, y: -4 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: -4, transition: swapOut }}
-                      transition={spring}
-                      style={{ display: "flex", alignItems: "center", gap: 6, marginTop: -2, fontSize: 12, lineHeight: "18px", color: ERROR_RED }}
+                      /* the fade is quick and linear-ish so the message reads at the same
+                         moment the pill ring starts drawing; only the settle keeps the spring */
+                      transition={{ ...spring, opacity: reduced ? { duration: 0 } : { duration: 0.12, ease: "easeOut" } }}
+                      style={{ display: "flex", alignItems: fracErr === "hint" ? "flex-start" : "center", gap: 6, marginTop: -2, fontSize: 12, lineHeight: "18px", color: fracErr === "hint" ? HINT_BLUE : ERROR_RED }}
                     >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
-                        <circle cx="8" cy="8" r="6.9" stroke={ERROR_RED} strokeWidth="1.2" />
-                        <path d="M8 4.6v4.2" stroke={ERROR_RED} strokeWidth="1.4" strokeLinecap="round" />
-                        <circle cx="8" cy="11.2" r="0.85" fill={ERROR_RED} />
-                      </svg>
-                      <span>{fractionMessage(fracErr, qty)}</span>
+                      {fracErr === "hint" ? (
+                        <span style={{ display: "flex", flexShrink: 0, marginTop: 1 }}>
+                          {/* the fractional-shares glyph (glasslab/icons FractionalIcon), at 16 */}
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M18.31 9.87A8.46 8.46 0 1 0 9.85 18.33L9.85 9.87Z" stroke={HINT_BLUE} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M22.45 14A8.45 8.45 0 0 1 14 22.45L14 14Z" stroke={HINT_BLUE} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </span>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" style={{ flexShrink: 0 }}>
+                          <circle cx="8" cy="8" r="6.9" stroke={ERROR_RED} strokeWidth="1.2" />
+                          <path d="M8 4.6v4.2" stroke={ERROR_RED} strokeWidth="1.4" strokeLinecap="round" />
+                          <circle cx="8" cy="11.2" r="0.85" fill={ERROR_RED} />
+                        </svg>
+                      )}
+                      <span>{fractionMessage(fracErr, qty, hintShares)}</span>
                     </motion.div>
                   )}
 

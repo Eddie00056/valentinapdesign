@@ -595,9 +595,13 @@ N[90] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          # the quote frozen at $300.00, at the phones' old rects (top-aligned, bleeding off)
          "shots": [asset(f"090-limit-error-{v}", f"fractional-limit-error-{v}.png", x, 31.01, 38.2, quality=92)
                    for x, v in ((16.05, "v1"), (57.71, "v2"))]}
+# the same Limit screen as the V1/V2 slide (?static: quote frozen at $300.00), at their phone
+# size and height, centred; on arrival 1.5 is completed in the quantity and the blue hint +
+# the limit-order-error ring round the order pill play together
 N[91] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
-         "labels": [{"text": "Label", "x": 50.21, "y": 26.66, "size": "lg"}],  # placeholder
-         "live": [live("fractional-order-flow", 34.52, 29.53, 31.38, 70.47, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder")]}
+         "labels": [{"text": "Label", "x": 50, "y": 34.4, "size": "lg"}],  # placeholder
+         "live": [dict(live("fractional-order-flow?fractionError=hint&hintShares=1.5&static", 50 - 31.01 / 2, 38.2, 31.01, 61.8, css=FOF_BG,
+                            fit=".fof-frame", vh=1000, mode="width", init="fracHintSetup"), arrive="fracHintType")]}
 N[92] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "panels": [P(50, 50, LIGHT_PANEL)],
          "shots": [crop(92, 'a', 14.0, 16.8, 36.3, 90.4), crop(92, 'b', 59.5, 22.5, 91.0, 75.0)]}
@@ -614,8 +618,8 @@ SWITCHER = live("fractional-order-flow", 21.0, 16.3, 12.4, 20.2, css=FOF_BG,
 SWITCH_ICON = live("switch-icon", 21.0, 16.3, 12.4, 20.2, css=".si-stage{background:none!important}",
                    fit='[aria-label="Switch"]', vh=1000, clip=True, pad=30, init="switchLoop")
 _S95 = (6.4, 65.4, 45.9, 81.4)       # the white strip holding the banner icon
-# the PDF's three light cards drawn under the corner title (the crops' cards began at 4%,
-# behind it), the tiles re-centred on them; the phone at slide 97's phone height, contained
+# the PDF's three light cards drawn under the corner title (see slide 97), the tiles
+# re-centred on them; the phone at slide 97's phone height, contained in its rect
 _C95 = "#f7f7f7"
 CARDS_UNDER_TITLE = [{"x": 2.75, "y": 13.0, "w": 46.75, "h": 40.4, "c": _C95},
                      {"x": 2.75, "y": 55.6, "w": 46.75, "h": 40.4, "c": _C95},
