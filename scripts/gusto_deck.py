@@ -621,10 +621,11 @@ N[96] = {"kind": "media", "bg": "white", "labels": FRAC_LABELS,
 _T97 = (20.68, 62.78, 31.56, 83.98)  # the "Order sent" tile
 _P97 = (63.2, 14.0, 84.7, 88.9)      # the phone: the live boxed order-placement screen
 # the boxed ticket's fractional-shares error, typed out on a loop (its own page, so the
-# tile is the text alone), in the light-theme red on the card's ground
-TYPED_ERROR = live("typed-error", 14.1, 16.3, 24.0, 28.4,
-                   css=".te-stage{background:none!important}.te-block{color:#c02416!important}",
-                   fit=".te-block", vh=1000, clip=True, pad=12)
+# tile is the text alone), in the light-theme red on the card's ground. No fit: vw equals
+# the rect's width in slide px (24% of 1920), so the page draws 1:1 and its 16px is 16px on
+# the slide, the page's own stage centring the two lines in the rect.
+TYPED_ERROR = live("typed-error", 14.1, 16.3, 24.0, 28.4, vw=461,
+                   css=".te-stage{background:none!important}.te-block{color:#c02416!important}", clip=True)
 # the order-placed mark and caption on the card's ground: no phone, no page, the ring
 # track and captions re-inked for a light ground
 OPA_LIGHT = ('.opa-stage{background:none!important}.opa-phone{filter:none!important}'
