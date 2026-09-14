@@ -695,6 +695,37 @@ const title = (s: Slide): string | undefined =>
       // slide 81: the quote screen with its fractional banner already open
       openFractional: (_w, d) =>
         d.querySelector<HTMLElement>('[aria-label="Fractional shares"]')?.click(),
+      /* slide 79, "Beta release": the entry's css hides the open banner
+         (the state stays open, so the chip never mounts — the tag is the
+         fractional affordance here) and this sets a "Fractional" tag beside
+         the top icons in the banner's own colours (its strip #dce9f7, its
+         text #0066db), boxed like the icons beside it: 32 tall, 8 of
+         padding, the row's 8 gap. */
+      /* slide 79, "Original design": the PDF draws this column as HOOD —
+         the quote screen before fractional existed — so the name reads
+         Robinhood here; the entry's css hides the chip and the banner. */
+      notiveOriginal: (_w, d) => {
+        const walker = d.createTreeWalker(d.body, NodeFilter.SHOW_TEXT);
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+          if (n.nodeValue?.trim() === "Apple Inc") n.nodeValue = "Robinhood Markets Inc";
+        }
+      },
+      notiveBeta: (_w, d) => {
+        const row = d.querySelector<HTMLElement>(".nq-nav-right");
+        if (!row || row.querySelector(".gd-frac-tag")) return;
+        const tag = d.createElement("span");
+        tag.className = "gd-frac-tag";
+        tag.textContent = "Fractional";
+        /* The banner's material and nothing else: #dce9f7 under #0066db,
+           no rim, no shadow. Computed styles of chip and strip measure
+           identical (rgb(220,233,247)); a white rim, then a grey drop
+           shadow, each made the small chip read paler than the wide strip
+           beside white icons, so both are gone. */
+        tag.style.cssText =
+          "display:inline-flex;align-items:center;height:32px;padding:0 8px;border-radius:999px;" +
+          "background:#dce9f7;color:#0066db;font:400 12px/1 'Open Sans',Helvetica,Arial,sans-serif;flex:none;";
+        row.insertBefore(tag, row.firstChild);
+      },
       /* slide 95: the amount / quantity switcher, tapping itself — the
          arrowheads flip every two seconds. The frame's own timer, so it
          dies with the slide. */
@@ -849,7 +880,8 @@ const title = (s: Slide): string | undefined =>
       const name = f.dataset.init;
       if (!name || f.dataset.inited) return;
       try {
-        INIT[name]?.(f.contentWindow, f.contentDocument!);
+        // "a,b": several actions on one frame (slide 79 freezes the price walk beside its own set-up)
+        for (const n of name.split(",")) INIT[n.trim()]?.(f.contentWindow, f.contentDocument!);
         f.dataset.inited = "1";
       } catch {
         /* same-origin always; a missing element just leaves the default state */

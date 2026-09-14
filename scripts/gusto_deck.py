@@ -501,14 +501,27 @@ def releases(n, k):
 
 N[77] = releases(77, 1)
 N[78] = releases(78, 2)
-N[79] = releases(79, 1)
-N[79]["labels"] = releases(79, 3)["labels"]
-# the third card is drawn by the deck and holds the live fractional order
-# flow, bleeding off the card's bottom edge the way the release phones do
-N[79]["boxes"] = [{"x": x, "y": 23.8, "w": 28.44, "h": 55.0, "c": "#f6f6f6"} for x in (35.75, 67.37)]
-N[79]["live"] = [live("notive-quote", 40.1, 35.3, 20.75, 43.5, css=NQ_BG, fit=PHONE, vh=1000, mode="width", clip=True),
-                live("fractional-order-flow", 72.2, 35.2, 20.85, 43.6, css=FOF_BG, fit=".fof-frame",
-                      vh=1000, mode="width", clip=True)]
+# slide 79: the three releases are the live quote screen in three states,
+# exactly as the PDF's own slide 79 draws them (079a/b/c: the same light
+# screen — HOOD with nothing fractional; APPL with a "Fractional" tag; the
+# fractional banner at the top). One per column at the cards' old rects,
+# no grey cards. Original: chip and banner hidden by css, and the deck's
+# `notiveOriginal` init names it Robinhood as the PDF does. Beta: banner
+# hidden, a blue "Fractional" tag set beside the top icons by `notiveBeta`.
+# Public: the page as it is, banner open.
+NQ_ORIGINAL = NQ_BG + ".nq-banner,.nq-frac-slot{display:none!important}"
+# beta hides the banner AND the chip's (empty) 32px slot, or the tag sits
+# a slot's width from the star while the star sits 8 from the bell
+NQ_BETA = NQ_BG + ".nq-banner,.nq-frac-slot{display:none!important}"
+N[79] = {"kind": "media", "bg": "white", "corner": "How do I find the right symbol?",
+         # the phones run to 89.8 so the chart is in view (the crop at 78.8
+         # cut it), and the captions sit under them at the slide's foot
+         "labels": [{"text": t, "x": round(x + 14.22, 2), "y": 91.0, "size": "lg"} for x, t in RELEASES[:3]],
+         "live": [live("notive-quote", x, 23.8, 28.44, 66.0, css=css, fit=PHONE, vh=1000, mode="width", clip=True,
+                       init=init)
+                  # every column also freezes the price walk: the slide holds still
+                  for x, css, init in ((4.14, NQ_ORIGINAL, "notiveOriginal,freeze"), (35.75, NQ_BETA, "notiveBeta,freeze"),
+                                       (67.37, NQ_BG, "freeze"))]}
 # the live quote screen, as the slide draws it: large, bleeding off the bottom
 # both quote screens side by side, same size as when they were a slide each: the
 # plain one, then with its fractional banner open (81 is hidden in the overrides)

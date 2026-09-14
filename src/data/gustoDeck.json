@@ -1733,72 +1733,64 @@
    {
     "text": "Original design",
     "x": 18.36,
-    "y": 80.1,
+    "y": 91.0,
     "size": "lg"
    },
    {
     "text": "Beta release",
     "x": 49.97,
-    "y": 80.1,
+    "y": 91.0,
     "size": "lg"
    },
    {
     "text": "Public release",
     "x": 81.59,
-    "y": 80.1,
+    "y": 91.0,
     "size": "lg"
-   }
-  ],
-  "shots": [
-   {
-    "src": "079a",
-    "x": 4.14,
-    "y": 23.8,
-    "w": 28.44
-   }
-  ],
-  "boxes": [
-   {
-    "x": 35.75,
-    "y": 23.8,
-    "w": 28.44,
-    "h": 55.0,
-    "c": "#f6f6f6"
-   },
-   {
-    "x": 67.37,
-    "y": 23.8,
-    "w": 28.44,
-    "h": 55.0,
-    "c": "#f6f6f6"
    }
   ],
   "live": [
    {
     "page": "notive-quote",
-    "x": 40.1,
-    "y": 35.3,
-    "w": 20.75,
-    "h": 43.5,
+    "x": 4.14,
+    "y": 23.8,
+    "w": 28.44,
+    "h": 66.0,
+    "vw": 1280,
+    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+    "mode": "width",
+    "clip": true,
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000,
+    "init": "notiveOriginal,freeze"
+   },
+   {
+    "page": "notive-quote",
+    "x": 35.75,
+    "y": 23.8,
+    "w": 28.44,
+    "h": 66.0,
+    "vw": 1280,
+    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+    "mode": "width",
+    "clip": true,
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000,
+    "init": "notiveBeta,freeze"
+   },
+   {
+    "page": "notive-quote",
+    "x": 67.37,
+    "y": 23.8,
+    "w": 28.44,
+    "h": 66.0,
     "vw": 1280,
     "css": ".nq-root,.phone-stage{background:none!important}",
     "mode": "width",
     "clip": true,
     "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   },
-   {
-    "page": "fractional-order-flow",
-    "x": 72.2,
-    "y": 35.2,
-    "w": 20.85,
-    "h": 43.6,
-    "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "mode": "width",
-    "clip": true,
-    "fit": ".fof-frame",
-    "vh": 1000
+    "vh": 1000,
+    "init": "freeze"
    }
   ]
  },

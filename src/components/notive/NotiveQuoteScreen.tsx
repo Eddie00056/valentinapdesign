@@ -391,9 +391,10 @@ export function NotiveQuoteScreen({
      Sans throughout (user: "don't change the font type"). */
   const header = (
     <div className="nq-head">
-      {/* -5: the scroller's content edge is 67 below the screen top (plate
-          liner + 50 + 16); the artboard's nav row starts at 62. */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: -5 }}>
+      {/* -3: the scroller's content edge is 67 below the screen top (plate
+          liner + 50 + 16); the artboard's nav row starts at 62, and the
+          user asked for it 2 lower than that (2026-09-14). */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: -3 }}>
         {/* The shared mobile icon set (glasslab) — the same Back / Watchlist
             / Alert the alert-creation header renders, at the set's own 32px
             box and 16px glyph, with that header's tap motion: the set's
@@ -404,13 +405,13 @@ export function NotiveQuoteScreen({
             spec, applied in notive-quote.css; the geometry is the
             library's. */}
         <BackButton variant="light" />
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <div className="nq-nav-right" style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {/* The compact half of the fractional card, in the slot
               alert-creation gives it: left of Watchlist, a fixed 32px box
               (the icon set's) so the row never reflows as the card morphs in
               and out. The chip is the fractional-shares banner's blue chip
               with its mark — see `.nq-frac`. */}
-          <div style={{ width: 32, height: 32, flex: "none", position: "relative" }}>
+          <div className="nq-frac-slot" style={{ width: 32, height: 32, flex: "none", position: "relative" }}>
             {!fracOpen && (
               <motion.div
                 layoutId="nq-frac-card"
@@ -577,12 +578,13 @@ export function NotiveQuoteScreen({
       {fracOpen && (
         <motion.div
           key="nq-frac-slot"
+          className="nq-banner"
           exit={{ height: 0, marginTop: 0, transition: { duration: 0.12, ease: [0.4, 0, 0.2, 1] } }}
-          /* A full-bleed band with 16px padding, so its mark and text sit
-             16 from the phone's edge with everything else (user,
-             2026-09-14: "all the content 16px left and right … all the
-             icons and text … from the mockup"). */
-          style={{ position: "relative", marginLeft: -16, marginRight: -16, height: 40, marginTop: 18 }}
+          /* A rounded card on the 16px column, not a full-bleed band (user,
+             2026-09-14: "a smaller banner with rounded corners" — it had
+             been reverted to a band when the section cards came out). Its
+             own 12px of padding sets the mark and text inside it. */
+          style={{ position: "relative", height: 40, marginTop: 18 }}
         >
           <motion.div
             layoutId="nq-frac-card"
@@ -592,7 +594,7 @@ export function NotiveQuoteScreen({
               setFracSettled(true);
             }}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1, borderRadius: 0, transition: { duration: 0.16 } }}
+            animate={{ opacity: 1, borderRadius: 12, transition: { duration: 0.16 } }}
             exit={{ opacity: 0, transition: { duration: 0.1 } }}
             role="button"
             tabIndex={0}
@@ -614,7 +616,7 @@ export function NotiveQuoteScreen({
               display: "flex",
               alignItems: "center",
               gap: 8,
-              padding: "0 16px",
+              padding: "0 12px",
               boxSizing: "border-box",
               background: FRAC_TINT,
               color: FRAC,
