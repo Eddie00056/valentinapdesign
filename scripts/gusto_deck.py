@@ -499,29 +499,32 @@ def releases(n, k):
             "shots": [crop(n, "abc"[i], x, 23.8, x + 28.44, 78.8, strip=STRIP) for i, (x, _) in enumerate(RELEASES[:k])]}
 
 
-N[77] = releases(77, 1)
-N[78] = releases(78, 2)
-# slide 79: the three releases are the live quote screen in three states,
-# exactly as the PDF's own slide 79 draws them (079a/b/c: the same light
-# screen — HOOD with nothing fractional; APPL with a "Fractional" tag; the
-# fractional banner at the top). One per column at the cards' old rects,
-# no grey cards. Original: chip and banner hidden by css, and the deck's
-# `notiveOriginal` init names it Robinhood as the PDF does. Beta: banner
-# hidden, a blue "Fractional" tag set beside the top icons by `notiveBeta`.
-# Public: the page as it is, banner open.
+# slides 77-79: the releases, built up one screen per slide — Original;
+# Original + Beta; all three — as live quote screens at fixed columns, so
+# each advance adds a phone without moving the others. Captions on top,
+# under the corner title; phones from 33% down, running off the slide's
+# foot (the top two thirds of the screen: header, quote, chart, rail).
+# Original: chip and banner hidden by css, named Robinhood by the deck's
+# `notiveOriginal` init. Beta: banner + empty chip slot hidden, a
+# "Fractional" tag beside the top icons by `notiveBeta`. Public: the page
+# as it is, banner open. Every column also freezes the price walk.
 NQ_ORIGINAL = NQ_BG + ".nq-banner,.nq-frac-slot{display:none!important}"
-# beta hides the banner AND the chip's (empty) 32px slot, or the tag sits
-# a slot's width from the star while the star sits 8 from the bell
 NQ_BETA = NQ_BG + ".nq-banner,.nq-frac-slot{display:none!important}"
-N[79] = {"kind": "media", "bg": "white", "corner": "How do I find the right symbol?",
-         # the phones run to 89.8 so the chart is in view (the crop at 78.8
-         # cut it), and the captions sit under them at the slide's foot
-         "labels": [{"text": t, "x": round(x + 14.22, 2), "y": 91.0, "size": "lg"} for x, t in RELEASES[:3]],
-         "live": [live("notive-quote", x, 23.8, 28.44, 66.0, css=css, fit=PHONE, vh=1000, mode="width", clip=True,
-                       init=init)
-                  # every column also freezes the price walk: the slide holds still
-                  for x, css, init in ((4.14, NQ_ORIGINAL, "notiveOriginal,freeze"), (35.75, NQ_BETA, "notiveBeta,freeze"),
-                                       (67.37, NQ_BG, "freeze"))]}
+RELEASE_SCREENS = [(NQ_ORIGINAL, "notiveOriginal,freeze"), (NQ_BETA, "notiveBeta,freeze"), (NQ_BG, "freeze")]
+
+
+def releases_live(k):
+    return {"kind": "media", "bg": "white", "corner": "How do I find the right symbol?",
+            # caption box (21px type, ~25px tall) ends 5px above the phone's top edge at 33%
+            "labels": [{"text": t, "x": round(x + 14.22, 2), "y": 30.2, "size": "lg"} for x, t in RELEASES[:k]],
+            "live": [live("notive-quote", x, 33.0, 28.44, 67.0, css=css, fit=PHONE, vh=1000, mode="width", clip=True,
+                          init=init)
+                     for (x, _), (css, init) in zip(RELEASES[:k], RELEASE_SCREENS[:k])]}
+
+
+N[77] = releases_live(1)
+N[78] = releases_live(2)
+N[79] = releases_live(3)
 # the live quote screen, as the slide draws it: large, bleeding off the bottom
 # both quote screens side by side, same size as when they were a slide each: the
 # plain one, then with its fractional banner open (81 is hidden in the overrides)
@@ -555,8 +558,12 @@ N[86] = {"kind": "media", "bg": "white", "corner": "How does an advanced trader 
 N[87] = {"kind": "media", "bg": "white", "corner": "Happy path", "corner2": {"text": "Happy path", "x": 55.2},
          "panels": [P(50, 50, LIGHT_PANEL)],
          "labels": [{"text": "Old design", "x": 26.99, "y": 13.2}, {"text": "Updated design", "x": 73.57, "y": 13.2}],
-         "live": [live("order-placement", 17.77, 20.09, 18.4, 69.62, css=PHONE_BG, fit=PHONE, vh=1000, mode="width"),
-                  live("order-placement-boxed-single", 64.22, 15.19, 18.7, 74.13, css=PHONE_BG, fit=PHONE, vh=1000)]}
+         # both columns are the boxed ticket; "Old design" is the same screen
+         # before the shares / dollar switcher (same label, no chevron)
+         # rects are the phone's own aspect (1218x2475) at 850 canvas px tall,
+         # tops 6px under the labels; the old design also loses the fractional button
+         "live": [live("order-placement-boxed", 16.09, 15.84, 21.79, 78.7, css=PHONE_BG + ".opb-frac-btn{visibility:hidden!important}", fit=PHONE, vh=1000, init="quantityOnly"),
+                  live("order-placement-boxed", 62.67, 15.84, 21.79, 78.7, css=PHONE_BG, fit=PHONE, vh=1000)]}
 N[88] = {"kind": "numbered", "bg": "white", "corner": "Design process",
          "items": ["Happy path design", "Order type navigation", "Symbol discoverability"], "active": [1]}
 N[89] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",

@@ -1677,16 +1677,24 @@
    {
     "text": "Original design",
     "x": 18.36,
-    "y": 80.1,
+    "y": 30.2,
     "size": "lg"
    }
   ],
-  "shots": [
+  "live": [
    {
-    "src": "077a",
+    "page": "notive-quote",
     "x": 4.14,
-    "y": 23.8,
-    "w": 28.44
+    "y": 33.0,
+    "w": 28.44,
+    "h": 67.0,
+    "vw": 1280,
+    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+    "mode": "width",
+    "init": "notiveOriginal,freeze",
+    "clip": true,
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
    }
   ]
  },
@@ -1699,28 +1707,44 @@
    {
     "text": "Original design",
     "x": 18.36,
-    "y": 80.1,
+    "y": 30.2,
     "size": "lg"
    },
    {
     "text": "Beta release",
     "x": 49.97,
-    "y": 80.1,
+    "y": 30.2,
     "size": "lg"
    }
   ],
-  "shots": [
+  "live": [
    {
-    "src": "078a",
+    "page": "notive-quote",
     "x": 4.14,
-    "y": 23.8,
-    "w": 28.44
+    "y": 33.0,
+    "w": 28.44,
+    "h": 67.0,
+    "vw": 1280,
+    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+    "mode": "width",
+    "init": "notiveOriginal,freeze",
+    "clip": true,
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
    },
    {
-    "src": "078b",
+    "page": "notive-quote",
     "x": 35.75,
-    "y": 23.8,
-    "w": 28.44
+    "y": 33.0,
+    "w": 28.44,
+    "h": 67.0,
+    "vw": 1280,
+    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
+    "mode": "width",
+    "init": "notiveBeta,freeze",
+    "clip": true,
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
    }
   ]
  },
@@ -1733,19 +1757,19 @@
    {
     "text": "Original design",
     "x": 18.36,
-    "y": 91.0,
+    "y": 30.2,
     "size": "lg"
    },
    {
     "text": "Beta release",
     "x": 49.97,
-    "y": 91.0,
+    "y": 30.2,
     "size": "lg"
    },
    {
     "text": "Public release",
     "x": 81.59,
-    "y": 91.0,
+    "y": 30.2,
     "size": "lg"
    }
   ],
@@ -1753,44 +1777,44 @@
    {
     "page": "notive-quote",
     "x": 4.14,
-    "y": 23.8,
+    "y": 33.0,
     "w": 28.44,
-    "h": 66.0,
+    "h": 67.0,
     "vw": 1280,
     "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
     "mode": "width",
+    "init": "notiveOriginal,freeze",
     "clip": true,
     "fit": "img[src*=\"iphone\"]",
-    "vh": 1000,
-    "init": "notiveOriginal,freeze"
+    "vh": 1000
    },
    {
     "page": "notive-quote",
     "x": 35.75,
-    "y": 23.8,
+    "y": 33.0,
     "w": 28.44,
-    "h": 66.0,
+    "h": 67.0,
     "vw": 1280,
     "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
     "mode": "width",
+    "init": "notiveBeta,freeze",
     "clip": true,
     "fit": "img[src*=\"iphone\"]",
-    "vh": 1000,
-    "init": "notiveBeta,freeze"
+    "vh": 1000
    },
    {
     "page": "notive-quote",
     "x": 67.37,
-    "y": 23.8,
+    "y": 33.0,
     "w": 28.44,
-    "h": 66.0,
+    "h": 67.0,
     "vw": 1280,
     "css": ".nq-root,.phone-stage{background:none!important}",
     "mode": "width",
+    "init": "freeze",
     "clip": true,
     "fit": "img[src*=\"iphone\"]",
-    "vh": 1000,
-    "init": "freeze"
+    "vh": 1000
    }
   ]
  },
@@ -2032,23 +2056,23 @@
   ],
   "live": [
    {
-    "page": "order-placement",
-    "x": 17.77,
-    "y": 20.09,
-    "w": 18.4,
-    "h": 69.62,
+    "page": "order-placement-boxed",
+    "x": 16.09,
+    "y": 15.84,
+    "w": 21.79,
+    "h": 78.7,
     "vw": 1280,
-    "css": ".phone-stage{background:none!important}",
-    "mode": "width",
+    "css": ".phone-stage{background:none!important}.opb-frac-btn{visibility:hidden!important}",
     "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
+    "vh": 1000,
+    "init": "quantityOnly"
    },
    {
-    "page": "order-placement-boxed-single",
-    "x": 64.22,
-    "y": 15.19,
-    "w": 18.7,
-    "h": 74.13,
+    "page": "order-placement-boxed",
+    "x": 62.67,
+    "y": 15.84,
+    "w": 21.79,
+    "h": 78.7,
     "vw": 1280,
     "css": ".phone-stage{background:none!important}",
     "fit": "img[src*=\"iphone\"]",
