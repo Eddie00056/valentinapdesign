@@ -202,6 +202,13 @@
   width: 12px;
   height: 12px;
 }
+/* In the expanded banner the mark matches the 14px close (user,
+   2026-09-14) — a 12 -> 14 step the shared-layout morph animates, which
+   at this size is invisible. */
+.nq-frac-glyph--banner img {
+  width: 14px;
+  height: 14px;
+}
 
 /* ---- Buy / Sell ----
    The fractional order flow's own CTA, by value: 44 tall, a 100 radius,
@@ -261,27 +268,3 @@
   }
 }
 
-/* ---- the Key statistics panel ----
-   Liquid glass, built from `glasslab.css`'s `.pshell-glass` — this project's
-   light large-surface spec (blur 18, a white fill at ~0.8, a soft low shadow)
-   — plus `.nq-glass`'s masked rim and the library's real
-   `.inner-stroke--light` highlight, so the panel is the same material as the
-   range pill rather than a second kind of glass.
-
-   `saturate(1.15)` rides along with the blur per the widget shell's note: it
-   only bites when something varied sits behind the panel, and costs nothing
-   over a flat ground while keeping the treatment honest. */
-.nq-card {
-  background: rgba(255, 255, 255, 0.72);
-  -webkit-backdrop-filter: blur(18px) saturate(1.15);
-  backdrop-filter: blur(18px) saturate(1.15);
-  box-shadow: 0 8px 24px rgba(20, 28, 24, 0.05);
-}
-
-/* 11, not 12 — the widget shell's own note applies here too: the panel
-   rounds at 12 on its border box and the highlight sits 1px inside it, so
-   what it has to trace is 11. `.inner-stroke` ships at 1000px because every
-   other thing wearing it is a pill. */
-.nq-card > .inner-stroke {
-  border-radius: 11px;
-}

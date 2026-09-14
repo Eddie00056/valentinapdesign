@@ -12,7 +12,7 @@ import { pxHub, PX_BASE, PX_STEP } from "../alertscreen/priceHub";
 import type { PriceState } from "../alertscreen/priceHub";
 import { LiveAreaChart } from "../labs/LiveAreaChart";
 import { Rolling } from "../shared/RollingNumber";
-import { BackButton, WatchlistButton, AlertButton, AppleIcon } from "../glasslab/GlassButton";
+import { BackButton, WatchlistButton, AlertButton } from "../glasslab/GlassButton";
 
 /* The fractional mark — the same image /work/fractional-shares-banner
    draws in its chip (the user's call: "just reuse that icon"). */
@@ -63,7 +63,7 @@ const DOWN_CHIP_INK = "#b3261e";
    screen's green: the fractional story is one thing across the two
    screens, and this row is where they meet. */
 const FRAC = "#0066db";
-const FRAC_TINT = "#eaf1fd";
+const FRAC_TINT = "#dce9f7"; // the banner strip (user, 2026-09-14: "make the banner DCE9F7")
 
 /* The change line's pair, sampled off the Wealthsimple capture the header
    was rebuilt against (2026-09-13): a touch warmer and lower-chroma than
@@ -172,7 +172,7 @@ const CHART_PAD_B = 18;
 const START_FROM_BOTTOM = 0.12;
 const PROGRESS = 0.56; // "now" — the constant both house charts already share
 
-/* Both panels are the same glass card with a heading, and both carry the
+/* Both panels are the same section with a heading, and both carry the
    same two-column label/value grid — so neither is written twice. */
 function Panel({
   title,
@@ -183,27 +183,14 @@ function Panel({
   marginTop: number;
   children: ReactNode;
 }) {
+  /* A plain section on the 16px column — the glass card it used to be
+     (white .72 + blur + rim + inner highlight, 8 off the edge) was removed
+     on request (user, 2026-09-14: "remove the white card and make all the
+     content have 16px left and right padding … from the mockup"). */
   return (
-    <div
-      className="nq-glass nq-card"
-      style={{
-        /* The card's edge sits 8 from the screen and its 16px padding
-           puts the text back on the 16 column — every label lines up with
-           the price and the name above. */
-        margin: `${marginTop}px -8px 0`,
-        borderRadius: 12,
-        padding: "16px 16px 20px",
-        boxSizing: "border-box",
-      }}
-    >
-      <span className="inner-stroke inner-stroke--light" />
-      {/* The highlight is a positioned element at z-index 3; static content
-          paints before it and would sit underneath. z-index 4 is what
-          GlassButton gives its own label for exactly this reason. */}
-      <div style={{ position: "relative", zIndex: 4 }}>
-        <div style={{ fontSize: 19, fontWeight: 600, lineHeight: "26px", color: INK }}>{title}</div>
-        {children}
-      </div>
+    <div style={{ marginTop }}>
+      <div style={{ fontSize: 19, fontWeight: 600, lineHeight: "26px", color: INK }}>{title}</div>
+      {children}
     </div>
   );
 }
@@ -271,7 +258,7 @@ const SNAP = { type: "spring", stiffness: 500, damping: 45 } as const;
 const MORPH = { type: "spring", visualDuration: 0.34, bounce: 0 } as const;
 
 export function NotiveQuoteScreen({
-  fractionalBanner = false,
+  fractionalBanner = true, // opens with the strip up (user, 2026-09-14)
 }: {
   /** Land with the full-width fractional-shares strip already up. Off by
       default — the screen opens on the compact chip, and tapping it is what
@@ -509,27 +496,9 @@ export function NotiveQuoteScreen({
           with "USD" at 15/600 on the same baseline, 7 to its left edge;
           then the change at 14/600, its baseline 24 under the price's.
           The face is Open Sans throughout, as ever. */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 18 }}>
-        <span
-          aria-hidden="true"
-          style={{
-            /* 24, down from 32 ("the fill background is too big, shrink
-               it", 2026-09-13) — the 15px mark now fills it the way the
-               artboard's does. Radius scales with it. */
-            width: 24,
-            height: 24,
-            flex: "none",
-            borderRadius: 6,
-            background: "#000",
-            color: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            lineHeight: 0,
-          }}
-        >
-          <AppleIcon size={15} /> {/* 20 / 1.3 — "the icon looks the same size as the background" */}
-        </span>
+      {/* Name only — the black logo tile was removed on request
+          (2026-09-14). The row keeps the artboard's 18 under the nav. */}
+      <div style={{ display: "flex", alignItems: "center", marginTop: 18 }}>
         <span style={{ fontSize: 12, fontWeight: 400, lineHeight: "16px", color: HEAD_NAME }}>
           {NAME}
         </span>
@@ -538,9 +507,13 @@ export function NotiveQuoteScreen({
       {/* 34, down from the artboard's 40 (user, 2026-09-13: "reduce the
           hero price font"). The odometer's cells are 1.15em boxes: at 34px
           the digits' cap top sits 8.4px below the cell top and their
-          baseline 6.4px above its bottom — the 2px margin keeps the cap top
-          10 under the tile, and the USD tag's padding lifts its baseline
-          onto the price's. */}
+          baseline 6.4px above its bottom; the USD tag's padding lifts its
+          baseline onto the price's. */}
+      {/* The two ink gaps around the price are equal (user, 2026-09-14):
+          14px from the name's baseline to the price's cap top, and 14px
+          from the price's baseline to the change line's cap top. Name:
+          baseline 3.4 above its 16px box, odometer cap top 8.4 below the
+          cell top -> 3.4 + 2 + 8.4 = 14. */}
       <div style={{ display: "flex", alignItems: "flex-end", marginTop: 2 }}>
         <Rolling
           value={"$" + money(price)}
@@ -568,8 +541,11 @@ export function NotiveQuoteScreen({
 
       <div
         style={{
-          marginTop: 5, // keeps the artboard's 24px baseline-to-baseline under the smaller price
-          fontSize: 14,
+          /* Price baseline 6.4 above its cell, change cap top 2.1 below
+             its line-height-1 box -> 6.4 + 5.5 + 2.1 = 14, the same gap as
+             above the price. */
+          marginTop: 5.5,
+          fontSize: 12, // was 14; "make them both 12", matching the name
           fontWeight: 600,
           lineHeight: 1,
           whiteSpace: "pre",
@@ -584,12 +560,13 @@ export function NotiveQuoteScreen({
   );
 
   const banner = (
-    /* The slot is mounted at its FINAL geometry (40 tall, 12 under the nav
-       row) and never tweens on open. It used to animate height / marginTop
-       0 -> 40 / 12 alongside the card's shared-layout morph, and that is
+    /* The slot is mounted at its FINAL geometry (40 tall, 18 under the nav
+       row — the same 18 the name row keeps under it, so the strip sits in
+       equal air above and below; user, 2026-09-14) and never tweens on open. It used to animate height / marginTop
+       0 -> 40 / 18 alongside the card's shared-layout morph, and that is
        what made the open hitch: Motion measures a `layoutId` target once,
        on mount — an ancestor whose margin then tweens moves the real box
-       12px after the target was taken, so the card "almost got there,
+       18px after the target was taken, so the card "almost got there,
        stopped, jumped". With the slot static the target is true from frame
        one, and the content below slides via its own `layout="position"`
        animation (see the render), measured in the same LayoutGroup pass.
@@ -601,7 +578,11 @@ export function NotiveQuoteScreen({
         <motion.div
           key="nq-frac-slot"
           exit={{ height: 0, marginTop: 0, transition: { duration: 0.12, ease: [0.4, 0, 0.2, 1] } }}
-          style={{ position: "relative", marginLeft: -16, marginRight: -16, height: 40, marginTop: 12 }}
+          /* A full-bleed band with 16px padding, so its mark and text sit
+             16 from the phone's edge with everything else (user,
+             2026-09-14: "all the content 16px left and right … all the
+             icons and text … from the mockup"). */
+          style={{ position: "relative", marginLeft: -16, marginRight: -16, height: 40, marginTop: 18 }}
         >
           <motion.div
             layoutId="nq-frac-card"
@@ -643,7 +624,7 @@ export function NotiveQuoteScreen({
           >
             <motion.span
               layoutId="nq-frac-glyph"
-              className="nq-frac-glyph"
+              className="nq-frac-glyph nq-frac-glyph--banner"
               transition={{ layout: fracGlyphPop }}
               style={{ flex: "none", lineHeight: 0 }}
             >
@@ -652,7 +633,7 @@ export function NotiveQuoteScreen({
                 animate={{ scale: 1, opacity: 1, transition: fracGlyphPop }}
                 style={{ display: "block" }}
               >
-                <img src={MARK_SRC} alt="" width={12} height={12} />
+                <img src={MARK_SRC} alt="" width={14} height={14} />
               </motion.span>
             </motion.span>
 
@@ -664,7 +645,7 @@ export function NotiveQuoteScreen({
                 flex: 1,
                 minWidth: 0,
                 fontSize: 12,
-                fontWeight: 600,
+                fontWeight: 400, // regular, per the user (2026-09-14)
                 lineHeight: 1,
                 whiteSpace: "nowrap",
                 overflow: "hidden",
@@ -799,13 +780,13 @@ export function NotiveQuoteScreen({
   );
 
   const statsCard = (
-    <Panel title="Key statistics" marginTop={32}>
+    <Panel title="Key statistics" marginTop={48}>
       <Facts rows={stats} />
     </Panel>
   );
 
   const about = (
-    <Panel title={`About ${NAME.replace(/ Inc\.?$/, "")}`} marginTop={16}>
+    <Panel title={`About ${NAME.replace(/ Inc\.?$/, "")}`} marginTop={40}>
       {/* Motion animates the box; the clamp is what produces the ellipsis,
           and it flips instantly in both directions so the text is already
           the right shape before the height starts moving. `height: auto`
