@@ -40,6 +40,44 @@
   letter-spacing: 0;
 }
 
+/* ---- the header ----
+   Rebuilt against a Wealthsimple quote screenshot (2026-09-13): its sizes,
+   weights, spacing and colours, in the house face. The typeface stays Open
+   Sans on request ("make sure you don't change the font type"). */
+/* The nav row's two white plates — the back disc and the star + bell pill
+   — 44 tall with black glyphs, and no shadow: on the screenshot's light
+   ground they read as flat white shapes. The disc is a button and the pill
+   is a div holding two; `background` is stated here because the scoped
+   reset above deliberately leaves it alone. */
+.nq-nav {
+  height: 44px;
+  flex: none;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: #fff;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+}
+.nq-root button.nq-nav-glyph {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #000;
+  line-height: 0;
+  flex: none;
+}
+/* The glyph is drawn a size up to fill the box (its path has side bearings
+   on the 24 grid) — as a flex item it would otherwise shrink back to the
+   box. */
+.nq-root button.nq-nav-glyph > svg {
+  flex: none;
+}
+
 /* Scrollbar off — the 24px left/right padding has to read as symmetric, and
    a classic scrollbar eats into the right inset and shifts the chart's
    negative-margin bleed. Matches iOS, where the scrollbar is an overlay. */

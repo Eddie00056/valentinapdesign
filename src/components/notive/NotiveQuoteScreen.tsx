@@ -9,7 +9,7 @@ import { pxHub, PX_BASE, PX_STEP } from "../alertscreen/priceHub";
 import type { PriceState } from "../alertscreen/priceHub";
 import { LiveAreaChart } from "../labs/LiveAreaChart";
 import { Rolling } from "../shared/RollingNumber";
-import { SearchIcon, CloseIcon, FractionalIcon, AppleIcon } from "../glasslab/GlassButton";
+import { StarFilledIcon, BellIcon, FractionalIcon, AppleIcon } from "../glasslab/GlassButton";
 
 /* Notive — "Quote - Fractional".
  *
@@ -43,14 +43,12 @@ const MUTED = "#5e6d83"; // stat labels
    inverted for a light ground) and read as the chart getting heavier
    towards "now"; the elapsed session is separated by alpha instead. */
 const UP_LINE = "#389b3c";
-const UP_TEXT = "#087346"; // the change figure
 const UP_CHIP_INK = "#227c20"; // selected range label, and the Buy button
 
 /* The artboard never draws a down day. These are the Material tone-40/30
    reds that sit where the greens above sit on their own ramp, so a red
    session is the same design with one hue swapped — not a second style. */
 const DOWN_LINE = "#b3261e";
-const DOWN_TEXT = "#8c1d18";
 const DOWN_CHIP_INK = "#b3261e";
 
 /* Fractional is blue on both prototypes — the order flow's accent, and the
@@ -60,12 +58,23 @@ const DOWN_CHIP_INK = "#b3261e";
 const FRAC = "#0066db";
 const FRAC_TINT = "#eaf1fd";
 
+/* ---- the header's own palette, sampled off the Wealthsimple screenshot
+   the header was rebuilt against (2026-09-13). Pure black for the price,
+   one grey for the name and the USD tag, and a red / green pair for the
+   change line that sit a touch warmer and lower-chroma than the chart's
+   greens below — the app colours the whole line, label included, so the
+   figure never has to carry the hue on its own. */
+const HEAD_INK = "#000000";
+const HEAD_MUTED = "#6d6d6d";
+const HEAD_UP = "#477746";
+const HEAD_DOWN = "#b03424";
+
 const UP_RGB = "56,155,60";
 const DOWN_RGB = "179,38,30";
 
 /* ---- instrument ---- */
 const SYMBOL = "AAPL";
-const NAME = "Apple Inc.";
+const NAME = "Apple Inc"; // no period — the screenshot has none
 const REST = 325.51; // the artboard's quote — where every series ends
 const PREV_CLOSE = 320.88; // REST - 4.63, see the note above
 /* The shared price clock walks around PX_BASE (194.29) and every screen on
@@ -159,19 +168,6 @@ const CHART_PAD_T = 40;
 const CHART_PAD_B = 18;
 const START_FROM_BOTTOM = 0.12;
 const PROGRESS = 0.56; // "now" — the constant both house charts already share
-
-/* The header's bare glyphs. 24px box, 44pt hit area via the negative
-   inset — the same target glass-button.css gives its own icon buttons. */
-const glyphBtn: CSSProperties = {
-  position: "relative",
-  width: 24,
-  height: 24,
-  flex: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  background: "transparent",
-};
 
 /* Both panels are the same glass card with a heading, and both carry the
    same two-column label/value grid — so neither is written twice. */
@@ -357,9 +353,9 @@ export function NotiveQuoteScreen({
 
   const lineColor = up ? UP_LINE : DOWN_LINE;
   const fillRgb = up ? UP_RGB : DOWN_RGB;
-  const changeColor = up ? UP_TEXT : DOWN_TEXT;
+  const changeColor = up ? HEAD_UP : HEAD_DOWN;
   const chipInk = up ? UP_CHIP_INK : DOWN_CHIP_INK;
-  const priceColor = dir === 0 ? INK : dir > 0 ? UP_TEXT : DOWN_TEXT;
+  const priceColor = dir === 0 ? HEAD_INK : dir > 0 ? HEAD_UP : HEAD_DOWN;
 
   const sign = change >= 0 ? "+" : "−";
   const pct = reference ? (Math.abs(change) / reference) * 100 : 0;
@@ -376,56 +372,116 @@ export function NotiveQuoteScreen({
     ["Market cap", "4.82T", "P/E ratio", "39.60"],
   ];
 
-  /* Header, taken from the fractional order flow's own
-     (/work/fractional-order-flow): "AAPL (Apple Inc.)" on a muted line with
-     bare glyphs at its right, then the quote with USD. The Notive change
-     line sits under that, and the fractional card's compact state sits at
-     its right — which is where the order flow puts its own fractional icon
-     too, at the end of the row under the price. (The order flow also
-     carries a Bid/Ask readout opposite the price; dropped here on request.) */
+  /* Header, rebuilt 2026-09-13 against the user's Wealthsimple quote
+     screenshot (IMG_0253 — an iPhone 16 Pro capture, measured at 3px/pt
+     and used 1:1 as px, the way the artboard's dp were). Top to bottom: a
+     44px nav row — a white back disc at the left and a white 80x44 pill
+     at the right holding the watchlist star and the alert bell — 34px
+     down to the 32px logo tile beside the name, the bold 41px price with
+     its USD tag on the same baseline, then the change line, coloured whole.
+
+     Two departures from the screenshot, both deliberate: the after-hours
+     moon at the right of the price was dropped on request ("remove the
+     icon"), and the compact fractional card keeps its slot at the right of
+     the change line — where the moon sat — because it is the way into the
+     fractional banner. The screenshot draws a second, at-close line; this
+     screen is live mid-session, so it has the one.
+
+     The face stays Open Sans — the user's explicit call ("make sure you
+     don't change the font type"); what the screenshot contributes is the
+     scale: 16/400 name, 41/700 price, 16/700 USD tag, 14/600 change line. */
   const header = (
-    <>
-      <div style={{ display: "flex", alignItems: "center", gap: 8, height: 24 }}>
-        <span style={{ lineHeight: 0, flex: "none", color: INK }}>
-          <AppleIcon size={15} />
-        </span>
-        <span style={{ fontSize: 14, lineHeight: "22px", color: MUTED }}>
-          {SYMBOL} ({NAME})
-        </span>
-        <span style={{ flex: 1 }} />
-        {/* Bare glyphs, as the order flow draws its own close — the glass in
-            this header is the fractional card alone. */}
-        <button aria-label="Search" style={{ ...glyphBtn, color: INK }}>
-          <SearchIcon />
+    <div className="nq-head">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          height: 44,
+          /* The scroller's content edge sits 67px below the screen top
+             (plate liner + 50 + 16); the screenshot's nav row starts at 64. */
+          marginTop: -3,
+        }}
+      >
+        <button aria-label="Back" className="nq-nav" style={{ width: 44 }}>
+          {/* 16 x 14 arrow, as measured — ArrowBackIcon's 14-unit path would
+              render 12px wide in a 20px box. Same 2px round-capped stroke as
+              the icon set. */}
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+            <path
+              d="M17 10H3M9 16l-6-6 6-6"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </button>
-        <button aria-label="Close" style={{ ...glyphBtn, color: INK }}>
-          <CloseIcon />
-        </button>
+        <div
+          className="nq-nav"
+          style={{ width: 80, justifyContent: "space-between", padding: "0 11px 0 10px" }}
+        >
+          {/* Glyph inks measured at 20 x 19 (star) and 18 x 20 (bell); the
+              set's icons carry their own side bearings on a 24 grid, so both
+              are rendered a size up to fill the boxes the screenshot gives
+              them. */}
+          <button aria-label="Watchlist" className="nq-nav-glyph" style={{ width: 20 }}>
+            <StarFilledIcon size={27} />
+          </button>
+          <button aria-label="Alerts" className="nq-nav-glyph" style={{ width: 18 }}>
+            <BellIcon size={23} />
+          </button>
+        </div>
       </div>
 
-      <div style={{ display: "flex", alignItems: "flex-end", marginTop: 12 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8, height: 32, marginTop: 34 }}>
+        <span
+          aria-hidden="true"
+          style={{
+            width: 32,
+            height: 32,
+            flex: "none",
+            borderRadius: 8,
+            background: "#000",
+            color: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            lineHeight: 0,
+          }}
+        >
+          <AppleIcon size={20} />
+        </span>
+        <span style={{ fontSize: 16, fontWeight: 400, lineHeight: "24px", color: HEAD_MUTED }}>
+          {NAME}
+        </span>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "flex-end", marginTop: 14 }}>
         <Rolling
           value={"$" + money(price)}
           style={{
-            fontSize: 35,
-            fontWeight: 400,
+            fontSize: 41,
+            /* 600, not 700: the screenshot's bold has a 5.7px stroke on a
+               29.3px cap, and Open Sans 700 at this size paints 7. */
+            fontWeight: 600,
             lineHeight: 1,
             color: priceColor,
             transition: "color 760ms cubic-bezier(.4,0,.2,1)",
           }}
         />
-        {/* The odometer's digit cells are 1.15em boxes, which puts their
-            baseline 6.55px above the box bottom at 35px; "USD" at 14px/1
-            sits 1.6px above its own. The 5px lifts it onto the same
-            baseline the artboard draws them on. */}
+        {/* The odometer's digit cells are 1.15em boxes, so the digits'
+            baseline floats above the box bottom; the padding lifts "USD"
+            onto that same baseline (checked against the render, not the
+            metrics). */}
         <span
           style={{
-            fontSize: 14,
-            fontWeight: 400,
+            fontSize: 16,
+            fontWeight: 600, // its stems measure 2px on the screenshot; 700 here paints 2.4
             lineHeight: 1,
-            paddingBottom: 5,
-            marginLeft: 9,
-            color: MUTED,
+            paddingBottom: 5.5,
+            marginLeft: 8,
+            color: HEAD_MUTED,
           }}
         >
           USD
@@ -436,25 +492,27 @@ export function NotiveQuoteScreen({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 6,
-          marginTop: 6,
+          /* Negative: the 30px chip slot centres the 24px line box 3px
+             down, and the odometer's 1.15em cells leave 6px of box under
+             the digits' baseline. -1 puts the change line's baseline 27px
+             under the price's, as the screenshot has it. */
+          marginTop: -1,
           fontSize: 14,
-          lineHeight: "19px",
-          color: INK,
-          minHeight: 28,
+          fontWeight: 600,
+          lineHeight: "24px",
+          color: changeColor,
+          transition: "color 520ms ease",
+          minHeight: 30,
+          whiteSpace: "pre",
         }}
       >
-        <span style={{ color: changeColor, transition: "color 520ms ease" }}>
-          {sign}${money(Math.abs(change))}
+        <span>
+          {sign}${money(Math.abs(change))} ({sign}
+          {pct.toFixed(2)}%) {active.since}
         </span>
-        <span style={{ color: changeColor, transition: "color 520ms ease" }}>
-          ({sign}
-          {pct.toFixed(2)}%)
-        </span>
-        <span>{active.since}</span>
         <span style={{ flex: 1 }} />
 
-        {/* The compact half of the fractional card. Fixed 28px slot so the
+        {/* The compact half of the fractional card. Fixed 30px slot so the
             row never reflows as the card morphs in and out of it. */}
         <div style={{ width: 30, height: 30, flex: "none", position: "relative" }}>
           {!fracOpen && (
@@ -502,7 +560,7 @@ export function NotiveQuoteScreen({
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 
   const banner = (
@@ -717,7 +775,7 @@ export function NotiveQuoteScreen({
   );
 
   const about = (
-    <Panel title={`About ${NAME.replace(/ Inc\.$/, "")}`} marginTop={16}>
+    <Panel title={`About ${NAME.replace(/ Inc\.?$/, "")}`} marginTop={16}>
       {/* Motion animates the box; the clamp is what produces the ellipsis,
           and it flips instantly in both directions so the text is already
           the right shape before the height starts moving. `height: auto`
