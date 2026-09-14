@@ -579,12 +579,15 @@ N[87] = {"kind": "media", "bg": "white", "corner": "Happy path",
 N[88] = {"kind": "numbered", "bg": "white", "corner": "Design process",
          "items": ["Happy path design", "Order type navigation", "Symbol discoverability"], "active": [1]}
 N[89] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
+         # placeholder caption, its box ending on the phone's top edge like slide 90's
+         "labels": [{"text": "Label", "x": 50.64, "y": 29.56, "size": "lg"}],
          # the edge cases run on the live fractional order flow, opened on a Limit order
          "live": [live("fractional-order-flow", 35.61, 32.43, 30.07, 67.57, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder")]}
 N[90] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "labels": [{"text": "V1", "x": 31.45, "y": 34.4}, {"text": "V2", "x": 73.25, "y": 34.4}],
          "live": [live("fractional-order-flow", x, 38.2, 31.01, 61.8, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder") for x in (16.05, 57.71)]}
 N[91] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
+         "labels": [{"text": "Label", "x": 50.21, "y": 26.66, "size": "lg"}],  # placeholder
          "live": [live("fractional-order-flow", 34.52, 29.53, 31.38, 70.47, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder")]}
 N[92] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "panels": [P(50, 50, LIGHT_PANEL)],

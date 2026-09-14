@@ -1843,13 +1843,17 @@ const title = (s: Slide): string | undefined =>
   .gd-media-big .g {
     color: #46d497;
   }
+  /* mockup captions ("Original design", "Old design", "V1"…): ONE style
+     across the deck — 21/500, no tracking (the 15px variant the small
+     captions used read as a second, lesser label beside these). The
+     JSON's `size: "lg"` is therefore a no-op, kept for the generator. */
   .gd-media-l {
     position: absolute;
     margin: 0;
     transform: translateX(-50%);
-    font-size: 15px;
+    font-size: 21px;
     font-weight: 500;
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
     white-space: nowrap;
     color: rgba(255, 255, 255, 0.82);
     z-index: 1;
@@ -1858,10 +1862,6 @@ const title = (s: Slide): string | undefined =>
   .gd-slide--canvas .gd-media-l,
   .gd-media-l.tone-dark {
     color: rgba(0, 0, 0, 0.72);
-  }
-  .gd-media-l.is-lg {
-    font-size: 21px;
-    letter-spacing: 0;
   }
   .gd-media-l-accent {
     color: #e5484d;

@@ -2133,6 +2133,14 @@
   "kind": "media",
   "bg": "white",
   "corner": "Navigating edge cases",
+  "labels": [
+   {
+    "text": "Label",
+    "x": 50.64,
+    "y": 29.56,
+    "size": "lg"
+   }
+  ],
   "live": [
    {
     "page": "fractional-order-flow",
@@ -2200,6 +2208,14 @@
   "kind": "media",
   "bg": "white",
   "corner": "Navigating edge cases",
+  "labels": [
+   {
+    "text": "Label",
+    "x": 50.21,
+    "y": 26.66,
+    "size": "lg"
+   }
+  ],
   "live": [
    {
     "page": "fractional-order-flow",
