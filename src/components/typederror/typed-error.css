@@ -11,13 +11,13 @@
   line-height: 1.35;
   color: #ff557d; /* the ticket's DOWN — the field-error red */
   white-space: pre;
-  text-align: center;
+  text-align: left; /* both lines share one left edge (user's call); the block itself is centred by the stage */
 }
 
 /* one line each: the row is an inline box the width of its finished
-   text, centred by the block; its hidden ghost holds that width from the
-   first frame, and the typed text sits on the row's left edge, so every
-   line is centred and the letters land from a fixed origin */
+   text; its hidden ghost holds that width from the first frame, and the
+   typed text sits on the row's left edge, so the block is sized by its
+   longer line before a letter lands and nothing reflows while typing */
 .te-line {
   display: block;
 }
