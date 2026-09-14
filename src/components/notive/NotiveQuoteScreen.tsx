@@ -398,7 +398,8 @@ export function NotiveQuoteScreen({
           {/* The compact half of the fractional card, in the slot
               alert-creation gives it: left of Watchlist, a fixed 32px box
               (the icon set's) so the row never reflows as the card morphs in
-              and out. The chip wears the star's treatment — see `.nq-frac`. */}
+              and out. The chip is the fractional blue, at the star's size and
+              stroke — see `.nq-frac`. */}
           <div style={{ width: 32, height: 32, flex: "none", position: "relative" }}>
             {!fracOpen && (
               <motion.div

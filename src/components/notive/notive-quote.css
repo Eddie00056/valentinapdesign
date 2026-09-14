@@ -122,40 +122,18 @@
 }
 
 /* ---- the fractional card ----
-   Its compact state is one of the nav row's icons and wears exactly what
-   the star beside it wears: the icon set's fill as re-tuned above for this
-   ground (white .78, the tight shadow, the dark masked rim), black glyph.
-   Keep these three values in step with `.nq-root .btn--mobile.btn--icon`.
-   It can't simply carry the `.btn` classes: it is a Motion shared-layout
-   box whose radius and size animate into the banner, and the set's
-   `:active` scale would fight that (see use-motion-for-prototypes). The
-   blue disc it was earlier today was rejected: "don't make it blue, match
-   the colour and format of the star." The expanded banner keeps its own
-   tint. */
+   Its compact state sits in the nav row beside the star, at the star's
+   size and stroke, but in the fractional BLUE: a solid disc in the tint
+   with the blue mark — the same material as the expanded banner it morphs
+   into, so the shared-layout transition changes shape only. No rim, no
+   shadow, no glass: the solid version the user asked for earlier in the
+   day, brought back ("make it blue again like we had before, keep it in
+   the same position", 2026-09-13) after a pass that dressed it like the
+   star. Blue, not the screen's green: fractional is one accent across both
+   prototypes. */
 .nq-frac {
-  background: rgba(255, 255, 255, 0.78);
-  box-shadow: 0 2px 8px rgba(20, 28, 24, 0.08);
-  color: #000;
-}
-.nq-frac::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  padding: 1px;
-  border-radius: inherit;
-  background: linear-gradient(
-    270deg,
-    rgba(0, 0, 0, 0.07) 0%,
-    rgba(0, 0, 0, 0) 24.61%,
-    rgba(0, 0, 0, 0.05) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+  background: #eaf1fd;
+  color: #0066db;
 }
 
 /* 14px, not the set's nominal 16: the star's path spans 18 of its 24 grid
