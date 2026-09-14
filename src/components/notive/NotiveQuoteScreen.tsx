@@ -679,6 +679,13 @@ export function NotiveQuoteScreen({
     </AnimatePresence>
   );
 
+  /* ?chartH=<px>: a shorter chart box (a slide that shows this screen beside
+     ones without the banner keeps their rails level); the gallery never asks */
+  const [chartH, setChartH] = useState(CHART_H);
+  useEffect(() => {
+    const v = Number(new URLSearchParams(window.location.search).get("chartH"));
+    if (v >= 80) setChartH(v);
+  }, []);
   const chart = (
     /* Full bleed: the artboard runs the line clean off both edges, so the
        chart cancels the 16px column rather than sitting inside it. 32 under
@@ -688,7 +695,7 @@ export function NotiveQuoteScreen({
     <div style={{ width: "calc(100% + 32px)", margin: "32px -16px 0" }}>
       <LiveAreaChart
         w={386}
-        h={CHART_H}
+        h={chartH}
         padT={CHART_PAD_T}
         padB={CHART_PAD_B}
         series={active.series}
