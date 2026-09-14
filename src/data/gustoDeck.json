@@ -1129,7 +1129,7 @@
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "notiveOriginal,freeze",
         "clip": true
       }
@@ -1165,7 +1165,7 @@
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "notiveOriginal,freeze",
         "clip": true
       },
@@ -1179,7 +1179,7 @@
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "notiveBeta,freeze",
         "clip": true
       }
@@ -1221,7 +1221,7 @@
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "notiveOriginal,freeze",
         "clip": true
       },
@@ -1235,7 +1235,7 @@
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "notiveBeta,freeze",
         "clip": true
       },
@@ -1249,7 +1249,7 @@
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-panel{display:none!important}",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "freeze",
         "clip": true
       }
