@@ -1638,41 +1638,27 @@
         "w": 46.7,
         "h": 91.95,
         "c": "#f7f7f7"
-      },
-      {
-        "x": 14.11,
-        "y": 8.49,
-        "w": 24.01,
-        "h": 35.86,
-        "c": "#000000"
-      },
-      {
-        "x": 16.04,
-        "y": 55.51,
-        "w": 20.17,
-        "h": 35.86,
-        "c": "#000000"
       }
     ],
     "live": [
       {
         "page": "alert-creation",
-        "x": 18.68,
-        "y": 20.09,
-        "w": 14.89,
-        "h": 12.66,
+        "x": 14.12,
+        "y": 16.21,
+        "w": 24.0,
+        "h": 20.41,
         "vw": 1280,
         "vh": 1000,
         "fit": "svg[viewBox=\"0 0 393 188\"]",
         "clip": true,
-        "css": ".acs-root{background:none!important}body *{visibility:hidden!important}svg[viewBox=\"0 0 393 188\"],svg[viewBox=\"0 0 393 188\"] *{visibility:visible!important}"
+        "css": ".acs-root{background:none!important}body *{visibility:hidden!important}svg[viewBox=\"0 0 393 188\"],svg[viewBox=\"0 0 393 188\"] *{visibility:visible!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#48d597\"]{fill:#389b3c!important}svg[viewBox=\"0 0 393 188\"] [stroke=\"#48d597\"]{stroke:#389b3c!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#7ED37B\"]{fill:#389b3c!important}svg[viewBox=\"0 0 393 188\"] [stroke=\"#7ED37B\"]{stroke:#389b3c!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#ff557d\"]{fill:#b3261e!important}svg[viewBox=\"0 0 393 188\"] [stroke=\"#ff557d\"]{stroke:#b3261e!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#FF9E7E\"]{fill:#b3261e!important}svg[viewBox=\"0 0 393 188\"] [stroke=\"#FF9E7E\"]{stroke:#b3261e!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#04150c\"]{fill:#fff!important}svg[viewBox=\"0 0 393 188\"] g[opacity=\"0.38\"],svg[viewBox=\"0 0 393 188\"] g[style*=\"opacity: 0.38\"],svg[viewBox=\"0 0 393 188\"] g[style*=\"opacity:0.38\"]{opacity:0.62!important}"
       },
       {
         "page": "order-placed-animation",
-        "x": 22.37,
-        "y": 66.78,
-        "w": 7.5,
-        "h": 13.33,
+        "x": 21.17,
+        "y": 64.64,
+        "w": 9.9,
+        "h": 17.59,
         "vw": 1280,
         "vh": 1000,
         "fit": ".opa-badge",
