@@ -601,7 +601,7 @@ ACS_CHART = ('#bg-wrap .acs-root.acs-root.acs-root.acs-root,.acs-root,:has(>.acs
              '.acs-scroll>:nth-child(2) div[style*="255, 255, 255"] span,'
              '.acs-scroll>:nth-child(2) div[style*="#ffffff"] span{color:#0e0e0e}'
              # no fade on the older candles: full opacity, and the cool tints back to the live colours
-             'svg[viewBox="0 0 393 188"] g[opacity]{opacity:1!important}'
+             'svg[viewBox="0 0 393 188"] g{opacity:1!important}'
              '[stroke="#7ED37B"]{stroke:#48d597!important}[fill="#7ED37B"]{fill:#48d597!important}'
              '[stroke="#FF9E7E"]{stroke:#ff557d!important}[fill="#FF9E7E"]{fill:#ff557d!important}')
 CANDLES = live("alert-creation", 14.1, 16.3, 24.0, 28.4, css=ACS_CHART,
@@ -615,7 +615,8 @@ N[97] = {"kind": "media", "bg": "white", "corner": "Advanced trading platform",
          "shots": [crop(97, 'a', 0, 0, 100, 100, wipe=(_T97, _SW, _P97))],
          "live": [CANDLES, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_LIGHT,
                        fit=".opa-badge, .opa-caption", vh=1000, clip=True, pad=26, init="mute"),
-                  live("order-placement", 63.45, 14.24, 20.94, 74.39, css=PHONE_BG, fit=PHONE, vh=1000)]}
+                  # the ticket's phone, cut a row under Sell / Buy: the empty screen below ran long
+                  live("order-placement", 63.45, 14.24, 20.94, 62.3, css=PHONE_BG, fit=PHONE, vh=1000, mode="width", clip=True)]}
 N[98] = D("Impact", bg="white", tone="green")
 N[99] = {"kind": "figures", "bg": "white", "tone": "green", "layout": "top",
          "items": [["60K", "increase in trading volume"], ["$33M", "total value traded"]]}
