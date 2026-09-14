@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
 import "./notive-quote.css";
 import "../glasslab/glass-button.css";
@@ -68,7 +68,8 @@ const FRAC_TINT = "#eaf1fd";
    was rebuilt against (2026-09-13): a touch warmer and lower-chroma than
    the chart's greens, and the whole line wears it, label included. */
 const HEAD_UP = "#477746";
-const HEAD_DOWN = "#b03424";
+const HEAD_DOWN = "#c02416"; // the "Sec. details" artboard's post-market red
+const HEAD_NAME = "#6d6d6d"; // its company-name grey
 
 const UP_RGB = "56,155,60";
 const DOWN_RGB = "179,38,30";
@@ -373,30 +374,18 @@ export function NotiveQuoteScreen({
     ["Market cap", "4.82T", "P/E ratio", "39.60"],
   ];
 
-  /* Header. The rows and the type scale are alert-creation's — the house
-     header (see alertscreen-palette): the glasslab icon set at the content
-     top, 16 down to an 18/600 heading, 4 down to the 18/600 price with its
-     USD tag, 4 down to the 14/400 change on its own line. What the
-     Wealthsimple capture the user sent (IMG_0253, 2026-09-13) contributes
-     is the layout around that: Back at the left with Watchlist + Alert at
-     the right, the 32px logo tile beside the name, a "USD" tag after the
-     price, and the change line's colours. A first pass took the capture's
-     41px price and the user sent it back twice ("too big" — then "match
-     the edge mobile dark prototype"); the price is the house 18 now.
+  /* Header. The nav row is the glasslab icon set (Back left; fractional,
+     Watchlist, Alert right) at the content top, as alert-creation has it.
+     The quote block under it is sized off the user's own "Sec. details"
+     artboard (2026-09-13) — see the comment on it; that supersedes the
+     day's earlier passes (a Wealthsimple capture's 41px, then the dark
+     prototype's 18/600, both sent back).
 
      Left out on request: the capture's after-hours moon ("remove the
      icon"). The compact fractional card sits left of Watchlist in the nav
      row, as alert-creation places it (user, 2026-09-13: "next to the star
      on the left … match the colour and format of the star"). The face is Open
      Sans throughout (user: "don't change the font type"). */
-  /* The 14/400 text beside the price, alert-creation's body scale. */
-  const beside: CSSProperties = {
-    fontSize: 14,
-    fontWeight: 400,
-    lineHeight: 1,
-    whiteSpace: "pre",
-  };
-
   const header = (
     <div className="nq-head">
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -472,13 +461,15 @@ export function NotiveQuoteScreen({
         </div>
       </div>
 
-      {/* Ticker block — alert-creation's own rows and scale: a 16px gap
-          under the nav row, the heading at 18/600, and 4px below it the
-          price at 18/600 with its USD tag centred beside it, then the
-          14/400 change on its own line. The logo tile beside the name and the
-          "USD" tag are the capture's; everything else is the house
-          header. */}
-      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 16 }}>
+      {/* Quote block, sized off the user's own "Sec. details" artboard
+          (2026-09-13, a 402pt frame at 2x, measured in pt and used as px):
+          18 under the nav row, the 32px logo tile with the name at 12/400
+          grey centred on it; 10 from the tile to the price's cap top; the
+          price at 40/600 (its cap is 29, stems 5.5 — Open Sans 600 at 40)
+          with "USD" at 15/600 on the same baseline, 7 to its left edge;
+          then the change at 14/600, its baseline 24 under the price's.
+          The face is Open Sans throughout, as ever. */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 18 }}>
         <span
           aria-hidden="true"
           style={{
@@ -496,33 +487,51 @@ export function NotiveQuoteScreen({
         >
           <AppleIcon size={20} />
         </span>
-        <span style={{ fontSize: 18, fontWeight: 600, lineHeight: "22px", color: INK }}>
+        <span style={{ fontSize: 12, fontWeight: 400, lineHeight: "16px", color: HEAD_NAME }}>
           {NAME}
         </span>
       </div>
 
-      {/* Price and its USD tag centred on one midline, not bottom-aligned
-          in 22px boxes the way alert-creation stacks its own — the user
-          marked that as "not aligned at all" with a line through the
-          price's middle. Line-height 1 on both so the boxes are the glyphs. */}
-      <div style={{ display: "flex", gap: 4, alignItems: "center", marginTop: 4 }}>
+      {/* The odometer's cells are 1.15em boxes: at 40px the digits' cap top
+          sits 10px below the cell top and their baseline 7.5px above its
+          bottom — so no margin puts the cap top 10 under the tile, and the
+          USD tag's padding lifts its baseline onto the price's. */}
+      <div style={{ display: "flex", alignItems: "flex-end" }}>
         <Rolling
           value={"$" + money(price)}
           style={{
-            fontSize: 18,
+            fontSize: 40,
             fontWeight: 600,
             lineHeight: 1,
             color: priceColor,
             transition: "color 760ms cubic-bezier(.4,0,.2,1)",
           }}
         />
-        <span style={{ ...beside, color: MUTED }}>USD</span>
+        <span
+          style={{
+            fontSize: 15,
+            fontWeight: 600,
+            lineHeight: 1,
+            paddingBottom: 5.5,
+            marginLeft: 7,
+            color: INK,
+          }}
+        >
+          USD
+        </span>
       </div>
 
-      {/* The change on its own line under the price (user, 2026-09-13:
-          "move this below the ticket price"), at the same 4px step the
-          rows above use. */}
-      <div style={{ ...beside, marginTop: 4, color: changeColor, transition: "color 520ms ease" }}>
+      <div
+        style={{
+          marginTop: 4,
+          fontSize: 14,
+          fontWeight: 600,
+          lineHeight: 1,
+          whiteSpace: "pre",
+          color: changeColor,
+          transition: "color 520ms ease",
+        }}
+      >
         {sign}${money(Math.abs(change))} ({sign}
         {pct.toFixed(2)}%) {active.since}
       </div>
