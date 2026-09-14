@@ -464,14 +464,7 @@
     "n": 30,
     "kind": "media",
     "bg": "black",
-    "shots": [
-      {
-        "src": "030a",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ],
+    "steps": 4,
     "corner": "Reducing time to trade",
     "labels": [
       {
@@ -480,20 +473,68 @@
         "y": 25.8,
         "size": "lg"
       }
+    ],
+    "shots": [
+      {
+        "src": "widget-tsla",
+        "x": 27.08,
+        "y": 27.42,
+        "w": 45.91,
+        "annot": {
+          "w": 609.41,
+          "h": 297.96,
+          "line": "#E03E1A",
+          "points": [
+            {
+              "at": [
+                12.72,
+                18.48
+              ],
+              "c": "#E03E1A",
+              "n": "1"
+            },
+            {
+              "at": [
+                12.72,
+                268.48
+              ],
+              "c": "#E03E1A",
+              "n": "2"
+            },
+            {
+              "at": [
+                96.72,
+                81.48
+              ],
+              "c": "#E03E1A",
+              "n": "3"
+            },
+            {
+              "at": [
+                310.72,
+                199.48
+              ],
+              "c": "#E03E1A",
+              "n": "4"
+            },
+            {
+              "at": [
+                457.72,
+                139.48
+              ],
+              "c": "#E03E1A",
+              "n": "5"
+            }
+          ]
+        }
+      }
     ]
   },
   {
     "n": 31,
     "kind": "media",
     "bg": "black",
-    "shots": [
-      {
-        "src": "031b",
-        "x": 1.99,
-        "y": -2.01,
-        "w": 96.02
-      }
-    ],
+    "corner": "Reducing time to trade",
     "labels": [
       {
         "text": "Current widget layout",
@@ -502,7 +543,81 @@
         "size": "lg"
       }
     ],
-    "corner": "Reducing time to trade"
+    "shots": [
+      {
+        "src": "widget-tsla",
+        "x": 27.08,
+        "y": 27.42,
+        "w": 45.91,
+        "annot": {
+          "w": 609.41,
+          "h": 297.96,
+          "line": "#D02A2A",
+          "boxes": [
+            [
+              23.38,
+              93.74,
+              194.58,
+              48.14
+            ],
+            [
+              169.81,
+              163.94,
+              102.3,
+              83.25
+            ],
+            [
+              373.41,
+              163.94,
+              204.6,
+              83.25
+            ]
+          ],
+          "lines": [
+            [
+              4.33,
+              117.31,
+              23.38,
+              117.31
+            ],
+            [
+              218.96,
+              248.19,
+              218.96,
+              303.85,
+              500.28,
+              303.85,
+              500.28,
+              248.19
+            ],
+            [
+              356.86,
+              303.85,
+              356.86,
+              316.39
+            ]
+          ],
+          "notes": [
+            {
+              "at": [
+                -0.69,
+                117.81
+              ],
+              "anchor": "right",
+              "text": "Only 12 clients can actually use these fields"
+            },
+            {
+              "at": [
+                355.36,
+                320.4
+              ],
+              "anchor": "top",
+              "text": "These values cannot be changed\nand interacted with"
+            }
+          ]
+        }
+      }
+    ]
   },
   {
     "n": 32,
@@ -1286,13 +1401,29 @@
     "n": 72,
     "kind": "media",
     "bg": "white",
+    "steps": 2,
     "corner": "Help traders find the correct symbol",
     "labels": [
       {
         "text": "Original design",
         "x": 18.36,
         "y": 42.2,
-        "size": "lg"
+        "size": "lg",
+        "s": 0
+      },
+      {
+        "text": "Beta release",
+        "x": 49.97,
+        "y": 42.2,
+        "size": "lg",
+        "s": 1
+      },
+      {
+        "text": "Public release",
+        "x": 81.59,
+        "y": 42.2,
+        "size": "lg",
+        "s": 2
       }
     ],
     "live": [
@@ -1308,7 +1439,41 @@
         "fit": "img[src*=\"iphone\"]",
         "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "notiveOriginal,freeze",
-        "clip": true
+        "clip": true,
+        "s": 0,
+        "rise": true
+      },
+      {
+        "page": "notive-quote?static",
+        "x": 38.74,
+        "y": 45.0,
+        "w": 22.45,
+        "h": 55.0,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
+        "init": "notiveBeta,freeze",
+        "clip": true,
+        "s": 1,
+        "rise": true
+      },
+      {
+        "page": "notive-quote?chartH=186&static",
+        "x": 70.37,
+        "y": 45.0,
+        "w": 22.45,
+        "h": 55.0,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
+        "init": "freeze",
+        "clip": true,
+        "s": 2,
+        "rise": true
       }
     ]
   },
@@ -1895,71 +2060,72 @@
     ]
   },
   {
-    "n": 91,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
+    "corner": "Advanced trading platform",
     "boxes": [
       {
-        "x": 2.76,
-        "y": 4.01,
-        "w": 46.72,
-        "h": 44.82,
+        "x": 2.75,
+        "y": 13.0,
+        "w": 46.75,
+        "h": 40.4,
         "c": "#f7f7f7"
       },
       {
-        "x": 2.76,
-        "y": 51.02,
-        "w": 46.72,
-        "h": 44.84,
+        "x": 2.75,
+        "y": 55.6,
+        "w": 46.75,
+        "h": 40.4,
         "c": "#f7f7f7"
       },
       {
-        "x": 50.47,
-        "y": 3.98,
-        "w": 46.7,
-        "h": 91.95,
+        "x": 50.5,
+        "y": 13.0,
+        "w": 46.75,
+        "h": 83.0,
         "c": "#f7f7f7"
       }
     ],
     "live": [
       {
-        "page": "alert-creation",
-        "x": 14.12,
-        "y": 16.21,
-        "w": 24.0,
-        "h": 20.41,
-        "vw": 1280,
-        "vh": 1000,
-        "fit": "svg[viewBox=\"0 0 393 188\"]",
-        "clip": true,
-        "css": ".acs-root{background:none!important}body *{visibility:hidden!important}svg[viewBox=\"0 0 393 188\"],svg[viewBox=\"0 0 393 188\"] *{visibility:visible!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#48d597\"]{fill:#389b3c!important}svg[viewBox=\"0 0 393 188\"] [stroke=\"#48d597\"]{stroke:#389b3c!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#7ED37B\"]{fill:#389b3c!important}svg[viewBox=\"0 0 393 188\"] [stroke=\"#7ED37B\"]{stroke:#389b3c!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#ff557d\"]{fill:#b3261e!important}svg[viewBox=\"0 0 393 188\"] [stroke=\"#ff557d\"]{stroke:#b3261e!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#FF9E7E\"]{fill:#b3261e!important}svg[viewBox=\"0 0 393 188\"] [stroke=\"#FF9E7E\"]{stroke:#b3261e!important}svg[viewBox=\"0 0 393 188\"] [fill=\"#04150c\"]{fill:#fff!important}svg[viewBox=\"0 0 393 188\"] g[opacity=\"0.38\"],svg[viewBox=\"0 0 393 188\"] g[style*=\"opacity: 0.38\"],svg[viewBox=\"0 0 393 188\"] g[style*=\"opacity:0.38\"]{opacity:0.62!important}"
+        "page": "typed-error",
+        "x": 4.1,
+        "y": 19.0,
+        "w": 44.0,
+        "h": 28.4,
+        "vw": 845,
+        "css": ".te-stage{background:none!important}.te-block{color:#c02416!important}",
+        "clip": true
       },
       {
         "page": "order-placed-animation",
-        "x": 21.17,
-        "y": 64.64,
-        "w": 9.9,
-        "h": 17.59,
+        "x": 20.68,
+        "y": 65.2,
+        "w": 10.88,
+        "h": 21.2,
         "vw": 1280,
-        "vh": 1000,
-        "fit": ".opa-badge",
-        "pad": 10,
+        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}",
+        "init": "mute",
+        "pad": 26,
         "clip": true,
-        "css": ".opa-stage{background:none!important}body *{visibility:hidden!important}.opa-badge,.opa-badge *{visibility:visible!important}.opa-glow,.opa-ripple,.opa-ripple2,.opa-ring-fill{display:none!important}.opa-phone{filter:none!important}.opa-screen{perspective:none!important}.opa-badge{transform-style:flat!important;animation-name:op-pop2d!important;animation-timing-function:cubic-bezier(0.33,0,0.2,1)!important}@keyframes op-pop2d{0%{transform:scale(1)}38%{transform:scale(1.12)}70%{transform:scale(0.97)}100%{transform:scale(1)}}",
-        "init": "mute"
+        "fit": ".opa-badge, .opa-caption",
+        "vh": 1000
       },
       {
         "page": "order-placement-boxed",
-        "x": 63.3,
-        "y": 14.2,
-        "w": 21.2,
-        "h": 74.5,
+        "x": 63.45,
+        "y": 16.6,
+        "w": 20.94,
+        "h": 75.8,
         "vw": 1280,
-        "vh": 1000,
+        "css": ".phone-stage{background:none!important}",
+        "mode": "width",
+        "clip": true,
         "fit": "img[src*=\"iphone\"]",
-        "css": ".phone-stage{background:none!important}"
+        "vh": 1000
       }
-    ]
+    ],
+    "n": 91
   },
   {
     "n": 92,
