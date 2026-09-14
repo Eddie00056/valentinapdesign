@@ -1536,12 +1536,27 @@
     "n": 89,
     "kind": "media",
     "bg": "black",
-    "shots": [
+    "boxes": [
       {
-        "src": "089full",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "x": 2.76,
+        "y": 4.01,
+        "w": 46.72,
+        "h": 44.82,
+        "c": "#f7f7f7"
+      },
+      {
+        "x": 2.76,
+        "y": 51.08,
+        "w": 46.72,
+        "h": 44.78,
+        "c": "#f7f7f7"
+      },
+      {
+        "x": 50.47,
+        "y": 3.98,
+        "w": 46.7,
+        "h": 91.95,
+        "c": "#f7f7f7"
       }
     ],
     "live": [
@@ -1558,8 +1573,8 @@
       },
       {
         "page": "fractional-order-flow",
-        "x": 21.01,
-        "y": 16.3,
+        "x": 19.94,
+        "y": 16.33,
         "w": 12.36,
         "h": 20.19,
         "vw": 1280,
@@ -1567,19 +1582,19 @@
         "fit": "[aria-label=\"Swap amount and quantity\"]",
         "pad": 20,
         "clip": true,
-        "css": ".fof-stage{background:none!important}",
+        "css": ".fof-stage{background:none!important}body *{visibility:hidden!important}[aria-label=\"Swap amount and quantity\"],[aria-label=\"Swap amount and quantity\"] *{visibility:visible!important}[aria-label=\"Swap amount and quantity\"]>svg{display:none!important}",
         "init": "swapLoop"
       },
       {
         "page": "fractional-shares-banner",
-        "x": 6.4,
-        "y": 65.37,
+        "x": 6.37,
+        "y": 65.46,
         "w": 39.5,
         "h": 16.02,
         "vw": 760,
         "vh": 1000,
         "fit": ".pshell-stage",
-        "css": ".pshell,.pshell-stage{background:none!important}",
+        "css": ".pshell,.pshell-stage{background:none!important}.pshell-nav{display:none!important}",
         "init": "bannerLoop",
         "clip": true
       }
