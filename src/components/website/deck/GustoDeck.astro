@@ -693,6 +693,21 @@ const title = (s: Slide): string | undefined =>
       // slide 81: the quote screen with its fractional banner already open
       openFractional: (_w, d) =>
         d.querySelector<HTMLElement>('[aria-label="Fractional shares"]')?.click(),
+      /* the fractional order flow, opened on a Limit order (89–91, 96): the
+         order-type pill's own menu, picked the way a tap would */
+      limitOrder: (w, d) => {
+        const pill = [...d.querySelectorAll<HTMLElement>("button")].find((b) => b.textContent?.trim() === "Market order");
+        pill?.click();
+        let tries = 0;
+        const pick = () => {
+          const item = [...d.querySelectorAll<HTMLElement>('[role="menuitemradio"]')].find((b) =>
+            b.textContent?.includes("Limit order"),
+          );
+          if (item) item.click();
+          else if (tries++ < 40) w.setTimeout(pick, 25);
+        };
+        pick();
+      },
       // the order-placed animation chimes when its check lands; a deck is
       // no place for a sound nobody asked for
       // stop the live price walk: the quote holds still on this slide

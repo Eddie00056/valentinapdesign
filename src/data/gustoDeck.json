@@ -493,7 +493,7 @@
    {
     "page": "stock-order-entry",
     "x": 61.5,
-    "y": 27,
+    "y": 25.24,
     "w": 27,
     "h": 8,
     "vw": 1280,
@@ -509,7 +509,7 @@
    {
     "page": "stock-order-entry",
     "x": 61.5,
-    "y": 35.82,
+    "y": 34.06,
     "w": 27,
     "h": 25,
     "vw": 1280,
@@ -525,7 +525,7 @@
    {
     "page": "stock-order-entry",
     "x": 61.5,
-    "y": 59.99,
+    "y": 58.23,
     "w": 27,
     "h": 34,
     "vw": 1280,
@@ -909,20 +909,12 @@
     "x": 2.2,
     "y": 27.1,
     "w": 45.8
-   }
-  ],
-  "live": [
+   },
    {
-    "page": "chain-to-order",
+    "src": "050-atlas-workspace",
     "x": 52.2,
-    "y": 26,
-    "w": 45.6,
-    "h": 50,
-    "vw": 1440,
-    "css": "",
-    "clip": true,
-    "fit": ".wsp-screen",
-    "vh": 900
+    "y": 27.1,
+    "w": 45.6
    }
   ]
  },
@@ -934,7 +926,7 @@
   "panels": [
    {
     "x": 0,
-    "w": 63,
+    "w": 50,
     "y": 16,
     "c": "#111116"
    }
@@ -942,33 +934,27 @@
   "labels": [
    {
     "text": "Initial design",
-    "x": 31.5,
+    "x": 25,
     "y": 21.2
    },
    {
     "text": "Updated design",
-    "x": 81.5,
+    "x": 75,
     "y": 21.2
    }
   ],
   "shots": [
    {
-    "src": "051a",
-    "x": 3,
+    "src": "051-atlas-initial",
+    "x": 11,
     "y": 26,
-    "w": 28.5
+    "w": 28
    },
    {
-    "src": "051b",
-    "x": 33.5,
+    "src": "051-atlas-updated",
+    "x": 61,
     "y": 26,
-    "w": 26.5
-   },
-   {
-    "src": "051c",
-    "x": 67,
-    "y": 26,
-    "w": 29
+    "w": 28
    }
   ]
  },
@@ -1159,12 +1145,20 @@
     "4 Engineering teams\n1 UX Researcher\n3 Product Managers"
    ]
   ],
-  "shot": {
-   "src": "063a",
-   "x": 58.4,
-   "y": 9.0,
-   "w": 29.3
-  }
+  "live": [
+   {
+    "page": "notive-quote",
+    "x": 58.4,
+    "y": 9.0,
+    "w": 29.3,
+    "h": 76.5,
+    "vw": 1280,
+    "css": ".nq-root,.phone-stage{background:none!important}",
+    "init": "openFractional",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
+   }
+  ]
  },
  {
   "n": 64,
@@ -1280,18 +1274,30 @@
     "y": 34.6
    }
   ],
-  "shots": [
+  "live": [
    {
-    "src": "070a",
-    "x": 12.0,
-    "y": 38.6,
-    "w": 26.0
+    "page": "notive-quote",
+    "x": 12.49,
+    "y": 39.2,
+    "w": 25.1,
+    "h": 60.8,
+    "vw": 1280,
+    "css": ".nq-root,.phone-stage{background:none!important}",
+    "mode": "width",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
    },
    {
-    "src": "070b",
-    "x": 62.4,
-    "y": 37.8,
-    "w": 25.2
+    "page": "alert-creation",
+    "x": 62.93,
+    "y": 38.36,
+    "w": 24.25,
+    "h": 61.64,
+    "vw": 1280,
+    "css": ".acs-root{background:none!important}",
+    "mode": "width",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
    }
   ]
  },
@@ -1530,7 +1536,8 @@
      "src": "075i1",
      "x": 20.2,
      "y": 34.2,
-     "w": 11.8
+     "w": 11.8,
+     "hide": true
     },
     "text": "Help traders discover\nfractional symbols"
    },
@@ -1563,6 +1570,17 @@
     "clip": true,
     "fit": ".opa-badge",
     "vh": 1000
+   },
+   {
+    "page": "holdings-empty-state",
+    "x": 21.5,
+    "y": 34.59,
+    "w": 9.2,
+    "h": 15.35,
+    "vw": 1280,
+    "css": ".he-root{background:none!important}",
+    "fit": ".he-card",
+    "vh": 1000
    }
   ]
  },
@@ -1581,7 +1599,8 @@
      "src": "075i1",
      "x": 20.2,
      "y": 34.2,
-     "w": 11.8
+     "w": 11.8,
+     "hide": true
     },
     "text": "Help traders discover\nfractional symbols"
    },
@@ -1613,6 +1632,17 @@
     "pad": 14,
     "clip": true,
     "fit": ".opa-badge",
+    "vh": 1000
+   },
+   {
+    "page": "holdings-empty-state",
+    "x": 21.5,
+    "y": 34.59,
+    "w": 9.2,
+    "h": 15.35,
+    "vw": 1280,
+    "css": ".he-root{background:none!important}",
+    "fit": ".he-card",
     "vh": 1000
    }
   ]
@@ -1704,15 +1734,16 @@
     "x": 4.14,
     "y": 23.8,
     "w": 28.44
-   },
-   {
-    "src": "079b",
-    "x": 35.75,
-    "y": 23.8,
-    "w": 28.44
    }
   ],
   "boxes": [
+   {
+    "x": 35.75,
+    "y": 23.8,
+    "w": 28.44,
+    "h": 55.0,
+    "c": "#f6f6f6"
+   },
    {
     "x": 67.37,
     "y": 23.8,
@@ -1722,6 +1753,19 @@
    }
   ],
   "live": [
+   {
+    "page": "notive-quote",
+    "x": 40.1,
+    "y": 35.3,
+    "w": 20.75,
+    "h": 43.5,
+    "vw": 1280,
+    "css": ".nq-root,.phone-stage{background:none!important}",
+    "mode": "width",
+    "clip": true,
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
+   },
    {
     "page": "fractional-order-flow",
     "x": 72.2,
@@ -1916,12 +1960,18 @@
     "y": 15.5
    }
   ],
-  "shots": [
+  "live": [
    {
-    "src": "086a",
-    "x": 16.2,
-    "y": 17.8,
-    "w": 21.2
+    "page": "order-placement",
+    "x": 17.77,
+    "y": 20.09,
+    "w": 18.4,
+    "h": 69.62,
+    "vw": 1280,
+    "css": ".phone-stage{background:none!important}",
+    "mode": "width",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
    }
   ]
  },
@@ -1954,15 +2004,19 @@
     "y": 13.2
    }
   ],
-  "shots": [
-   {
-    "src": "087a",
-    "x": 16.2,
-    "y": 17.8,
-    "w": 21.2
-   }
-  ],
   "live": [
+   {
+    "page": "order-placement",
+    "x": 17.77,
+    "y": 20.09,
+    "w": 18.4,
+    "h": 69.62,
+    "vw": 1280,
+    "css": ".phone-stage{background:none!important}",
+    "mode": "width",
+    "fit": "img[src*=\"iphone\"]",
+    "vh": 1000
+   },
    {
     "page": "order-placement-boxed-single",
     "x": 64.22,
@@ -1995,12 +2049,19 @@
   "kind": "media",
   "bg": "white",
   "corner": "Navigating edge cases",
-  "shots": [
+  "live": [
    {
-    "src": "089a",
-    "x": 33.7,
-    "y": 28.5,
-    "w": 32.5
+    "page": "fractional-order-flow",
+    "x": 35.61,
+    "y": 32.43,
+    "w": 30.07,
+    "h": 67.57,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "mode": "width",
+    "init": "limitOrder",
+    "fit": ".fof-frame",
+    "vh": 1000
    }
   ]
  },
@@ -2021,18 +2082,32 @@
     "y": 34.4
    }
   ],
-  "shots": [
+  "live": [
    {
-    "src": "090a",
-    "x": 14.1,
-    "y": 37.4,
-    "w": 33.5
+    "page": "fractional-order-flow",
+    "x": 16.05,
+    "y": 38.2,
+    "w": 31.01,
+    "h": 61.8,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "mode": "width",
+    "init": "limitOrder",
+    "fit": ".fof-frame",
+    "vh": 1000
    },
    {
-    "src": "090b",
-    "x": 55.8,
-    "y": 37.4,
-    "w": 33.5
+    "page": "fractional-order-flow",
+    "x": 57.71,
+    "y": 38.2,
+    "w": 31.01,
+    "h": 61.8,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "mode": "width",
+    "init": "limitOrder",
+    "fit": ".fof-frame",
+    "vh": 1000
    }
   ]
  },
@@ -2041,12 +2116,19 @@
   "kind": "media",
   "bg": "white",
   "corner": "Navigating edge cases",
-  "shots": [
+  "live": [
    {
-    "src": "091a",
-    "x": 32.5,
-    "y": 25.2,
-    "w": 34.0
+    "page": "fractional-order-flow",
+    "x": 34.52,
+    "y": 29.53,
+    "w": 31.38,
+    "h": 70.47,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "mode": "width",
+    "init": "limitOrder",
+    "fit": ".fof-frame",
+    "vh": 1000
    }
   ]
  },
@@ -2116,7 +2198,7 @@
     "css": ".fof-stage{background:none!important}",
     "pad": 30,
     "clip": true,
-    "fit": "img[alt=\"Swap amount and quantity\"]",
+    "fit": "[aria-label=\"Swap amount and quantity\"]",
     "vh": 1000
    },
    {
@@ -2170,18 +2252,33 @@
     "x": 2.0,
     "y": 29.6,
     "w": 30.1
+   }
+  ],
+  "live": [
+   {
+    "page": "fractional-order-flow",
+    "x": 35.63,
+    "y": 30.13,
+    "w": 27.9,
+    "h": 69.87,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "mode": "width",
+    "fit": ".fof-frame",
+    "vh": 1000
    },
    {
-    "src": "096b",
-    "x": 33.9,
-    "y": 29.6,
-    "w": 30.1
-   },
-   {
-    "src": "096c",
-    "x": 65.8,
-    "y": 29.6,
-    "w": 30.1
+    "page": "fractional-order-flow",
+    "x": 67.5,
+    "y": 30.13,
+    "w": 27.9,
+    "h": 69.87,
+    "vw": 1280,
+    "css": ".fof-stage{background:none!important}",
+    "mode": "width",
+    "init": "limitOrder",
+    "fit": ".fof-frame",
+    "vh": 1000
    }
   ],
   "corner": "Title"
@@ -2209,7 +2306,7 @@
     "css": ".fof-stage{background:none!important}",
     "pad": 30,
     "clip": true,
-    "fit": "img[alt=\"Swap amount and quantity\"]",
+    "fit": "[aria-label=\"Swap amount and quantity\"]",
     "vh": 1000
    },
    {
@@ -2224,6 +2321,17 @@
     "pad": 26,
     "clip": true,
     "fit": ".opa-badge, .opa-caption",
+    "vh": 1000
+   },
+   {
+    "page": "order-placement",
+    "x": 63.45,
+    "y": 14.24,
+    "w": 20.94,
+    "h": 74.39,
+    "vw": 1280,
+    "css": ".phone-stage{background:none!important}",
+    "fit": "img[src*=\"iphone\"]",
     "vh": 1000
    }
   ],

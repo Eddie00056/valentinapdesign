@@ -104,6 +104,19 @@ def cardimg(n, tag, xref, x, w, y=None, cy=None, radius=30, key=True):
     return {"src": name, "x": x, "y": round(y, 3), "w": w}
 
 
+def asset(name, file, x, w, y, quality=None):
+    """A component export from the design library (scripts/deck-assets), not the
+    PDF: encoded lossless into the crops dir so it keeps its alpha corners."""
+    path = f'{CROPS}/{name}.webp'
+    im = Image.open(f'{os.path.dirname(os.path.abspath(__file__))}/deck-assets/{file}').convert('RGBA')
+    if quality:  # big screens: lossy keeps the page light
+        im.save(path, 'WEBP', quality=quality, method=6)
+    else:
+        im.save(path, 'WEBP', lossless=True, method=6)
+    made.add(name)
+    return {"src": name, "x": x, "y": y, "w": w}
+
+
 def place(shot, x, w, y=None, cy=None):
     """Show a crop larger than the PDF drew it: same pixels (rendered at 4x),
     new rect. Height follows the crop's own aspect."""
@@ -145,6 +158,8 @@ LEAN = (".ob-cost,.st-attach-stack,.wshell-actions{display:none!important}"
 FOF_BG = ".fof-stage{background:none!important}"
 ACS_BG = ".acs-root{background:none!important}"
 PHONE_BG = ".phone-stage{background:none!important}"
+NQ_BG = ".nq-root,.phone-stage{background:none!important}"
+HE_BG = ".he-root{background:none!important}"
 OPA_BG = ".opa-stage{background:none!important}"
 
 
@@ -305,7 +320,8 @@ WIDGET_CALLOUTS = {
 N[31] = {"kind": "media", "bg": "black", "heading": "What data do we show?",
          "labels": [{"text": "Current widget layout", "x": 50, "y": 21.5}],
          "shots": [dict(widget(29, 34.93, 34.815, 65.07, 61.204), annot=WIDGET_CALLOUTS)]}
-_SX, _SW32 = 61.5, 27  # slide 32: the stacked tickets' left edge and width (%)
+_SX, _SW32 = 61.5, 27  # slide 32: the stacked tickets' left edge and width (%); the first card's
+# top lines up with the current-widget screenshot opposite (276px)
 N[32] = {"kind": "media", "bg": "black", "heading": "What data do we show?",
          "panels": [P(0, 50, "#0e0e0e", 16)],
          "labels": [{"text": "Current widget design", "x": 25, "y": 22.6},
@@ -316,8 +332,8 @@ N[32] = {"kind": "media", "bg": "black", "heading": "What data do we show?",
          "steps": 2,
          "live": [dict(live("stock-order-entry", _SX, y, _SW32, h, css=TICKET_BG + NO_HEADER, fit=CARD, mode="width",
                             init=init), s=k, rise=True, stack=True)
-                  for k, (init, y, h) in enumerate((("ticketQuote", 27, 8), ("ticketQty", 35.82, 25),
-                                                    ("ticketFull", 59.99, 34)))]}
+                  for k, (init, y, h) in enumerate((("ticketQuote", 25.24, 8), ("ticketQty", 34.06, 25),
+                                                    ("ticketFull", 58.23, 34)))]}
 N[33] = S("How do we make the option trade\nexperience faster?", "Reducing time to trade")
 N[34] = S("What are options?")
 N[35] = {"kind": "twocol", "bg": "black", "panels": [P(0, 50, DARK_PANEL)],
@@ -373,15 +389,16 @@ N[50] = {"kind": "media", "bg": "black", "heading": "Maximizing widget and works
          "panels": [P(0, 50.1, DARK_PANEL, 16)],
          "labels": [{"text": "Screenshot of a client’s workspace", "x": 25, "y": 22.6},
                     {"text": "Redesigned workspace layout", "x": 75, "y": 22.6}],
-         "shots": [crop(50, 'a', 2.2, 27.1, 48.0, 74.0)],
-         # the redesigned workspace, live: /work/chain-to-order, rail and all
-         "live": [live("chain-to-order", 52.2, 26, 45.6, 50, 1440, fit=".wsp-screen", vh=900, clip=True)]}
+         # the redesigned workspace is the Atlas workspace export, top-aligned with the client's
+         "shots": [crop(50, 'a', 2.2, 27.1, 48.0, 74.0),
+                   asset("050-atlas-workspace", "atlas-workspace.png", 52.2, 45.6, 27.1, quality=92)]}
 N[51] = {"kind": "media", "bg": "black", "heading": "Maximizing widget and workspace efficiency",
-         "panels": [P(0, 63, DARK_PANEL, 16)],
-         "labels": [{"text": "Initial design", "x": 31.5, "y": 21.2}, {"text": "Updated design", "x": 81.5, "y": 21.2}],
-         "shots": [cardimg(51, 'a', 2949, 3, 28.5, y=26),
-                   cardimg(51, 'b', 2947, 33.5, 26.5, y=26),
-                   cardimg(51, 'c', 2945, 67, 29, y=26)]}
+         "panels": [P(0, 50, DARK_PANEL, 16)],
+         "labels": [{"text": "Initial design", "x": 25, "y": 21.2}, {"text": "Updated design", "x": 75, "y": 21.2}],
+         # the Atlas component library exports, one per side, same scale, centred in
+         # their halves, under their labels: the initial ticket (quote row + bid/ask), then the lean updated one
+         "shots": [asset("051-atlas-initial", "atlas-ticket-360.png", 25 - 14, 28, 26),
+                   asset("051-atlas-updated", "atlas-ticket.png", 75 - 14, 28, 26)]}
 N[52] = D("Final designs")
 N[53] = {"kind": "media", "bg": "black", "bigTitle": "Then vs ", "bigAccent": "Now",
          "panels": [P(0, 50.1, DARK_PANEL, 23)],
@@ -415,7 +432,8 @@ N[62] = {"kind": "media", "bg": "white", "corner": "Solution",
 N[63] = {"kind": "role", "bg": "white", "corner": "My contribution",
          "rows": [["My role", "Product Designer"], ["Design Timeline", "4 months"],
                   ["Team", "4 Engineering teams\n1 UX Researcher\n3 Product Managers"]],
-         "shot": crop(63, 'a', 58.4, 9.0, 87.7, 85.5)}
+         # the live quote screen with its fractional strip up, where the PDF had a card
+         "live": [live("notive-quote", 58.4, 9.0, 29.3, 76.5, css=NQ_BG, fit=PHONE, vh=1000, init="openFractional")]}
 N[64] = {"kind": "media", "bg": "white", "corner": "Research",
          "shots": [crop(64, 'a', 31.6, 19.4, 68.8, 100)]}
 N[65] = S("Traders need affordable and flexible\nways to trade.", bg="white", corner="Problem", fw=600)
@@ -437,7 +455,10 @@ N[70] = {"kind": "media", "bg": "white", "corner": "2 Platforms = 2 Design langu
          "panels": [P(0, 50, LIGHT_PANEL)],
          "labels": [{"text": "Regular trading platforms", "x": 25, "y": 34.6},
                     {"text": "Advanced trading platforms", "x": 75, "y": 34.6}],
-         "shots": [crop(70, 'a', 12.0, 38.6, 38.0, 100), crop(70, 'b', 62.4, 37.8, 87.6, 100)]}
+         # regular = the fractional quote screen, advanced = the dark quote screen; both
+         # live, at the PDF phones' own bezel rects, bleeding off the bottom
+         "live": [live("notive-quote", 12.49, 39.2, 25.1, 60.8, css=NQ_BG, fit=PHONE, vh=1000, mode="width"),
+                  live("alert-creation", 62.93, 38.36, 24.25, 61.64, css=ACS_BG, fit=PHONE, vh=1000, mode="width")]}
 N[71] = {"kind": "checklist", "bg": "white", "corner": "Project scope", "panels": [P(0, 50, LIGHT_PANEL)], "cols": [NORTH]}
 N[72] = {"kind": "checklist", "bg": "white", "corner": "Project scope", "panels": [P(0, 50, LIGHT_PANEL)], "cols": [NORTH, MVP]}
 N[73] = S("How might we make investing\naccessible to new investors without\nslowing down advanced traders?",
@@ -454,7 +475,10 @@ GOAL_CARDS = [{"x": 5.8, "y": 25.95, "w": 40.57, "h": 45.05, "icon": _goal_icons
 # exactly where the goals layout puts the icon (measured: 65.7, 34.59, 9.2 x 15.35)
 GOAL_LIVE = [live("order-placed-animation", 65.7, 34.59, 9.2, 15.35, css=OPA_BG,
                   fit=".opa-badge", vh=1000, clip=True, pad=14, init="mute")]
-GOAL_CARDS_LIVE = [GOAL_CARDS[0], dict(GOAL_CARDS[1], icon=dict(_goal_icons[1], hide=True))]
+GOAL_CARDS_LIVE = [dict(GOAL_CARDS[0], icon=dict(_goal_icons[0], hide=True)),
+                   dict(GOAL_CARDS[1], icon=dict(_goal_icons[1], hide=True))]
+# ...and the symbol finder is the holdings magnifier, the same size as the check tile
+GOAL_LIVE = GOAL_LIVE + [live("holdings-empty-state", 26.1 - 4.6, 34.59, 9.2, 15.35, css=HE_BG, fit=".he-card", vh=1000)]
 N[75] = {"kind": "goals", "bg": "white", "corner": "Goal", "cards": GOAL_CARDS_LIVE, "live": GOAL_LIVE}
 N[76] = {"kind": "goals", "bg": "white", "corner": "Goal", "cards": GOAL_CARDS_LIVE, "live": GOAL_LIVE}
 
@@ -471,12 +495,13 @@ def releases(n, k):
 
 N[77] = releases(77, 1)
 N[78] = releases(78, 2)
-N[79] = releases(79, 2)
+N[79] = releases(79, 1)
 N[79]["labels"] = releases(79, 3)["labels"]
 # the third card is drawn by the deck and holds the live fractional order
 # flow, bleeding off the card's bottom edge the way the release phones do
-N[79]["boxes"] = [{"x": 67.37, "y": 23.8, "w": 28.44, "h": 55.0, "c": "#f6f6f6"}]
-N[79]["live"] = [live("fractional-order-flow", 72.2, 35.2, 20.85, 43.6, css=FOF_BG, fit=".fof-frame",
+N[79]["boxes"] = [{"x": x, "y": 23.8, "w": 28.44, "h": 55.0, "c": "#f6f6f6"} for x in (35.75, 67.37)]
+N[79]["live"] = [live("notive-quote", 40.1, 35.3, 20.75, 43.5, css=NQ_BG, fit=PHONE, vh=1000, mode="width", clip=True),
+                live("fractional-order-flow", 72.2, 35.2, 20.85, 43.6, css=FOF_BG, fit=".fof-frame",
                       vh=1000, mode="width", clip=True)]
 # the live quote screen, as the slide draws it: large, bleeding off the bottom
 N[80] = {"kind": "media", "bg": "white", "corner": "How do I find the right symbol?",
@@ -503,22 +528,23 @@ N[85] = {"kind": "media", "bg": "white", "corner": "Original design",
 N[86] = {"kind": "media", "bg": "white", "corner": "How does an advanced trader place an order?",
          "panels": [P(50, 50, LIGHT_PANEL)],
          "labels": [{"text": "Old design", "x": 28.45, "y": 15.5}],
-         "shots": [crop(86, 'a', 16.2, 17.8, 37.4, 90.4, strip=("Old", "design", "Updated"))]}
+         # the old ticket is the live order-placement screen, at the PDF phone's bezel rect
+         "live": [live("order-placement", 17.77, 20.09, 18.4, 69.62, css=PHONE_BG, fit=PHONE, vh=1000, mode="width")]}
 N[87] = {"kind": "media", "bg": "white", "corner": "Happy path", "corner2": {"text": "Happy path", "x": 55.2},
          "panels": [P(50, 50, LIGHT_PANEL)],
          "labels": [{"text": "Old design", "x": 26.99, "y": 13.2}, {"text": "Updated design", "x": 73.57, "y": 13.2}],
-         "shots": [crop(87, 'a', 16.2, 17.8, 37.4, 90.4, strip=("Old", "design", "Updated"))],
-         "live": [live("order-placement-boxed-single", 64.22, 15.19, 18.7, 74.13, css=PHONE_BG, fit=PHONE, vh=1000)]}
+         "live": [live("order-placement", 17.77, 20.09, 18.4, 69.62, css=PHONE_BG, fit=PHONE, vh=1000, mode="width"),
+                  live("order-placement-boxed-single", 64.22, 15.19, 18.7, 74.13, css=PHONE_BG, fit=PHONE, vh=1000)]}
 N[88] = {"kind": "numbered", "bg": "white", "corner": "Design process",
          "items": ["Happy path design", "Order type navigation", "Symbol discoverability"], "active": [1]}
 N[89] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
-         "shots": [crop(89, 'a', 33.7, 28.5, 66.2, 100)]}
+         # the edge cases run on the live fractional order flow, opened on a Limit order
+         "live": [live("fractional-order-flow", 35.61, 32.43, 30.07, 67.57, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder")]}
 N[90] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "labels": [{"text": "V1", "x": 31.45, "y": 34.4}, {"text": "V2", "x": 73.25, "y": 34.4}],
-         "shots": [crop(90, 'a', 14.1, 37.4, 47.6, 100, strip=("V", "1", "V2")),
-                   crop(90, 'b', 55.8, 37.4, 89.3, 100, strip=("V", "1", "V2"))]}
+         "live": [live("fractional-order-flow", x, 38.2, 31.01, 61.8, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder") for x in (16.05, 57.71)]}
 N[91] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
-         "shots": [crop(91, 'a', 32.5, 25.2, 66.5, 100)]}
+         "live": [live("fractional-order-flow", 34.52, 29.53, 31.38, 70.47, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init="limitOrder")]}
 N[92] = {"kind": "media", "bg": "white", "corner": "Navigating edge cases",
          "panels": [P(50, 50, LIGHT_PANEL)],
          "shots": [crop(92, 'a', 14.0, 16.8, 36.3, 90.4), crop(92, 'b', 59.5, 22.5, 91.0, 75.0)]}
@@ -530,7 +556,7 @@ N[94] = D("", bg="white")
 _P95 = (62.9, 5.2, 87.8, 94.0)       # the phone
 _SW = (21.0, 16.3, 33.4, 36.5)       # the switcher icon (both collages)
 SWITCHER = live("fractional-order-flow", 21.0, 16.3, 12.4, 20.2, css=FOF_BG,
-                fit='img[alt="Swap amount and quantity"]', vh=1000, clip=True, pad=30)
+                fit='[aria-label="Swap amount and quantity"]', vh=1000, clip=True, pad=30)
 _S95 = (6.4, 65.4, 45.9, 81.4)       # the white strip holding the banner icon
 N[95] = {"kind": "media", "bg": "white",
          "shots": [crop(95, 'a', 0, 0, 100, 100, wipe=(_P95, _S95, _SW))],
@@ -540,13 +566,18 @@ FRAC_LABELS = [{"text": "Market non-fractional", "x": 18.25, "y": 27.2},
                {"text": "Market fractional", "x": 50.35, "y": 27.2},
                {"text": "Limit non-fractional", "x": 82.05, "y": 27.2}]
 N[96] = {"kind": "media", "bg": "white", "labels": FRAC_LABELS,
-         "shots": [crop(96, "abc"[i], x0, 29.6, x1, 100, strip=("Market", "non-", "fractional", "Limit"))
-                   for i, (x0, x1) in enumerate([(2.0, 32.1), (33.9, 64.0), (65.8, 95.9)])]}
+         # market fractional + limit run on the live flow; the flow has no whole-shares-only
+         # market mode, so "Market non-fractional" stays the PDF's screen
+         "shots": [crop(96, 'a', 2.0, 29.6, 32.1, 100, strip=("Market", "non-", "fractional", "Limit"))],
+         "live": [live("fractional-order-flow", x, 30.13, 27.9, 69.87, css=FOF_BG, fit=".fof-frame", vh=1000, mode="width", init=init)
+                  for x, init in ((35.63, None), (67.5, "limitOrder"))]}
 _T97 = (20.68, 62.78, 31.56, 83.98)  # the "Order sent" tile
+_P97 = (63.2, 14.0, 84.7, 88.9)      # the phone: the live order-placement screen
 N[97] = {"kind": "media", "bg": "white",
-         "shots": [crop(97, 'a', 0, 0, 100, 100, wipe=(_T97, _SW))],
+         "shots": [crop(97, 'a', 0, 0, 100, 100, wipe=(_T97, _SW, _P97))],
          "live": [SWITCHER, live("order-placed-animation", 20.68, 62.78, 10.88, 21.2, css=OPA_BG,
-                       fit=".opa-badge, .opa-caption", vh=1000, clip=True, pad=26, init="mute")]}
+                       fit=".opa-badge, .opa-caption", vh=1000, clip=True, pad=26, init="mute"),
+                  live("order-placement", 63.45, 14.24, 20.94, 74.39, css=PHONE_BG, fit=PHONE, vh=1000)]}
 N[98] = D("Impact", bg="white", tone="green")
 N[99] = {"kind": "figures", "bg": "white", "tone": "green", "layout": "top",
          "items": [["60K", "increase in trading volume"], ["$33M", "total value traded"]]}
