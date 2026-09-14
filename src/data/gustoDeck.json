@@ -8,59 +8,58 @@
  },
  {
   "n": 2,
-  "kind": "divider",
-  "bg": "black",
-  "text": "I’m a Product Designer",
-  "size": "md",
-  "fs": 94
- },
- {
-  "n": 3,
   "kind": "ownership",
   "bg": "black",
   "reveal": 1,
   "corner": "Title"
  },
  {
-  "n": 4,
+  "n": 3,
   "kind": "ownership",
   "bg": "black",
   "reveal": 2,
   "corner": "Title"
  },
  {
-  "n": 5,
+  "n": 4,
   "kind": "ownership",
   "bg": "black",
   "reveal": 3,
   "corner": "Title"
  },
  {
-  "n": 6,
+  "n": 5,
   "kind": "ownership",
   "bg": "black",
   "reveal": 4,
   "corner": "Title"
  },
  {
-  "n": 7,
+  "n": 6,
   "kind": "ownership",
   "bg": "black",
   "reveal": 5,
   "corner": "Title"
  },
  {
-  "n": 8,
+  "n": 7,
   "kind": "ownership",
   "bg": "black",
   "reveal": 6,
   "corner": "Title"
  },
  {
-  "n": 9,
+  "n": 8,
   "kind": "ownership",
   "bg": "black",
   "reveal": 7,
+  "corner": "Title"
+ },
+ {
+  "n": 9,
+  "kind": "ownership",
+  "bg": "black",
+  "reveal": 8,
   "corner": "Title"
  },
  {
@@ -68,18 +67,11 @@
   "kind": "ownership",
   "bg": "black",
   "reveal": 8,
-  "corner": "Title"
- },
- {
-  "n": 11,
-  "kind": "ownership",
-  "bg": "black",
-  "reveal": 8,
   "dim": true,
   "corner": "Title"
  },
  {
-  "n": 12,
+  "n": 11,
   "kind": "titlecard",
   "bg": "black",
   "kicker": "Case study",
@@ -87,76 +79,63 @@
   "fs": 120
  },
  {
-  "n": 13,
+  "n": 12,
   "kind": "divider",
   "bg": "black",
   "text": "Background",
   "size": "lg"
  },
  {
-  "n": 14,
+  "n": 13,
   "kind": "media",
   "bg": "black",
-  "cornerInk": "dark",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50,
-    "y": 0,
-    "c": "#f2f2f2"
-   }
-  ],
-  "labels": [
-   {
-    "text": "Regular trading platforms",
-    "x": 26.5,
-    "y": 22.3,
-    "tone": "dark"
-   },
-   {
-    "text": "Advanced trading platforms",
-    "x": 77.05,
-    "y": 22.3
-   }
-  ],
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "014a",
-    "x": 3,
-    "y": 24.3,
-    "w": 44
-   },
-   {
-    "src": "014b",
-    "x": 51.4,
-    "y": 24.3,
-    "w": 46.6
+    "src": "013full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
-  ],
-  "corner": "Title"
+  ]
  },
  {
-  "n": 15,
-  "kind": "statement",
-  "bg": "black",
-  "text": "Questrade was experiencing slower\ngrowth among the active traders.",
-  "corner": "Title"
- },
- {
-  "n": 16,
+  "n": 14,
   "kind": "statement",
   "bg": "black",
   "text": "Launch a new, modernized trading platform",
   "kicker": "Solution"
  },
  {
-  "n": 17,
+  "n": 15,
+  "kind": "media",
   "bg": "black",
-  "raster": "017.webp",
-  "corner": "Title"
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "015full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
  },
  {
-  "n": 18,
+  "n": 16,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "016full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 17,
   "kind": "role",
   "bg": "black",
   "rows": [
@@ -189,68 +168,91 @@
   "corner": "Title"
  },
  {
-  "n": 19,
+  "n": 18,
   "kind": "divider",
   "bg": "black",
   "text": "The journey",
   "size": "lg"
  },
  {
-  "n": 20,
-  "kind": "quote",
+  "n": 19,
+  "kind": "media",
   "bg": "black",
-  "kicker": "Existing client sentiment",
-  "text": "“Don’t change order entry. It’s the only\nfeature no one complains about.”"
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "019full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
  },
  {
-  "n": 21,
+  "n": 20,
   "kind": "statement",
   "bg": "black",
   "text": "Led foundational research with active traders\nto evaluate the full trading journey.",
   "kicker": "Pivoting the research"
  },
  {
-  "n": 22,
-  "kind": "journey",
+  "n": 21,
+  "kind": "media",
   "bg": "black",
-  "kicker": "User journey",
-  "steps": [
-   "Idea generation",
-   "Conviction building",
-   "Execution",
-   "Monitoring"
-  ],
-  "active": -1
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "021full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 22,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "022full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
  },
  {
   "n": 23,
-  "kind": "journey",
+  "kind": "media",
   "bg": "black",
-  "kicker": "User journey",
-  "steps": [
-   "Idea generation",
-   "Conviction building",
-   "Execution",
-   "Monitoring"
-  ],
-  "active": 2
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "023full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
  },
  {
   "n": 24,
-  "kind": "statement",
+  "kind": "media",
   "bg": "black",
-  "text": "The current order placement is slow, in\nparticular for option traders.",
-  "kicker": "The problem"
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "024full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
  },
  {
   "n": 25,
-  "kind": "statement",
-  "bg": "black",
-  "text": "Make trade submission fast and frictionless\nand best in Canada.",
-  "kicker": "The goal"
- },
- {
-  "n": 26,
   "kind": "metrics",
   "bg": "black",
   "kicker": "Success metrics",
@@ -264,37 +266,44 @@
   ]
  },
  {
-  "n": 27,
+  "n": 26,
   "kind": "divider",
   "bg": "black",
   "text": "How?",
   "size": "lg"
  },
  {
-  "n": 28,
+  "n": 27,
   "kind": "statement",
   "bg": "black",
   "text": "What data do we show and how?",
   "kicker": "Reducing time to trade"
  },
  {
+  "n": 28,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "028full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
   "n": 29,
   "kind": "media",
   "bg": "black",
-  "heading": "How do we show the data?",
-  "labels": [
-   {
-    "text": "Current widget layout",
-    "x": 50,
-    "y": 21.5
-   }
-  ],
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "029a",
-    "x": 21,
-    "y": 25.5,
-    "w": 58
+    "src": "029full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -302,156 +311,27 @@
   "n": 30,
   "kind": "media",
   "bg": "black",
-  "heading": "How do we show the data?",
-  "labels": [
-   {
-    "text": "Current widget layout",
-    "x": 50,
-    "y": 21.5
-   }
-  ],
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "029a",
-    "x": 21,
-    "y": 25.5,
-    "w": 58,
-    "annot": {
-     "w": 609.41,
-     "h": 297.96,
-     "line": "#E03E1A",
-     "points": [
-      {
-       "at": [
-        12.72,
-        18.48
-       ],
-       "c": "#E03E1A",
-       "n": "1"
-      },
-      {
-       "at": [
-        12.72,
-        268.48
-       ],
-       "c": "#E03E1A",
-       "n": "2"
-      },
-      {
-       "at": [
-        96.72,
-        81.48
-       ],
-       "c": "#E03E1A",
-       "n": "3"
-      },
-      {
-       "at": [
-        310.72,
-        199.48
-       ],
-       "c": "#E03E1A",
-       "n": "4"
-      },
-      {
-       "at": [
-        457.72,
-        139.48
-       ],
-       "c": "#E03E1A",
-       "n": "5"
-      }
-     ]
-    }
+    "src": "030full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
-  ],
-  "steps": 4
+  ]
  },
  {
   "n": 31,
   "kind": "media",
   "bg": "black",
-  "heading": "What data do we show?",
-  "labels": [
-   {
-    "text": "Current widget layout",
-    "x": 50,
-    "y": 21.5
-   }
-  ],
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "029a",
-    "x": 21,
-    "y": 25.5,
-    "w": 58,
-    "annot": {
-     "w": 609.41,
-     "h": 297.96,
-     "line": "#D02A2A",
-     "boxes": [
-      [
-       23.38,
-       93.74,
-       194.58,
-       48.14
-      ],
-      [
-       169.81,
-       163.94,
-       102.3,
-       83.25
-      ],
-      [
-       373.41,
-       163.94,
-       204.6,
-       83.25
-      ]
-     ],
-     "lines": [
-      [
-       4.33,
-       117.31,
-       23.38,
-       117.31
-      ],
-      [
-       218.96,
-       248.19,
-       218.96,
-       303.85,
-       500.28,
-       303.85,
-       500.28,
-       248.19
-      ],
-      [
-       356.86,
-       303.85,
-       356.86,
-       316.39
-      ]
-     ],
-     "notes": [
-      {
-       "at": [
-        -0.69,
-        117.81
-       ],
-       "anchor": "right",
-       "text": "Only 12 clients can actually use these fields"
-      },
-      {
-       "at": [
-        355.36,
-        320.4
-       ],
-       "anchor": "top",
-       "text": "These values cannot be changed\nand interacted with"
-      }
-     ]
-    }
+    "src": "031full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -459,103 +339,60 @@
   "n": 32,
   "kind": "media",
   "bg": "black",
-  "heading": "What data do we show?",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50,
-    "y": 16,
-    "c": "#0e0e0e"
-   }
-  ],
-  "labels": [
-   {
-    "text": "Current widget design",
-    "x": 25,
-    "y": 22.6
-   },
-   {
-    "text": "Updated widget design",
-    "x": 75,
-    "y": 22.6
-   }
-  ],
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "032a",
-    "x": 4,
-    "y": 38.558,
-    "w": 42
-   }
-  ],
-  "steps": 2,
-  "live": [
-   {
-    "page": "stock-order-entry",
-    "x": 61.5,
-    "y": 25.24,
-    "w": 27,
-    "h": 8,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}.wshell-bar{display:none!important}",
-    "mode": "width",
-    "init": "ticketQuote",
-    "fit": ".wshell",
-    "vh": 960,
-    "s": 0,
-    "rise": true,
-    "stack": true
-   },
-   {
-    "page": "stock-order-entry",
-    "x": 61.5,
-    "y": 34.06,
-    "w": 27,
-    "h": 25,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}.wshell-bar{display:none!important}",
-    "mode": "width",
-    "init": "ticketQty",
-    "fit": ".wshell",
-    "vh": 960,
-    "s": 1,
-    "rise": true,
-    "stack": true
-   },
-   {
-    "page": "stock-order-entry",
-    "x": 61.5,
-    "y": 58.23,
-    "w": 27,
-    "h": 34,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}.wshell-bar{display:none!important}",
-    "mode": "width",
-    "init": "ticketFull",
-    "fit": ".wshell",
-    "vh": 960,
-    "s": 2,
-    "rise": true,
-    "stack": true
+    "src": "032full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
  {
   "n": 33,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "033full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 34,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "034full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 35,
   "kind": "statement",
   "bg": "black",
   "text": "How do we make the option trade\nexperience faster?",
   "kicker": "Reducing time to trade"
  },
  {
-  "n": 34,
+  "n": 36,
   "kind": "statement",
   "bg": "black",
   "text": "What are options?",
   "corner": "Title"
  },
  {
-  "n": 35,
+  "n": 37,
   "kind": "twocol",
   "bg": "black",
   "panels": [
@@ -571,75 +408,37 @@
   "corner": "Title"
  },
  {
-  "n": 36,
-  "kind": "journey",
+  "n": 38,
+  "kind": "media",
   "bg": "black",
-  "kicker": "User journey",
-  "steps": [
-   "Idea generation",
-   "Conviction building",
-   "Execution",
-   "Monitoring"
-  ],
-  "active": 2
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "038full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
  },
  {
-  "n": 37,
+  "n": 39,
   "kind": "statement",
   "bg": "black",
   "text": "The journey between finding an option and\nplacing an option trade was broken",
   "kicker": "Reducing time to trade"
  },
  {
-  "n": 38,
-  "kind": "statement",
-  "bg": "black",
-  "text": "80% of Questrade’s revenue = the most complex\nindustry experience",
-  "kicker": "The problem"
- },
- {
-  "n": 39,
-  "kind": "media",
-  "bg": "black",
-  "labels": [
-   {
-    "text": "Option chain (your catalog)",
-    "x": 25.6,
-    "y": 8.6
-   },
-   {
-    "text": "Order entry (checkout)",
-    "x": 74.4,
-    "y": 8.6
-   }
-  ],
-  "shots": [
-   {
-    "src": "039a",
-    "x": 1.4,
-    "y": 11.8,
-    "w": 54.0
-   },
-   {
-    "src": "039b",
-    "x": 55.9,
-    "y": 11.8,
-    "w": 40.5
-   }
-  ],
-  "corner": "Title"
- },
- {
   "n": 40,
   "kind": "media",
   "bg": "black",
-  "heading": "Reduce time to trade",
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "040a",
-    "x": 10.4,
-    "y": 13.2,
-    "w": 79.2
+    "src": "040full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -651,38 +450,37 @@
   "shots": [
    {
     "src": "041a",
-    "x": 17,
-    "y": 33.332,
-    "w": 66
+    "x": 10.4,
+    "y": 13.2,
+    "w": 79.2
    }
   ]
  },
  {
   "n": 42,
-  "kind": "statement",
+  "kind": "media",
   "bg": "black",
-  "text": "Tailor the order placement experience\nto each security type",
-  "kicker": "The solution"
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "042full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
  },
  {
   "n": 43,
   "kind": "media",
   "bg": "black",
-  "heading": "Reduce time to trade: Options",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50,
-    "y": 0,
-    "c": "#111116"
-   }
-  ],
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "043a",
-    "x": 3,
-    "y": 40.686,
-    "w": 44
+    "src": "043full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -690,104 +488,13 @@
   "n": 44,
   "kind": "media",
   "bg": "black",
-  "heading": "Reduce time to trade: Options",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50,
-    "y": 0,
-    "c": "#111116"
-   }
-  ],
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "044a",
-    "x": 3,
-    "y": 40.686,
-    "w": 44
-   }
-  ],
-  "steps": 1,
-  "labels": [
-   {
-    "text": "Stocks",
-    "x": 53.646,
-    "y": 25.648,
-    "size": "lg",
-    "s": 1
-   },
-   {
-    "text": "Options",
-    "x": 53.646,
-    "y": 67.685,
-    "size": "lg",
-    "s": 1
-   }
-  ],
-  "connectors": [
-   {
-    "s": 1,
-    "points": [
-     [
-      863,
-      522
-     ],
-     [
-      895,
-      522
-     ]
-    ]
-   },
-   {
-    "s": 1,
-    "points": [
-     [
-      978,
-      290
-     ],
-     [
-      895,
-      290
-     ],
-     [
-      895,
-      744
-     ],
-     [
-      978,
-      744
-     ]
-    ]
-   }
-  ],
-  "live": [
-   {
-    "page": "stock-order-entry",
-    "x": 57.8125,
-    "y": 9.814814814814815,
-    "w": 31.25,
-    "h": 45,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}",
-    "mode": "width",
-    "init": "freeze",
-    "fit": ".wshell",
-    "vh": 960,
-    "s": 1
-   },
-   {
-    "page": "options-strategy-builder",
-    "x": 57.8125,
-    "y": 47.68518518518518,
-    "w": 31.25,
-    "h": 45,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}",
-    "mode": "width",
-    "init": "freeze",
-    "fit": ".wshell",
-    "vh": 960,
-    "s": 1
+    "src": "044full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -795,25 +502,74 @@
   "n": 45,
   "kind": "media",
   "bg": "black",
-  "heading": "Reduce time to trade: Options",
-  "live": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "page": "chain-to-order",
-    "x": 8,
-    "y": 15,
-    "w": 84,
-    "h": 80,
-    "vw": 1440,
-    "css": ".wsp-stage,.wsp-screen,.wsp,.wsp-canvas{background:none!important;box-shadow:none!important;border-color:transparent!important}.wsp-screen{overflow:visible!important}.wsp-rail{visibility:hidden!important}.ob-scrim{background-color:transparent!important}",
-    "init": "chainFirst",
-    "pad": 18,
-    "fit": ".ctt .wshell",
-    "vh": 900
+    "src": "045full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
  {
   "n": 46,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "046full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 47,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "047full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 48,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "048full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 49,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "049full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 50,
   "kind": "media",
   "bg": "black",
   "corner": "Product vision",
@@ -853,190 +609,58 @@
   ]
  },
  {
-  "n": 47,
-  "kind": "media",
-  "bg": "black",
-  "live": [
-   {
-    "page": "options-strategy-builder",
-    "x": 5,
-    "y": 16,
-    "w": 44,
-    "h": 70,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}",
-    "fit": ".wshell",
-    "vh": 960
-   }
-  ],
-  "corner": "Title"
- },
- {
-  "n": 48,
-  "kind": "numbered",
-  "bg": "black",
-  "items": [
-   "Reduce time to trade",
-   "Standardize",
-   "Innovate while respecting the past"
-  ],
-  "active": [
-   0,
-   1
-  ]
- },
- {
-  "n": 49,
-  "kind": "numbered",
-  "bg": "black",
-  "items": [
-   "Reduce time to trade",
-   "Standardize",
-   "Innovate while respecting the past"
-  ],
-  "active": [
-   0,
-   1
-  ]
- },
- {
-  "n": 50,
-  "kind": "media",
-  "bg": "black",
-  "heading": "Maximizing widget and workspace efficiency",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50.1,
-    "y": 16,
-    "c": "#111116"
-   }
-  ],
-  "labels": [
-   {
-    "text": "Screenshot of a client’s workspace",
-    "x": 25,
-    "y": 22.6
-   },
-   {
-    "text": "Redesigned workspace layout",
-    "x": 75,
-    "y": 22.6
-   }
-  ],
-  "shots": [
-   {
-    "src": "050a",
-    "x": 2.2,
-    "y": 27.1,
-    "w": 45.8
-   },
-   {
-    "src": "050-atlas-workspace",
-    "x": 52.2,
-    "y": 27.1,
-    "w": 45.6
-   }
-  ]
- },
- {
   "n": 51,
   "kind": "media",
   "bg": "black",
-  "heading": "Maximizing widget and workspace efficiency",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50,
-    "y": 16,
-    "c": "#111116"
-   }
-  ],
-  "labels": [
-   {
-    "text": "Initial design",
-    "x": 25,
-    "y": 21.2
-   },
-   {
-    "text": "Updated design",
-    "x": 75,
-    "y": 21.2
-   }
-  ],
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "051-atlas-initial",
-    "x": 11,
-    "y": 26,
-    "w": 28
-   },
-   {
-    "src": "051-atlas-updated",
-    "x": 61,
-    "y": 26,
-    "w": 28
+    "src": "051full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
  {
   "n": 52,
+  "kind": "media",
+  "bg": "black",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "052full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 53,
   "kind": "divider",
   "bg": "black",
   "text": "Final designs",
   "size": "lg"
  },
  {
-  "n": 53,
+  "n": 54,
   "kind": "media",
   "bg": "black",
-  "bigTitle": "Then vs ",
-  "bigAccent": "Now",
-  "panels": [
-   {
-    "x": 0,
-    "w": 50.1,
-    "y": 23,
-    "c": "#111116"
-   }
-  ],
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "053a",
-    "x": 4,
-    "y": 40.971,
-    "w": 42
-   }
-  ],
-  "live": [
-   {
-    "page": "stock-order-entry",
-    "x": 55,
-    "y": 22,
-    "w": 40,
-    "h": 33,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}.st-attach-stack{display:none!important}",
-    "fit": ".wshell",
-    "vh": 960
-   },
-   {
-    "page": "options-strategy-builder",
-    "x": 55,
-    "y": 57,
-    "w": 40,
-    "h": 39,
-    "vw": 1280,
-    "css": ".ob-stage{background:none!important}.ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}",
-    "fit": ".wshell",
-    "vh": 960
+    "src": "054full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
  {
-  "n": 54,
+  "n": 55,
   "bg": "black",
-  "raster": "054.webp",
+  "raster": "055.webp",
   "live": [
    {
     "page": "chain-to-order",
@@ -1054,14 +678,14 @@
   "corner": "Title"
  },
  {
-  "n": 55,
+  "n": 56,
   "kind": "divider",
   "bg": "black",
   "text": "Impact",
   "size": "lg"
  },
  {
-  "n": 56,
+  "n": 57,
   "kind": "figures",
   "bg": "black",
   "tone": "mint",
@@ -1087,97 +711,72 @@
   "corner": "Title"
  },
  {
-  "n": 57,
+  "n": 58,
   "kind": "divider",
   "bg": "black",
   "text": "Reflections",
   "size": "lg"
  },
  {
-  "n": 58,
-  "kind": "titlecard",
-  "bg": "white",
-  "kicker": "Case study",
-  "title": "Fractional\nshares",
-  "fs": 84,
-  "shot": {
-   "src": "058a",
-   "x": 46.7,
-   "y": 4.9,
-   "w": 51.6
-  }
- },
- {
   "n": 59,
-  "kind": "numbered",
+  "kind": "media",
   "bg": "white",
-  "corner": "Company goal",
-  "size": "lg",
-  "items": [
-   "Win more active traders",
-   "Streamline the trading experience"
-  ],
-  "active": "all"
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "059full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
  },
  {
   "n": 60,
+  "kind": "media",
+  "bg": "white",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "060full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 61,
   "kind": "statement",
   "bg": "white",
   "text": "Introduce fractional trading",
   "corner": "Solution"
  },
  {
-  "n": 61,
-  "kind": "statement",
-  "bg": "white",
-  "text": "What is that?",
-  "corner": "Solution"
- },
- {
   "n": 62,
   "kind": "media",
   "bg": "white",
-  "corner": "Solution",
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "062a",
-    "x": 15.5,
-    "y": 19.5,
-    "w": 64.5
+    "src": "062full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
  {
   "n": 63,
-  "kind": "role",
+  "kind": "media",
   "bg": "white",
-  "corner": "My contribution",
-  "rows": [
-   [
-    "My role",
-    "Product Designer"
-   ],
-   [
-    "Design Timeline",
-    "4 months"
-   ],
-   [
-    "Team",
-    "4 Engineering teams\n1 UX Researcher\n3 Product Managers"
-   ]
-  ],
-  "live": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "page": "notive-quote",
-    "x": 58.4,
-    "y": 9.0,
-    "w": 29.3,
-    "h": 76.5,
-    "vw": 1280,
-    "css": ".nq-root,.phone-stage{background:none!important}",
-    "init": "openFractional",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
+    "src": "063full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -1185,10 +784,24 @@
   "n": 64,
   "kind": "media",
   "bg": "white",
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "064full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
+ },
+ {
+  "n": 65,
+  "kind": "media",
+  "bg": "white",
   "corner": "Research",
   "shots": [
    {
-    "src": "064a",
+    "src": "065a",
     "x": 31.6,
     "y": 19.4,
     "w": 37.2
@@ -1196,7 +809,7 @@
   ]
  },
  {
-  "n": 65,
+  "n": 66,
   "kind": "statement",
   "bg": "white",
   "text": "Traders need affordable and flexible\nways to trade.",
@@ -1205,7 +818,7 @@
   "fs": 80
  },
  {
-  "n": 66,
+  "n": 67,
   "kind": "statement",
   "bg": "white",
   "text": "1 Feature.",
@@ -1213,7 +826,7 @@
   "corner": "Design challenge"
  },
  {
-  "n": 67,
+  "n": 68,
   "kind": "statement",
   "bg": "white",
   "text": "1 Feature. 2 Personas.",
@@ -1221,7 +834,7 @@
   "corner": "Design challenge"
  },
  {
-  "n": 68,
+  "n": 69,
   "kind": "statement",
   "bg": "white",
   "text": "1 Feature. 2 Personas. 2 Design languages",
@@ -1229,49 +842,21 @@
   "corner": "Design challenge"
  },
  {
-  "n": 69,
-  "kind": "cards",
+  "n": 70,
+  "kind": "media",
   "bg": "white",
-  "corner": "Trader types",
-  "panels": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
+    "src": "070full",
     "x": 0,
-    "w": 50,
     "y": 0,
-    "c": "#f2f2f2"
-   }
-  ],
-  "cards": [
-   {
-    "x": 14.32,
-    "y": 37.2,
-    "w": 25,
-    "tone": "white",
-    "title": "Regular trader",
-    "points": [
-     "Fractional shares is a primary feature",
-     "Wants to trade in $ amounts",
-     "Wants to distribute 100% of all their assets",
-     "Has limited understanding of industry rules and limitations"
-    ]
-   },
-   {
-    "x": 62.19,
-    "y": 36.1,
-    "w": 25,
-    "tone": "canvas",
-    "title": "Advanced trader",
-    "points": [
-     "Fractional shares as a “nice to have” feature",
-     "Wants to short fractional amounts",
-     "Wants to mitigate risk",
-     "Has some understanding of industry rules and limitations"
-    ]
+    "w": 100
    }
   ]
  },
  {
-  "n": 70,
+  "n": 71,
   "kind": "media",
   "bg": "white",
   "corner": "2 Platforms = 2 Design languages",
@@ -1323,80 +908,21 @@
   ]
  },
  {
-  "n": 71,
-  "kind": "checklist",
+  "n": 72,
+  "kind": "media",
   "bg": "white",
-  "corner": "Project scope",
-  "panels": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
+    "src": "072full",
     "x": 0,
-    "w": 50,
     "y": 0,
-    "c": "#f2f2f2"
-   }
-  ],
-  "cols": [
-   {
-    "title": "North star",
-    "sections": [
-     {
-      "label": "Symbol availability",
-      "items": [
-       [
-        "US symbols",
-        true
-       ],
-       [
-        "CAD symbols",
-        true
-       ]
-      ]
-     },
-     {
-      "label": "Supported order types",
-      "items": [
-       [
-        "Market orders",
-        true
-       ],
-       [
-        "Limit orders",
-        true
-       ]
-      ]
-     },
-     {
-      "label": "Supported action types",
-      "items": [
-       [
-        "Buy orders",
-        true
-       ],
-       [
-        "Sell orders",
-        true
-       ]
-      ]
-     },
-     {
-      "label": "Order management",
-      "items": [
-       [
-        "Order placement",
-        true
-       ],
-       [
-        "Order modification",
-        true
-       ]
-      ]
-     }
-    ]
+    "w": 100
    }
   ]
  },
  {
-  "n": 72,
+  "n": 73,
   "kind": "checklist",
   "bg": "white",
   "corner": "Project scope",
@@ -1526,21 +1052,18 @@
   ]
  },
  {
-  "n": 73,
-  "kind": "statement",
-  "bg": "white",
-  "text": "How might we make investing\naccessible to new investors without\nslowing down advanced traders?",
-  "fw": 600,
-  "corner": "The challenge"
- },
- {
   "n": 74,
-  "kind": "divider",
+  "kind": "media",
   "bg": "white",
-  "text": "Design process",
-  "size": "lg",
-  "tone": "green",
-  "fs": 125
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "074full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
+  ]
  },
  {
   "n": 75,
@@ -1553,13 +1076,7 @@
     "y": 25.95,
     "w": 40.57,
     "h": 45.05,
-    "icon": {
-     "src": "075i1",
-     "x": 20.2,
-     "y": 34.2,
-     "w": 11.8,
-     "hide": true
-    },
+    "icon": null,
     "text": "Help traders discover\nfractional symbols"
    },
    {
@@ -1567,13 +1084,7 @@
     "y": 25.95,
     "w": 40.57,
     "h": 45.05,
-    "icon": {
-     "src": "075i2",
-     "x": 65.7,
-     "y": 32.6,
-     "w": 9.2,
-     "hide": true
-    },
+    "icon": null,
     "text": "Allow traders to place\na fractional trade"
    }
   ],
@@ -1607,64 +1118,15 @@
  },
  {
   "n": 76,
-  "kind": "goals",
+  "kind": "media",
   "bg": "white",
-  "corner": "Goal",
-  "cards": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "x": 5.8,
-    "y": 25.95,
-    "w": 40.57,
-    "h": 45.05,
-    "icon": {
-     "src": "075i1",
-     "x": 20.2,
-     "y": 34.2,
-     "w": 11.8,
-     "hide": true
-    },
-    "text": "Help traders discover\nfractional symbols"
-   },
-   {
-    "x": 50.02,
-    "y": 25.95,
-    "w": 40.57,
-    "h": 45.05,
-    "icon": {
-     "src": "075i2",
-     "x": 65.7,
-     "y": 32.6,
-     "w": 9.2,
-     "hide": true
-    },
-    "text": "Allow traders to place\na fractional trade"
-   }
-  ],
-  "live": [
-   {
-    "page": "order-placed-animation",
-    "x": 65.7,
-    "y": 34.59,
-    "w": 9.2,
-    "h": 15.35,
-    "vw": 1280,
-    "css": ".opa-stage{background:none!important}",
-    "init": "mute",
-    "pad": 14,
-    "clip": true,
-    "fit": ".opa-badge",
-    "vh": 1000
-   },
-   {
-    "page": "holdings-empty-state",
-    "x": 21.5,
-    "y": 34.59,
-    "w": 9.2,
-    "h": 15.35,
-    "vw": 1280,
-    "css": ".he-root{background:none!important}",
-    "fit": ".he-card",
-    "vh": 1000
+    "src": "076full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -1672,29 +1134,13 @@
   "n": 77,
   "kind": "media",
   "bg": "white",
-  "corner": "How do I find the right symbol?",
-  "labels": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "text": "Original design",
-    "x": 18.36,
-    "y": 30.2,
-    "size": "lg"
-   }
-  ],
-  "live": [
-   {
-    "page": "notive-quote",
-    "x": 4.14,
-    "y": 33.0,
-    "w": 28.44,
-    "h": 67.0,
-    "vw": 1280,
-    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
-    "mode": "width",
-    "init": "notiveOriginal,freeze",
-    "clip": true,
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
+    "src": "077full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -1702,49 +1148,13 @@
   "n": 78,
   "kind": "media",
   "bg": "white",
-  "corner": "How do I find the right symbol?",
-  "labels": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "text": "Original design",
-    "x": 18.36,
-    "y": 30.2,
-    "size": "lg"
-   },
-   {
-    "text": "Beta release",
-    "x": 49.97,
-    "y": 30.2,
-    "size": "lg"
-   }
-  ],
-  "live": [
-   {
-    "page": "notive-quote",
-    "x": 4.14,
-    "y": 33.0,
-    "w": 28.44,
-    "h": 67.0,
-    "vw": 1280,
-    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
-    "mode": "width",
-    "init": "notiveOriginal,freeze",
-    "clip": true,
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   },
-   {
-    "page": "notive-quote",
-    "x": 35.75,
-    "y": 33.0,
-    "w": 28.44,
-    "h": 67.0,
-    "vw": 1280,
-    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
-    "mode": "width",
-    "init": "notiveBeta,freeze",
-    "clip": true,
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
+    "src": "078full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -1752,69 +1162,13 @@
   "n": 79,
   "kind": "media",
   "bg": "white",
-  "corner": "How do I find the right symbol?",
-  "labels": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "text": "Original design",
-    "x": 18.36,
-    "y": 30.2,
-    "size": "lg"
-   },
-   {
-    "text": "Beta release",
-    "x": 49.97,
-    "y": 30.2,
-    "size": "lg"
-   },
-   {
-    "text": "Public release",
-    "x": 81.59,
-    "y": 30.2,
-    "size": "lg"
-   }
-  ],
-  "live": [
-   {
-    "page": "notive-quote",
-    "x": 4.14,
-    "y": 33.0,
-    "w": 28.44,
-    "h": 67.0,
-    "vw": 1280,
-    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
-    "mode": "width",
-    "init": "notiveOriginal,freeze",
-    "clip": true,
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   },
-   {
-    "page": "notive-quote",
-    "x": 35.75,
-    "y": 33.0,
-    "w": 28.44,
-    "h": 67.0,
-    "vw": 1280,
-    "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}",
-    "mode": "width",
-    "init": "notiveBeta,freeze",
-    "clip": true,
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   },
-   {
-    "page": "notive-quote",
-    "x": 67.37,
-    "y": 33.0,
-    "w": 28.44,
-    "h": 67.0,
-    "vw": 1280,
-    "css": ".nq-root,.phone-stage{background:none!important}",
-    "mode": "width",
-    "init": "freeze",
-    "clip": true,
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
+    "src": "079full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -1822,27 +1176,13 @@
   "n": 80,
   "kind": "media",
   "bg": "white",
-  "corner": "How do I find the right symbol?",
-  "labels": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "text": "Original design",
-    "x": 31.35,
-    "y": 32.5,
-    "size": "lg"
-   }
-  ],
-  "live": [
-   {
-    "page": "alert-creation",
-    "x": 14.7,
-    "y": 35.28,
-    "w": 33.3,
-    "h": 64.72,
-    "vw": 1280,
-    "css": ".acs-root{background:none!important}",
-    "mode": "width",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
+    "src": "080full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
@@ -1850,109 +1190,54 @@
   "n": 81,
   "kind": "media",
   "bg": "white",
-  "corner": "How do I find the right symbol?",
-  "labels": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "text": "Original design",
-    "x": 31.35,
-    "y": 32.5,
-    "size": "lg"
-   },
-   {
-    "text": "Updated design",
-    "x": 68.65,
-    "y": 32.5,
-    "size": "lg"
-   }
-  ],
-  "live": [
-   {
-    "page": "alert-creation",
-    "x": 14.7,
-    "y": 35.28,
-    "w": 33.3,
-    "h": 64.72,
-    "vw": 1280,
-    "css": ".acs-root{background:none!important}",
-    "mode": "width",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   },
-   {
-    "page": "alert-creation",
-    "x": 52.0,
-    "y": 35.28,
-    "w": 33.3,
-    "h": 64.72,
-    "vw": 1280,
-    "css": ".acs-root{background:none!important}",
-    "mode": "width",
-    "init": "openFractional",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
+    "src": "081full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
  {
   "n": 82,
-  "kind": "goals",
+  "kind": "media",
   "bg": "white",
-  "plain": true,
-  "cards": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "x": 8.9,
-    "y": 38,
-    "w": 40,
-    "h": 20,
-    "icon": null,
-    "text": "Help traders discover\nfractional symbols"
+    "src": "082full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
-  ],
-  "corner": "Title"
+  ]
  },
  {
   "n": 83,
-  "kind": "goals",
+  "kind": "media",
   "bg": "white",
-  "plain": true,
-  "corner": "Title",
-  "cards": [
+  "corner": "NEEDS REVIEW",
+  "shots": [
    {
-    "x": 8.9,
-    "y": 38,
-    "w": 40,
-    "h": 20,
-    "icon": null,
-    "text": "Help traders discover\nfractional symbols"
-   },
-   {
-    "x": 51.1,
-    "y": 38,
-    "w": 40,
-    "h": 20,
-    "icon": null,
-    "text": "Allow traders to place\na fractional trade"
+    "src": "083full",
+    "x": 0,
+    "y": 0,
+    "w": 100
    }
   ]
  },
  {
   "n": 84,
   "kind": "media",
-  "bg": "canvas",
-  "corner": "Original design",
-  "labels": [
-   {
-    "text": "Original multi page wizard order entry",
-    "x": 47.45,
-    "y": 19.6,
-    "size": "lg"
-   }
-  ],
+  "bg": "white",
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "083a",
+    "src": "084full",
     "x": 0,
-    "y": 22.0,
+    "y": 0,
     "w": 100
    }
   ]
@@ -1960,111 +1245,19 @@
  {
   "n": 85,
   "kind": "media",
-  "bg": "canvas",
-  "corner": "Original design",
-  "labels": [
-   {
-    "text": "Original multi page wizard order entry",
-    "x": 47.45,
-    "y": 17.1,
-    "size": "lg"
-   }
-  ],
+  "bg": "white",
+  "corner": "NEEDS REVIEW",
   "shots": [
    {
-    "src": "084a",
+    "src": "085full",
     "x": 0,
-    "y": 19.6,
+    "y": 0,
     "w": 100
    }
   ]
  },
  {
   "n": 86,
-  "kind": "media",
-  "bg": "white",
-  "corner": "Original design",
-  "panels": [
-   {
-    "x": 0,
-    "w": 64.27,
-    "y": 0,
-    "c": "#f6f4f5"
-   }
-  ],
-  "labels": [
-   {
-    "text": "Original multi page wizard order entry",
-    "x": 26.85,
-    "y": 15.3,
-    "size": "lg"
-   },
-   {
-    "text": "Suggested design",
-    "x": 82.5,
-    "y": 15.3,
-    "size": "lg"
-   }
-  ],
-  "shots": [
-   {
-    "src": "085a",
-    "x": 0,
-    "y": 17.7,
-    "w": 64.27
-   }
-  ],
-  "live": [
-   {
-    "page": "fractional-order-flow",
-    "x": 72.08,
-    "y": 18.4,
-    "w": 21.11,
-    "h": 73.11,
-    "vw": 1280,
-    "css": ".fof-stage{background:none!important}",
-    "fit": ".fof-frame",
-    "vh": 1000
-   }
-  ]
- },
- {
-  "n": 87,
-  "kind": "media",
-  "bg": "white",
-  "corner": "How does an advanced trader place an order?",
-  "panels": [
-   {
-    "x": 50,
-    "w": 50,
-    "y": 0,
-    "c": "#f2f2f2"
-   }
-  ],
-  "labels": [
-   {
-    "text": "Old design",
-    "x": 28.45,
-    "y": 15.5
-   }
-  ],
-  "live": [
-   {
-    "page": "order-placement",
-    "x": 17.77,
-    "y": 20.09,
-    "w": 18.4,
-    "h": 69.62,
-    "vw": 1280,
-    "css": ".phone-stage{background:none!important}",
-    "mode": "width",
-    "fit": "img[src*=\"iphone\"]",
-    "vh": 1000
-   }
-  ]
- },
- {
-  "n": 88,
   "kind": "media",
   "bg": "white",
   "corner": "Happy path",
@@ -2115,21 +1308,21 @@
   ]
  },
  {
-  "n": 89,
-  "kind": "numbered",
+  "n": 87,
+  "kind": "media",
   "bg": "white",
-  "corner": "Design process",
-  "items": [
-   "Happy path design",
-   "Order type navigation",
-   "Symbol discoverability"
-  ],
-  "active": [
-   1
+  "corner": "NEEDS REVIEW",
+  "shots": [
+   {
+    "src": "087full",
+    "x": 0,
+    "y": 0,
+    "w": 100
+   }
   ]
  },
  {
-  "n": 90,
+  "n": 88,
   "kind": "media",
   "bg": "white",
   "corner": "Navigating edge cases",
@@ -2158,7 +1351,7 @@
   ]
  },
  {
-  "n": 91,
+  "n": 89,
   "kind": "media",
   "bg": "white",
   "corner": "Navigating edge cases",
@@ -2190,7 +1383,7 @@
   ]
  },
  {
-  "n": 92,
+  "n": 90,
   "kind": "media",
   "bg": "white",
   "corner": "Navigating edge cases",
@@ -2220,7 +1413,7 @@
   ]
  },
  {
-  "n": 93,
+  "n": 91,
   "kind": "media",
   "bg": "white",
   "corner": "Navigating edge cases",
@@ -2234,13 +1427,13 @@
   ],
   "shots": [
    {
-    "src": "092a",
+    "src": "091a",
     "x": 14.0,
     "y": 16.8,
     "w": 22.3
    },
    {
-    "src": "092b",
+    "src": "091b",
     "x": 59.5,
     "y": 22.5,
     "w": 31.5
@@ -2248,7 +1441,7 @@
   ]
  },
  {
-  "n": 94,
+  "n": 92,
   "kind": "divider",
   "bg": "white",
   "text": "Final designs",
@@ -2256,14 +1449,14 @@
   "tone": "green"
  },
  {
-  "n": 95,
+  "n": 93,
   "kind": "divider",
   "bg": "white",
   "text": "",
   "size": "lg"
  },
  {
-  "n": 96,
+  "n": 94,
   "kind": "media",
   "bg": "white",
   "boxes": [
@@ -2330,7 +1523,7 @@
   ]
  },
  {
-  "n": 97,
+  "n": 95,
   "kind": "media",
   "bg": "white",
   "labels": [
@@ -2352,7 +1545,7 @@
   ],
   "shots": [
    {
-    "src": "096a",
+    "src": "095a",
     "x": 2.0,
     "y": 29.6,
     "w": 30.1
@@ -2388,7 +1581,7 @@
   "corner": "Title"
  },
  {
-  "n": 98,
+  "n": 96,
   "kind": "media",
   "bg": "white",
   "corner": "Advanced trading platform",
@@ -2456,7 +1649,7 @@
   ]
  },
  {
-  "n": 99,
+  "n": 97,
   "kind": "divider",
   "bg": "white",
   "text": "Impact",
@@ -2464,7 +1657,7 @@
   "tone": "green"
  },
  {
-  "n": 100,
+  "n": 98,
   "kind": "figures",
   "bg": "white",
   "tone": "green",
@@ -2482,7 +1675,7 @@
   "corner": "Title"
  },
  {
-  "n": 101,
+  "n": 99,
   "kind": "figures",
   "bg": "white",
   "tone": "green",
@@ -2504,7 +1697,7 @@
   "corner": "Title"
  },
  {
-  "n": 102,
+  "n": 100,
   "kind": "divider",
   "bg": "white",
   "text": "Reflections",
@@ -2512,15 +1705,15 @@
   "tone": "green"
  },
  {
-  "n": 103,
+  "n": 101,
   "kind": "divider",
   "bg": "black",
   "text": "",
   "size": "lg"
  },
  {
-  "n": 104,
+  "n": 102,
   "bg": "black",
-  "raster": "103.webp"
+  "raster": "102.webp"
  }
 ]
