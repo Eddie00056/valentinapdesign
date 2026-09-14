@@ -781,6 +781,14 @@ const title = (s: Slide): string | undefined =>
         };
         w.setTimeout(tick, 1200);
       },
+      /* fractional-order-flow's amount/quantity swap glyph, tapping itself */
+      swapLoop: (w, d) => {
+        const tick = () => {
+          d.querySelector<HTMLElement>('[aria-label="Swap amount and quantity"]')?.click();
+          w.setTimeout(tick, 2000);
+        };
+        w.setTimeout(tick, 1200);
+      },
       /* the fractional order flow, opened on a Limit order (89–91, 96): the
          order-type pill's own menu, picked the way a tap would */
       limitOrder: (w, d) => {
