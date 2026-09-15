@@ -1378,8 +1378,8 @@
     "live": [
       {
         "page": "holdings-empty-state?auto",
-        "x": 15.03,
-        "y": 37.0,
+        "x": 16.9,
+        "y": 33.0,
         "w": 22.2,
         "h": 40.0,
         "vw": 1280,
@@ -1391,8 +1391,8 @@
       },
       {
         "page": "order-placed-animation",
-        "x": 67.2,
-        "y": 44.0,
+        "x": 65.33,
+        "y": 40.0,
         "w": 13.35,
         "h": 26.0,
         "vw": 1280,
@@ -1406,32 +1406,32 @@
     ],
     "boxes": [
       {
-        "x": 2.75,
-        "y": 13.0,
-        "w": 46.75,
-        "h": 83.0,
+        "x": 11.5,
+        "y": 22.0,
+        "w": 33.0,
+        "h": 56.0,
         "c": "#f7f7f7"
       },
       {
-        "x": 50.5,
-        "y": 13.0,
-        "w": 46.75,
-        "h": 83.0,
+        "x": 55.5,
+        "y": 22.0,
+        "w": 33.0,
+        "h": 56.0,
         "c": "#f7f7f7"
       }
     ],
     "labels": [
       {
         "text": "Help traders discover fractional symbols",
-        "x": 26.12,
-        "y": 17.5,
+        "x": 28.0,
+        "y": 25.5,
         "size": "lg",
         "tone": "dark"
       },
       {
         "text": "Allow traders to place a fractional trade",
-        "x": 73.88,
-        "y": 17.5,
+        "x": 72.0,
+        "y": 25.5,
         "size": "lg",
         "tone": "dark"
       }
