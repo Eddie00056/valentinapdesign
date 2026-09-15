@@ -28,10 +28,13 @@ const isOn = (active: any, i: number) =>
 const fs = (s: Slide) => (s.fs ? `font-size:${s.fs}px` : undefined);
 const title = (s: Slide): string | undefined =>
   s.corner ?? s.heading ?? (s.kind === "titlecard" ? undefined : s.kicker);
+/* `solo`: the deck is the whole window and starts at once — the
+   presentation page is nothing but the presentation. Same as `?solo`. */
+const { solo = false } = Astro.props as { solo?: boolean };
 ---
 
 <section class="gd w-wrap">
-  <div class="gd-stage" data-count={COUNT} data-overrides={JSON.stringify(overrides)}>
+  <div class="gd-stage" data-count={COUNT} data-overrides={JSON.stringify(overrides)} data-solo={solo ? "1" : undefined}>
     <button type="button" class="gd-play">
       <span class="gd-play-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
@@ -1235,9 +1238,10 @@ const title = (s: Slide): string | undefined =>
        deck the whole window (a presenter view you can open in its own tab). */
     const params = new URLSearchParams(location.search);
     const edit = import.meta.env.DEV && params.has("edit");
-    if (params.has("solo") || edit) stage.classList.add("is-solo");
+    const solo = params.has("solo") || !!stage.dataset.solo; // the page can ask for it too
+    if (solo || edit) stage.classList.add("is-solo");
     const m = /^#slide-(\d+)$/.exec(location.hash);
-    if (m || params.has("solo") || edit) startShow(m ? parseInt(m[1], 10) : 1);
+    if (m || solo || edit) startShow(m ? parseInt(m[1], 10) : 1);
     // ?edit — local dev server only; the import is dropped from production builds
     (stage as any).__show = show;
     (stage as any).__step = step;
