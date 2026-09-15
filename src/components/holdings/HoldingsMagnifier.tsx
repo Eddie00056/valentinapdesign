@@ -71,20 +71,28 @@ export function HoldingsMagnifier() {
     const pts = [0, 1, 3, 2].map((slot) => [GRID_LEFT + slotX(slot) - 1, GRID_TOP + slotY(slot) - 1] as const);
     const n = pts.length;
     const at = (u: number) => {
-      // u in [0, n): segment i, local s
-      const i = Math.floor(u) % n;
-      const s = u - Math.floor(u);
+      // u in [0, n): segment i, local s — wrapped, so it can never index off the list
+      const w = ((u % n) + n) % n;
+      const i = Math.floor(w) % n;
+      const s = w - Math.floor(w);
       const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
       const cr = (a: number, b: number, c: number, d: number) =>
         0.5 * (2 * b + (-a + c) * s + (2 * a - 5 * b + 4 * c - d) * s * s + (-a + 3 * b - 3 * c + d) * s * s * s);
       return [cr(p0[0], p1[0], p2[0], p3[0]), cr(p0[1], p1[1], p2[1], p3[1])] as const;
     };
-    const t0 = performance.now();
+    // useTime and this callback share one clock: the value itself
+    const t0 = time.get();
     const unsub = time.on("change", (now) => {
-      const u = (((now - t0) / ROLL_MS) % 1) * n;
-      const [x, y] = at(u);
-      lensX.set(x);
-      lensY.set(y);
+      try {
+        const u = ((((now - t0) / ROLL_MS) % 1) + 1) % 1 * n;
+        const [x, y] = at(u);
+        if (Number.isFinite(x) && Number.isFinite(y)) {
+          lensX.set(x);
+          lensY.set(y);
+        }
+      } catch {
+        /* a bad frame must never break the loop every animation on the page shares */
+      }
     });
     return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
