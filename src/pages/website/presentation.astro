@@ -1,34 +1,20 @@
 ---
-/* The presentation page is the presentation and nothing else: the deck
-   fills the window and starts on slide 1 (or the #slide-N deep link). The
-   page copy that used to sit around it — hero, portrait, chapters — lives
-   in git history (before 2026-09-14) should it ever come back. */
-import Website from "../../layouts/Website.astro";
-import GustoDeck from "../../components/website/deck/GustoDeck.astro";
+/* The presentation moved to the root. Old links (and their #slide-N deep
+   links) land here and go straight on; the fragment survives, which a
+   server redirect would not carry through a meta refresh. */
 ---
 
-<Website
-  title="Portfolio presentation"
-  description="The portfolio presentation — three active-trader case studies at Questrade, end to end."
->
-  <main class="gp">
-    <GustoDeck solo />
-  </main>
-</Website>
-
-<style is:global>
-  /* the deck is fixed to the window; nothing behind it may scroll */
-  html,
-  body {
-    height: 100%;
-    overflow: hidden;
-    background: #000;
-  }
-</style>
-
-<style>
-  .gp {
-    min-height: 100vh;
-    background: #000;
-  }
-</style>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Portfolio presentation</title>
+    <link rel="canonical" href="https://valentinapdesign.com/" />
+    <meta name="robots" content="noindex" />
+    <script is:inline>
+      location.replace("/" + location.search + location.hash);
+    </script>
+    <noscript><meta http-equiv="refresh" content="0; url=/" /></noscript>
+  </head>
+  <body style="background:#000"></body>
+</html>
