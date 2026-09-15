@@ -76,9 +76,17 @@ export function AutoHeight({
        for reasons this component cannot see — a leg arriving, a label
        rewrapping, the card being resized — and all of them are the same
        event as far as the box is concerned. */
-    const ro = new ResizeObserver(() => setH(el.offsetHeight));
+    /* A zero reading is a box that is not being rendered (a deck preloads
+       the page in a hidden slide) — never a height to animate from: taking
+       it collapsed the panel, which then sprang open when the slide showed
+       ("the bracket and special instructions come in late"). */
+    const measure = () => {
+      const hh = el.offsetHeight;
+      if (hh > 0) setH(hh);
+    };
+    const ro = new ResizeObserver(measure);
     ro.observe(el);
-    setH(el.offsetHeight);
+    measure();
     return () => ro.disconnect();
   }, [enabled]);
 

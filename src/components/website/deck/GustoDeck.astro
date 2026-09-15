@@ -1060,7 +1060,8 @@ const title = (s: Slide): string | undefined =>
          jump when a slide appears. Everything further away is display:none. */
       const o = order();
       const at = o.indexOf(i);
-      neighbours = new Set([o[at - 1], o[at + 1]].filter(Boolean));
+      // two either side: a fast run of arrows lands on a slide whose frames are already placed
+      neighbours = new Set([o[at - 2], o[at - 1], o[at + 1], o[at + 2]].filter(Boolean));
       slides.forEach((el) => {
         const n = parseInt(el.dataset.n || "0", 10);
         el.hidden = n !== i && !neighbours.has(n);
