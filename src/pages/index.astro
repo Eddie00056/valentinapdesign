@@ -1,7 +1,8 @@
 ---
 /* The site's front door is the presentation: the deck fills the window
-   and starts on slide 1 (or the #slide-N deep link). Two quiet links, top
-   left — the gallery header's own pair — lead to the website and to the
+   and starts on slide 1 (or the #slide-N deep link). A hidden side-nav on
+   the left edge — a hairline handle until hovered, then a panel slides in
+   with the gallery header's own pair of links: the website and the
    prototypes gallery (/prototypes, the old root). */
 import Website from "../layouts/Website.astro";
 import GustoDeck from "../components/website/deck/GustoDeck.astro";
@@ -13,11 +14,13 @@ import GustoDeck from "../components/website/deck/GustoDeck.astro";
 >
   <main class="gp">
     <GustoDeck solo />
-    <p class="gp-links">
-      <a href="/website">Website ↗</a>
-      <span class="gp-sep" aria-hidden="true">·</span>
-      <a href="/prototypes">Prototypes ↗</a>
-    </p>
+    <nav class="gp-nav" aria-label="Site">
+      <span class="gp-nav-handle" aria-hidden="true"></span>
+      <div class="gp-nav-panel">
+        <a href="/website">Website ↗</a>
+        <a href="/prototypes">Prototypes ↗</a>
+      </div>
+    </nav>
   </main>
 </Website>
 
@@ -36,34 +39,98 @@ import GustoDeck from "../components/website/deck/GustoDeck.astro";
     min-height: 100vh;
     background: #000;
   }
-  /* Above the deck (its stage is z 1000). The gallery header's links,
-     verbatim: mono, 12px, grey to white on hover. Difference blending
-     keeps them legible over the white slides too. */
-  .gp-links {
+  /* The side-nav sits above the deck (its stage is z 1000). At rest it is
+     a 2px hairline at the top-left edge, faint; the hot zone around it is
+     wider than it looks. Hovering slides the panel in from the left and
+     the links follow it a beat apart. All CSS transitions: compositor-
+     driven, so they run even when a frame loop would be throttled, and
+     they never get in the way of the slide underneath. */
+  .gp-nav {
     position: fixed;
-    top: 18px;
-    left: 20px;
+    top: 0;
+    left: 0;
     z-index: 1001;
+    width: 28px;
+    height: 120px;
+  }
+  .gp-nav-handle {
+    position: absolute;
+    top: 22px;
+    left: 10px;
+    width: 2px;
+    height: 24px;
+    border-radius: 1px;
+    background: #fff;
+    opacity: 0.22;
+    mix-blend-mode: difference;
+    transform-origin: 50% 50%;
+    transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .gp-nav:hover .gp-nav-handle,
+  .gp-nav:focus-within .gp-nav-handle {
+    opacity: 0;
+    transform: scaleY(0.4);
+  }
+  .gp-nav-panel {
+    position: absolute;
+    top: 0;
+    left: 0;
     display: flex;
-    gap: 0.6rem;
-    margin: 0;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px 26px 20px 20px;
+    border-radius: 0 0 14px 0;
+    background: rgba(8, 8, 8, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow: inset -1px -1px 0 rgba(255, 255, 255, 0.06);
+    transform: translateX(-100%);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      transform 0.38s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.22s ease;
+  }
+  .gp-nav:hover .gp-nav-panel,
+  .gp-nav:focus-within .gp-nav-panel {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .gp-nav-panel a {
     font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
     font-size: 0.75rem;
     letter-spacing: 0.02em;
-    mix-blend-mode: difference;
-  }
-  .gp-links a {
+    white-space: nowrap;
     color: #8a8a8a;
     text-decoration: underline;
     text-decoration-color: #4a4a4a;
     text-underline-offset: 0.2em;
-    transition: color 0.15s ease, text-decoration-color 0.15s ease;
+    transform: translateX(-10px);
+    opacity: 0;
+    transition:
+      color 0.15s ease,
+      text-decoration-color 0.15s ease,
+      transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.25s ease;
   }
-  .gp-links a:hover {
+  .gp-nav-panel a:nth-child(2) {
+    transition-delay: 0s, 0s, 0.06s, 0.06s;
+  }
+  .gp-nav:hover .gp-nav-panel a,
+  .gp-nav:focus-within .gp-nav-panel a {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  .gp-nav-panel a:hover {
     color: #f2f2f2;
     text-decoration-color: #f2f2f2;
   }
-  .gp-sep {
-    color: #4a4a4a;
+  @media (prefers-reduced-motion: reduce) {
+    .gp-nav-handle,
+    .gp-nav-panel,
+    .gp-nav-panel a {
+      transition-duration: 0.01ms;
+    }
   }
 </style>
