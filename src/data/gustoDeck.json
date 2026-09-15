@@ -1424,16 +1424,18 @@
       {
         "text": "Help traders discover fractional symbols",
         "x": 28.0,
-        "y": 25.5,
+        "y": 27.5,
         "size": "lg",
-        "tone": "dark"
+        "tone": "dark",
+        "fs": 24
       },
       {
         "text": "Allow traders to place a fractional trade",
         "x": 72.0,
-        "y": 25.5,
+        "y": 27.5,
         "size": "lg",
-        "tone": "dark"
+        "tone": "dark",
+        "fs": 24
       }
     ]
   },

@@ -277,7 +277,7 @@ const title = (s: Slide): string | undefined =>
                       <p
                         class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade", l.wrap && "is-wrap"]}
                         data-s={l.s ?? undefined}
-                        style={`left:${l.x}%;top:${l.y ?? 19}%`}
+                        style={`left:${l.x}%;top:${l.y ?? 19}%${l.fs ? `;font-size:${l.fs}px` : ""}`}
                       >
                         {l.text}
                         {l.accent && <span class="gd-media-l-accent">{l.accent}</span>}
