@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import type { KeyboardEvent } from "react";
 import {
-  animate,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -63,37 +62,31 @@ export function HoldingsMagnifier() {
     lensY.set(clamp(lensY.get() + d[1], BOUNDS.top, BOUNDS.bottom));
   };
 
-  /* ?auto: the glass tours the logos by itself — a slow ease onto a logo,
-     a hold while it is lit, a slow ease away — for a slide that shows the
-     discovery rather than asking for a hand. Every leg is one easing, no
-     springs, so nothing overshoots the logo it lands on. */
+  /* ?auto: the glass rolls by itself — one slow, seamless loop that passes
+     over each logo in turn (a closed Catmull-Rom spline through the four
+     centres, walked at constant speed off the frame clock). No legs, no
+     stops: "seamless roll around slowly". */
   useEffect(() => {
     if (reduce || !new URLSearchParams(window.location.search).has("auto")) return;
-    let live = true;
-    const ease = [0.65, 0, 0.35, 1] as const;
-    const goTo = (x: number, y: number, s: number) =>
-      Promise.all([
-        animate(lensX, x, { duration: s, ease }).then(() => undefined),
-        animate(lensY, y, { duration: s, ease }).then(() => undefined),
-      ]);
-    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    const over = (slot: number) => [GRID_LEFT + slotX(slot) - 1, GRID_TOP + slotY(slot) - 1] as const;
-    (async () => {
-      await wait(1400);
-      while (live) {
-        for (const slot of [0, 3, 1, 2]) {
-          const [x, y] = over(slot);
-          await goTo(x, y, 1.8);
-          if (!live) return;
-          await wait(1300);
-        }
-        await goTo(LENS_HOME.x, LENS_HOME.y, 1.8);
-        await wait(1600);
-      }
-    })();
-    return () => {
-      live = false;
+    const pts = [0, 1, 3, 2].map((slot) => [GRID_LEFT + slotX(slot) - 1, GRID_TOP + slotY(slot) - 1] as const);
+    const n = pts.length;
+    const at = (u: number) => {
+      // u in [0, n): segment i, local s
+      const i = Math.floor(u) % n;
+      const s = u - Math.floor(u);
+      const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      const cr = (a: number, b: number, c: number, d: number) =>
+        0.5 * (2 * b + (-a + c) * s + (2 * a - 5 * b + 4 * c - d) * s * s + (-a + 3 * b - 3 * c + d) * s * s * s);
+      return [cr(p0[0], p1[0], p2[0], p3[0]), cr(p0[1], p1[1], p2[1], p3[1])] as const;
     };
+    const t0 = performance.now();
+    const unsub = time.on("change", (now) => {
+      const u = (((now - t0) / ROLL_MS) % 1) * n;
+      const [x, y] = at(u);
+      lensX.set(x);
+      lensY.set(y);
+    });
+    return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduce]);
 
@@ -234,6 +227,8 @@ const BOUNDS = { left: 0, top: 0, right: STAGE.w - LENS, bottom: STAGE.h - LENS 
 const LENS_HOME = { x: GRID_LEFT + GRID + 12 - R, y: GRID_TOP - 5 - R };
 
 const DRIFT_MS = 9000;
+/** One full roll of the glass round the four logos, in ?auto */
+const ROLL_MS = 16000;
 
 // ── Motion ──────────────────────────────────────────────────────────────
 
