@@ -674,6 +674,13 @@ const title = (s: Slide): string | undefined =>
         wrap.style.clipPath = "";
         return;
       }
+      /* Read at zoom 1. Chrome snaps a zoomed frame's layout to device
+         pixels, so the same 357px card read 358.6 wide at the markup's
+         starting zoom and 357.0 after a reload that kept the last zoom —
+         two frames of one page landed at different zooms. */
+      f.style.zoom = "1";
+      f.style.left = "0px";
+      f.style.top = "0px";
       // the union of every match — "the chain AND its ticket" is one target
       const measure = () => {
         const rs = Array.from(d.querySelectorAll(sel))
@@ -695,26 +702,53 @@ const title = (s: Slide): string | undefined =>
         r = measure();
       }
       if (!r) return;
-      await new Promise((res) => setTimeout(res, 150)); // let entry springs settle
-      r = measure() || r;
+      /* Measured when it is STILL, not at a fixed delay. The same page on
+         two consecutive slides was placed a pixel or two apart (the MVP
+         ticket on 44 and 45): one frame was read with fallback-font
+         metrics before its web font arrived, the other mid entry spring,
+         so their zooms differed by a fraction and the card shifted on the
+         arrow. Wait for the fonts, then read until two reads agree. */
+      try {
+        await (d as Document & { fonts?: { ready: Promise<unknown> } }).fonts?.ready;
+      } catch {
+        /* no FontFaceSet: measure as before */
+      }
+      const same = (a: typeof r, b: typeof r) =>
+        !!a && !!b && Math.abs(a.left - b.left) < 0.05 && Math.abs(a.top - b.top) < 0.05 && Math.abs(a.width - b.width) < 0.05 && Math.abs(a.height - b.height) < 0.05;
+      for (let n = 0; n < 14; n++) {
+        await new Promise((res) => setTimeout(res, 120));
+        const q = measure();
+        if (!q) continue;
+        if (same(q, r)) break;
+        r = q;
+      }
       const pad = parseFloat(f.dataset.pad || "0");
       /* "width": the slide draws this device larger than the slide is tall
          — it fills the rect's width from the top and bleeds off the bottom
          edge, which the slide clips. Default: contain, centred. */
       const byWidth = f.dataset.mode === "width";
-      const k = byWidth
-        ? bw / r.width
-        : Math.min((bw - 2 * pad) / r.width, (bh - 2 * pad) / r.height);
-      const ox = bw / 2 - (r.left + r.width / 2) * k;
-      const oy = byWidth ? -r.top * k : bh / 2 - (r.top + r.height / 2) * k;
-      /* `zoom`, not `transform: scale()`. A transformed iframe is a GPU layer
-         rasterized once and then stretched, so shrinking a 1440px page onto
-         the slide read soft on real displays. Zoom lays the page out at its
-         final size, so its text is drawn crisp. Zoom also scales the
-         element's own left/top, hence the division. */
-      f.style.zoom = String(k);
-      f.style.left = `${ox / k}px`;
-      f.style.top = `${oy / k}px`;
+      let k = 1;
+      const apply = (q: NonNullable<typeof r>) => {
+        k = byWidth ? bw / q.width : Math.min((bw - 2 * pad) / q.width, (bh - 2 * pad) / q.height);
+        const ox = bw / 2 - (q.left + q.width / 2) * k;
+        const oy = byWidth ? -q.top * k : bh / 2 - (q.top + q.height / 2) * k;
+        /* `zoom`, not `transform: scale()`. A transformed iframe is a GPU layer
+           rasterized once and then stretched, so shrinking a 1440px page onto
+           the slide read soft on real displays. Zoom lays the page out at its
+           final size, so its text is drawn crisp. Zoom also scales the
+           element's own left/top, hence the division. */
+        f.style.zoom = String(k);
+        f.style.left = `${ox / k}px`;
+        f.style.top = `${oy / k}px`;
+      };
+      apply(r);
+      // a second read at the final zoom corrects the snapping that zoom introduces
+      await new Promise((res) => setTimeout(res, 0)); // not rAF: frozen in a background tab
+      const q = measure();
+      if (q && !same(q, r)) {
+        r = q;
+        apply(r);
+      }
       /* The iframe is a whole page, mostly transparent and far wider than
          the work — left unclipped it swallows clicks meant for whatever sits
          beside it. Clip (clip-path clips hit-testing too) to the card's
