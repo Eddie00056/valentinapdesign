@@ -219,3 +219,11 @@
   mask-composite: exclude;
   pointer-events: none;
 }
+
+/* the handle's lean: a wrapper the size of the lens, turned about its centre */
+.he-lean {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  pointer-events: none;
+}

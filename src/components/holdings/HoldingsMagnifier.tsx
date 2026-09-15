@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import type { KeyboardEvent } from "react";
 import {
+  animate,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -36,6 +37,14 @@ export function HoldingsMagnifier() {
   const driftY = useTransform(time, (t) =>
     reduce ? 0 : Math.sin((t / DRIFT_MS) * Math.PI * 2 + Math.PI / 2) * 2.5
   );
+  // ...and each logo breathes on its own period on top (tcosta.com's
+  // per-logo float: ±2 up, ±1.5 across, 7–10s, phased), still off the one clock
+  const bob = FLOAT.map(({ ms, phase }) =>
+    useTransform(time, (t) => (reduce ? 0 : Math.sin(((t + phase) / ms) * Math.PI * 2) * 2))
+  );
+  const sway = FLOAT.map(({ ms, phase }) =>
+    useTransform(time, (t) => (reduce ? 0 : Math.cos(((t + phase) / ms) * Math.PI * 2) * 1.5))
+  );
 
   // ── The lens ──────────────────────────────────────────────────────────
   // x / y are the glass's top-left in stage px. Drag and arrow keys write
@@ -62,46 +71,45 @@ export function HoldingsMagnifier() {
     lensY.set(clamp(lensY.get() + d[1], BOUNDS.top, BOUNDS.bottom));
   };
 
-  /* ?auto: the glass rolls by itself — one slow, seamless loop that passes
-     over each logo in turn (a closed Catmull-Rom spline through the four
-     centres, walked at constant speed off the frame clock). No legs, no
-     stops: "seamless roll around slowly". */
+  /* ?auto: the glass moves by itself, the way tcosta.com's holdings logos
+     move — one soft spring per hop (his 250 / 24 / 0.8), a randomised dwell
+     on each logo (his 1.8–3.4s swap cadence), the handle leaning into the
+     move on his snappier 460 / 26 / 0.65 and settling back. Springs, not
+     eases: the glass rolls to a stop instead of arriving on a curve. */
+  const lean = useMotionValue(0);
   useEffect(() => {
     if (reduce || !new URLSearchParams(window.location.search).has("auto")) return;
-    const pts = [0, 1, 3, 2].map((slot) => [GRID_LEFT + slotX(slot) - 1, GRID_TOP + slotY(slot) - 1] as const);
-    const n = pts.length;
-    const at = (u: number) => {
-      // u in [0, n): segment i, local s — wrapped, so it can never index off the list
-      const w = ((u % n) + n) % n;
-      const i = Math.floor(w) % n;
-      const s = w - Math.floor(w);
-      const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
-      const cr = (a: number, b: number, c: number, d: number) =>
-        0.5 * (2 * b + (-a + c) * s + (2 * a - 5 * b + 4 * c - d) * s * s + (-a + 3 * b - 3 * c + d) * s * s * s);
-      return [cr(p0[0], p1[0], p2[0], p3[0]), cr(p0[1], p1[1], p2[1], p3[1])] as const;
-    };
-    // useTime and this callback share one clock: the value itself
-    const t0 = time.get();
-    const unsub = time.on("change", (now) => {
-      try {
-        const u = ((((now - t0) / ROLL_MS) % 1) + 1) % 1 * n;
-        const [x, y] = at(u);
-        if (Number.isFinite(x) && Number.isFinite(y)) {
-          lensX.set(x);
-          lensY.set(y);
-        }
-      } catch {
-        /* a bad frame must never break the loop every animation on the page shares */
+    let live = true;
+    let slot = -1;
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const HOP = { type: "spring", stiffness: 250, damping: 24, mass: 0.8 } as const;
+    const LEAN = { type: "spring", stiffness: 460, damping: 26, mass: 0.65 } as const;
+    (async () => {
+      await wait(1400);
+      while (live) {
+        let next = Math.floor(Math.random() * 4);
+        if (next === slot) next = (next + 1 + Math.floor(Math.random() * 3)) % 4;
+        const x = GRID_LEFT + slotX(next) - 1;
+        const y = GRID_TOP + slotY(next) - 1;
+        const dir = Math.sign(x - lensX.get()) || (Math.random() < 0.5 ? -1 : 1);
+        slot = next;
+        animate(lean, dir * 9, LEAN);
+        await Promise.all([animate(lensX, x, HOP), animate(lensY, y, HOP)]);
+        if (!live) return;
+        animate(lean, 0, LEAN);
+        await wait(1800 + Math.random() * 1600);
       }
-    });
-    return unsub;
+    })();
+    return () => {
+      live = false;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduce]);
 
   return (
     <div className="he-root">
       <div className="he-card" data-thumb>
-        <Scene driftX={driftX} driftY={driftY} reduce={reduce} />
+        <Scene driftX={driftX} driftY={driftY} bob={bob} sway={sway} reduce={reduce} />
 
         <motion.div
           className="he-lens"
@@ -131,13 +139,15 @@ export function HoldingsMagnifier() {
             transition={reduce ? INSTANT : { duration: 0.4, ease: "easeOut", delay: 0.6 }}
           >
             <div className="he-glass-frame">
-              <span className="he-handle" aria-hidden="true" />
+              <motion.span className="he-lean" style={{ rotate: lean }} aria-hidden="true">
+                <span className="he-handle" />
+              </motion.span>
               <div className="he-glass" aria-hidden="true">
                 <motion.div
                   className="he-glass-view"
                   style={{ x: innerX, y: innerY }}
                 >
-                  <Scene driftX={driftX} driftY={driftY} reduce={reduce} mirror />
+                  <Scene driftX={driftX} driftY={driftY} bob={bob} sway={sway} reduce={reduce} mirror />
                 </motion.div>
                 <span className="he-glass-sheen" />
               </div>
@@ -157,11 +167,15 @@ export function HoldingsMagnifier() {
 function Scene({
   driftX,
   driftY,
+  bob,
+  sway,
   reduce,
   mirror = false,
 }: {
   driftX: MotionValue<number>;
   driftY: MotionValue<number>;
+  bob: MotionValue<number>[];
+  sway: MotionValue<number>[];
   reduce: boolean;
   mirror?: boolean;
 }) {
@@ -169,11 +183,11 @@ function Scene({
     <div className={mirror ? "he-scene he-scene--lit" : "he-scene"} inert={mirror || undefined}>
       <motion.div className="he-grid" style={{ x: driftX, y: driftY }}>
         {LOGOS.map((logo, slot) => (
-          <div
+          <motion.div
             key={logo.ticker}
             className="he-tile"
-            // Position with left/top: the pop inside owns the transform
-            style={{ left: slotX(slot), top: slotY(slot) }}
+            // Position with left/top; the float rides on x/y, the pop inside owns its own transform
+            style={{ left: slotX(slot), top: slotY(slot), x: sway[slot], y: bob[slot] }}
           >
             <motion.div
               className="he-logo"
@@ -183,7 +197,7 @@ function Scene({
             >
               <img src={logo.src} alt={mirror ? "" : logo.ticker} draggable={false} />
             </motion.div>
-          </div>
+          </motion.div>
         ))}
       </motion.div>
     </div>
@@ -235,8 +249,8 @@ const BOUNDS = { left: 0, top: 0, right: STAGE.w - LENS, bottom: STAGE.h - LENS 
 const LENS_HOME = { x: GRID_LEFT + GRID + 12 - R, y: GRID_TOP - 5 - R };
 
 const DRIFT_MS = 9000;
-/** One full roll of the glass round the four logos, in ?auto */
-const ROLL_MS = 16000;
+/** Each logo's own float — periods and phases in ms */
+const FLOAT = [7000, 8200, 9400, 10600].map((ms, i) => ({ ms, phase: i * 700 }));
 
 // ── Motion ──────────────────────────────────────────────────────────────
 
