@@ -1,5 +1,6 @@
 ---
 import Website from "../../layouts/Website.astro";
+import { EdgeChart } from "../../components/website/EdgeChart";
 import SiteHeader from "../../components/website/SiteHeader.astro";
 import { Reveal } from "../../components/website/Reveal";
 import "../../components/website/case-study.css";
@@ -77,7 +78,7 @@ const P = "/website/video"; // shared prototype clips from the homepage
           <div class="dark fit-wide"><video src={`${P}/edge-order.mp4`} autoplay loop muted playsinline></video></div>
           <div class="dark fit-price"><video src={`${P}/edge-hood.mp4`} autoplay loop muted playsinline></video></div>
           <div class="dark fit-panel"><video src={`${V}/chain.mp4`} autoplay loop muted playsinline preload="metadata"></video></div>
-          <div class="dark fit-fill"><video src={`${P}/edge-chart.mp4`} autoplay loop muted playsinline></video></div>
+          <div class="dark fit-fill"><EdgeChart client:visible /></div>
         </div>
         <div class="col">
           <div class="dark fit-bell"><video src={`${P}/edge-bell.mp4`} autoplay loop muted playsinline></video></div>

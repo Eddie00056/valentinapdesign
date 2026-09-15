@@ -301,6 +301,9 @@
 /* chart */
 .cs-bento .fit-fill {
   aspect-ratio: 3 / 2;
+  /* the live chart's footprint — the clip's caps below */
+  --ec-w: 66%;
+  --ec-h: 78%;
 }
 .cs-bento .dark.fit-fill > video {
   max-width: 66%;

@@ -1,0 +1,25 @@
+/* The live chart takes the clip's place in the card: centred, at the
+   fraction of the card the page's own rules give it (--ec-w / --ec-h,
+   set per page beside the old video caps), never stretching the card. */
+.ec {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: var(--ec-w, 66%);
+  max-height: var(--ec-h, 78%);
+  aspect-ratio: 2000 / 1463;
+}
+.ec-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.ec-label {
+  font-family: var(--w-font-alt, "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif);
+  font-size: 62px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: fill 0.2s ease;
+}
