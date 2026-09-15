@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import type { KeyboardEvent } from "react";
 import {
+  animate,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -60,6 +62,40 @@ export function HoldingsMagnifier() {
     lensX.set(clamp(lensX.get() + d[0], BOUNDS.left, BOUNDS.right));
     lensY.set(clamp(lensY.get() + d[1], BOUNDS.top, BOUNDS.bottom));
   };
+
+  /* ?auto: the glass tours the logos by itself — a slow ease onto a logo,
+     a hold while it is lit, a slow ease away — for a slide that shows the
+     discovery rather than asking for a hand. Every leg is one easing, no
+     springs, so nothing overshoots the logo it lands on. */
+  useEffect(() => {
+    if (reduce || !new URLSearchParams(window.location.search).has("auto")) return;
+    let live = true;
+    const ease = [0.65, 0, 0.35, 1] as const;
+    const goTo = (x: number, y: number, s: number) =>
+      Promise.all([
+        animate(lensX, x, { duration: s, ease }).then(() => undefined),
+        animate(lensY, y, { duration: s, ease }).then(() => undefined),
+      ]);
+    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    const over = (slot: number) => [GRID_LEFT + slotX(slot) - 1, GRID_TOP + slotY(slot) - 1] as const;
+    (async () => {
+      await wait(1400);
+      while (live) {
+        for (const slot of [0, 3, 1, 2]) {
+          const [x, y] = over(slot);
+          await goTo(x, y, 1.8);
+          if (!live) return;
+          await wait(1300);
+        }
+        await goTo(LENS_HOME.x, LENS_HOME.y, 1.8);
+        await wait(1600);
+      }
+    })();
+    return () => {
+      live = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce]);
 
   return (
     <div className="he-root">

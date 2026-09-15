@@ -1382,7 +1382,36 @@
         "w": 100
       }
     ],
-    "corner": "Goal"
+    "corner": "Goal",
+    "live": [
+      {
+        "page": "holdings-empty-state?auto",
+        "x": 17.4,
+        "y": 57.0,
+        "w": 22.2,
+        "h": 40.0,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".he-card",
+        "pad": 0,
+        "clip": true,
+        "css": ".he-root,.he-card{background:none!important;box-shadow:none!important;border:none!important}.he-card::after{display:none!important}.he-scene:not(.he-scene--lit) .he-logo img{opacity:.22!important}.he-glass{background:#fff!important}.he-rim{background:linear-gradient(160deg,#9aa3b5 0%,#4b5563 48%,#1f2937 72%,#8b93a4 100%)!important}.he-handle{background:linear-gradient(90deg,#4b5563 0%,#9aa3b5 45%,#1f2937 100%)!important;box-shadow:0 3px 8px rgba(0,0,0,.25)!important}.back{display:none!important}"
+      },
+      {
+        "page": "order-placed-animation",
+        "x": 65.33,
+        "y": 64.5,
+        "w": 13.35,
+        "h": 26.0,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".opa-badge, .opa-caption",
+        "pad": 26,
+        "clip": true,
+        "init": "mute",
+        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}"
+      }
+    ]
   },
   {
     "n": 71,
