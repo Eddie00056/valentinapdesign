@@ -1812,116 +1812,112 @@
   },
   {
     "n": 82,
-    "kind": "media",
-    "bg": "black",
-    "shots": [
-      {
-        "src": "082full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "kind": "statement",
+    "bg": "white",
+    "text": "But there’s more..",
+    "fw": 700,
+    "fs": 64
   },
   {
     "n": 83,
     "kind": "media",
-    "bg": "black",
-    "shots": [
-      {
-        "src": "083full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ],
+    "bg": "white",
+    "corner": "Navigating edge cases",
     "live": [
       {
         "page": "fractional-order-flow",
-        "x": 33.74,
-        "y": 25,
-        "w": 32.47,
-        "h": 70,
+        "x": 35.61,
+        "y": 32.43,
+        "w": 30.07,
+        "h": 67.57,
         "vw": 1280,
-        "vh": 1000,
-        "fit": ".fof-frame",
-        "mode": "width",
         "css": ".fof-stage{background:none!important}",
-        "init": "limitOrder"
+        "mode": "width",
+        "init": "limitOrder",
+        "fit": ".fof-frame",
+        "vh": 1000
       }
     ]
   },
   {
     "n": 84,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
+    "corner": "Navigating edge cases",
+    "labels": [
+      {
+        "text": "V1",
+        "x": 31.45,
+        "y": 34.4
+      },
+      {
+        "text": "V2",
+        "x": 73.25,
+        "y": 34.4
+      }
+    ],
     "shots": [
       {
-        "src": "084full",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "src": "090-limit-error-v1",
+        "x": 16.05,
+        "y": 38.2,
+        "w": 31.01
+      },
+      {
+        "src": "090-limit-error-v2",
+        "x": 57.71,
+        "y": 38.2,
+        "w": 31.01
       }
     ]
   },
   {
     "n": 85,
     "kind": "media",
-    "bg": "black",
-    "shots": [
+    "bg": "white",
+    "corner": "Navigating edge cases",
+    "live": [
       {
-        "src": "085full",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "page": "fractional-order-flow?fractionError=hint&hintShares=1.5&static",
+        "x": 34.495,
+        "y": 38.2,
+        "w": 31.01,
+        "h": 61.8,
+        "vw": 1280,
+        "css": ".fof-stage{background:none!important}",
+        "mode": "width",
+        "init": "fracHintSetup",
+        "fit": ".fof-frame",
+        "vh": 1000,
+        "arrive": "fracHintType"
       }
     ]
   },
   {
     "n": 86,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
+    "corner": "Navigating edge cases",
+    "panels": [
+      {
+        "x": 50,
+        "w": 50,
+        "y": 0,
+        "c": "#f2f2f2"
+      }
+    ],
     "shots": [
       {
-        "src": "086full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ],
-    "live": [
-      {
-        "page": "fractional-order-flow",
-        "x": 58,
-        "y": 16,
-        "w": 32,
-        "h": 30,
-        "vw": 1280,
-        "vh": 1000,
-        "fit": ".fof-frame",
-        "css": ".fof-stage{background:none!important}"
+        "src": "091a",
+        "x": 14.0,
+        "y": 16.8,
+        "w": 22.3
       },
       {
-        "page": "fractional-shares-banner",
-        "x": 58,
-        "y": 50,
-        "w": 32,
-        "h": 26,
-        "vw": 760,
-        "vh": 1000,
-        "fit": ".pshell-stage",
-        "css": ".pshell,.pshell-stage{background:none!important}",
-        "init": "bannerLoop",
-        "clip": true
-      }
-    ],
-    "boxes": [
-      {
-        "x": 56,
-        "y": 18,
-        "w": 36,
-        "h": 64,
-        "c": "#000000"
+        "src": "091b",
+        "x": 59.5,
+        "y": 22.5,
+        "w": 31.5
       }
     ]
   },
