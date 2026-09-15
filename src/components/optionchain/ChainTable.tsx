@@ -1,6 +1,11 @@
 import type React from "react";
 import { useEffect, useRef } from "react";
 import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
+
+/* ?static: rows are laid out, never FLIPped. A deck slide preloads this page
+   in a hidden frame, and the layout spring then plays the first real
+   measurement on arrival as rows sliding sideways into place. */
+const STILL = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("static");
 import {
   type ChainRow as ChainRowData,
   type Expiry,
@@ -528,7 +533,7 @@ export function ChainTable({
   rows.forEach((row, i) => {
     if (i === insertAt) ladder.push(<SpotLine key="spot" spot={spot} spring={spring} />);
     ladder.push(
-      <motion.div key={row.strike} layout="position" transition={spring}>
+      <motion.div key={row.strike} layout={STILL ? false : "position"} transition={spring}>
         <Row
           row={row}
           side={side}
@@ -603,7 +608,7 @@ function SpotLine({
   spring: object;
 }) {
   return (
-    <motion.div className="oc-spot" role="separator" layout="position" transition={spring}>
+    <motion.div className="oc-spot" role="separator" layout={STILL ? false : "position"} transition={spring}>
       <span className="oc-spot-pill oc-num">${formatCurrency(spot)}</span>
     </motion.div>
   );

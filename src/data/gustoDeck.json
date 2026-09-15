@@ -882,7 +882,7 @@
     ],
     "live": [
       {
-        "page": "chain-to-order",
+        "page": "chain-to-order?static",
         "x": 13.28,
         "y": 14.91,
         "w": 68.35,
