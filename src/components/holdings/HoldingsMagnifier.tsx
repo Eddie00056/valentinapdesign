@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import type { KeyboardEvent } from "react";
 import {
-  animate,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -71,38 +70,53 @@ export function HoldingsMagnifier() {
     lensY.set(clamp(lensY.get() + d[1], BOUNDS.top, BOUNDS.bottom));
   };
 
-  /* ?auto: the glass moves by itself, the way tcosta.com's holdings logos
-     move — one soft spring per hop (his 250 / 24 / 0.8), a randomised dwell
-     on each logo (his 1.8–3.4s swap cadence), the handle leaning into the
-     move on his snappier 460 / 26 / 0.65 and settling back. Springs, not
-     eases: the glass rolls to a stop instead of arriving on a curve. */
+  /* ?auto: the glass wanders by itself — one slow, seamless loop that
+     drifts in and out of each logo's radius (a closed Catmull-Rom spline
+     through points just inside each logo, plus a soft breath sideways),
+     walked at constant speed off the frame clock. No springs, no stops:
+     the user asked for "moving slowly in and out of the icon radius"
+     rather than snapping onto icons. The handle leans a little with the
+     direction of travel. */
   const lean = useMotionValue(0);
   useEffect(() => {
     if (reduce || !new URLSearchParams(window.location.search).has("auto")) return;
-    let live = true;
-    let slot = -1;
-    const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
-    const HOP = { type: "spring", stiffness: 250, damping: 24, mass: 0.8 } as const;
-    const LEAN = { type: "spring", stiffness: 460, damping: 26, mass: 0.65 } as const;
-    (async () => {
-      await wait(1400);
-      while (live) {
-        let next = Math.floor(Math.random() * 4);
-        if (next === slot) next = (next + 1 + Math.floor(Math.random() * 3)) % 4;
-        const x = GRID_LEFT + slotX(next) - 1;
-        const y = GRID_TOP + slotY(next) - 1;
-        const dir = Math.sign(x - lensX.get()) || (Math.random() < 0.5 ? -1 : 1);
-        slot = next;
-        animate(lean, dir * 9, LEAN);
-        await Promise.all([animate(lensX, x, HOP), animate(lensY, y, HOP)]);
-        if (!live) return;
-        animate(lean, 0, LEAN);
-        await wait(1800 + Math.random() * 1600);
-      }
-    })();
-    return () => {
-      live = false;
+    // waypoints: each logo's lens position, pulled 6px toward the grid's centre so the glass
+    // skims through the logo rather than parking on it, in a figure that visits all four
+    const cx = GRID_LEFT + GRID / 2 - R, cy = GRID_TOP + GRID / 2 - R;
+    const pts = [0, 1, 3, 2].map((slot) => {
+      const x = GRID_LEFT + slotX(slot) - 1, y = GRID_TOP + slotY(slot) - 1;
+      return [x + (cx - x) * 0.18, y + (cy - y) * 0.18] as const;
+    });
+    const n = pts.length;
+    const at = (u: number) => {
+      const w = ((u % n) + n) % n;
+      const i = Math.floor(w) % n;
+      const s = w - Math.floor(w);
+      const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      const cr = (a: number, b: number, c: number, d: number) =>
+        0.5 * (2 * b + (-a + c) * s + (2 * a - 5 * b + 4 * c - d) * s * s + (-a + 3 * b - 3 * c + d) * s * s * s);
+      return [cr(p0[0], p1[0], p2[0], p3[0]), cr(p0[1], p1[1], p2[1], p3[1])] as const;
     };
+    const t0 = time.get();
+    let lastX = lensX.get();
+    const unsub = time.on("change", (now) => {
+      try {
+        const e = now - t0;
+        const u = ((((e / WANDER_MS) % 1) + 1) % 1) * n;
+        const [x, y] = at(u);
+        const breath = Math.sin((e / 4300) * Math.PI * 2) * 4; // the soft in-and-out across the radius
+        const nx = x + breath, ny = y + Math.cos((e / 5100) * Math.PI * 2) * 3;
+        if (Number.isFinite(nx) && Number.isFinite(ny)) {
+          lean.set(Math.max(-8, Math.min(8, (nx - lastX) * 40)));
+          lastX = nx;
+          lensX.set(nx);
+          lensY.set(ny);
+        }
+      } catch {
+        /* a bad frame must never break the loop every animation on the page shares */
+      }
+    });
+    return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reduce]);
 
@@ -249,6 +263,8 @@ const BOUNDS = { left: 0, top: 0, right: STAGE.w - LENS, bottom: STAGE.h - LENS 
 const LENS_HOME = { x: GRID_LEFT + GRID + 12 - R, y: GRID_TOP - 5 - R };
 
 const DRIFT_MS = 9000;
+/** One slow lap of the glass round the four logos, in ?auto */
+const WANDER_MS = 22000;
 /** Each logo's own float — periods and phases in ms */
 const FLOAT = [7000, 8200, 9400, 10600].map((ms, i) => ({ ms, phase: i * 700 }));
 

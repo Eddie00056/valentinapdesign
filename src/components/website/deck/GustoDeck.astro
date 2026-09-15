@@ -1028,9 +1028,13 @@ const title = (s: Slide): string | undefined =>
     /* Leaving a slide resets any chain-to-order prototype that was used
        (ticket open, confirmation up), so it's fresh next time. */
     const resetUsed = (n: number) => {
-      slides[n - 1]?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe[data-arrive]").forEach((f) => {
-        if (!f.dataset.arrived || !f.getAttribute("src")) return;
+      /* Every live frame on the slide being left reloads — while it is still a
+         neighbour, so it is placed again before it can be seen — and the next
+         arrival plays its motion from the start instead of resuming mid-way. */
+      slides[n - 1]?.querySelectorAll<HTMLIFrameElement>(".gd-live iframe").forEach((f) => {
+        if (!f.getAttribute("src")) return;
         delete f.dataset.arrived;
+        delete f.dataset.stepped;
         unmount(f);
         mount(f);
       });
