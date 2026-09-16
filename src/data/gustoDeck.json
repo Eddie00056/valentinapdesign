@@ -189,10 +189,16 @@
     "bg": "black",
     "shots": [
       {
-        "src": "015a",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "src": "015b",
+        "x": 3.16,
+        "y": 24.97,
+        "w": 43.94
+      },
+      {
+        "src": "015c",
+        "x": 51.7,
+        "y": 25.15,
+        "w": 46.7
       }
     ],
     "corner": "Questrade platforms",
@@ -201,8 +207,7 @@
         "text": "Regular trading platforms",
         "x": 25.13,
         "y": 21.66,
-        "size": "lg",
-        "tone": "dark"
+        "size": "lg"
       },
       {
         "text": "Advanced trading platforms",
