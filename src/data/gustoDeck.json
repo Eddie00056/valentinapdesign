@@ -1695,16 +1695,16 @@
       {
         "text": "Original quote page",
         "x": 26.88,
-        "y": 30.29,
+        "y": 37.57,
         "size": "lg"
       }
     ],
     "shots": [
       {
         "src": "075a",
-        "x": 0,
-        "y": 33.2,
-        "w": 50
+        "x": 3.07,
+        "y": 40.57,
+        "w": 44.47
       }
     ]
   },
@@ -1718,15 +1718,13 @@
         "text": "Original quote page",
         "x": 26.88,
         "y": 37.57,
-        "size": "lg",
-        "s": 1
+        "size": "lg"
       },
       {
         "text": "Updated quote page",
         "x": 74.0,
         "y": 37.57,
-        "size": "lg",
-        "s": 0
+        "size": "lg"
       }
     ],
     "shots": [
@@ -1734,8 +1732,7 @@
         "src": "076a",
         "x": 3.07,
         "y": 40.57,
-        "w": 44.47,
-        "s": 1
+        "w": 44.47
       }
     ],
     "live": [
@@ -1750,11 +1747,9 @@
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
         "css": ".acs-root{background:none!important}",
-        "clip": true,
-        "s": 0
+        "clip": true
       }
-    ],
-    "steps": 2
+    ]
   },
   {
     "n": 77,
