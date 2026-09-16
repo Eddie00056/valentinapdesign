@@ -37,6 +37,12 @@ import { OptionsBuilder } from "../../components/optionsbuilder/OptionsBuilder";
     html.is-bare .tpill {
       background: #1c1e21 !important;
     }
+    /* the bar's top corners: 11 was cut for the card's 1px border (12 − 1);
+       against the bare 0.5px stroke it left a half-pixel notch in each
+       corner, plain once a slide zooms the frame (user, 2026-09-16) */
+    html.is-bare .wshell-bar {
+      border-radius: 11.5px 11.5px 0 0 !important;
+    }
     html.is-bare .wshell {
       background: transparent !important;
       box-shadow: none !important;
