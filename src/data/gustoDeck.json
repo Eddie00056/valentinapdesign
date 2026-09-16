@@ -983,23 +983,23 @@
     "bg": "black",
     "shots": [
       {
-        "src": "049b",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "src": "049c",
+        "x": 9.3,
+        "y": 24.63,
+        "w": 25.05
       }
     ],
     "corner": "Final designs",
     "labels": [
       {
         "text": "Then",
-        "x": 24.88,
-        "y": 21.45,
+        "x": 21.82,
+        "y": 21.29,
         "size": "lg"
       },
       {
         "text": "Now",
-        "x": 74.22,
+        "x": 64.09,
         "y": 21.29,
         "size": "lg"
       }
@@ -1007,27 +1007,38 @@
     "live": [
       {
         "page": "stock-order-entry?bare",
-        "x": 61.68,
-        "y": 24.6,
-        "w": 25.07,
-        "h": 33.0,
+        "x": 37.16,
+        "y": 24.07,
+        "w": 25.68,
+        "h": 33.89,
         "vw": 1280,
         "vh": 1000,
         "fit": ".wshell",
         "clip": true,
-        "css": ".ob-stage{background:none!important}.wshell-actions{display:none!important}.ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}"
+        "css": ".ob-stage{background:none!important}.wshell-actions{display:none!important}.ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}",
+        "pad": 6
       },
       {
         "page": "options-strategy-builder?bare",
-        "x": 61.68,
-        "y": 58.5,
-        "w": 25.07,
-        "h": 34.2,
+        "x": 65.34,
+        "y": 24.07,
+        "w": 25.68,
+        "h": 35.28,
         "vw": 1280,
         "vh": 1000,
         "fit": ".wshell",
         "clip": true,
-        "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}"
+        "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}",
+        "pad": 6
+      }
+    ],
+    "boxes": [
+      {
+        "x": 35.911,
+        "y": 15.86,
+        "w": 0.052,
+        "h": 84.0,
+        "c": "#272727"
       }
     ]
   },
