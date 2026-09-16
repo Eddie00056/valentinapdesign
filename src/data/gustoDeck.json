@@ -2174,18 +2174,17 @@
         "css": ".fof-stage{background:none!important}"
       },
       {
-        "page": "fractional-order-flow",
+        "page": "switch-icon?auto",
         "x": 23.23,
         "y": 28.06,
         "w": 5.78,
         "h": 10.28,
         "vw": 1280,
         "vh": 1000,
-        "fit": "[aria-label=\"Swap amount and quantity\"]",
+        "fit": ".si-btn",
         "pad": 20,
         "clip": true,
-        "css": ".fof-stage{background:none!important}body *{visibility:hidden!important}[aria-label=\"Swap amount and quantity\"],[aria-label=\"Swap amount and quantity\"] *{visibility:visible!important}[aria-label=\"Swap amount and quantity\"]>svg{display:none!important}",
-        "init": "swapLoop"
+        "css": ".si-stage{background:none!important}.si-btn{background:none!important}"
       },
       {
         "page": "fractional-shares-banner",

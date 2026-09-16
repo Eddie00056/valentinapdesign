@@ -1,13 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 /* The amount / quantity switcher — the user's own component, as given.
-   Tap flips both arrowheads; the deck taps it on a loop (slide 95). */
+   Tap flips both arrowheads; the deck taps it on a loop (slide 95).
+   ?auto: it flips itself every two seconds (slide 89's top-left icon). */
 export default function SwitchIcon() {
   const [active, setActive] = useState(false);
   const [hovered, setHovered] = useState(false);
 
+  useEffect(() => {
+    if (!new URLSearchParams(window.location.search).has("auto")) return;
+    const id = window.setInterval(() => setActive((a) => !a), 2000);
+    return () => window.clearInterval(id);
+  }, []);
+
   return (
     <button
+      className="si-btn"
       aria-label="Switch"
       onClick={() => setActive(!active)}
       onMouseEnter={() => setHovered(true)}
