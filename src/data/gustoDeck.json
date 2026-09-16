@@ -1391,10 +1391,10 @@
       },
       {
         "page": "order-placed-animation",
-        "x": 65.33,
-        "y": 37.0,
-        "w": 13.35,
-        "h": 26.0,
+        "x": 67.0,
+        "y": 40.85,
+        "w": 10.0,
+        "h": 18.0,
         "vw": 1280,
         "vh": 1000,
         "fit": ".opa-badge",
@@ -1404,36 +1404,26 @@
         "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}.opa-glow{animation:none!important;opacity:.06!important;transform:translate(-50%,-50%) scale(1.3)!important}.opa-caption{display:none!important}"
       }
     ],
-    "boxes": [
-      {
-        "x": 15.0,
-        "y": 30.0,
-        "w": 26.0,
-        "h": 40.0,
-        "c": "#f7f7f7"
-      },
-      {
-        "x": 59.0,
-        "y": 30.0,
-        "w": 26.0,
-        "h": 40.0,
-        "c": "#f7f7f7"
-      }
-    ],
     "labels": [
       {
-        "text": "Help traders discover fractional symbols",
+        "text": "Help traders discover\nfractional symbols",
         "x": 28.0,
-        "y": 26.7,
+        "y": 30.3,
         "size": "lg",
-        "tone": "dark"
+        "tone": "dark",
+        "fs": 52,
+        "wrap": true,
+        "mw": 14
       },
       {
-        "text": "Allow traders to place a fractional trade",
+        "text": "Allow traders to place\na fractional trade",
         "x": 72.0,
-        "y": 26.7,
+        "y": 30.3,
         "size": "lg",
-        "tone": "dark"
+        "tone": "dark",
+        "fs": 52,
+        "wrap": true,
+        "mw": 14
       }
     ]
   },
