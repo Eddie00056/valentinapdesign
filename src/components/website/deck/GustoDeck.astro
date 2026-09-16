@@ -14,6 +14,7 @@ import deck from "../../../data/gustoDeck.json";
 import overrides from "../../../data/gustoDeckOverrides.json";
 import Shot from "./DeckShot.astro";
 import { InlineClock } from "./InlineClock";
+import { OwnershipStack } from "./OwnershipStack";
 
 type Slide = Record<string, any>;
 const slides = deck as Slide[];
@@ -372,85 +373,7 @@ const { solo = false } = Astro.props as { solo?: boolean };
                     ))}
                   </div>
                 ) : s.kind === "ownership" ? (
-                  <div class:list={["gd-own", { "is-dim": s.dim }]}>
-                    {s.reveal >= 1 && (
-                      <div class="gd-own-card gd-own-head">
-                        <div class="gd-own-pills">
-                          {[0, 1, 2, 3].map(() => (
-                            <span class="gd-pill">
-                              <b>$271.01</b> <i>+$3.64 +3.09%</i>
-                            </span>
-                          ))}
-                        </div>
-                        <p>Design ownership spread across highest revenue products</p>
-                      </div>
-                    )}
-                    {s.reveal >= 2 && (
-                      <div class="gd-own-card gd-own-metric">
-                        <span class="gd-own-n">10+</span>
-                        <span class="gd-own-l">active trader features</span>
-                      </div>
-                    )}
-                    {s.reveal >= 3 && (
-                      <div class="gd-own-icons">
-                        <div class="gd-own-card gd-own-icon">
-                          <img src={`${OWN}adv-charting.webp`} alt="" />
-                          <span>Advanced charting</span>
-                        </div>
-                        <div class="gd-own-card gd-own-icon">
-                          <img src={`${OWN}sym-alerts.webp`} alt="" />
-                          <span>Symbol alerts</span>
-                        </div>
-                      </div>
-                    )}
-                    {s.reveal >= 4 && (
-                      <div class="gd-own-card gd-own-metric">
-                        <span class="gd-own-n">3+</span>
-                        <span class="gd-own-l">0→1 products launched</span>
-                      </div>
-                    )}
-                    {s.reveal >= 5 && (
-                      <div class="gd-own-icons">
-                        <div class="gd-own-card gd-own-icon">
-                          {/* drawn, not the old rt-chip.webp crop — that bitmap carried
-                              the export's darker backdrop, a box on the card */}
-                          <span class="gd-own-chip">
-                            <span class="gd-pill">
-                              <b>$271.01</b> <i>+$3.64 +3.09%</i>
-                            </span>
-                          </span>
-                          <span>Real time streaming</span>
-                        </div>
-                        <div class="gd-own-card gd-own-icon">
-                          <img src={`${OWN}frac-trading.webp`} alt="" />
-                          <span>Fractional trading</span>
-                        </div>
-                      </div>
-                    )}
-                    {s.reveal >= 6 && (
-                      <div class="gd-own-icons">
-                        <div class="gd-own-card gd-own-icon">
-                          <img src={`${OWN}questrade-pro.webp`} alt="" />
-                          <span>Questrade Pro</span>
-                        </div>
-                        <div class="gd-own-card gd-own-icon">
-                          <img src={`${OWN}edge-mobile.webp`} alt="" />
-                          <span>Edge Mobile</span>
-                        </div>
-                      </div>
-                    )}
-                    {s.reveal >= 7 && (
-                      <div class="gd-own-card gd-own-team">
-                        <p>Led 4 Product Designers + Multiple team initiatives</p>
-                      </div>
-                    )}
-                    {s.reveal >= 8 && (
-                      <div class="gd-own-card gd-own-metric">
-                        <span class="gd-own-n">2</span>
-                        <span class="gd-own-l">awards</span>
-                      </div>
-                    )}
-                  </div>
+                  <OwnershipStack client:load reveal={s.reveal} dim={!!s.dim} />
                 ) : null}
                 {(s.live || []).map((l: any) => {
                   const bw = (l.w / 100) * W;
@@ -1288,7 +1211,10 @@ const { solo = false } = Astro.props as { solo?: boolean };
     background: #000;
   }
 
-  /* ?solo — the deck is the whole window */
+  /* ?solo — the deck is the whole window. The band around the 16:9 slide
+     is a near-black, not the slide's own black: on a wider window the two
+     merged, and a caption centred in a black slide half read as sitting
+     left of centre in "the black" (slide 15). */
   .gd-stage.is-solo {
     position: fixed;
     inset: 0;
@@ -2174,121 +2100,6 @@ const { solo = false } = Astro.props as { solo?: boolean };
     position: absolute;
     height: auto;
     border-radius: 4px;
-  }
-
-  /* ---- ownership build (slides 6–14) ---- */
-  .gd-own {
-    position: absolute;
-    top: 2%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 858px;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-  }
-  .gd-own-card {
-    border-radius: 16px;
-    background: linear-gradient(180deg, #0c110e 0%, #030504 100%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-  }
-  .gd-own-head {
-    padding: 12px 30px 12px;
-    text-align: center;
-  }
-  .gd-own-pills {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 13px;
-  }
-  .gd-pill {
-    font-size: 12.5px;
-    letter-spacing: -0.01em;
-    padding: 5px 11px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.055);
-    white-space: nowrap;
-  }
-  .gd-pill b {
-    font-weight: 600;
-  }
-  .gd-pill i {
-    font-style: normal;
-    color: #4ec98a;
-  }
-  .gd-own-head p {
-    margin: 0;
-    font-size: 21px;
-    font-weight: 500;
-    letter-spacing: -0.015em;
-  }
-  .gd-own-metric {
-    display: flex;
-    align-items: center;
-    gap: 44px;
-    padding: 7px 46px;
-  }
-  .gd-own-n {
-    font-size: 66px;
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    background: linear-gradient(180deg, #ffd3ac 0%, #f7975c 55%, #e07846 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    min-width: 120px;
-  }
-  .gd-own-l {
-    font-size: 21px;
-    font-weight: 400;
-    letter-spacing: -0.01em;
-  }
-  .gd-own-icons {
-    display: flex;
-    gap: 12px;
-  }
-  .gd-own-icon {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 9px;
-    padding: 14px 20px 13px;
-  }
-  .gd-own-icon img {
-    width: 108px;
-    height: auto;
-  }
-  /* same box the 220×51 chip image had, so the tile keeps its height */
-  .gd-own-chip {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 51px;
-  }
-  .gd-own-chip .gd-pill {
-    font-size: 15px;
-    padding: 5px 10px;
-  }
-  .gd-own-icon span {
-    font-size: 21px;
-    font-weight: 400;
-    letter-spacing: -0.01em;
-  }
-  .gd-own-team {
-    padding: 9px 30px;
-    text-align: center;
-  }
-  .gd-own-team p {
-    margin: 0;
-    font-size: 21px;
-    font-weight: 400;
-    letter-spacing: -0.01em;
-  }
-  .gd-own.is-dim > *:not(:last-child):not(:nth-last-child(2)) {
-    opacity: 0.24;
   }
 
   /* ---- twocol ---- */

@@ -1,0 +1,157 @@
+/* The ownership build (deck slides 2–10) — the stack of cards under
+   OwnershipStack.tsx. Global on purpose: the deck's own styles are Astro-
+   scoped and cannot reach a React island. */
+
+.gd-own {
+  position: absolute;
+  top: 3.7%; /* the PDF stack's top: 42px of 1125 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 858px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.gd-own-card {
+  border-radius: 16px;
+  background: linear-gradient(180deg, #0c110e 0%, #030504 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  /* a hairline of top light, the way the glass icons catch it */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+.gd-own-head {
+  padding: 16px 30px;
+  text-align: center;
+}
+.gd-own-pills {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 13px;
+}
+.gd-pill {
+  font-size: 12.5px;
+  letter-spacing: -0.01em;
+  padding: 5px 11px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.055);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.gd-pill b {
+  font-weight: 600;
+}
+.gd-pill i {
+  font-style: normal;
+  color: #4ec98a;
+}
+.gd-pill i.is-down {
+  color: #ff7a93;
+}
+/* rolling digits: one clipped cell per glyph */
+.gd-roll {
+  display: inline-flex;
+  vertical-align: bottom;
+}
+.gd-roll-cell {
+  display: inline-block;
+  overflow: hidden;
+  line-height: 1.2;
+}
+.gd-own-head p {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.gd-own-metric {
+  padding: 5.5px 0; /* the grid below is measured from the card's edge, so no side padding */
+}
+/* Number and label as one centred pair with a fixed gap. The PDF's two
+   fixed columns (number centred at 280, label at 502) left a hole that
+   grew as the number narrowed — "2  …  awards" — so the gap is what is
+   held constant, not the columns. */
+.gd-own-metric-in {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+}
+.gd-own-metric-in > .gd-own-l {
+  white-space: nowrap;
+}
+.gd-own-n {
+  font-size: 66px;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  background: linear-gradient(180deg, #ffd3ac 0%, #f7975c 55%, #e07846 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+.gd-own-suffix {
+  transition: opacity 0.25s ease;
+}
+.gd-own-l {
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  display: inline-block;
+}
+.gd-own-icons {
+  display: flex;
+  gap: 12px;
+}
+.gd-own-icon {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 24px 20px; /* 175px tall with the 84px icon box, the PDF's tile */
+}
+.gd-own-icon img {
+  width: auto;
+  display: block;
+  transform-origin: 50% 80%;
+}
+/* the streaming tile's chip keeps the box its old bitmap had */
+.gd-own-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 84px;
+}
+.gd-own-chip .gd-own-pills {
+  margin: 0;
+}
+.gd-own-chip .gd-pill {
+  font-size: 15px;
+  padding: 5px 10px;
+}
+.gd-own-icon > span:last-child {
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.gd-own-team {
+  padding: 21px 30px;
+  text-align: center;
+}
+.gd-own-team p {
+  margin: 0;
+  font-size: 21px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* the idle float's wrapper: the icon's own pop is on the image inside it */
+.gd-own-float {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 84px; /* every tile's icon box, whatever its ink height */
+  will-change: transform;
+}

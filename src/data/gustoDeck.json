@@ -14,120 +14,58 @@
   },
   {
     "n": 2,
-    "kind": "media",
+    "kind": "ownership",
     "bg": "black",
-    "shots": [
-      {
-        "src": "002full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "reveal": 1
   },
   {
     "n": 3,
-    "kind": "media",
+    "kind": "ownership",
     "bg": "black",
-    "shots": [
-      {
-        "src": "003full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "reveal": 2
   },
   {
     "n": 4,
-    "kind": "media",
+    "kind": "ownership",
     "bg": "black",
-    "shots": [
-      {
-        "src": "004full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "reveal": 3
   },
   {
     "n": 5,
-    "kind": "media",
+    "kind": "ownership",
     "bg": "black",
-    "shots": [
-      {
-        "src": "005full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "reveal": 4
   },
   {
     "n": 6,
-    "kind": "media",
+    "kind": "ownership",
     "bg": "black",
-    "shots": [
-      {
-        "src": "006full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "reveal": 5
   },
   {
     "n": 7,
-    "kind": "media",
+    "kind": "ownership",
     "bg": "black",
-    "shots": [
-      {
-        "src": "007full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "reveal": 6
   },
   {
     "n": 8,
-    "kind": "media",
+    "kind": "ownership",
     "bg": "black",
-    "shots": [
-      {
-        "src": "008full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "reveal": 7
   },
   {
     "n": 9,
-    "kind": "media",
+    "kind": "ownership",
     "bg": "black",
-    "shots": [
-      {
-        "src": "009full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "reveal": 8
   },
   {
     "n": 10,
-    "kind": "media",
+    "kind": "ownership",
     "bg": "black",
-    "shots": [
-      {
-        "src": "010full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "reveal": 8,
+    "dim": true
   },
   {
     "n": 11,
