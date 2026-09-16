@@ -847,10 +847,10 @@
     "live": [
       {
         "page": "options-strategy-builder?bare",
-        "x": 8.75,
+        "x": 11.13,
         "y": 25.05,
-        "w": 31.82,
-        "h": 43.42,
+        "w": 27.05,
+        "h": 36.91,
         "vw": 1280,
         "vh": 960,
         "fit": ".wshell",
@@ -882,10 +882,10 @@
     "live": [
       {
         "page": "options-strategy-builder?bare",
-        "x": 8.75,
+        "x": 11.13,
         "y": 25.05,
-        "w": 31.82,
-        "h": 43.42,
+        "w": 27.05,
+        "h": 36.91,
         "vw": 1280,
         "vh": 960,
         "fit": ".wshell",
