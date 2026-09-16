@@ -1496,21 +1496,21 @@
       {
         "text": "Original design",
         "x": 18.36,
-        "y": 40.07,
+        "y": 41.55,
         "size": "lg",
         "s": 0
       },
       {
         "text": "Beta release",
         "x": 49.97,
-        "y": 40.07,
+        "y": 41.55,
         "size": "lg",
         "s": 1
       },
       {
         "text": "Public release",
         "x": 81.59,
-        "y": 40.07,
+        "y": 41.55,
         "size": "lg",
         "s": 2
       }
@@ -1519,7 +1519,7 @@
       {
         "page": "notive-quote?static",
         "x": 7.13,
-        "y": 43.52,
+        "y": 45.0,
         "w": 22.45,
         "h": 55.0,
         "vw": 1280,
