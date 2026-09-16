@@ -410,9 +410,11 @@ function FieldValue({
 }
 
 /* The swap toggle: the user's SwitchIcon (src/components/switchicon), set
-   inside the control's 40px white disc with its hairline rim. Two 1.8px
-   strokes with arrowheads; a tap flips both heads (up-line becomes down,
-   down becomes up) over 0.2s — the same paths and easing as the icon. */
+   inside the control's 40px white disc with its hairline rim, at the old
+   glyph's size and colour: its ink ran 17.8px tall in #1E1E21, so the
+   16-unit icon is drawn at 28px (ink 17.5) with the stroke held near the
+   icon's own 1.8px. A tap flips both heads over 0.2s — the icon's paths
+   and easing. */
 function SwapGlyph({ turns, reduced }: { turns: number; reduced: boolean }) {
   const active = turns % 2 === 1;
   const ease = { transition: reduced ? "none" : "all 0.2s ease" } as const;
@@ -434,21 +436,21 @@ function SwapGlyph({ turns, reduced }: { turns: number; reduced: boolean }) {
         justifyContent: "center",
       }}
     >
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ display: "block" }}>
-        <path d="M11.5 3V13" stroke="black" strokeWidth="1.8" strokeLinecap="round" style={ease} />
+      <svg width="28" height="28" viewBox="0 0 16 16" fill="none" style={{ display: "block" }}>
+        <path d="M11.5 3V13" stroke="#1E1E21" strokeWidth="1.05" strokeLinecap="round" style={ease} />
         <path
           d={active ? "M14 5.5L11.5 3L9 5.5" : "M14 10.5L11.5 13L9 10.5"}
-          stroke="black"
-          strokeWidth="1.8"
+          stroke="#1E1E21"
+          strokeWidth="1.05"
           strokeLinecap="round"
           strokeLinejoin="round"
           style={ease}
         />
-        <path d="M4.5 13L4.5 3" stroke="black" strokeWidth="1.8" strokeLinecap="round" style={ease} />
+        <path d="M4.5 13L4.5 3" stroke="#1E1E21" strokeWidth="1.05" strokeLinecap="round" style={ease} />
         <path
           d={active ? "M7 10.5L4.5 13L2 10.5" : "M7 5.5L4.5 3L2 5.5"}
-          stroke="black"
-          strokeWidth="1.8"
+          stroke="#1E1E21"
+          strokeWidth="1.05"
           strokeLinecap="round"
           strokeLinejoin="round"
           style={ease}
