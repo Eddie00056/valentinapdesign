@@ -437,19 +437,19 @@ function SwapGlyph({ turns, reduced }: { turns: number; reduced: boolean }) {
       }}
     >
       <svg width="19" height="19" viewBox="0 0 16 16" fill="none" style={{ display: "block" }}>
-        <path d="M11.5 3V13" stroke="black" strokeWidth="1.8" strokeLinecap="round" style={ease} />
+        <path d="M11.5 3V13" stroke="#262D33" strokeWidth="1.8" strokeLinecap="round" style={ease} />
         <path
           d={active ? "M14 5.5L11.5 3L9 5.5" : "M14 10.5L11.5 13L9 10.5"}
-          stroke="black"
+          stroke="#262D33"
           strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
           style={ease}
         />
-        <path d="M4.5 13L4.5 3" stroke="black" strokeWidth="1.8" strokeLinecap="round" style={ease} />
+        <path d="M4.5 13L4.5 3" stroke="#262D33" strokeWidth="1.8" strokeLinecap="round" style={ease} />
         <path
           d={active ? "M7 10.5L4.5 13L2 10.5" : "M7 5.5L4.5 3L2 5.5"}
-          stroke="black"
+          stroke="#262D33"
           strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
