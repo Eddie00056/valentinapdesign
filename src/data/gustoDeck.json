@@ -1927,10 +1927,10 @@
         "vh": 1000,
         "fit": "img[src*=\"iphone\"]",
         "css": ".phone-stage{background:none!important}.opb-frac-btn{visibility:hidden!important}",
-        "init": "quantityOnly"
+        "init": "quantityOnly,freeze"
       },
       {
-        "page": "order-placement-boxed",
+        "page": "order-placement-boxed?calm",
         "x": 62.97,
         "y": 17.66,
         "w": 21.2,

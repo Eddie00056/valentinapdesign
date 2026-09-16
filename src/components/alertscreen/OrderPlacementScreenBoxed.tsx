@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import type { CSSProperties, ReactNode, MouseEvent as ReactMouseEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { pxHub, PX_BASE } from "./priceHub";
+
+/* ?calm: the last price keeps streaming, but everything derived from it —
+   bid/ask, the estimated total — holds at the opening price. Those readouts
+   re-key on every tick and fade in, which on a slide read as the whole
+   screen flashing; held, nothing but the price roll moves (slide 81). */
+const CALM = typeof window !== "undefined" && new URLSearchParams(window.location.search).has("calm");
 import type { PriceState } from "./priceHub";
 import { UP, DOWN } from "./chart";
 import { FractionalIcon, GlassButton } from "../glasslab/GlassButton";
@@ -245,8 +251,9 @@ export function OrderPlacementScreenBoxed({
     setStep(singleCta ? "placing" : "review");
   };
 
-  const bidPx = s.price - 0.01;
-  const askPx = s.price + 0.01;
+  const quotePx = CALM ? PX_BASE : s.price;
+  const bidPx = quotePx - 0.01;
+  const askPx = quotePx + 0.01;
 
   const delta = s.price - PREV_CLOSE;
   const sign = delta >= 0 ? "+" : "−";
@@ -278,12 +285,12 @@ export function OrderPlacementScreenBoxed({
     };
   });
 
-  const total = s.price * qty;
+  const total = quotePx * qty;
 
   // review screen: shares vs dollar-amount modes resolve differently
   const isDollars = effQtyType === "dollars";
   // in dollar-amount mode the ticket estimates a share count instead of a cost
-  const estShares = s.price ? qty / s.price : 0;
+  const estShares = quotePx ? qty / quotePx : 0;
   const reviewShares = isDollars ? (lockedPx ? qty / lockedPx : 0) : qty;
   const reviewAmount = isDollars ? qty : qty * lockedPx;
   const reviewRows: Array<[string, string]> = [
