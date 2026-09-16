@@ -150,7 +150,13 @@
    tint. */
 .nq-frac-skin {
   position: absolute;
-  inset: 0;
+  /* 34px on the 32px box: the chip is the one dark shape in a row of
+     white ones on a light ground, and a dark disc reads smaller than a
+     light one of the same size (user, 2026-09-16: "the circle looks
+     smaller than the other icons" — all three measured 32). The extra
+     pixel each side is optical; the layout box, the slot and the gaps
+     stay 32 / 8. */
+  inset: -1px;
   border-radius: inherit;
   isolation: isolate;
   overflow: hidden;
@@ -185,12 +191,10 @@
     0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* The mark's sizes are set on the `InkMark` in the component: 12 in the
-   chip (the star's and bell's ~13px of 1.2px-outline ink beside it; the
-   heavier mark matches their weight a pixel smaller — user, 2026-09-16)
-   and 14 in the strip, matching its close (user, 2026-09-14). The glyph
-   carries its own `layoutId`, so the 12 -> 14 step is animated, invisibly
-   at this size. */
+/* The mark's size is set on the `InkMark` in the component: 14 in both
+   the chip and the strip — the star's and bell's ~13px of ink plus their
+   1.2px outline is ~14 to the eye, and 12 and 13 both read smaller (user,
+   2026-09-16); the strip's 14 matches its close (user, 2026-09-14). */
 
 /* ---- Buy / Sell ----
    The fractional order flow's own CTA, by value: 44 tall, a 100 radius,

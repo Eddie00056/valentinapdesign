@@ -23,14 +23,6 @@ const GLASS: CSSProperties = {
   background: SLAB,
 };
 
-const MASK: CSSProperties = {
-  WebkitMask:
-    "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-  WebkitMaskComposite: "xor",
-  maskComposite: "exclude",
-  pointerEvents: "none",
-};
-
 const MARK_SRC = "/work/glass/mark.png";
 
 function CloseIcon() {
@@ -153,16 +145,6 @@ export function FractionalSharesBanner({
       : "width 0.34s cubic-bezier(0.45,0,0.7,0.2), left 0.36s cubic-bezier(0.4,0,0.6,0.25) 0.06s, border-radius 0.34s ease, transform 0.26s cubic-bezier(0.34,1.4,0.5,1), box-shadow 0.2s ease, background-image 0.2s ease",
   };
 
-  const ring: CSSProperties = {
-    ...MASK,
-    position: "absolute",
-    inset: 0,
-    borderRadius: "inherit",
-    zIndex: 2,
-    padding: 2,
-    background: "rgba(255,255,255,0.85)",
-  };
-
 
   const iconWrap: CSSProperties = {
     position: "absolute",
@@ -255,7 +237,6 @@ export function FractionalSharesBanner({
           }
         }}
       >
-        <div style={ring} />
         <div style={iconWrap}>
           <span style={glyph} />
         </div>

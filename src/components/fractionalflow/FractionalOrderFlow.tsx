@@ -1041,54 +1041,35 @@ export function FractionalOrderFlow({
                         boxSizing: "border-box",
                         contain: "paint",
                         cursor: "pointer",
-                        background: "rgba(255,255,255,0.5)",
-                        backgroundImage: "linear-gradient(rgba(0,102,219,0.10), rgba(0,102,219,0.10))",
-                        backdropFilter: "blur(8px)",
-                        WebkitBackdropFilter: "blur(8px)",
+                        /* the fractional chip's material, shared with the
+                           banner page and the Notive chip (the snackbar
+                           colours, 2026-09-16): the slab, no rim, no inner
+                           highlight, the mark in the #305FAA ink */
+                        background: "linear-gradient(180deg, #DFE5F5 0%, #D0DBF2 100%)",
                         boxShadow: "0 4px 8px rgba(0,0,0,0.06)",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
                       }}
                     >
-                      <div
+                      <span
+                        role="img"
+                        aria-label="Fractional shares"
                         style={{
-                          position: "absolute",
-                          inset: 0,
-                          borderRadius: "inherit",
-                          zIndex: 2,
-                          opacity: 0.5,
-                          padding: 1,
-                          background: "linear-gradient(273.75deg, #6C9BE6 3.96%, #B2E1F5 34.23%, #6291DC 98.29%)",
-                          WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                          WebkitMaskComposite: "xor",
-                          maskComposite: "exclude",
-                          pointerEvents: "none",
+                          position: "relative",
+                          zIndex: 4,
+                          width: 13,
+                          height: 13,
+                          display: "block",
+                          flexShrink: 0,
+                          background: "#305FAA",
+                          WebkitMaskImage: `url(${P}/fof-fractional-icon.png)`,
+                          maskImage: `url(${P}/fof-fractional-icon.png)`,
+                          WebkitMaskSize: "contain",
+                          maskSize: "contain",
+                          WebkitMaskRepeat: "no-repeat",
+                          maskRepeat: "no-repeat",
                         }}
-                      />
-                      <div
-                        style={{
-                          position: "absolute",
-                          left: 1,
-                          right: 1,
-                          top: 1,
-                          bottom: 1,
-                          borderRadius: "inherit",
-                          zIndex: 3,
-                          boxSizing: "border-box",
-                          padding: 1,
-                          background:
-                            "linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 25.12%, rgba(255,255,255,0.6) 102.08%)",
-                          WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-                          WebkitMaskComposite: "xor",
-                          maskComposite: "exclude",
-                          pointerEvents: "none",
-                        }}
-                      />
-                      <img
-                        src={`${P}/fof-fractional-icon.png`}
-                        alt="Fractional shares"
-                        style={{ position: "relative", zIndex: 4, width: 13, height: 13, display: "block", flexShrink: 0 }}
                       />
                     </motion.div>
                   )}

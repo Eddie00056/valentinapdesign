@@ -718,8 +718,8 @@ const { solo = false } = Astro.props as { solo?: boolean };
       /* slide 79, "Beta release": the entry's css hides the open banner
          (the state stays open, so the chip never mounts — the tag is the
          fractional affordance here) and this sets a "Fractional" tag beside
-         the top icons in the banner's own colours (its strip #dce9f7, its
-         text #0066db), boxed like the icons beside it: 32 tall, 8 of
+         the top icons in the banner's own colours (its slab #dfe5f5→#d0dbf2,
+         its ink #305faa), boxed like the icons beside it: 32 tall, 8 of
          padding, the row's 8 gap. */
       /* slide 79, "Original design": the PDF draws this column as HOOD —
          the quote screen before fractional existed — so the name reads
@@ -750,14 +750,13 @@ const { solo = false } = Astro.props as { solo?: boolean };
         const tag = d.createElement("span");
         tag.className = "gd-frac-tag";
         tag.textContent = "Fractional";
-        /* The banner's material and nothing else: #dce9f7 under #0066db,
-           no rim, no shadow. Computed styles of chip and strip measure
-           identical (rgb(220,233,247)); a white rim, then a grey drop
-           shadow, each made the small chip read paler than the wide strip
-           beside white icons, so both are gone. */
+        /* The banner's material and nothing else: the slab under the
+           #305faa ink (the snackbar colours, 2026-09-16), no rim, no
+           shadow — a white rim, then a grey drop shadow, each made the
+           small chip read paler than the wide strip beside white icons. */
         tag.style.cssText =
           "display:inline-flex;align-items:center;height:32px;padding:0 8px;border-radius:999px;" +
-          "background:#dce9f7;color:#0066db;font:400 12px/1 'Open Sans',Helvetica,Arial,sans-serif;flex:none;";
+          "background:linear-gradient(180deg,#dfe5f5,#d0dbf2);color:#305faa;font:400 12px/1 'Open Sans',Helvetica,Arial,sans-serif;flex:none;";
         row.insertBefore(tag, row.firstChild);
       },
       /* slide 95: the amount / quantity switcher, tapping itself — the
