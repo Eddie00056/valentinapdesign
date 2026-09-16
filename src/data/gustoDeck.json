@@ -1967,7 +1967,7 @@
     "corner": "Navigating edge cases",
     "live": [
       {
-        "page": "fractional-order-flow",
+        "page": "fractional-order-flow?static",
         "x": 35.61,
         "y": 32.43,
         "w": 30.07,
