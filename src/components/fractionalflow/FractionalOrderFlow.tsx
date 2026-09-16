@@ -409,23 +409,13 @@ function FieldValue({
   );
 }
 
-/* The swap toggle, drawn rather than the old 198px PNG so it stays sharp at
-   any size and can move. Geometry is measured off that PNG: a 40px white
-   disc with a hairline rim, and two 1.4px square-cap arrows — up on the
-   left, down on the right. The pair is exactly point-symmetric about the
-   disc centre (20.35),
-   so a half turn lands it exactly back on itself: each tap spins it 180°
-   (the swap), while the arrows push out along their own direction and
-   settle, so the tap reads as the two values trading places. */
+/* The swap toggle: the user's SwitchIcon (src/components/switchicon), set
+   inside the control's 40px white disc with its hairline rim. Two 1.8px
+   strokes with arrowheads; a tap flips both heads (up-line becomes down,
+   down becomes up) over 0.2s — the same paths and easing as the icon. */
 function SwapGlyph({ turns, reduced }: { turns: number; reduced: boolean }) {
-  const spin = reduced ? { duration: 0 } : { type: "spring", visualDuration: 0.5, bounce: 0.18 } as const;
-  const nudge = (dy: number) =>
-    reduced
-      ? {}
-      : {
-          animate: { y: turns ? [0, dy, 0] : 0 },
-          transition: { duration: 0.42, times: [0, 0.35, 1], ease: "easeInOut" as const },
-        };
+  const active = turns % 2 === 1;
+  const ease = { transition: reduced ? "none" : "all 0.2s ease" } as const;
   return (
     <div
       aria-hidden="true"
@@ -439,27 +429,31 @@ function SwapGlyph({ turns, reduced }: { turns: number; reduced: boolean }) {
         background: "#FFFFFF",
         boxShadow: "0 0 0 0.75px #E9E9E9, 0 1px 5px rgba(0,0,0,0.05)",
         pointerEvents: "none",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <motion.svg
-        width="40.7"
-        height="40.7"
-        viewBox="0 0 40.7 40.7"
-        fill="none"
-        style={{ display: "block", overflow: "visible", transformOrigin: "50% 50%" }}
-        initial={false}
-        animate={{ rotate: turns * 180 }}
-        transition={spin}
-      >
-        <motion.g key={`u${turns}`} {...nudge(-2)} stroke="#1E1E21" strokeWidth={1.45} strokeLinecap="butt" strokeLinejoin="miter">
-          <path d="M 17.33 11.45 V 20.95" />
-          <path d="M 12.93 15.85 L 17.33 11.45 L 21.73 15.85" />
-        </motion.g>
-        <motion.g key={`d${turns}`} {...nudge(2)} stroke="#1E1E21" strokeWidth={1.45} strokeLinecap="butt" strokeLinejoin="miter">
-          <path d="M 23.37 19.75 V 29.25" />
-          <path d="M 18.97 24.85 L 23.37 29.25 L 27.77 24.85" />
-        </motion.g>
-      </motion.svg>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ display: "block" }}>
+        <path d="M11.5 3V13" stroke="black" strokeWidth="1.8" strokeLinecap="round" style={ease} />
+        <path
+          d={active ? "M14 5.5L11.5 3L9 5.5" : "M14 10.5L11.5 13L9 10.5"}
+          stroke="black"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={ease}
+        />
+        <path d="M4.5 13L4.5 3" stroke="black" strokeWidth="1.8" strokeLinecap="round" style={ease} />
+        <path
+          d={active ? "M7 10.5L4.5 13L2 10.5" : "M7 5.5L4.5 3L2 5.5"}
+          stroke="black"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={ease}
+        />
+      </svg>
     </div>
   );
 }
