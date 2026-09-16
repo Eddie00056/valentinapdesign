@@ -620,6 +620,10 @@ export function AlertCreationScreen({
                               fontSize: 12,
                               fontWeight: 500,
                               lineHeight: 1,
+                              /* the Notive strip's nudge: Open Sans's caps sit
+                                 ~1px above the centred line box */
+                              position: "relative",
+                              top: 1,
                               whiteSpace: "nowrap",
                               overflow: "hidden",
                               textOverflow: "ellipsis",

@@ -666,7 +666,10 @@ export function NotiveQuoteScreen({
                 animate={{ scale: 1, opacity: 1, transition: fracGlyphPop }}
                 style={{ display: "block" }}
               >
-                <InkMark size={14} ink={FRAC} />
+                {/* 16 in the strip: at 14 it read smaller than the 14px close
+                    beside the copy (user, 2026-09-16); the chip keeps 14 and
+                    the shared layout animates the step */}
+                <InkMark size={16} ink={FRAC} />
               </motion.span>
             </motion.span>
 
@@ -680,6 +683,11 @@ export function NotiveQuoteScreen({
                 fontSize: 12,
                 fontWeight: 400, // regular, per the user (2026-09-14)
                 lineHeight: 1,
+                /* Open Sans carries more ascender than descender, so the
+                   centred 12px line box puts the caps ~1px above the mark's
+                   and close's centre; one pixel down centres the ink */
+                position: "relative",
+                top: 1,
                 whiteSpace: "nowrap",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
