@@ -1486,18 +1486,6 @@
         "x": 18.36,
         "y": 41.55,
         "size": "lg"
-      },
-      {
-        "text": "Beta release",
-        "x": 49.97,
-        "y": 41.55,
-        "size": "lg"
-      },
-      {
-        "text": "Public release",
-        "x": 81.59,
-        "y": 41.55,
-        "size": "lg"
       }
     ],
     "live": [
@@ -1514,34 +1502,6 @@
         "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "notiveOriginal,freeze",
         "clip": true
-      },
-      {
-        "page": "notive-quote?static",
-        "x": 38.74,
-        "y": 45.0,
-        "w": 22.45,
-        "h": 55.0,
-        "vw": 1280,
-        "vh": 1000,
-        "mode": "width",
-        "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
-        "init": "notiveBeta,freeze",
-        "clip": true
-      },
-      {
-        "page": "notive-quote?chartH=186&static",
-        "x": 70.37,
-        "y": 45.0,
-        "w": 22.45,
-        "h": 55.0,
-        "vw": 1280,
-        "vh": 1000,
-        "mode": "width",
-        "fit": "img[src*=\"iphone\"]",
-        "css": ".nq-root,.phone-stage{background:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
-        "init": "freeze",
-        "clip": true
       }
     ]
   },
@@ -1554,13 +1514,13 @@
       {
         "text": "Original design",
         "x": 18.36,
-        "y": 42.2,
+        "y": 41.55,
         "size": "lg"
       },
       {
         "text": "Beta release",
         "x": 49.97,
-        "y": 42.2,
+        "y": 41.55,
         "size": "lg"
       }
     ],
@@ -1604,19 +1564,19 @@
       {
         "text": "Original design",
         "x": 18.36,
-        "y": 42.2,
+        "y": 41.55,
         "size": "lg"
       },
       {
         "text": "Beta release",
         "x": 49.97,
-        "y": 42.2,
+        "y": 41.55,
         "size": "lg"
       },
       {
         "text": "Public release",
         "x": 81.59,
-        "y": 42.2,
+        "y": 41.55,
         "size": "lg"
       }
     ],
@@ -1672,6 +1632,126 @@
     "corner": "Help traders find the correct symbol",
     "labels": [
       {
+        "text": "Original design",
+        "x": 18.36,
+        "y": 42.2,
+        "size": "lg"
+      },
+      {
+        "text": "Beta release",
+        "x": 49.97,
+        "y": 42.2,
+        "size": "lg"
+      }
+    ],
+    "live": [
+      {
+        "page": "notive-quote?static",
+        "x": 7.13,
+        "y": 45.0,
+        "w": 22.45,
+        "h": 55.0,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
+        "init": "notiveOriginal,freeze",
+        "clip": true
+      },
+      {
+        "page": "notive-quote?static",
+        "x": 38.74,
+        "y": 45.0,
+        "w": 22.45,
+        "h": 55.0,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
+        "init": "notiveBeta,freeze",
+        "clip": true
+      }
+    ]
+  },
+  {
+    "n": 77,
+    "kind": "media",
+    "bg": "white",
+    "corner": "Help traders find the correct symbol",
+    "labels": [
+      {
+        "text": "Original design",
+        "x": 18.36,
+        "y": 42.2,
+        "size": "lg"
+      },
+      {
+        "text": "Beta release",
+        "x": 49.97,
+        "y": 42.2,
+        "size": "lg"
+      },
+      {
+        "text": "Public release",
+        "x": 81.59,
+        "y": 42.2,
+        "size": "lg"
+      }
+    ],
+    "live": [
+      {
+        "page": "notive-quote?static",
+        "x": 7.13,
+        "y": 45.0,
+        "w": 22.45,
+        "h": 55.0,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
+        "init": "notiveOriginal,freeze",
+        "clip": true
+      },
+      {
+        "page": "notive-quote?static",
+        "x": 38.74,
+        "y": 45.0,
+        "w": 22.45,
+        "h": 55.0,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
+        "init": "notiveBeta,freeze",
+        "clip": true
+      },
+      {
+        "page": "notive-quote?chartH=186&static",
+        "x": 70.37,
+        "y": 45.0,
+        "w": 22.45,
+        "h": 55.0,
+        "vw": 1280,
+        "vh": 1000,
+        "mode": "width",
+        "fit": "img[src*=\"iphone\"]",
+        "css": ".nq-root,.phone-stage{background:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
+        "init": "freeze",
+        "clip": true
+      }
+    ]
+  },
+  {
+    "n": 78,
+    "kind": "media",
+    "bg": "white",
+    "corner": "Help traders find the correct symbol",
+    "labels": [
+      {
         "text": "Original quote page",
         "x": 26.88,
         "y": 37.57,
@@ -1688,7 +1768,7 @@
     ]
   },
   {
-    "n": 77,
+    "n": 79,
     "kind": "media",
     "bg": "white",
     "corner": "Help traders find the correct symbol",
@@ -1731,7 +1811,7 @@
     ]
   },
   {
-    "n": 78,
+    "n": 80,
     "kind": "media",
     "bg": "white",
     "corner": "Goal",
@@ -1790,7 +1870,7 @@
     ]
   },
   {
-    "n": 79,
+    "n": 81,
     "kind": "media",
     "bg": "white",
     "shots": [
@@ -1813,7 +1893,7 @@
     ]
   },
   {
-    "n": 80,
+    "n": 82,
     "kind": "media",
     "bg": "white",
     "shots": [
@@ -1843,7 +1923,7 @@
     ]
   },
   {
-    "n": 81,
+    "n": 83,
     "kind": "media",
     "bg": "white",
     "panels": [
@@ -1879,7 +1959,7 @@
     "corner": "Help traders placing a trade"
   },
   {
-    "n": 82,
+    "n": 84,
     "kind": "media",
     "bg": "white",
     "panels": [
@@ -1932,7 +2012,7 @@
     "corner": "Help traders placing a trade"
   },
   {
-    "n": 83,
+    "n": 85,
     "kind": "statement",
     "bg": "white",
     "text": "But there’s more..",
@@ -1940,7 +2020,7 @@
     "fs": 64
   },
   {
-    "n": 84,
+    "n": 86,
     "kind": "media",
     "bg": "white",
     "corner": "Navigating edge cases",
@@ -1970,7 +2050,7 @@
     ]
   },
   {
-    "n": 85,
+    "n": 87,
     "kind": "media",
     "bg": "white",
     "corner": "Navigating edge cases",
@@ -2002,7 +2082,7 @@
     ]
   },
   {
-    "n": 86,
+    "n": 88,
     "kind": "media",
     "bg": "white",
     "corner": "Navigating edge cases",
@@ -2033,7 +2113,7 @@
     ]
   },
   {
-    "n": 87,
+    "n": 89,
     "kind": "media",
     "bg": "white",
     "corner": "Navigating edge cases",
@@ -2061,7 +2141,7 @@
     ]
   },
   {
-    "n": 88,
+    "n": 90,
     "kind": "media",
     "bg": "black",
     "shots": [
@@ -2074,7 +2154,7 @@
     ]
   },
   {
-    "n": 89,
+    "n": 91,
     "kind": "media",
     "bg": "black",
     "shots": [
@@ -2114,7 +2194,7 @@
     ]
   },
   {
-    "n": 90,
+    "n": 92,
     "kind": "media",
     "bg": "white",
     "boxes": [
@@ -2182,7 +2262,7 @@
     "corner": "Novice trading platform"
   },
   {
-    "n": 91,
+    "n": 93,
     "kind": "media",
     "bg": "black",
     "shots": [
@@ -2260,10 +2340,10 @@
         "vh": 1000
       }
     ],
-    "n": 92
+    "n": 94
   },
   {
-    "n": 93,
+    "n": 95,
     "kind": "media",
     "bg": "black",
     "shots": [
@@ -2276,7 +2356,7 @@
     ]
   },
   {
-    "n": 94,
+    "n": 96,
     "kind": "media",
     "bg": "black",
     "shots": [
@@ -2289,7 +2369,7 @@
     ]
   },
   {
-    "n": 95,
+    "n": 97,
     "kind": "media",
     "bg": "black",
     "shots": [
@@ -2302,7 +2382,7 @@
     ]
   },
   {
-    "n": 96,
+    "n": 98,
     "kind": "media",
     "bg": "black",
     "shots": [
@@ -2315,7 +2395,7 @@
     ]
   },
   {
-    "n": 97,
+    "n": 99,
     "kind": "media",
     "bg": "black",
     "shots": [
@@ -2368,7 +2448,7 @@
     ]
   },
   {
-    "n": 98,
+    "n": 100,
     "kind": "media",
     "bg": "black",
     "shots": [
