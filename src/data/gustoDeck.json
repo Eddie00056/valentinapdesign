@@ -1379,7 +1379,7 @@
       {
         "page": "holdings-empty-state?auto",
         "x": 16.9,
-        "y": 5.83,
+        "y": 23.05,
         "w": 22.2,
         "h": 40.0,
         "vw": 1280,
@@ -1392,7 +1392,7 @@
       {
         "page": "order-placed-animation",
         "x": 67.0,
-        "y": 17.87,
+        "y": 35.09,
         "w": 10.0,
         "h": 18.0,
         "vw": 1280,
@@ -1408,7 +1408,7 @@
       {
         "text": "Help traders discover\nfractional symbols",
         "x": 28.0,
-        "y": 33.89,
+        "y": 51.11,
         "size": "lg",
         "tone": "dark",
         "fs": 52,
@@ -1418,7 +1418,7 @@
       {
         "text": "Allow traders to place\na fractional trade",
         "x": 72.0,
-        "y": 33.89,
+        "y": 51.11,
         "size": "lg",
         "tone": "dark",
         "fs": 52,
