@@ -183,7 +183,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "017full",
+        "src": "017b",
         "x": 0,
         "y": 0,
         "w": 100
@@ -578,7 +578,7 @@
     ],
     "live": [
       {
-        "page": "stock-order-entry",
+        "page": "stock-order-entry?bare",
         "x": 35.62,
         "y": 28.46,
         "w": 28.81,
@@ -586,7 +586,7 @@
         "vw": 1280,
         "vh": 960,
         "fit": ".wshell",
-        "css": ".ob-stage{background:none!important;align-items:flex-start!important}",
+        "css": ".ob-stage{background:none!important;align-items:flex-start!important}html.is-bare .wshell.wshell{background:#010101!important}",
         "step": "openBracket",
         "unstep": "closeBracket",
         "mode": "width"
@@ -736,7 +736,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "042a",
+        "src": "042b",
         "x": 0,
         "y": 0,
         "w": 100
@@ -744,7 +744,7 @@
     ],
     "live": [
       {
-        "page": "stock-order-entry",
+        "page": "stock-order-entry?bare",
         "x": 67.12,
         "y": 9.07,
         "w": 24.99,
@@ -754,10 +754,10 @@
         "fit": ".wshell",
         "mode": "width",
         "init": "freeze",
-        "css": ".ob-stage{background:none!important}.wshell-actions{display:none!important}.ob-cta-label{font-weight:600!important}"
+        "css": ".ob-stage{background:none!important}.wshell-actions{display:none!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}"
       },
       {
-        "page": "options-strategy-builder",
+        "page": "options-strategy-builder?bare",
         "x": 67.14,
         "y": 49.51,
         "w": 24.95,
@@ -767,7 +767,7 @@
         "fit": ".wshell",
         "mode": "width",
         "init": "freeze",
-        "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}"
+        "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}"
       }
     ],
     "boxes": [
@@ -816,7 +816,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "043a",
+        "src": "043b",
         "x": 0,
         "y": 0,
         "w": 100
@@ -824,7 +824,7 @@
     ],
     "live": [
       {
-        "page": "chain-to-order?static",
+        "page": "chain-to-order?static&bare",
         "x": 13.28,
         "y": 14.91,
         "w": 68.35,
@@ -832,7 +832,7 @@
         "vw": 1440,
         "vh": 900,
         "fit": ".wsp-screen",
-        "css": "",
+        "css": "html.is-bare .wshell.wshell{background:#010101!important}",
         "clip": true,
         "init": "chainFirst"
       }
@@ -845,7 +845,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "044a",
+        "src": "044b",
         "x": 0,
         "y": 0,
         "w": 100
@@ -853,7 +853,7 @@
     ],
     "live": [
       {
-        "page": "options-strategy-builder",
+        "page": "options-strategy-builder?bare",
         "x": 8.75,
         "y": 25.05,
         "w": 31.82,
@@ -861,7 +861,7 @@
         "vw": 1280,
         "vh": 960,
         "fit": ".wshell",
-        "css": ".ob-stage{background:none!important}"
+        "css": ".ob-stage{background:none!important}html.is-bare .wshell.wshell{background:#010101!important}"
       }
     ],
     "corner": "MVP vs final vision",
@@ -880,7 +880,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "045a",
+        "src": "045b",
         "x": 0,
         "y": 0,
         "w": 100
@@ -888,7 +888,7 @@
     ],
     "live": [
       {
-        "page": "options-strategy-builder",
+        "page": "options-strategy-builder?bare",
         "x": 8.75,
         "y": 25.05,
         "w": 31.82,
@@ -896,7 +896,7 @@
         "vw": 1280,
         "vh": 960,
         "fit": ".wshell",
-        "css": ".ob-stage{background:none!important}"
+        "css": ".ob-stage{background:none!important}html.is-bare .wshell.wshell{background:#010101!important}"
       }
     ],
     "corner": "MVP vs final vision",
@@ -921,7 +921,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "046a",
+        "src": "046b",
         "x": 0,
         "y": 0,
         "w": 100
@@ -949,7 +949,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "047a",
+        "src": "047b",
         "x": 0,
         "y": 0,
         "w": 100
@@ -990,7 +990,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "049a",
+        "src": "049b",
         "x": 0,
         "y": 0,
         "w": 100
@@ -1018,7 +1018,7 @@
     "bg": "black",
     "shots": [
       {
-        "src": "050full",
+        "src": "050b",
         "x": 0,
         "y": 0,
         "w": 100
@@ -1026,7 +1026,7 @@
     ],
     "live": [
       {
-        "page": "chain-to-order",
+        "page": "chain-to-order?bare",
         "x": 14.06,
         "y": 8.98,
         "w": 71.88,
@@ -1034,7 +1034,7 @@
         "vw": 1440,
         "vh": 900,
         "fit": ".wsp-screen",
-        "css": "",
+        "css": "html.is-bare .wshell.wshell{background:#010101!important}",
         "clip": true
       }
     ]

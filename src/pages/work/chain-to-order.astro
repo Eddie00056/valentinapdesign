@@ -41,5 +41,40 @@ import { ChainToTicket } from "../../components/chaintoticket/ChainToTicket";
       color: #e8ebe9;
       text-decoration: none;
     }
-  </style>
+      /* ?bare — the workspace's widgets without their cards: each shell keeps
+       its Figma stroke (#353d3f at 34%) but loses fill and shadow, and the
+       panels behind the content go; the ticket's payoff strip gets a 1px
+       stroke in its own divider colour. Same flag as the two widget pages. */
+    html.is-bare .ob-stage {
+      --chip: #1c1e21; /* the input boxes, off the user's swatch */
+      /* the divider inside a field (unit switcher | value, $ | price): --sunk
+         is #171f20, invisible on the new chip — white at 10% */
+      --sunk: rgba(255, 255, 255, 0.1);
+    }
+    /* the symbol pill in the same colour as the input boxes */
+    html.is-bare .tpill {
+      background: #1c1e21 !important;
+    }
+    html.is-bare .wshell {
+      background: transparent !important;
+      box-shadow: none !important;
+      border: 0.5px solid rgba(255, 255, 255, 0.16) !important;
+    }
+    html.is-bare .oc-table,
+    html.is-bare .ob-card,
+    html.is-bare .ob-legs-panel,
+    html.is-bare .ob-params-panel {
+      background: transparent !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+    html.is-bare .ob-payoff {
+      background: transparent !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      margin-inline: 6px;
+    }
+</style>
+  <script is:inline>
+    if (new URLSearchParams(location.search).has("bare")) document.documentElement.classList.add("is-bare");
+  </script>
 </Bare>

@@ -23,21 +23,44 @@ import { StockTicket } from "../../components/stockticket/StockTicket";
       overflow-y: auto !important;
     }
     /* ?bare — a version without the card: the widget's rows sit straight
-       on the page ground. The shell keeps its stroke — the 1px #353d3f66
-       edge from the strategy-builder Figma (elevation-2 at 40%) — so the
-       widget still reads against the ground; its fill, shadow and the
-       panels behind the content go. Review flag. */
+       on the page ground. The shell keeps a stroke — 0.5px of white at 16%
+       — so the widget still reads against the ground; its fill, shadow and
+       the panels behind the content go. Review flag. */
+    html.is-bare .ob-stage {
+      --chip: #1c1e21; /* the input boxes, off the user's swatch */
+      /* the divider inside a field (unit switcher | value, $ | price): --sunk
+         is #171f20, invisible on the new chip — white at 10% */
+      --sunk: rgba(255, 255, 255, 0.1);
+    }
+    /* the symbol pill in the same colour as the input boxes */
+    html.is-bare .tpill {
+      background: #1c1e21 !important;
+    }
     html.is-bare .wshell {
       background: transparent !important;
       box-shadow: none !important;
-      /* the stroke a touch under its 40%: #353d3f at 34% — 24% was hard to
-         see on this ground */
-      border-color: rgba(53, 61, 63, 0.34) !important;
+      border: 0.5px solid rgba(255, 255, 255, 0.16) !important;
     }
     html.is-bare .st-body {
       background: transparent !important;
       border-color: transparent !important;
       box-shadow: none !important;
+    }
+    /* a rule between the attachments row (Bracket order / Special
+       instructions) and the footer's total and CTAs, in the divider white */
+    html.is-bare .wshell .ob-foot {
+      /* the same rule as the one above the attachments row: --rule, and
+         inset by the body's 6px side padding so both span the same width */
+      border-top: 1px solid var(--rule);
+      margin-inline: 6px;
+      /* the add row's ink sits 13.2 under the rule above it; the same 13.2
+         between its baseline and this rule (the footer's own 8 margin
+         made it 22.4). Below the rule the band is the buttons': 12 from the
+         rule to their top and 12 from their bottom to the card's edge, the
+         card's own inset, so the footer reads as one even band. */
+      margin-top: -1.2px;
+      padding-top: 11px;
+      padding-bottom: 4px;
     }
   </style>
   <script is:inline>
