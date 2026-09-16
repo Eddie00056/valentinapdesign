@@ -2042,6 +2042,15 @@
         "vh": 1000,
         "arrive": "fracHintType"
       }
+    ],
+    "labels": [
+      {
+        "text": "Final content",
+        "x": 50.0,
+        "y": 34.74,
+        "size": "lg",
+        "tone": "dark"
+      }
     ]
   },
   {
