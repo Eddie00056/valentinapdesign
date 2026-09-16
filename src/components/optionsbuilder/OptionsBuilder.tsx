@@ -446,6 +446,48 @@ export function OptionsBuilder({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [legs]);
 
+  /* ?auto — a looped build for the deck (slide 17, 2026-09-16): from the
+     opening leg, a leg lands every 1.6s until the ticket holds four — a
+     sold call above, a bought put below, a sold put further down, an iron
+     condor by the end — holds, then starts over on the opening leg. The
+     legs are built the way a chain pick builds them, priced at the mark of
+     the moment. The frame's own timer; the page never learns it is in a
+     deck. */
+  const autoRef = useRef({ S, n });
+  autoRef.current = { S, n };
+  useEffect(() => {
+    if (typeof location === "undefined" || !new URLSearchParams(location.search).has("auto")) return;
+    const base = Math.round(CHAIN_UNDERLYING.last / 5) * 5;
+    const picks: [Side, Kind, number][] = [
+      ["sell", "call", base + 5],
+      ["buy", "put", base - 5],
+      ["sell", "put", base - 10],
+    ];
+    let i = 0;
+    let t = 0;
+    const step = () => {
+      const { S, n } = autoRef.current;
+      if (i < picks.length) {
+        const [action, kind, strike] = picks[i++];
+        const price = legMark({ kind, strike }, S, n);
+        const leg = legFrom(
+          { strike, kind, action, expiry: CHAIN_EXPIRIES[0].date, price, mode: "add", nonce: 0 },
+          S,
+          n,
+        );
+        setLegs((cur) => (cur.length >= MAX_LEGS ? cur : [...cur, leg]));
+        t = window.setTimeout(step, i < picks.length ? 1600 : 2800);
+      } else {
+        i = 0;
+        setLegs([defaultLeg(S, n)]);
+        t = window.setTimeout(step, 1600);
+      }
+    };
+    t = window.setTimeout(step, 1600);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   /* A quote picked off the chain. Keyed on `nonce` rather than on the
      quote's values — clicking the same ask twice is two separate acts,
      and the second must still land. */

@@ -183,10 +183,25 @@
     "bg": "black",
     "shots": [
       {
-        "src": "017b",
+        "src": "017c",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "options-strategy-builder?bare&auto",
+        "x": 54.2,
+        "y": 20.5,
+        "w": 32.0,
+        "h": 62,
+        "vw": 1280,
+        "vh": 960,
+        "fit": ".wshell",
+        "mode": "width",
+        "clip": true,
+        "css": ".ob-stage{background:none!important}html.is-bare .wshell.wshell{background:#010101!important}"
       }
     ]
   },
