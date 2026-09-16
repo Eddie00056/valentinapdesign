@@ -1979,6 +1979,15 @@
         "fit": ".fof-frame",
         "vh": 1000
       }
+    ],
+    "labels": [
+      {
+        "text": "Unsupported order type",
+        "x": 50.64,
+        "y": 28.97,
+        "size": "lg",
+        "tone": "dark"
+      }
     ]
   },
   {
