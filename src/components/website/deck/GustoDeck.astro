@@ -571,6 +571,13 @@ const { solo = false } = Astro.props as { solo?: boolean };
               "html,body,html[data-embed],html[data-embed] body{background:transparent!important}" +
               // page chrome that isn't the work: the dev toolbar (localhost) and the review-comments button
               "astro-dev-toolbar,.cmt-root,.back,.oc-back{display:none!important}" +
+              /* the bare widgets' 0.5px stroke: a slide scales its frame by
+                 the stage (0.8 at 1543 wide), so on a 1.8× display it came
+                 to 0.64 device px and Chrome dropped the left edge while
+                 keeping the right (slide 17, user 2026-09-16: "on the left
+                 side i cannot see the stroke"); 0.75px lands at ≥1 device
+                 px on every edge without reading heavier */
+              "html.is-bare .wshell.wshell{border-width:0.75px!important}" +
               (f.dataset.css || "");
             d.head.appendChild(st);
             f.contentWindow!.addEventListener("keydown", (e) => {

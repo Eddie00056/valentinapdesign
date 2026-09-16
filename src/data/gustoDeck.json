@@ -202,7 +202,8 @@
         "mode": "width",
         "clip": true,
         "css": ".ob-stage{background:none!important}.ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}html.is-bare .wshell.wshell{background:#010101!important}",
-        "init": "freeze"
+        "init": "freeze",
+        "pad": 4
       }
     ]
   },

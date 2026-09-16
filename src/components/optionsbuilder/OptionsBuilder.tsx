@@ -453,10 +453,13 @@ export function OptionsBuilder({
      legs are built the way a chain pick builds them, priced at the mark of
      the moment. The frame's own timer; the page never learns it is in a
      deck. */
+  const [autoLoop] = useState(
+    () => typeof location !== "undefined" && new URLSearchParams(location.search).has("auto"),
+  );
   const autoRef = useRef({ S, n });
   autoRef.current = { S, n };
   useEffect(() => {
-    if (typeof location === "undefined" || !new URLSearchParams(location.search).has("auto")) return;
+    if (!autoLoop) return;
     const base = Math.round(CHAIN_UNDERLYING.last / 5) * 5;
     const picks: [Side, Kind, number][] = [
       ["sell", "call", base + 5],
@@ -698,9 +701,22 @@ export function OptionsBuilder({
      column is sized for. A butterfly genuinely has two; this shows the
      near one, and the other is in `profile.breakevens` if the column ever
      earns the room. */
-  const breakevenText = profile.breakevens.length
+  const breakevenLive = profile.breakevens.length
     ? `$${profile.breakevens[0].toFixed(2)}`
     : "—";
+  /* ?auto (the deck's loop): the three figures hold at what the opening
+     leg came to, rather than re-reading on every leg that lands — the
+     slide is about rows arriving, not the maths (user, 2026-09-16: "keep
+     max profit, loss and breakeven static"). Captured on the first render,
+     before the loop adds anything. */
+  const payoffHeld = useRef<{ profit: string; loss: string; be: string } | null>(null);
+  const payoffLive = {
+    profit: maxProfit === null ? "Unlimited" : signedMoney(maxProfit),
+    loss: maxLoss === null ? "Unlimited" : signedMoney(maxLoss),
+    be: breakevenLive,
+  };
+  if (autoLoop && !payoffHeld.current) payoffHeld.current = payoffLive;
+  const payoffShown = autoLoop && payoffHeld.current ? payoffHeld.current : payoffLive;
 
   /* What the order actually costs. Quotes are per share; a contract is
      100 of them, and the figure a reader compares against their buying
@@ -1000,15 +1016,9 @@ export function OptionsBuilder({
               the order above them comes to, and all three move when any
               one of the fields does. */}
           <div className="ob-payoff">
-            <Payoff
-              k="Max profit"
-              v={maxProfit === null ? "Unlimited" : signedMoney(maxProfit)}
-            />
-            <Payoff
-              k="Max loss"
-              v={maxLoss === null ? "Unlimited" : signedMoney(maxLoss)}
-            />
-            <Payoff k="Breakeven" v={breakevenText} />
+            <Payoff k="Max profit" v={payoffShown.profit} />
+            <Payoff k="Max loss" v={payoffShown.loss} />
+            <Payoff k="Breakeven" v={payoffShown.be} />
           </div>
 
           {/* ---- what it costs, and the button that commits to it ----
