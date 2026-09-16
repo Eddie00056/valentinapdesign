@@ -16,6 +16,14 @@ import type { CSSProperties } from "react";
 const BLUE = "#305FAA"; /* the ink: text, icon disc, close, all (48,95,170) */
 const SLAB = "linear-gradient(180deg, #DFE5F5 0%, #D0DBF2 100%)";
 
+/* `skin="glass"` (the page's ?glass): the banner's original colours — the
+   50% white glass with the 10% blue tint, #0055B6 ink at 300, the mark as
+   shipped — with only the container's stroke from the snackbar: the 2px
+   white ring in place of the gradient ring and inner highlight. A version
+   the user asked to see side by side (2026-09-16). */
+export type BannerSkin = "snackbar" | "glass";
+const BLUE_GLASS = "#0055B6";
+
 const GLASS: CSSProperties = {
   isolation: "isolate",
   border: 0,
@@ -33,12 +41,13 @@ const MASK: CSSProperties = {
 
 const MARK_SRC = "/work/glass/mark.png";
 
-function CloseIcon() {
+function CloseIcon({ ink, glass }: { ink: string; glass: boolean }) {
   return (
     <svg width={14} height={14} viewBox="0 0 14 14" fill="none" style={{ display: "block" }}>
       <path
         d="M1.4 1.4l11.2 11.2M12.6 1.4L1.4 12.6"
-        stroke={BLUE}
+        stroke={ink}
+        strokeOpacity={glass ? 0.55 : 1}
         strokeWidth={2}
         strokeLinecap="round"
       />
@@ -49,14 +58,17 @@ function CloseIcon() {
 export function FractionalSharesBanner({
   text = "Fractional shares available for AAPL market orders",
   boldTerm = "AAPL",
-  expandedWidth = 616, /* the old 58 | copy | 61, the copy at 500 now */
+  expandedWidth,
   stageWidth = 680,
   collapsedPosition = "center",
   auto = false,
+  skin = "snackbar",
 }: {
   text?: string;
   boldTerm?: string;
+  /** the old 58 | copy | 61: 616 for the snackbar's 500-weight copy, 590 for the glass's 300 */
   expandedWidth?: number;
+  skin?: BannerSkin;
   stageWidth?: number;
   collapsedPosition?: "center" | "left";
   auto?: boolean;
@@ -106,7 +118,9 @@ export function FractionalSharesBanner({
       : "0 8px 16px rgba(0,0,0,0.06)";
 
   const n = text.length;
-  const w = expandedWidth;
+  const glass = skin === "glass";
+  const ink = glass ? BLUE_GLASS : BLUE;
+  const w = expandedWidth ?? (glass ? 590 : 616);
   const bStart = boldTerm ? text.indexOf(boldTerm) : -1;
   const bEnd = bStart === -1 ? -1 : bStart + boldTerm.length;
   const centered = collapsedPosition === "center";
@@ -122,6 +136,13 @@ export function FractionalSharesBanner({
 
   const outer: CSSProperties = {
     ...GLASS,
+    ...(glass && {
+      background: "rgba(255, 255, 255, 0.5)",
+      backgroundImage:
+        !open && hover
+          ? "linear-gradient(rgba(0,102,219,0.17), rgba(0,102,219,0.17))"
+          : "linear-gradient(rgba(0,102,219,0.10), rgba(0,102,219,0.10))",
+    }),
     backdropFilter: "blur(18px)",
     WebkitBackdropFilter: "blur(18px)",
     boxShadow: shadow,
@@ -134,13 +155,13 @@ export function FractionalSharesBanner({
     width: open ? w : 66,
     height: 66,
     /* a circle closed; the snackbar's radius (a third of the height) open */
-    borderRadius: open ? 22 : 33,
+    borderRadius: open && !glass ? 22 : 33,
     cursor: open ? "default" : "pointer",
     overflow: "hidden",
     boxSizing: "border-box",
     contain: "paint",
     transformOrigin: open ? "33px center" : "center center",
-    filter: !open && hover ? "brightness(0.97)" : "none",
+    filter: !open && hover && !glass ? "brightness(0.97)" : "none",
     transform: pop
       ? "scale(0.97, 1.02)"
       : !open && press
@@ -188,7 +209,7 @@ export function FractionalSharesBanner({
     width: 22,
     height: 22,
     flexShrink: 0,
-    background: BLUE,
+    background: ink,
     WebkitMaskImage: `url(${MARK_SRC})`,
     maskImage: `url(${MARK_SRC})`,
     WebkitMaskSize: "contain",
@@ -206,9 +227,9 @@ export function FractionalSharesBanner({
     top: "50%",
     fontSize: 21,
     lineHeight: 1.4,
-    color: BLUE,
+    color: ink,
     whiteSpace: "nowrap",
-    fontWeight: 500,
+    fontWeight: glass ? 300 : 500,
     letterSpacing: "-0.01em",
     transform: "translateY(-50%)",
   };
@@ -225,7 +246,7 @@ export function FractionalSharesBanner({
     justifyContent: "center",
     borderRadius: 999,
     cursor: "pointer",
-    background: xHover ? "rgba(48,95,170,0.09)" : "transparent",
+    background: xHover ? (glass ? "rgba(0,85,182,0.09)" : "rgba(48,95,170,0.09)") : "transparent",
     opacity: open ? 1 : 0,
     pointerEvents: open ? "auto" : "none",
     transition: open
@@ -257,7 +278,11 @@ export function FractionalSharesBanner({
       >
         <div style={ring} />
         <div style={iconWrap}>
-          <span style={glyph} />
+          {glass ? (
+            <img src={MARK_SRC} alt="" width={22} height={22} style={{ display: "block", flexShrink: 0 }} />
+          ) : (
+            <span style={glyph} />
+          )}
         </div>
         <div style={copy}>
           {text.split("").map((ch, i) => {
@@ -265,7 +290,7 @@ export function FractionalSharesBanner({
             const chStyle: CSSProperties = {
               display: "inline-block",
               whiteSpace: "pre",
-              fontWeight: i >= bStart && i < bEnd ? 600 : 500,
+              fontWeight: i >= bStart && i < bEnd ? (glass ? 500 : 600) : glass ? 300 : 500,
               opacity: open ? 1 : 0,
               transform: open ? "translateY(0)" : "translateY(4px)",
               transition: open
@@ -298,7 +323,7 @@ export function FractionalSharesBanner({
             }
           }}
         >
-          <CloseIcon />
+          <CloseIcon ink={ink} glass={glass} />
         </div>
       </div>
     </div>
