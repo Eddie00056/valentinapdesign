@@ -744,20 +744,32 @@ const { solo = false } = Astro.props as { solo?: boolean };
           if (n.nodeValue?.trim() === "Apple Inc") n.nodeValue = "Robinhood Markets Inc";
         }
       },
-      notiveBeta: (_w, d) => {
-        const row = d.querySelector<HTMLElement>(".nq-nav-right");
-        if (!row || row.querySelector(".gd-frac-tag")) return;
-        const tag = d.createElement("span");
-        tag.className = "gd-frac-tag";
-        tag.textContent = "Fractional";
-        /* The banner's material and nothing else: the slab under the
-           #305faa ink (the snackbar colours, 2026-09-16), no rim, no
-           shadow — a white rim, then a grey drop shadow, each made the
-           small chip read paler than the wide strip beside white icons. */
-        tag.style.cssText =
-          "display:inline-flex;align-items:center;height:32px;padding:0 8px;border-radius:999px;" +
-          "background:linear-gradient(180deg,#dfe5f5,#d0dbf2);color:#305faa;font:400 12px/1 'Open Sans',Helvetica,Arial,sans-serif;flex:none;";
-        row.insertBefore(tag, row.firstChild);
+      notiveBeta: (w, d) => {
+        const put = () => {
+          const row = d.querySelector<HTMLElement>(".nq-nav-right");
+          if (!row || row.querySelector(".gd-frac-tag")) return;
+          const tag = d.createElement("span");
+          tag.className = "gd-frac-tag";
+          tag.textContent = "Fractional";
+          /* The banner's material and nothing else: the slab under the
+             #305faa ink (the snackbar colours, 2026-09-16), no rim, no
+             shadow — a white rim, then a grey drop shadow, each made the
+             small chip read paler than the wide strip beside white icons. */
+          tag.style.cssText =
+            "display:inline-flex;align-items:center;height:32px;padding:0 8px;border-radius:999px;" +
+            "background:linear-gradient(180deg,#dfe5f5,#d0dbf2);color:#305faa;font:400 12px/1 'Open Sans',Helvetica,Arial,sans-serif;flex:none;";
+          row.insertBefore(tag, row.firstChild);
+        };
+        /* The init runs on the server-rendered row; React's hydration then
+           re-renders it and the tag is gone (it was missing on prod,
+           2026-09-16). So the tag is put back for a while after — the
+           chainFirst pattern: 250ms × 20, stopping once it stays. */
+        put();
+        let n = 0;
+        const t = w.setInterval(() => {
+          put();
+          if (++n >= 20) w.clearInterval(t);
+        }, 250);
       },
       /* slide 95: the amount / quantity switcher, tapping itself — the
          arrowheads flip every two seconds. The frame's own timer, so it
