@@ -6,12 +6,15 @@ interface Props {
   y: number;
   w: number;
   cls?: string;
+  /** step index: the crop fades in on that arrow, like a label or a live frame */
+  s?: number;
 }
-const { src, x, y, w, cls = "gd-media-shot" } = Astro.props;
+const { src, x, y, w, cls = "gd-media-shot", s } = Astro.props;
 ---
 
 <img
-  class={cls}
+  class:list={[cls, s != null && "gd-fade"]}
+  data-s={s ?? undefined}
   src={`/website/case/gusto/v2/${src}.webp`}
   alt=""
   loading="lazy"

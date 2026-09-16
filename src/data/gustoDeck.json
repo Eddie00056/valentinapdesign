@@ -1718,39 +1718,43 @@
         "text": "Original quote page",
         "x": 26.88,
         "y": 30.29,
-        "size": "lg"
+        "size": "lg",
+        "s": 1
       },
       {
         "text": "Updated quote page",
         "x": 74.0,
         "y": 30.29,
-        "size": "lg"
+        "size": "lg",
+        "s": 0
       }
     ],
     "shots": [
       {
         "src": "076a",
-        "x": 0,
-        "y": 33.2,
-        "w": 50
+        "x": 2.69,
+        "y": 33.25,
+        "w": 45.0,
+        "s": 1
       }
     ],
     "live": [
       {
-        "page": "alert-creation",
-        "x": 56.62,
+        "page": "alert-creation?banner=open",
+        "x": 58.36,
         "y": 33.74,
-        "w": 34.75,
-        "h": 66.0,
+        "w": 31.28,
+        "h": 59.4,
         "vw": 1280,
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
         "css": ".acs-root{background:none!important}",
         "clip": true,
-        "arrive": "openFractional"
+        "s": 0
       }
-    ]
+    ],
+    "steps": 2
   },
   {
     "n": 77,
