@@ -1866,29 +1866,38 @@
   {
     "n": 80,
     "kind": "media",
-    "bg": "black",
-    "shots": [
+    "bg": "white",
+    "panels": [
       {
-        "src": "080full",
-        "x": 0,
+        "x": 50,
         "y": 0,
-        "w": 100
+        "w": 50,
+        "c": "#f2f2f2"
+      }
+    ],
+    "labels": [
+      {
+        "text": "Old design",
+        "x": 26.85,
+        "y": 14.21,
+        "size": "lg"
       }
     ],
     "live": [
       {
-        "page": "order-placement",
+        "page": "order-placement-boxed",
         "x": 16.25,
-        "y": 18.03,
+        "y": 17.66,
         "w": 21.2,
         "h": 72.18,
         "vw": 1280,
         "vh": 1000,
         "fit": "img[src*=\"iphone\"]",
-        "mode": "width",
-        "css": ".phone-stage{background:none!important}"
+        "css": ".phone-stage{background:none!important}.opb-frac-btn{visibility:hidden!important}",
+        "init": "quantityOnly,freeze"
       }
-    ]
+    ],
+    "corner": "Help traders placing a trade"
   },
   {
     "n": 81,
