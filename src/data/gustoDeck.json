@@ -1938,8 +1938,7 @@
         "vw": 1280,
         "vh": 1000,
         "fit": "img[src*=\"iphone\"]",
-        "css": ".phone-stage{background:none!important}",
-        "arrive": "openFractional"
+        "css": ".phone-stage{background:none!important}"
       }
     ],
     "corner": "Help traders placing a trade"
