@@ -7,15 +7,19 @@ import type { CSSProperties } from "react";
  * staggered per-letter reveal; the close (x) collapses it back.
  */
 
-const BLUE = "#0055B6";
+/* The snackbar spec (Snackbar.png, 451×91, scaled ×0.725 to this 66px
+   bar): a light-blue slab a shade lighter at the top, a 2px white stroke,
+   one ink for text, icon and close, the icon a filled disc with the glyph
+   knocked out, a hairline in the ink at 20% the bar's full height before
+   the close, radius a third of the height. Every value sampled off the file. */
+const BLUE = "#305FAA"; /* the ink: text, icon disc, close, all (48,95,170) */
+const SLAB = "linear-gradient(180deg, #DFE5F5 0%, #D0DBF2 100%)";
 
 const GLASS: CSSProperties = {
   isolation: "isolate",
   border: 0,
   zIndex: 1,
-  background: "rgba(255, 255, 255, 0.5)",
-  backgroundImage:
-    "linear-gradient(rgba(0,102,219,0.10), rgba(0,102,219,0.10))",
+  background: SLAB,
 };
 
 const MASK: CSSProperties = {
@@ -26,15 +30,6 @@ const MASK: CSSProperties = {
   pointerEvents: "none",
 };
 
-const STROKE_BASE: CSSProperties = {
-  ...MASK,
-  borderRadius: "inherit",
-  zIndex: 3,
-  boxSizing: "border-box",
-  background:
-    "linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0) 25.12%, rgba(255,255,255,0.6) 102.08%)",
-};
-
 const MARK_SRC = "/work/glass/mark.png";
 
 function CloseIcon() {
@@ -43,7 +38,6 @@ function CloseIcon() {
       <path
         d="M1.4 1.4l11.2 11.2M12.6 1.4L1.4 12.6"
         stroke={BLUE}
-        strokeOpacity={0.55}
         strokeWidth={2}
         strokeLinecap="round"
       />
@@ -54,7 +48,7 @@ function CloseIcon() {
 export function FractionalSharesBanner({
   text = "Fractional shares available for AAPL market orders",
   boldTerm = "AAPL",
-  expandedWidth = 590,
+  expandedWidth = 670,
   stageWidth = 680,
   collapsedPosition = "center",
   auto = false,
@@ -138,16 +132,13 @@ export function FractionalSharesBanner({
         : Math.round((stageWidth - w) / 2),
     width: open ? w : 66,
     height: 66,
-    borderRadius: 33,
+    borderRadius: 22,
     cursor: open ? "default" : "pointer",
     overflow: "hidden",
     boxSizing: "border-box",
     contain: "paint",
     transformOrigin: open ? "33px center" : "center center",
-    backgroundImage:
-      !open && hover
-        ? "linear-gradient(rgba(0,102,219,0.17), rgba(0,102,219,0.17))"
-        : "linear-gradient(rgba(0,102,219,0.10), rgba(0,102,219,0.10))",
+    filter: !open && hover ? "brightness(0.97)" : "none",
     transform: pop
       ? "scale(0.97, 1.02)"
       : !open && press
@@ -166,22 +157,20 @@ export function FractionalSharesBanner({
     inset: 0,
     borderRadius: "inherit",
     zIndex: 2,
-    opacity: 0.5,
-    padding: 1,
-    background: open
-      ? "linear-gradient(168deg, #A9CBF2 0%, #DCEFFA 42%, #7FA9E4 100%)"
-      : "linear-gradient(273.75deg, #6C9BE6 3.96%, #B2E1F5 34.23%, #6291DC 98.29%)",
-    transition: "background 0.4s ease",
+    padding: 2,
+    background: "rgba(255,255,255,0.85)",
   };
 
-  const stroke: CSSProperties = {
-    ...STROKE_BASE,
+  /* the hairline before the close, the slab's full height */
+  const divider: CSSProperties = {
     position: "absolute",
-    left: 1,
-    right: 1,
-    top: 1,
-    bottom: 1,
-    padding: 1,
+    right: 66,
+    top: 0,
+    bottom: 0,
+    width: 1,
+    background: "rgba(48,95,170,0.2)",
+    opacity: open ? 1 : 0,
+    transition: open ? "opacity 0.22s ease 0.48s" : "opacity 0.08s ease",
   };
 
   const iconWrap: CSSProperties = {
@@ -202,16 +191,42 @@ export function FractionalSharesBanner({
       : "transform 0.32s cubic-bezier(0.4,0,0.6,0.25)",
   };
 
+  const disc: CSSProperties = {
+    width: 22,
+    height: 22,
+    borderRadius: 999,
+    background: BLUE,
+    display: "grid",
+    placeItems: "center",
+    flexShrink: 0,
+  };
+  const glyph: CSSProperties = {
+    display: "block",
+    width: 13,
+    height: 13,
+    background: "#fff",
+    WebkitMaskImage: `url(${MARK_SRC})`,
+    maskImage: `url(${MARK_SRC})`,
+    WebkitMaskSize: "contain",
+    maskSize: "contain",
+    WebkitMaskRepeat: "no-repeat",
+    maskRepeat: "no-repeat",
+    WebkitMaskPosition: "center",
+    maskPosition: "center",
+  };
+
   const copy: CSSProperties = {
     position: "absolute",
-    left: 58,
-    right: 61,
+    /* the icon lands at 36 when open; the reference's gaps ×0.725: 26 after
+       the icon, 11 before the hairline, 70 from the hairline to the edge */
+    left: 84,
+    right: 81,
     top: "50%",
     fontSize: 21,
     lineHeight: 1.4,
     color: BLUE,
     whiteSpace: "nowrap",
-    fontWeight: 300,
+    fontWeight: 500,
     letterSpacing: "-0.01em",
     transform: "translateY(-50%)",
   };
@@ -228,7 +243,7 @@ export function FractionalSharesBanner({
     justifyContent: "center",
     borderRadius: 999,
     cursor: "pointer",
-    background: xHover ? "rgba(0,85,182,0.09)" : "transparent",
+    background: xHover ? "rgba(48,95,170,0.09)" : "transparent",
     opacity: open ? 1 : 0,
     pointerEvents: open ? "auto" : "none",
     transition: open
@@ -259,15 +274,13 @@ export function FractionalSharesBanner({
         }}
       >
         <div style={ring} />
-        <div style={stroke} />
+        <div style={divider} />
         <div style={iconWrap}>
-          <img
-            src={MARK_SRC}
-            alt=""
-            width={22}
-            height={22}
-            style={{ display: "block", flexShrink: 0 }}
-          />
+          {/* the reference's icon: a filled disc in the ink, the glyph
+              knocked out of it in white — the mark as a mask */}
+          <div style={disc}>
+            <span style={glyph} />
+          </div>
         </div>
         <div style={copy}>
           {text.split("").map((ch, i) => {
@@ -275,7 +288,7 @@ export function FractionalSharesBanner({
             const chStyle: CSSProperties = {
               display: "inline-block",
               whiteSpace: "pre",
-              fontWeight: i >= bStart && i < bEnd ? 500 : 300,
+              fontWeight: i >= bStart && i < bEnd ? 600 : 500,
               opacity: open ? 1 : 0,
               transform: open ? "translateY(0)" : "translateY(4px)",
               transition: open
