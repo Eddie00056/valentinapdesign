@@ -276,7 +276,9 @@ const { solo = false } = Astro.props as { solo?: boolean };
                         style={`left:${b.x}%;top:${b.y}%;width:${b.w}%;height:${b.h}%;background:${b.c}`}
                       />
                     ))}
-                    {/* `mw`: a wrapped label's own measure in em. An absolute box
+                    {/* `op`: a label's or live frame's opacity — a slide that
+                        dims one half to point at the other (71 dims 70's right).
+                        `mw`: a wrapped label's own measure in em. An absolute box
                         otherwise shrinks to what is left of the slide right of
                         its `left`, so a caption centred at 72% wrapped at 28% of
                         the width; max-content frees it, the cap wraps it. */}
@@ -284,7 +286,7 @@ const { solo = false } = Astro.props as { solo?: boolean };
                       <p
                         class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade", l.wrap && "is-wrap"]}
                         data-s={l.s ?? undefined}
-                        style={`left:${l.x}%;top:${l.y ?? 19}%${l.fs ? `;font-size:${l.fs}px` : ""}${l.mw ? `;width:max-content;max-width:${l.mw}em;text-align:center` : ""}`}
+                        style={`left:${l.x}%;top:${l.y ?? 19}%${l.fs ? `;font-size:${l.fs}px` : ""}${l.mw ? `;width:max-content;max-width:${l.mw}em;text-align:center` : ""}${l.op != null ? `;opacity:${l.op}` : ""}`}
                       >
                         {l.text}
                         {l.accent && <span class="gd-media-l-accent">{l.accent}</span>}
@@ -460,7 +462,7 @@ const { solo = false } = Astro.props as { solo?: boolean };
                       class:list={["gd-live", { "is-clip": l.clip, "gd-fade": l.s != null, "is-rise": l.rise }]}
                       data-s={l.s ?? undefined}
                       data-stack={l.stack ? "" : undefined}
-                      style={`left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%`}
+                      style={`left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%${l.op != null ? `;opacity:${l.op}` : ""}`}
                     >
                       <iframe
                         title={l.page}
