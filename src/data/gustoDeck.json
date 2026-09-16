@@ -2182,7 +2182,7 @@
         "vw": 1280,
         "vh": 1000,
         "fit": ".si-btn",
-        "pad": 20,
+        "pad": 13,
         "clip": true,
         "css": ".si-stage{background:none!important}.si-btn{background:none!important}"
       },
