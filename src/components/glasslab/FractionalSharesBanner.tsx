@@ -10,8 +10,9 @@ import type { CSSProperties } from "react";
 /* The snackbar spec (Snackbar.png, 451×91, scaled ×0.725 to this 66px
    bar): a light-blue slab a shade lighter at the top, a 2px white stroke,
    one ink for text, icon and close, the icon a filled disc with the glyph
-   knocked out, a hairline in the ink at 20% the bar's full height before
-   the close, radius a third of the height. Every value sampled off the file. */
+   in the ink, radius a third of the height when open (a circle closed).
+   Sampled off the file; the divider and the reference's gaps were tried
+   and dropped (user, 2026-09-16). */
 const BLUE = "#305FAA"; /* the ink: text, icon disc, close, all (48,95,170) */
 const SLAB = "linear-gradient(180deg, #DFE5F5 0%, #D0DBF2 100%)";
 
@@ -48,7 +49,7 @@ function CloseIcon() {
 export function FractionalSharesBanner({
   text = "Fractional shares available for AAPL market orders",
   boldTerm = "AAPL",
-  expandedWidth = 670,
+  expandedWidth = 616, /* the old 58 | copy | 61, the copy at 500 now */
   stageWidth = 680,
   collapsedPosition = "center",
   auto = false,
@@ -132,7 +133,8 @@ export function FractionalSharesBanner({
         : Math.round((stageWidth - w) / 2),
     width: open ? w : 66,
     height: 66,
-    borderRadius: 22,
+    /* a circle closed; the snackbar's radius (a third of the height) open */
+    borderRadius: open ? 22 : 33,
     cursor: open ? "default" : "pointer",
     overflow: "hidden",
     boxSizing: "border-box",
@@ -161,17 +163,6 @@ export function FractionalSharesBanner({
     background: "rgba(255,255,255,0.85)",
   };
 
-  /* the hairline before the close, the slab's full height */
-  const divider: CSSProperties = {
-    position: "absolute",
-    right: 66,
-    top: 0,
-    bottom: 0,
-    width: 1,
-    background: "rgba(48,95,170,0.2)",
-    opacity: open ? 1 : 0,
-    transition: open ? "opacity 0.22s ease 0.48s" : "opacity 0.08s ease",
-  };
 
   const iconWrap: CSSProperties = {
     position: "absolute",
@@ -191,20 +182,13 @@ export function FractionalSharesBanner({
       : "transform 0.32s cubic-bezier(0.4,0,0.6,0.25)",
   };
 
-  const disc: CSSProperties = {
-    width: 22,
-    height: 22,
-    borderRadius: 999,
-    background: BLUE,
-    display: "grid",
-    placeItems: "center",
-    flexShrink: 0,
-  };
+  /* the mark in the ink — the PNG is #0066DB, so it goes through a mask */
   const glyph: CSSProperties = {
     display: "block",
-    width: 13,
-    height: 13,
-    background: "#fff",
+    width: 22,
+    height: 22,
+    flexShrink: 0,
+    background: BLUE,
     WebkitMaskImage: `url(${MARK_SRC})`,
     maskImage: `url(${MARK_SRC})`,
     WebkitMaskSize: "contain",
@@ -217,10 +201,8 @@ export function FractionalSharesBanner({
 
   const copy: CSSProperties = {
     position: "absolute",
-    /* the icon lands at 36 when open; the reference's gaps ×0.725: 26 after
-       the icon, 11 before the hairline, 70 from the hairline to the edge */
-    left: 84,
-    right: 81,
+    left: 58,
+    right: 61,
     top: "50%",
     fontSize: 21,
     lineHeight: 1.4,
@@ -274,13 +256,8 @@ export function FractionalSharesBanner({
         }}
       >
         <div style={ring} />
-        <div style={divider} />
         <div style={iconWrap}>
-          {/* the reference's icon: a filled disc in the ink, the glyph
-              knocked out of it in white — the mark as a mask */}
-          <div style={disc}>
-            <span style={glyph} />
-          </div>
+          <span style={glyph} />
         </div>
         <div style={copy}>
           {text.split("").map((ch, i) => {
