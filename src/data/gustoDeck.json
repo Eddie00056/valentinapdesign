@@ -1003,6 +1003,32 @@
         "y": 21.29,
         "size": "lg"
       }
+    ],
+    "live": [
+      {
+        "page": "stock-order-entry?bare",
+        "x": 61.68,
+        "y": 24.6,
+        "w": 25.07,
+        "h": 33.0,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".wshell",
+        "clip": true,
+        "css": ".ob-stage{background:none!important}.wshell-actions{display:none!important}.ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}"
+      },
+      {
+        "page": "options-strategy-builder?bare",
+        "x": 61.68,
+        "y": 58.5,
+        "w": 25.07,
+        "h": 34.2,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".wshell",
+        "clip": true,
+        "css": ".ob-stage{background:none!important}.ob-cost,.st-attach-stack,.wshell-actions{display:none!important}.ob-foot{justify-content:flex-end!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}"
+      }
     ]
   },
   {
