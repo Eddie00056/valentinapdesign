@@ -168,13 +168,15 @@ export function AlertCreationScreen({
   }, []);
   /* inline approximation of the glass `light` icon button (glass-button.css
      .dark .btn--light) so the morphing card can *be* the resting icon. */
-  // Match the mobile GlassButton (watchlist / alert) exactly: 66deg fill +
-  // soft shadow here, and the same 66deg masked 1px rim via `.acs-frac-card`
-  // (a plain inset ring reads flat / faded next to the real glass buttons).
+  // The star and bell beside it are `.dark .btn--light` (glass-button.css):
+  // white at 8%, `0 8px 16px .35`, ink white at 85%, and the 270deg masked
+  // 1px rim — the rim lives on `.acs-frac-card`. Chip AND strip wear it, so
+  // the notice reads as one more of those controls, not a band (user,
+  // 2026-09-16: "make it look more like these icons. don't make it full
+  // width").
   const fracGlass: CSSProperties = {
-    background:
-      "linear-gradient(66deg, rgba(255,255,255,0.1), rgba(255,255,255,0.045))",
-    boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
+    background: "rgba(255,255,255,0.08)",
+    boxShadow: "0 8px 16px rgba(0,0,0,0.35)",
     backdropFilter: "blur(18px)",
     WebkitBackdropFilter: "blur(18px)",
     color: "rgba(255,255,255,0.85)",
@@ -549,21 +551,20 @@ export function AlertCreationScreen({
                           transition: { duration: 0.12, ease: [0.4, 0, 0.2, 1] },
                         }}
                         transition={{ duration: 0.17, ease: [0.4, 0, 0.2, 1] }}
-                        style={{
-                          position: "relative",
-                          marginLeft: -24,
-                          marginRight: -24,
-                        }}
+                        /* on the 24px column, a rounded card like the Notive
+                           quote's — not the full-bleed band it was */
+                        style={{ position: "relative" }}
                       >
                         <motion.div
                           layoutId="frac-card"
+                          className="acs-frac-card"
                           transition={fracSpring}
                           onLayoutAnimationComplete={() => setFracSettled(true)}
                           initial={{ opacity: 0 }}
                           // borderRadius is an explicit animate target here
                           // too — see the matching comment on the compact
                           // icon above.
-                          animate={{ opacity: 1, borderRadius: 0, transition: { duration: 0.16 } }}
+                          animate={{ opacity: 1, borderRadius: 12, transition: { duration: 0.16 } }}
                           exit={{ opacity: 0, transition: { duration: 0.1 } }}
                           role="button"
                           tabIndex={0}
@@ -587,12 +588,9 @@ export function AlertCreationScreen({
                             display: "flex",
                             alignItems: "center",
                             gap: 8,
-                            padding: "0 24px",
+                            padding: "0 12px",
                             boxSizing: "border-box",
-                            background: "#000",
-                            borderTop: "1px solid #31383f",
-                            borderBottom: "1px solid #31383f",
-                            color: "#f2f2f8",
+                            ...fracGlass,
                             cursor: "pointer",
                             overflow: "hidden",
                           }}
@@ -627,7 +625,9 @@ export function AlertCreationScreen({
                               textOverflow: "ellipsis",
                             }}
                           >
-                            Fractional shares available for {SYMBOL} market orders
+                            {/* the Notive quote's line: "market orders" no longer
+                                fits the card on the column (it ellipsed) */}
+                            Fractional shares available for {SYMBOL}
                           </motion.span>
                           <motion.span
                             aria-hidden="true"

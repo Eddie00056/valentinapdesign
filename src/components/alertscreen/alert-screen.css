@@ -43,9 +43,10 @@
 /* fractional-shares glyph — match the 16px glyph the glass icon buttons use */
 .acs-frac-glyph svg { width: 16px; height: 16px; }
 
-/* fractional compact button — same 66deg masked 1px rim as the mobile glass
-   icon buttons (glass-button.css .btn--mobile.btn--icon::before), so it reads
-   as the same material and not a flat, faded disc. */
+/* fractional chip AND strip — the masked 1px rim of the star and bell
+   beside them (glass-button.css `.dark .btn--light::before`, verbatim), so
+   the notice reads as the same material and not a flat, faded disc or a
+   band. The fill and shadow are inline (`fracGlass` in the component). */
 .acs-frac-card::before {
   content: "";
   position: absolute;
@@ -53,10 +54,10 @@
   padding: 1px;
   border-radius: inherit;
   background: linear-gradient(
-    66deg,
-    rgba(255, 255, 255, 0.18) 0%,
-    rgba(255, 255, 255, 0.03) 42%,
-    rgba(255, 255, 255, 0.09) 100%
+    270deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0) 24.61%,
+    rgba(255, 255, 255, 0.1) 100%
   );
   -webkit-mask:
     linear-gradient(#fff 0 0) content-box,
