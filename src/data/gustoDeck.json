@@ -1479,29 +1479,25 @@
     "n": 73,
     "kind": "media",
     "bg": "white",
-    "steps": 2,
     "corner": "Help traders find the correct symbol",
     "labels": [
       {
         "text": "Original design",
         "x": 18.36,
         "y": 41.55,
-        "size": "lg",
-        "s": 0
+        "size": "lg"
       },
       {
         "text": "Beta release",
         "x": 49.97,
         "y": 41.55,
-        "size": "lg",
-        "s": 1
+        "size": "lg"
       },
       {
         "text": "Public release",
         "x": 81.59,
         "y": 41.55,
-        "size": "lg",
-        "s": 2
+        "size": "lg"
       }
     ],
     "live": [
@@ -1517,9 +1513,7 @@
         "fit": "img[src*=\"iphone\"]",
         "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "notiveOriginal,freeze",
-        "clip": true,
-        "s": 0,
-        "rise": true
+        "clip": true
       },
       {
         "page": "notive-quote?static",
@@ -1533,9 +1527,7 @@
         "fit": "img[src*=\"iphone\"]",
         "css": ".nq-root,.phone-stage{background:none!important}.nq-banner,.nq-frac-slot{display:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "notiveBeta,freeze",
-        "clip": true,
-        "s": 1,
-        "rise": true
+        "clip": true
       },
       {
         "page": "notive-quote?chartH=186&static",
@@ -1549,9 +1541,7 @@
         "fit": "img[src*=\"iphone\"]",
         "css": ".nq-root,.phone-stage{background:none!important}.nq-panel{display:none!important}.lac-pulse{display:none!important}",
         "init": "freeze",
-        "clip": true,
-        "s": 2,
-        "rise": true
+        "clip": true
       }
     ]
   },
