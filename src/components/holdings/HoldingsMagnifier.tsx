@@ -264,7 +264,7 @@ const LENS_HOME = { x: GRID_LEFT + GRID + 12 - R, y: GRID_TOP - 5 - R };
 
 const DRIFT_MS = 9000;
 /** One slow lap of the glass round the four logos, in ?auto */
-const WANDER_MS = 22000;
+const WANDER_MS = 17000; // 22s read a touch slow on the slide
 /** Each logo's own float — periods and phases in ms */
 const FLOAT = [7000, 8200, 9400, 10600].map((ms, i) => ({ ms, phase: i * 700 }));
 

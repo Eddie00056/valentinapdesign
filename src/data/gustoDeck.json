@@ -1379,7 +1379,7 @@
       {
         "page": "holdings-empty-state?auto",
         "x": 16.9,
-        "y": 33.0,
+        "y": 30.0,
         "w": 22.2,
         "h": 40.0,
         "vw": 1280,
@@ -1392,31 +1392,31 @@
       {
         "page": "order-placed-animation",
         "x": 65.33,
-        "y": 40.0,
+        "y": 37.0,
         "w": 13.35,
         "h": 26.0,
         "vw": 1280,
         "vh": 1000,
-        "fit": ".opa-badge, .opa-caption",
+        "fit": ".opa-badge",
         "pad": 26,
         "clip": true,
         "init": "mute",
-        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}.opa-glow{animation:none!important;opacity:.06!important;transform:translate(-50%,-50%) scale(1.3)!important}"
+        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}.opa-glow{animation:none!important;opacity:.06!important;transform:translate(-50%,-50%) scale(1.3)!important}.opa-caption{display:none!important}"
       }
     ],
     "boxes": [
       {
-        "x": 11.5,
-        "y": 22.0,
-        "w": 33.0,
-        "h": 56.0,
+        "x": 15.0,
+        "y": 30.0,
+        "w": 26.0,
+        "h": 40.0,
         "c": "#f7f7f7"
       },
       {
-        "x": 55.5,
-        "y": 22.0,
-        "w": 33.0,
-        "h": 56.0,
+        "x": 59.0,
+        "y": 30.0,
+        "w": 26.0,
+        "h": 40.0,
         "c": "#f7f7f7"
       }
     ],
@@ -1424,18 +1424,16 @@
       {
         "text": "Help traders discover fractional symbols",
         "x": 28.0,
-        "y": 27.5,
+        "y": 26.7,
         "size": "lg",
-        "tone": "dark",
-        "fs": 24
+        "tone": "dark"
       },
       {
         "text": "Allow traders to place a fractional trade",
         "x": 72.0,
-        "y": 27.5,
+        "y": 26.7,
         "size": "lg",
-        "tone": "dark",
-        "fs": 24
+        "tone": "dark"
       }
     ]
   },
