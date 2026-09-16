@@ -486,10 +486,12 @@ export function NotiveQuoteScreen({
                   className="nq-frac-glyph"
                   style={{ position: "relative", zIndex: 4, lineHeight: 0 }}
                 >
-                  {/* 13: the star and bell beside it draw ~13px of ink in
-                      their 16px boxes (12 read smaller — user, 2026-09-16:
-                      "make sure the icons are the same size") */}
-                  <InkMark size={13} ink={FRAC} />
+                  {/* 12: the star and bell beside it draw ~13px of ink in
+                      their 16px boxes, but as 1.2px outlines — the mark's
+                      heavier glyph matches their visual weight one pixel
+                      smaller (user, 2026-09-16: "make sure the icons are the
+                      same size", then the set's shadow + 12) */}
+                  <InkMark size={12} ink={FRAC} />
                 </motion.span>
               </motion.div>
             )}

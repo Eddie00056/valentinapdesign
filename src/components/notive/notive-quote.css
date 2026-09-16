@@ -155,7 +155,13 @@
   isolation: isolate;
   overflow: hidden;
   background: linear-gradient(180deg, #dfe5f5 0%, #d0dbf2 100%);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+  /* the shadow of the star and bell beside it (`.nq-root .btn--mobile
+     .btn--icon` above), so the three read as one set (user, 2026-09-16);
+     hover and press keep the chip's lift on top of the same rim */
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.65),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 8px 24px rgba(0, 0, 0, 0.1);
   transform: scale(1);
   transition:
     transform 0.26s cubic-bezier(0.34, 1.4, 0.5, 1),
@@ -165,19 +171,26 @@
 }
 .nq-frac:hover .nq-frac-skin {
   transform: scale(1.06);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.65),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 12px 28px rgba(0, 0, 0, 0.12);
   filter: brightness(0.97);
 }
 .nq-frac:active .nq-frac-skin {
   transform: scale(0.94);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  box-shadow:
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.65),
+    0 1px 2px rgba(0, 0, 0, 0.06),
+    0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
-/* The mark's sizes are set on the `InkMark` in the component: 13 in the
-   chip (the star's and bell's ink beside it; 12 read smaller — user,
-   2026-09-16) and 14 in the strip, matching its close (user, 2026-09-14).
-   The glyph carries its own `layoutId`, so the 13 -> 14 step is animated,
-   invisibly at this size. */
+/* The mark's sizes are set on the `InkMark` in the component: 12 in the
+   chip (the star's and bell's ~13px of 1.2px-outline ink beside it; the
+   heavier mark matches their weight a pixel smaller — user, 2026-09-16)
+   and 14 in the strip, matching its close (user, 2026-09-14). The glyph
+   carries its own `layoutId`, so the 12 -> 14 step is animated, invisibly
+   at this size. */
 
 /* ---- Buy / Sell ----
    The fractional order flow's own CTA, by value: 44 tall, a 100 radius,
