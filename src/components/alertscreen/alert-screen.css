@@ -67,6 +67,28 @@
   pointer-events: none;
 }
 
+/* the range rail's selected pill: the same rim (it moves between the
+   ranges, so the rim rides on the indicator, not the buttons) */
+.acs-tf-ind::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    270deg,
+    rgba(255, 255, 255, 0.14) 0%,
+    rgba(255, 255, 255, 0) 24.61%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
 /* single hover state carried over from `style-hover` on the bell */
 .acs-bell:hover { transform: scale(1.06); }
 

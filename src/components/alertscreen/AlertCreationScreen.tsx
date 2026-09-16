@@ -717,7 +717,7 @@ export function AlertCreationScreen({
                   pad={14}
                   baseline={false}
                   startFromBottom={0.12}
-                  pillInset={0}
+                  pillInset={1} /* the pill's last pixel sat under the frame's screen edge (user, 2026-09-16) */
                   pillTextColor="#04150c"
                   drawIn={drawn}
                   live={tf === 0}
@@ -736,14 +736,21 @@ export function AlertCreationScreen({
                 role="tablist"
                 style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", margin: "10px -10px 0" }}
               >
+                {/* the selected range's pill, in the material of the header
+                    buttons and the notice card (`.dark .btn--light`: white
+                    at 8%, the masked rim on `.acs-tf-ind`) — it was a flat
+                    #22282f slab (user, 2026-09-16: "update it to match the
+                    styling of the rest of the UI") */}
                 <div
                   aria-hidden="true"
+                  className="acs-tf-ind"
                   style={{
                     position: "absolute",
                     top: 0,
                     bottom: 0,
                     borderRadius: 8,
-                    background: "#22282f",
+                    background: "rgba(255,255,255,0.08)",
+                    boxShadow: "0 8px 16px rgba(0,0,0,0.35)",
                     left: indLeft,
                     right: indRight,
                     opacity: indOpacity,
