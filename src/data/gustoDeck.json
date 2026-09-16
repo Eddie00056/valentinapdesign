@@ -814,25 +814,18 @@
     "n": 43,
     "kind": "media",
     "bg": "black",
-    "shots": [
-      {
-        "src": "043b",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ],
+    "shots": [],
     "live": [
       {
         "page": "chain-to-order?static&bare",
-        "x": 13.28,
-        "y": 14.91,
-        "w": 68.35,
-        "h": 76.3,
+        "x": 6.45,
+        "y": 7.28,
+        "w": 82.02,
+        "h": 91.56,
         "vw": 1440,
         "vh": 900,
         "fit": ".wsp-screen",
-        "css": "html.is-bare .wshell.wshell{background:#010101!important}",
+        "css": ".wsp-rail{display:none!important}.wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}html.is-bare .wshell.wshell{background:#010101!important}",
         "clip": true,
         "init": "chainFirst"
       }
