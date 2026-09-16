@@ -586,7 +586,7 @@
         "vw": 1280,
         "vh": 960,
         "fit": ".wshell",
-        "css": ".ob-stage{background:none!important;align-items:flex-start!important}html.is-bare .wshell.wshell{background:#010101!important}",
+        "css": ".ob-stage{background:none!important;align-items:flex-start!important}html.is-bare .wshell.wshell{background:#010101!important}.ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}",
         "step": "openBracket",
         "unstep": "closeBracket",
         "mode": "width"
@@ -754,7 +754,7 @@
         "fit": ".wshell",
         "mode": "width",
         "init": "freeze",
-        "css": ".ob-stage{background:none!important}.wshell-actions{display:none!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}"
+        "css": ".ob-stage{background:none!important}.wshell-actions{display:none!important}.ob-cta-label{font-weight:600!important}html.is-bare .wshell.wshell{background:#010101!important}.ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}"
       },
       {
         "page": "options-strategy-builder?bare",
