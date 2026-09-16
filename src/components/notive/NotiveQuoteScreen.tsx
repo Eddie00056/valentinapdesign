@@ -62,8 +62,36 @@ const DOWN_CHIP_INK = "#b3261e";
    colour its chip and mark are drawn in. It is deliberately not the
    screen's green: the fractional story is one thing across the two
    screens, and this row is where they meet. */
-const FRAC = "#0066db";
-const FRAC_TINT = "#dce9f7"; // the banner strip (user, 2026-09-14: "make the banner DCE9F7")
+/* The fractional chip and strip wear the snackbar's colours (user,
+   2026-09-16, off their Snackbar.png: "i actually really like the new blue
+   color. can we update the color only"): the light-blue slab #DFE5F5→#D0DBF2
+   and one ink #305FAA for the mark, the copy and the close. Colour only —
+   the weights, the close's 70% and the geometry stay; the snackbar's white
+   stroke was tried here and removed ("remove the white border"). The old
+   values, for the record: #0066DB ink on a #DCE9F7 strip (2026-09-14). */
+const FRAC = "#305FAA";
+const FRAC_TINT = "linear-gradient(180deg, #DFE5F5 0%, #D0DBF2 100%)";
+
+/* the mark in an ink of our choosing: the PNG is #0066DB, so a mask */
+function InkMark({ size, ink }: { size: number; ink: string }) {
+  return (
+    <span
+      style={{
+        display: "block",
+        width: size,
+        height: size,
+        background: ink,
+        WebkitMaskImage: `url(${MARK_SRC})`,
+        maskImage: `url(${MARK_SRC})`,
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+      }}
+    />
+  );
+}
+
 
 /* The change line's pair, sampled off the Wealthsimple capture the header
    was rebuilt against (2026-09-13): a touch warmer and lower-chroma than
@@ -452,15 +480,16 @@ export function NotiveQuoteScreen({
                     tick) is the bounce use-motion-for-prototypes warns
                     about. The skin carries the ring (`::before`) and the
                     library's blue inner stroke. */}
-                <span className="nq-frac-skin" aria-hidden="true">
-                  <span className="inner-stroke inner-stroke--blue" />
-                </span>
+                <span className="nq-frac-skin" aria-hidden="true" />
                 <motion.span
                   layoutId="nq-frac-glyph"
                   className="nq-frac-glyph"
                   style={{ position: "relative", zIndex: 4, lineHeight: 0 }}
                 >
-                  <img src={MARK_SRC} alt="" width={12} height={12} />
+                  {/* 13: the star and bell beside it draw ~13px of ink in
+                      their 16px boxes (12 read smaller — user, 2026-09-16:
+                      "make sure the icons are the same size") */}
+                  <InkMark size={13} ink={FRAC} />
                 </motion.span>
               </motion.div>
             )}
@@ -635,7 +664,7 @@ export function NotiveQuoteScreen({
                 animate={{ scale: 1, opacity: 1, transition: fracGlyphPop }}
                 style={{ display: "block" }}
               >
-                <img src={MARK_SRC} alt="" width={14} height={14} />
+                <InkMark size={14} ink={FRAC} />
               </motion.span>
             </motion.span>
 
