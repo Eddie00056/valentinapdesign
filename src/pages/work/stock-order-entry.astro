@@ -22,5 +22,25 @@ import { StockTicket } from "../../components/stockticket/StockTicket";
     body {
       overflow-y: auto !important;
     }
+    /* ?bare — a version without the card: the widget's rows sit straight
+       on the page ground. The shell keeps its stroke — the 1px #353d3f66
+       edge from the strategy-builder Figma (elevation-2 at 40%) — so the
+       widget still reads against the ground; its fill, shadow and the
+       panels behind the content go. Review flag. */
+    html.is-bare .wshell {
+      background: transparent !important;
+      box-shadow: none !important;
+      /* the stroke a touch under its 40%: #353d3f at 34% — 24% was hard to
+         see on this ground */
+      border-color: rgba(53, 61, 63, 0.34) !important;
+    }
+    html.is-bare .st-body {
+      background: transparent !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
   </style>
+  <script is:inline>
+    if (new URLSearchParams(location.search).has("bare")) document.documentElement.classList.add("is-bare");
+  </script>
 </Bare>

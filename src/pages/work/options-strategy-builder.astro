@@ -22,5 +22,35 @@ import { OptionsBuilder } from "../../components/optionsbuilder/OptionsBuilder";
     body {
       overflow-y: auto !important;
     }
+    /* ?bare — a version without the card: the widget's rows sit straight
+       on the page ground. The shell keeps its stroke — the 1px #353d3f66
+       edge from the strategy-builder Figma (elevation-2 at 40%) — so the
+       widget still reads against the ground; its fill, shadow and the
+       panels behind the content go. Review flag. */
+    html.is-bare .wshell {
+      background: transparent !important;
+      box-shadow: none !important;
+      /* the stroke a touch under its 40%: #353d3f at 34% — 24% was hard to
+         see on this ground */
+      border-color: rgba(53, 61, 63, 0.34) !important;
+    }
+    html.is-bare .ob-card,
+    html.is-bare .ob-legs-panel,
+    html.is-bare .ob-params-panel {
+      background: transparent !important;
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+    /* the payoff strip: no fill, a 1px stroke in its own divider colour */
+    html.is-bare .ob-payoff {
+      background: transparent !important;
+      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      /* inset by the fields panel's 6px side padding, so the strip's edges
+         land on the labels' left and the inputs' right */
+      margin-inline: 6px;
+    }
   </style>
+  <script is:inline>
+    if (new URLSearchParams(location.search).has("bare")) document.documentElement.classList.add("is-bare");
+  </script>
 </Bare>
