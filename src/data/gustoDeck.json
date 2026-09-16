@@ -818,14 +818,14 @@
     "live": [
       {
         "page": "chain-to-order?static&bare",
-        "x": 6.45,
-        "y": 7.28,
-        "w": 82.02,
-        "h": 91.56,
+        "x": 22.63,
+        "y": 20.46,
+        "w": 34.22,
+        "h": 60.0,
         "vw": 1440,
         "vh": 900,
-        "fit": ".wsp-screen",
-        "css": ".wsp-rail{display:none!important}.wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}html.is-bare .wshell.wshell{background:#010101!important}",
+        "fit": ".ctt .oc-root",
+        "css": ".wsp-rail{visibility:hidden!important}.wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}html.is-bare .wshell.wshell{background:#010101!important}",
         "clip": true,
         "init": "chainFirst"
       }
