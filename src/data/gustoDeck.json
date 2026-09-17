@@ -843,7 +843,8 @@
         "vh": 900,
         "fit": ".ctt",
         "css": ".wsp-rail{visibility:hidden!important}.wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}.ctt{min-height:0!important;padding:0!important;width:max-content!important}html.is-bare .wshell.wshell{background:#010101!important}",
-        "clip": true
+        "clip": true,
+        "init": "pairOverlays"
       }
     ],
     "corner": "Reducing time to trade"
@@ -1096,7 +1097,8 @@
         "vh": 900,
         "fit": ".ctt",
         "css": ".wsp-rail{visibility:hidden!important}.wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}.ctt{min-height:0!important;padding:0!important;width:max-content!important}html.is-bare .wshell.wshell{background:#010101!important}",
-        "clip": true
+        "clip": true,
+        "init": "pairOverlays"
       }
     ],
     "corner": "Reducing time to trade"

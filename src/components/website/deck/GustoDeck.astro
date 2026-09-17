@@ -770,7 +770,8 @@ const { solo = false } = Astro.props as { solo?: boolean };
         /* The init runs on the server-rendered row; React's hydration then
            re-renders it and the tag is gone (it was missing on prod,
            2026-09-16). So the tag is put back for a while after — the
-           chainFirst pattern: 250ms × 20, stopping once it stays. */
+           same retry pattern as pairOverlays: 250ms × 20, stopping once it
+           stays. */
         put();
         let n = 0;
         const t = w.setInterval(() => {
@@ -837,43 +838,89 @@ const { solo = false } = Astro.props as { solo?: boolean };
         const hub = w.__pxHub;
         if (hub) w.clearInterval(hub.timer); // the frame's own clearInterval: timer ids are per window
       },
-      /* the chain-to-order slide: opens on the option chain alone (the
-         ticket arrives when a price is clicked), and the order confirmation
-         and the "order placed" toast are brought over the widgets — they
-         are placed for a full browser window, which here runs off the slide */
-      chainFirst: (w, d) => {
-        const cards = [...d.querySelectorAll<HTMLElement>(".ctt .wshell")].map((e) => e.getBoundingClientRect());
-        if (!cards.length) return;
-        const u = {
-          l: Math.min(...cards.map((r) => r.left)),
-          t: Math.min(...cards.map((r) => r.top)),
-          r: Math.max(...cards.map((r) => r.right)),
-          b: Math.max(...cards.map((r) => r.bottom)),
+      /* the chain-to-order slides (39 and 47): both widgets are shown, and
+         the order confirmation and the "order placed" toast have to come
+         with them. Both are `position: fixed` inside the ticket, which
+         Motion's wrappers turn into a containing block — so they are laid
+         out against the ticket's 325px column, and clipped by the wrapper
+         that collapses the card on its way out. A confirmation card is
+         wider than that column, so what a slide showed was a panel cut off
+         down its side and below the fold.
+
+         The overlays are pinned over the union of the two cards instead:
+         a probe measures that containing block (its origin is not the
+         frame's, and cannot be assumed), the clipper is opened, and the
+         two wrappers are placed in the probe's coordinates. Retried while
+         the ticket is still server markup that React has not wired. */
+      pairOverlays: (w, d) => {
+        /* the two cards, as one box */
+        const union = () => {
+          /* the two WIDGETS. The confirmation is built on the same shell and
+             lives in this subtree too, so it would otherwise measure itself
+             into the box it is being placed inside — and it moves. */
+          const cards = [...d.querySelectorAll<HTMLElement>(".ctt .wshell")]
+            .filter((e) => !e.closest(".ob-modal-wrap, .ob-toast-wrap"))
+            .map((e) => e.getBoundingClientRect());
+          if (cards.length < 2) return null;
+          return {
+            l: Math.min(...cards.map((r) => r.left)),
+            t: Math.min(...cards.map((r) => r.top)),
+            r: Math.max(...cards.map((r) => r.right)),
+            b: Math.max(...cards.map((r) => r.bottom)),
+          };
         };
+        /* Placed when the overlay appears, not at load: `fixed` inside the
+           ticket resolves against whichever ancestor Motion has given a
+           transform at that moment, and that origin is not the frame's and
+           is not the same one twice. So the element is zeroed, measured —
+           where it lands IS its containing block's origin — and then set
+           from there. Two passes, no assumption. */
+        const pin = (el: HTMLElement, foot: boolean) => {
+          const u = union();
+          /* Re-placed every time it comes back, not once: the toast wrapper
+             is in the tree long before it holds anything, and the ancestor
+             Motion transforms while the toast arrives is a different
+             containing block than the one it was measured against. Empty,
+             it is released so the next appearance measures afresh. */
+          const showing = el.childElementCount > 0;
+          if (!showing) {
+            delete el.dataset.pinned;
+            return;
+          }
+          if (!u || el.dataset.pinned) return;
+          el.dataset.pinned = "1";
+          el.style.right = "auto";
+          el.style.bottom = "auto";
+          el.style.left = "0px";
+          el.style.top = "0px";
+          const o = el.getBoundingClientRect();
+          el.style.left = `${u.l - o.left}px`;
+          el.style.width = `${u.r - u.l}px`;
+          if (foot) {
+            /* the toast sits inside the pair's bottom edge */
+            el.style.top = `${u.b - 56 - o.top}px`;
+          } else {
+            el.style.top = `${u.t - o.top}px`;
+            el.style.height = `${u.b - u.t}px`;
+            el.style.padding = "0";
+            el.style.overflow = "visible";
+          }
+        };
+        const sweep = () => {
+          d.querySelectorAll<HTMLElement>(".ob-modal-wrap").forEach((el) => pin(el, false));
+          d.querySelectorAll<HTMLElement>(".ob-toast-wrap").forEach((el) => pin(el, true));
+        };
+        /* the wrapper that collapses the ticket on exit clips to its own
+           box, and a confirmation is wider than the ticket's column */
         const st = d.createElement("style");
-        st.textContent = `
-          .ob-stage .ob-modal-wrap { inset: auto !important; left: ${u.l}px !important; top: ${u.t}px !important;
-            width: ${u.r - u.l}px !important; height: ${u.b - u.t}px !important; padding: 0 !important; overflow: visible; }
-          .ob-stage .ob-toast-wrap { left: ${u.l}px !important; right: auto !important; width: ${u.r - u.l}px !important;
-            bottom: auto !important; top: ${u.b - 56}px !important; }
-        `;
+        st.textContent = ".ctt-ticket > div, .ctt-ticket > div > div { overflow: visible !important; }";
         d.head.appendChild(st);
+        sweep();
+        new (w.MutationObserver as typeof MutationObserver)(sweep).observe(d.body, { childList: true, subtree: true });
         /* the order placed toast stays a second longer here: the ticket
            dismisses it after 2600ms; stretch that one timer to 3600 */
         const st0 = w.setTimeout.bind(w);
         w.setTimeout = ((fn: any, ms?: number, ...a: any[]) => st0(fn, ms === 2600 ? 3600 : ms, ...a)) as any;
-        // the chain keeps its place; the ticket opens beside it
-        // close the ticket: picking a price in the chain brings it back.
-        // Retried: the button is in the server markup before React has wired
-        // it, and a click that lands first does nothing (the ticket stayed
-        // open on some loads of slide 43).
-        let tries = 0;
-        const closeTicket = () => {
-          const close = d.querySelector<HTMLElement>(".ctt-ticket .wshell-actions .wshell-btn:not(.wshell-linkout)");
-          close?.click();
-          if (++tries < 20 && d.querySelector(".ctt-ticket .wshell")) w.setTimeout(closeTicket, 250);
-        };
-        closeTicket();
       },
       /* slide 95: the fractional shares banner unfurling by itself — the
          piece's own `auto` cadence (open at 600ms, then every 2400ms), done
@@ -1030,7 +1077,7 @@ const { solo = false } = Astro.props as { solo?: boolean };
         unmount(f);
         mount(f);
       });
-      slides[n - 1]?.querySelectorAll<HTMLIFrameElement>('.gd-live iframe[data-init="chainFirst"]').forEach((f) => {
+      slides[n - 1]?.querySelectorAll<HTMLIFrameElement>('.gd-live iframe[data-init="pairOverlays"]').forEach((f) => {
         const d = f.contentDocument;
         const used = d && (d.querySelector(".ctt-ticket")?.childElementCount || d.querySelector(".ob-modal-wrap *, .ob-toast-item"));
         if (!used || !f.getAttribute("src")) return;
