@@ -1,11 +1,14 @@
 ---
 import Bare from "../../layouts/Bare.astro";
-import { OptionChain } from "../../components/optionchain/OptionChain";
+import { ChainToTicket } from "../../components/chaintoticket/ChainToTicket";
 ---
 
 <Bare title="Options chain" bg="#0b0b0d">
   <main class="oc-page">
-    <OptionChain client:load />
+    {/* The chain, with the order ticket wired to it: a click on a bid or
+        an ask opens the ticket beside it, the same wiring the chain-to-
+        order workspace uses, minus the canvas (user, 2026-09-17). */}
+    <ChainToTicket plain client:load />
   </main>
 
   <a class="oc-back" href="/prototypes" aria-label="Back to the prototypes">

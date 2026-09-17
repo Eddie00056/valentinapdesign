@@ -151,13 +151,18 @@ function useCanvasDrag(enabled: boolean) {
   };
 }
 
-export function ChainToTicket() {
+export function ChainToTicket({ plain = false }: { plain?: boolean }) {
   const reduce = useReducedMotion();
   const chainDrag = useCanvasDrag(!reduce);
   const ticketDrag = useCanvasDrag(!reduce);
   /* The ticket can be dismissed. Picking a price opens a fresh one — a
      chain with nowhere to send a quote would be a dead end. */
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(!plain);
+  /* `plain` (the option chain's own page): the chain is the piece there,
+     so it opens alone and the ticket arrives with the first pick. Once it
+     has been, its column stays reserved — the same rule the canvas keeps,
+     so dismissing never slides the chain sideways. */
+  const [everOpen, setEverOpen] = useState(!plain);
   const [incoming, setIncoming] = useState<IncomingQuote | undefined>();
   /* The chain owns the underlying on this page; the ticket is written on
      whatever it is showing. Two widgets about the same trade should not
@@ -182,6 +187,7 @@ export function ChainToTicket() {
   const chosen = useRef(false);
 
   function pick(p: QuotePick) {
+    setEverOpen(true);
     const key = keyOf(p);
     const held = pickedKeys.has(key);
 
@@ -215,12 +221,11 @@ export function ChainToTicket() {
     }));
   }
 
-  return (
-    <WorkspaceShell>
-    <div className="ctt">
+  const body = (
+    <div className={`ctt${plain ? " ctt--plain" : ""}${everOpen ? " is-open" : ""}`}>
       {/* The chain moves too. Same grip, same grid, same hook — see
           useCanvasDrag. */}
-      <motion.div className="ctt-chain" {...chainDrag.props}>
+      <motion.div className="ctt-chain" {...(plain ? {} : chainDrag.props)}>
         <OptionChain
           onPick={pick}
           pickedKeys={pickedKeys}
@@ -238,7 +243,7 @@ export function ChainToTicket() {
             )
           }
           onSpotChange={setUnderlying}
-          onGrip={chainDrag.start}
+          onGrip={plain ? undefined : chainDrag.start}
         />
       </motion.div>
       <div className="ctt-ticket">
@@ -257,7 +262,7 @@ export function ChainToTicket() {
                  both write to x/y, and sharing a node means the card
                  snaps back to the origin the first time either animation
                  re-runs. */
-              {...ticketDrag.props}
+              {...(plain ? {} : ticketDrag.props)}
             >
               <motion.div
                 /* Morphs out rather than vanishing: down to nothing in
@@ -321,7 +326,7 @@ export function ChainToTicket() {
               <OptionsBuilder
                 underlying={underlying}
                 incoming={incoming}
-                onGrip={ticketDrag.start}
+                onGrip={plain ? undefined : ticketDrag.start}
                 litLeg={litLeg}
                 onLegHover={(leg: LegSummary | null) =>
                   setBeamKey(leg ? keyOf(leg) : null)
@@ -344,6 +349,9 @@ export function ChainToTicket() {
         </AnimatePresence>
       </div>
     </div>
-    </WorkspaceShell>
   );
+
+  /* On the canvas the pair sits on the workspace's own ground; on the
+     chain's page it is just the two widgets, and the page centres them. */
+  return plain ? body : <WorkspaceShell>{body}</WorkspaceShell>;
 }

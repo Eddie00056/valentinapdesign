@@ -77,3 +77,25 @@
     align-self: auto;
   }
 }
+
+/* ---- `plain`: the pair on the option chain's own page ----
+   No canvas under them, so nothing has to land on a grid: the page
+   centres the pair and the padding goes. The ticket's column is width 0
+   until the first pick, then holds 357 for good — so the page opens as
+   the chain alone, the chain slides over once as the ticket arrives, and
+   dismissing the ticket leaves it where it is. */
+.ctt--plain {
+  min-height: 0;
+  justify-content: center;
+  padding: 0;
+}
+.ctt--plain .ctt-ticket {
+  flex: 0 0 0px;
+  transition: flex-basis 0.34s cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+.ctt--plain.is-open .ctt-ticket {
+  flex-basis: 357px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ctt--plain .ctt-ticket { transition: none; }
+}
