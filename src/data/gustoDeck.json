@@ -1089,16 +1089,15 @@
     "live": [
       {
         "page": "chain-to-order?static&bare",
-        "x": 22.63,
-        "y": 20.46,
-        "w": 34.22,
-        "h": 60.0,
+        "x": 22.0,
+        "y": 26.0,
+        "w": 56.0,
+        "h": 52.6,
         "vw": 1440,
         "vh": 900,
-        "fit": ".ctt .oc-root",
-        "css": ".wsp-rail{visibility:hidden!important}.wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}html.is-bare .wshell.wshell{background:#010101!important}",
-        "clip": true,
-        "init": "chainFirst"
+        "fit": ".ctt",
+        "css": ".wsp-rail{visibility:hidden!important}.wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}.ctt{min-height:0!important;padding:0!important;width:max-content!important}html.is-bare .wshell.wshell{background:#010101!important}",
+        "clip": true
       }
     ],
     "corner": "Reducing time to trade"
