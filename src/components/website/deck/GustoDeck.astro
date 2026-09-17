@@ -893,15 +893,25 @@ const { solo = false } = Astro.props as { solo?: boolean };
           el.style.bottom = "auto";
           el.style.left = "0px";
           el.style.top = "0px";
+          /* A 100px probe of itself: where it lands is its containing
+             block's origin, and what 100px measures as is the scale the
+             workspace has been fitted to. Lengths written here are in the
+             scaled space, the union is in the frame's — so every one of
+             them is divided back out, or the overlay comes out short and
+             sits off to one side. */
+          el.style.width = "100px";
+          el.style.height = "100px";
           const o = el.getBoundingClientRect();
-          el.style.left = `${u.l - o.left}px`;
-          el.style.width = `${u.r - u.l}px`;
+          const k = o.width / 100 || 1;
+          el.style.left = `${(u.l - o.left) / k}px`;
+          el.style.width = `${(u.r - u.l) / k}px`;
           if (foot) {
             /* the toast sits inside the pair's bottom edge */
-            el.style.top = `${u.b - 56 - o.top}px`;
+            el.style.height = "";
+            el.style.top = `${(u.b - 56 - o.top) / k}px`;
           } else {
-            el.style.top = `${u.t - o.top}px`;
-            el.style.height = `${u.b - u.t}px`;
+            el.style.top = `${(u.t - o.top) / k}px`;
+            el.style.height = `${(u.b - u.t) / k}px`;
             el.style.padding = "0";
             el.style.overflow = "visible";
           }
