@@ -1,7 +1,6 @@
 ---
 import Website from "../../layouts/Website.astro";
 import SiteHeader from "../../components/website/SiteHeader.astro";
-import { Reveal } from "../../components/website/Reveal";
 import "../../components/website/case-study.css";
 
 const V = "/website/case/questrade";
@@ -14,13 +13,13 @@ const V = "/website/case/questrade";
   <SiteHeader />
 
   <main class="cs">
-    <section class="cs-hero w-wrap">
+    <section class="cs-hero w-wrap" data-reveal>
       <h1 class="cs-title">
         Redesigning order placement to reduce trade time by 60%
       </h1>
     </section>
 
-    <div class="cs-media w-wrap">
+    <div class="cs-media w-wrap" data-reveal>
       <video
         src="/website/video/questrade.mp4"
         autoplay
@@ -30,8 +29,8 @@ const V = "/website/case/questrade";
         preload="metadata"></video>
     </div>
 
-    <section class="cs-overview w-wrap">
-      <div class="cs-block">
+    <section class="cs-overview w-wrap" data-reveal>
+      <div class="cs-block" data-r>
         <p class="cs-label">Project overview</p>
         <p class="cs-body">
           Questrade began modernizing its aging desktop trading experience, which
@@ -41,7 +40,7 @@ const V = "/website/case/questrade";
         </p>
       </div>
 
-      <div class="cs-block">
+      <div class="cs-block" data-r>
         <p class="cs-label">What I led</p>
         <p class="cs-body">
           Owned the platform’s highest-impact workflow, order placement, driving
@@ -52,62 +51,56 @@ const V = "/website/case/questrade";
       </div>
 
       <div class="cs-meta">
-        <div class="cs-block">
+        <div class="cs-block" data-r>
           <p class="cs-label">My role</p>
           <p class="cs-body">
             1 Product Manager, 1 UX Researcher, 1 Content Designer, 4 Engineering
             squads
           </p>
         </div>
-        <div class="cs-block">
+        <div class="cs-block" data-r>
           <p class="cs-label">Timeline</p>
           <p class="cs-body">5 months</p>
         </div>
       </div>
     </section>
 
-    <div class="cs-media w-wrap">
+    <div class="cs-media w-wrap" data-reveal>
       <video src={`${V}/order-entry-3up.mp4`} autoplay loop muted playsinline></video>
     </div>
 
-    <Reveal client:load>
-      <section class="cs-impact w-wrap">
-        <h2>Project impact</h2>
-        <ul class="cs-stats">
-          <li><span class="n">65%</span><span class="l">decrease in time to submit a trade</span></li>
-          <li><span class="n">3×</span><span class="l">fewer errors when placing an equity trade</span></li>
-          <li><span class="n">60K</span><span class="l">options contracts traded</span></li>
-        </ul>
-      </section>
-    </Reveal>
+    <section class="cs-impact w-wrap" data-reveal>
+      <h2 data-r>Project impact</h2>
+      <ul class="cs-stats">
+        <li data-r><span class="n">65%</span><span class="l">decrease in time to submit a trade</span></li>
+        <li data-r><span class="n">3×</span><span class="l">fewer errors when placing an equity trade</span></li>
+        <li data-r><span class="n">60K</span><span class="l">options contracts traded</span></li>
+      </ul>
+    </section>
 
-    <Reveal client:load>
-      <section class="cs-ba w-wrap">
-        <figure class="is-before">
-          <figcaption>Before</figcaption>
-          <img src={`${V}/fig-a.png`} alt="The previous order-entry widget" loading="lazy" />
-        </figure>
-        <figure class="is-after">
-          <figcaption>After</figcaption>
-          <video src={`${V}/tall.mp4`} autoplay loop muted playsinline></video>
-        </figure>
-      </section>
-    </Reveal>
+    <section class="cs-ba w-wrap" data-reveal>
+      <figure class="is-before">
+        <figcaption>Before</figcaption>
+        <img src={`${V}/fig-a.png`} alt="The previous order-entry widget" loading="lazy" />
+      </figure>
+      <figure class="is-after">
+        <figcaption>After</figcaption>
+        <video src={`${V}/tall.mp4`} autoplay loop muted playsinline></video>
+      </figure>
+    </section>
 
-    <Reveal client:load>
-      <section class="cs-ba cs-ba--wide w-wrap">
-        <figure class="is-before">
-          <figcaption>Before</figcaption>
-          <img src={`${V}/before.png`} alt="The previous desktop platform" loading="lazy" />
-        </figure>
-        <figure class="is-after">
-          <figcaption>After</figcaption>
-          <img src={`${V}/after.png`} alt="The redesigned desktop platform" loading="lazy" />
-        </figure>
-      </section>
-    </Reveal>
+    <section class="cs-ba cs-ba--wide w-wrap" data-reveal>
+      <figure class="is-before">
+        <figcaption>Before</figcaption>
+        <img src={`${V}/before.png`} alt="The previous desktop platform" loading="lazy" />
+      </figure>
+      <figure class="is-after">
+        <figcaption>After</figcaption>
+        <img src={`${V}/after.png`} alt="The redesigned desktop platform" loading="lazy" />
+      </figure>
+    </section>
 
-    <div class="cs-media cs-media--cap w-wrap">
+    <div class="cs-media cs-media--cap w-wrap" data-reveal>
       <video
         src={`${V}/options-chain.mp4`}
         autoplay
@@ -119,6 +112,9 @@ const V = "/website/case/questrade";
   </main>
 
   <script>
+    import { initReveal } from "../../components/website/reveal";
+    initReveal();
+
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.querySelectorAll("video").forEach((v) => {
         v.removeAttribute("autoplay");

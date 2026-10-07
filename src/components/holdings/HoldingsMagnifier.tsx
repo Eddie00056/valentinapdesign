@@ -23,7 +23,20 @@ import type { MotionValue } from "motion/react";
  * The glass is a hair bigger than a logo (1px all round) and goes exactly
  * where your hand takes it — no snapping, no easing between hand and glass.
  */
-export function HoldingsMagnifier() {
+export function HoldingsMagnifier({
+  auto = false,
+  cluster = false,
+  wanderMs = WANDER_MS,
+}: {
+  /** the glass wanders on its own (also ?auto) */
+  auto?: boolean;
+  /** the logos as a packed cluster of different sizes (the homepage card)
+      instead of the even 2×2 */
+  cluster?: boolean;
+  /** one lap of the wander, ms */
+  wanderMs?: number;
+} = {}) {
+  const layout = cluster ? CLUSTER : SQUARE;
   const reduce = useReducedMotion() ?? false;
 
   // One drift for the whole unit, off the frame clock rather than a
@@ -50,8 +63,8 @@ export function HoldingsMagnifier() {
   // them, the lit copy is their negative, and nothing re-renders while it
   // moves — one value, read directly, is what keeps a fast drag glued to
   // the pointer.
-  const lensX = useMotionValue(LENS_HOME.x);
-  const lensY = useMotionValue(LENS_HOME.y);
+  const lensX = useMotionValue(lensHome(layout).x);
+  const lensY = useMotionValue(lensHome(layout).y);
   const innerX = useTransform(lensX, (x) => -x);
   const innerY = useTransform(lensY, (y) => -y);
 
@@ -79,12 +92,15 @@ export function HoldingsMagnifier() {
      direction of travel. */
   const lean = useMotionValue(0);
   useEffect(() => {
-    if (reduce || !new URLSearchParams(window.location.search).has("auto")) return;
+    /* `auto` (the homepage card) or ?auto (the deck) */
+    if (reduce || !(auto || new URLSearchParams(window.location.search).has("auto"))) return;
     // waypoints: each logo's lens position, pulled 6px toward the grid's centre so the glass
     // skims through the logo rather than parking on it, in a figure that visits all four
-    const cx = GRID_LEFT + GRID / 2 - R, cy = GRID_TOP + GRID / 2 - R;
+    const left = (STAGE.w - layout.w) / 2, top = (STAGE.h - layout.h) / 2;
+    const cx = left + layout.w / 2 - R, cy = top + layout.h / 2 - R;
     const pts = [0, 1, 3, 2].map((slot) => {
-      const x = GRID_LEFT + slotX(slot) - 1, y = GRID_TOP + slotY(slot) - 1;
+      const t = layout.tiles[slot];
+      const x = left + t.x + t.size / 2 - R, y = top + t.y + t.size / 2 - R;
       return [x + (cx - x) * 0.18, y + (cy - y) * 0.18] as const;
     });
     const n = pts.length;
@@ -102,7 +118,7 @@ export function HoldingsMagnifier() {
     const unsub = time.on("change", (now) => {
       try {
         const e = now - t0;
-        const u = ((((e / WANDER_MS) % 1) + 1) % 1) * n;
+        const u = ((((e / wanderMs) % 1) + 1) % 1) * n;
         const [x, y] = at(u);
         const breath = Math.sin((e / 4300) * Math.PI * 2) * 4; // the soft in-and-out across the radius
         const nx = x + breath, ny = y + Math.cos((e / 5100) * Math.PI * 2) * 3;
@@ -118,12 +134,12 @@ export function HoldingsMagnifier() {
     });
     return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduce]);
+  }, [reduce, auto, cluster, wanderMs]);
 
   return (
     <div className="he-root">
       <div className="he-card" data-thumb>
-        <Scene driftX={driftX} driftY={driftY} bob={bob} sway={sway} reduce={reduce} />
+        <Scene layout={layout} driftX={driftX} driftY={driftY} bob={bob} sway={sway} reduce={reduce} />
 
         <motion.div
           className="he-lens"
@@ -161,7 +177,7 @@ export function HoldingsMagnifier() {
                   className="he-glass-view"
                   style={{ x: innerX, y: innerY }}
                 >
-                  <Scene driftX={driftX} driftY={driftY} bob={bob} sway={sway} reduce={reduce} mirror />
+                  <Scene layout={layout} driftX={driftX} driftY={driftY} bob={bob} sway={sway} reduce={reduce} mirror />
                 </motion.div>
                 <span className="he-glass-sheen" />
               </div>
@@ -179,6 +195,7 @@ export function HoldingsMagnifier() {
 /** Everything the lens can see, drawn once for the card and once inside
     the lens. The mirror is inert and out of the accessibility tree. */
 function Scene({
+  layout,
   driftX,
   driftY,
   bob,
@@ -186,6 +203,7 @@ function Scene({
   reduce,
   mirror = false,
 }: {
+  layout: Layout;
   driftX: MotionValue<number>;
   driftY: MotionValue<number>;
   bob: MotionValue<number>[];
@@ -195,13 +213,23 @@ function Scene({
 }) {
   return (
     <div className={mirror ? "he-scene he-scene--lit" : "he-scene"} inert={mirror || undefined}>
-      <motion.div className="he-grid" style={{ x: driftX, y: driftY }}>
+      <motion.div
+        className="he-grid"
+        style={{ x: driftX, y: driftY, width: layout.w, height: layout.h }}
+      >
         {LOGOS.map((logo, slot) => (
           <motion.div
             key={logo.ticker}
             className="he-tile"
             // Position with left/top; the float rides on x/y, the pop inside owns its own transform
-            style={{ left: slotX(slot), top: slotY(slot), x: sway[slot], y: bob[slot] }}
+            style={{
+              left: layout.tiles[slot].x,
+              top: layout.tiles[slot].y,
+              width: layout.tiles[slot].size,
+              height: layout.tiles[slot].size,
+              x: sway[slot],
+              y: bob[slot],
+            }}
           >
             <motion.div
               className="he-logo"
@@ -243,11 +271,33 @@ const TILE = 40;
 /** One clearance between tiles, everywhere. */
 const GAP = 6;
 const GRID = TILE * 2 + GAP;
-const GRID_LEFT = (STAGE.w - GRID) / 2;
-const GRID_TOP = (STAGE.h - GRID) / 2;
 
 const slotX = (slot: number) => (slot % 2) * (TILE + GAP);
 const slotY = (slot: number) => Math.floor(slot / 2) * (TILE + GAP);
+
+/** Where each logo sits (slot order, as LOGOS), in the grid's own box */
+type Layout = { w: number; h: number; tiles: { x: number; y: number; size: number }[] };
+
+/** The even 2×2 */
+const SQUARE: Layout = {
+  w: GRID,
+  h: GRID,
+  tiles: [0, 1, 2, 3].map((slot) => ({ x: slotX(slot), y: slotY(slot), size: TILE })),
+};
+
+/** A packed cluster of four sizes, ~4px apart (the homepage card): MSFT
+    big top-left, META small beside it, AAPL small below, GOOGL mid
+    bottom-right */
+const CLUSTER: Layout = {
+  w: 92,
+  h: 72,
+  tiles: [
+    { x: 0, y: 0, size: 44 },
+    { x: 48, y: 10, size: 24 },
+    { x: 24, y: 44, size: 28 },
+    { x: 56, y: 36, size: 36 },
+  ],
+};
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
@@ -258,9 +308,12 @@ const R = LENS / 2;
 /** Where the glass may go: anywhere its whole circle stays on the card. */
 const BOUNDS = { left: 0, top: 0, right: STAGE.w - LENS, bottom: STAGE.h - LENS };
 
-// At rest the glass sits off the top-right logo's outer corner — a lit
-// sliver of it invites the reach
-const LENS_HOME = { x: GRID_LEFT + GRID + 12 - R, y: GRID_TOP - 5 - R };
+// At rest the glass sits off the grid's top-right corner — a lit sliver of
+// the logo there invites the reach
+const lensHome = (l: Layout) => ({
+  x: (STAGE.w - l.w) / 2 + l.w + 12 - R,
+  y: (STAGE.h - l.h) / 2 - 5 - R,
+});
 
 const DRIFT_MS = 9000;
 /** One slow lap of the glass round the four logos, in ?auto */

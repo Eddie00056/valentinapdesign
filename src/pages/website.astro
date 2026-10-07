@@ -1,15 +1,24 @@
 ---
 import Website from "../layouts/Website.astro";
 import { caseStudies } from "../data/site";
-import { Reveal } from "../components/website/Reveal";
-import { HeroCreed } from "../components/website/HeroCreed";
-import { EdgeChart } from "../components/website/EdgeChart";
+import { HoldingsLoop } from "../components/website/HoldingsLoop";
+import { FracBanner, FracPill } from "../components/website/FracBanner";
+import { ChainLoop } from "../components/website/ChainLoop";
+import { FracFlowPhone } from "../components/website/FracFlowPhone";
 import SiteHeader from "../components/website/SiteHeader.astro";
 
 const bySlug = Object.fromEntries(caseStudies.map((c) => [c.slug, c]));
 const qp = bySlug["questrade-pro"];
 const fs = bySlug["fractional-shares"];
 const em = bySlug["edgemobile"];
+
+// the hero line, split so each word can be revealed in turn on load
+const heroLine =
+  "Product Designer with 5+ years experience shaping fintech products while focusing on fostering collaboration, pushing limits, and delivering high-impact work.";
+const heroWords = heroLine.split(" ");
+
+/* the references (#team) are hidden for now; flip to bring them back */
+const showReferences = false;
 
 const quotes = [
   {
@@ -36,7 +45,6 @@ const quotes = [
 ---
 
 <Website
-  snap
   title="Product Designer"
   description="Valentina Padure — Product Designer with 5+ years shaping fintech products."
 >
@@ -49,136 +57,157 @@ const quotes = [
         opacity: 1 !important;
         transform: none !important;
       }
-      /* show the finished joke without JS */
-      .creed-strike-line {
-        transform: scaleX(1) !important;
-      }
     </style>
   </noscript>
 
   <main>
-    <div class="hero-pin">
-      <div class="hero-sticky">
-        <section class="w-wrap bay hero">
-          <p class="statement">
-            Product Designer with 5+ years experience shaping fintech products
-            while focusing on fostering collaboration, pushing limits, and
-            delivering high-impact work.{" "}<HeroCreed client:load />
-          </p>
-        </section>
-      </div>
+    <div class="hero-screen">
+      <section class="w-wrap bay hero">
+        <p class="statement hero-statement">
+          {heroWords.map((w, i) => (
+            <><span class="hw" style="opacity:0">{w}</span>{i < heroWords.length - 1 && " "}</>
+          ))}
+        </p>
+      </section>
     </div>
 
     <section id="projects" class="w-wrap projects">
       <!-- Questrade Pro -->
-      <Reveal client:load amount={0.25}>
-        <a class="project" href={`/website/${qp.slug}`}>
-          <div class="project-copy">
-            <p class="kicker">{qp.title}</p>
-            <h2 class="project-title">{qp.summary}</h2>
-            <span class="see">See project →</span>
+      <a class="project" data-reveal href={`/website/${qp.slug}`}>
+        <div class="project-copy">
+          <div class="project-titles">
+            <p class="kicker" data-r>{qp.title}</p>
+            <h2 class="project-title" data-r>{qp.summary}</h2>
           </div>
-          <div class="media media--single">
-            <video
-              src="/website/video/questrade.mp4"
-              autoplay
-              loop
-              muted
-              playsinline
-              preload="metadata"></video>
-          </div>
-        </a>
-      </Reveal>
+          <span class="see" data-r>See project →</span>
+        </div>
+        <div class="media media--single" data-r>
+          <ChainLoop client:visible />
+        </div>
+      </a>
 
       <!-- Fractional Shares -->
-      <Reveal client:load amount={0.25}>
-        <a class="project" href={`/website/${fs.slug}`}>
-          <div class="project-copy">
-            <p class="kicker">{fs.title}</p>
-            <h2 class="project-title">{fs.summary}</h2>
-            <span class="see">See project →</span>
+      <a class="project" data-reveal href={`/website/${fs.slug}`}>
+        <div class="project-copy">
+          <div class="project-titles">
+            <p class="kicker" data-r>{fs.title}</p>
+            <h2 class="project-title" data-r>{fs.summary}</h2>
           </div>
-          <div class="media media--frac">
-            <div class="frac-phone">
-              <video src="/website/video/fractional-phone.mp4" autoplay loop muted playsinline></video>
-            </div>
-            <div class="frac-a">
-              <video src="/website/video/fractional-limit.mp4" autoplay loop muted playsinline></video>
-            </div>
-            <div class="frac-b">
-              <video src="/website/video/fractional-icon.mp4" autoplay loop muted playsinline></video>
-            </div>
+          <span class="see" data-r>See project →</span>
+        </div>
+        <div class="media media--frac" data-r>
+          <div class="frac-phone">
+            <FracFlowPhone client:visible />
           </div>
-        </a>
-      </Reveal>
+          <div class="frac-a">
+            <FracPill client:visible />
+          </div>
+          <div class="frac-b">
+            <FracBanner client:visible />
+          </div>
+        </div>
+      </a>
 
       <!-- EdgeMobile -->
-      <Reveal client:load amount={0.25}>
-        <a class="project" href={`/website/${em.slug}`}>
-          <div class="project-copy">
-            <p class="kicker">{em.title}</p>
-            <h2 class="project-title">{em.summary}</h2>
-            <span class="see">See project →</span>
+      <a class="project" data-reveal href={`/website/${em.slug}`}>
+        <div class="project-copy">
+          <div class="project-titles">
+            <p class="kicker" data-r>{em.title}</p>
+            <h2 class="project-title" data-r>{em.summary}</h2>
           </div>
-          <div class="media media--edge">
-            <div class="col">
-              <div class="fit-fill">
-                <EdgeChart client:visible />
-              </div>
-              <div class="fit-price">
+          <span class="see" data-r>See project →</span>
+        </div>
+        <div class="media media--edge" data-r>
+          <div class="col">
+            <div class="fit-fill">
+              <HoldingsLoop client:visible />
+            </div>
+            <div class="fit-price">
+              <div class="hood-crop">
                 <video src="/website/video/edge-hood.mp4" autoplay loop muted playsinline></video>
               </div>
             </div>
-            <div class="col">
-              <div class="fit-bell">
-                <video src="/website/video/edge-bell.mp4" autoplay loop muted playsinline></video>
-              </div>
-              <div class="fit-wide">
-                <video src="/website/video/edge-order.mp4" autoplay loop muted playsinline></video>
-              </div>
+          </div>
+          <div class="col">
+            <div class="fit-bell">
+              <video src="/website/video/edge-bell.mp4" autoplay loop muted playsinline></video>
+            </div>
+            <div class="fit-wide">
+              <video src="/website/video/edge-order.mp4" autoplay loop muted playsinline></video>
             </div>
           </div>
-        </a>
-      </Reveal>
+        </div>
+      </a>
     </section>
 
-    <Reveal client:load amount={0.3}>
-      <section id="team" class="w-wrap bay">
-        <h2 class="statement">I'm a great team asset</h2>
-        <ul class="quotes">
-          {
-            quotes.map((q) => (
-              <li class="quote">
-                <p class="quote-text">“{q.text}”</p>
-                <p class="quote-by">
-                  <span class="quote-name">{q.name}</span>
-                  <span class="quote-role">{q.role}</span>
-                </p>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
-    </Reveal>
+    {
+      showReferences && (
+        <section id="team" class="w-wrap bay" data-reveal>
+          <h2 class="statement" data-r>I'm a great team asset</h2>
+          <ul class="quotes">
+            {
+              quotes.map((q) => (
+                <li class="quote" data-r>
+                  <p class="quote-text">“{q.text}”</p>
+                  <p class="quote-by">
+                    <span class="quote-name">{q.name}</span>
+                    <span class="quote-role">{q.role}</span>
+                  </p>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+      )
+    }
 
-    <Reveal client:load amount={0.5}>
-      <section id="contact" class="w-wrap bay contact">
-        <h2 class="statement">Currently looking for new roles</h2>
-        <p class="contact-line">
-          <a href="mailto:valeapad@gmail.com">valeapad@gmail.com</a>
-          <span class="dot">•</span>
-          <a href="tel:+19292716949">929-271-6949</a>
-          <span class="dot">•</span>
-          <a
-            class="u"
-            href="https://www.linkedin.com/in/valentinapadure"
-            target="_blank"
-            rel="noopener">Linkedin</a
-          >
-        </p>
-      </section>
-    </Reveal>
+    <section id="contact" class="w-wrap bay contact" data-reveal>
+      <h2 class="statement" data-r>Currently looking for new roles</h2>
+      <p class="contact-line" data-r>
+        <a href="mailto:valeapad@gmail.com">valeapad@gmail.com</a>
+        <span class="dot">•</span>
+        <a href="tel:+19292716949">929-271-6949</a>
+        <span class="dot">•</span>
+        <a
+          class="u"
+          href="https://www.linkedin.com/in/valentinapadure"
+          target="_blank"
+          rel="noopener">Linkedin</a
+        >
+      </p>
+    </section>
   </main>
+
+  <script>
+    import { initReveal } from "../components/website/reveal";
+    initReveal();
+  </script>
+
+  <script>
+    /* Hero text reveal — on load, each word fades up out of a soft blur in
+       turn. The words ship with inline opacity:0 so there's no flash of the
+       finished line first; <noscript> and reduced motion show it outright. */
+    import { animate, stagger } from "motion";
+
+    const words = document.querySelectorAll<HTMLElement>(".hero-statement .hw");
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      words.forEach((w) => (w.style.opacity = ""));
+    } else {
+      animate(
+        words,
+        {
+          opacity: [0, 1],
+          filter: ["blur(10px)", "blur(0px)"],
+          transform: ["translateY(0.28em)", "translateY(0)"],
+        },
+        {
+          duration: 0.9,
+          ease: [0.22, 1, 0.36, 1],
+          delay: stagger(0.045, { startDelay: 0.2 }),
+        },
+      );
+    }
+  </script>
 
   <script>
     // Respect reduced-motion: freeze the project loops on the first frame.
@@ -190,94 +219,6 @@ const quotes = [
     }
   </script>
 
-  <script>
-    /* Section settling — replaces CSS scroll-snap.
-       Nothing touches the scroll position while the user is scrolling
-       (slow or fast). Only once scrolling has fully stopped does the
-       nearest section ease to the top. So free-scrolling is never
-       fought, and a stop clicks cleanly into place. */
-    (() => {
-      const html = document.documentElement;
-      const reduce = matchMedia("(prefers-reduced-motion: reduce)");
-      if (reduce.matches) return;
-
-      const anchor = () =>
-        parseFloat(getComputedStyle(html).scrollPaddingTop) || 0;
-      const targets = () => [
-        ...document.querySelectorAll(".projects .project, #team, #contact"),
-      ];
-
-      let tweening = false;
-      let raf = 0;
-      const easeOutCubic = (t) => 1 - (1 - t) ** 3;
-
-      const stopTween = () => {
-        if (!tweening) return;
-        cancelAnimationFrame(raf);
-        tweening = false;
-        html.style.scrollBehavior = "";
-      };
-
-      function tweenTo(y) {
-        const from = window.scrollY;
-        const delta = y - from;
-        if (Math.abs(delta) < 2) return;
-        const dur = Math.min(480, 240 + Math.abs(delta) * 0.34);
-        const t0 = performance.now();
-        html.style.scrollBehavior = "auto";
-        tweening = true;
-        const step = (now) => {
-          const t = Math.min(1, (now - t0) / dur);
-          window.scrollTo(0, Math.round(from + delta * easeOutCubic(t)));
-          if (t < 1) raf = requestAnimationFrame(step);
-          else stopTween();
-        };
-        raf = requestAnimationFrame(step);
-      }
-
-      function settle() {
-        if (tweening) return;
-        if (html.classList.contains("snap-hold")) return; // hero pin busy
-        // let the hero pin hand off to the projects on its own — don't
-        // pounce with a settle the instant it releases
-        if (Date.now() - (+html.dataset.pinReleased || 0) < 700) return;
-        const off = anchor();
-        const maxPull = window.innerHeight * 0.55;
-        let best = null;
-        let bestDist = Infinity;
-        for (const el of targets()) {
-          const top = el.getBoundingClientRect().top - off;
-          const d = Math.abs(top);
-          if (d < bestDist) {
-            bestDist = d;
-            best = top;
-          }
-        }
-        if (best == null || bestDist < 3 || bestDist > maxPull) return;
-        tweenTo(window.scrollY + best);
-      }
-
-      if ("onscrollend" in window) {
-        window.addEventListener("scrollend", settle);
-      } else {
-        let d = 0;
-        window.addEventListener(
-          "scroll",
-          () => {
-            if (tweening) return;
-            clearTimeout(d);
-            d = setTimeout(settle, 170);
-          },
-          { passive: true }
-        );
-      }
-
-      // hand scroll back to the user the instant they act
-      ["wheel", "touchstart", "pointerdown", "keydown"].forEach((ev) =>
-        window.addEventListener(ev, stopTween, { passive: true })
-      );
-    })();
-  </script>
 </Website>
 
 <style>
@@ -286,86 +227,50 @@ const quotes = [
     scroll-margin-top: 5rem;
   }
 
-  /* Section settling is done in JS (see the scroll-settle <script>), not
-     CSS scroll-snap — so slow free-scrolling is never pulled. Each
-     settle target is marked data-snap. */
-
-  /* ---- hero pin: the hero holds still while a stretch of scroll drives
-     the "I get shit work done" reveal, then releases to the projects.
-     .hero-pin is a tall spacer; .hero-sticky pins inside it. */
-  .hero-pin {
-    position: relative;
-    /* the strike + a long fully-struck hold each get a real stretch of
-       scroll before the hero eases out (see HeroCreed) */
-    height: 200vh;
-  }
-
-  /* the sticky box is shorter than the viewport (and offset down a little)
-     so there's less empty screen to scroll past once the pin releases —
-     the hero still reads as roughly centred */
-  .hero-sticky {
-    position: sticky;
-    top: 9svh;
-    min-height: 82svh;
+  /* the hero fills the first screen under the header, line centred */
+  .hero-screen {
+    min-height: calc(100svh / var(--zoom) - 76px);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    will-change: opacity, transform;
   }
 
-  /* only the media-heavy project rows fill the viewport; the text-only
-     sections stay their natural height so there's no empty screen */
-  .project {
-    min-height: 100svh;
+  /* one padding between every divider and its section: the project rows
+     take #team's instead of filling the screen */
+  .project,
+  #team,
+  #contact {
+    padding-block: clamp(2.5rem, 1.75rem + 2.4cqw, 4rem);
   }
 
   #team,
   #contact {
-    padding-block: clamp(2.5rem, 1.75rem + 2.4vw, 4rem);
-    border-top: 1px solid var(--w-line);
+    border-top: 1px solid var(--w-rule);
   }
 
   /* contact: tuck the copy right under its separator and don't leave a
      cavernous gap under the last line */
   #contact {
-    padding-top: clamp(1.75rem, 1.25rem + 1.4vw, 2.5rem);
-    padding-bottom: clamp(2.5rem, 1.75rem + 2vw, 3.75rem);
-  }
-
-  /* .project keeps its own two-column grid; just centre it vertically */
-  .project {
-    align-content: center;
+    padding-top: clamp(1.75rem, 1.25rem + 1.4cqw, 2.5rem);
+    padding-bottom: clamp(2.5rem, 1.75rem + 2cqw, 3.75rem);
   }
 
   .bay {
-    padding-block: clamp(3.5rem, 4rem + 6vw, 8.5rem);
+    padding-block: clamp(3.5rem, 4rem + 6cqw, 8.5rem);
   }
 
   .hero {
-    padding-top: clamp(4rem, 3rem + 8vw, 9rem);
-    padding-bottom: clamp(4rem, 3rem + 8vw, 9rem);
+    padding-top: clamp(4rem, 3rem + 8cqw, 9rem);
+    padding-bottom: clamp(4rem, 3rem + 8cqw, 9rem);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .hero-pin {
-      height: auto;
-    }
-    .hero-sticky {
-      position: static;
-      top: auto;
-      min-height: 0;
-    }
-    .project {
-      min-height: 0;
-    }
-  }
 
   /* ---- big statements ------------------------------------------- */
   .statement {
     margin: 0;
     max-width: none;
     font-weight: 400;
-    font-size: clamp(1.75rem, 1.1rem + 2.6vw, 2.5rem);
+    font-size: clamp(1.75rem, 1.1rem + 2.6cqw, 2.5rem);
     line-height: 1.16;
     letter-spacing: -0.018em;
     text-wrap: balance;
@@ -374,41 +279,24 @@ const quotes = [
   .hero .statement {
     max-width: 25ch;
     text-wrap: pretty;
+    /* a step under the section headings: 32px (40px on screen at the
+       desktop zoom), down from the shared 40px */
+    font-size: clamp(1.5rem, 1rem + 2cqw, 2rem);
+  }
+
+  /* inline-block so each word can rise on its own; the spaces between the
+     spans are real text, so the line still wraps word by word */
+  .hw {
+    display: inline-block;
+    will-change: opacity, filter, transform;
   }
 
   @media (min-width: 700px) {
     .hero .statement {
-      max-width: 46ch;
+      /* 15% narrower than the old 46ch at 40px (≈962px), held in rem so
+         the smaller hero type keeps the same box — three lines */
+      max-width: 60rem;
     }
-  }
-
-  /* ---- hero creed tail ("… high-impact work I get shit work done") --- */
-  /* rendered by the HeroCreed React island, so these opt out of scoping */
-  :global(.creed-tail) {
-    will-change: opacity;
-  }
-
-  :global(.creed-strike) {
-    position: relative;
-    display: inline-block;
-    white-space: nowrap;
-  }
-
-  :global(.creed-strike-line) {
-    position: absolute;
-    left: -0.04em;
-    right: -0.04em;
-    top: 0.56em;
-    height: 0.075em;
-    background: currentColor;
-    transform: scaleX(0);
-    transform-origin: left center;
-    will-change: transform;
-    pointer-events: none;
-  }
-
-  :global(.creed-strike-line[data-static]) {
-    transform: scaleX(1);
   }
 
   /* ---- projects ------------------------------------------------- */
@@ -417,17 +305,33 @@ const quotes = [
     flex-direction: column;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .projects {
-      gap: clamp(4rem, 3rem + 8vw, 9rem);
-      padding-block: clamp(2rem, 1rem + 4vw, 5rem);
-    }
+
+  /* a hairline over each project row (so between the hero and the first,
+     and between every row), as wide as the one above #team (the full
+     w-wrap, gutters included): drawn overlong and clipped by .projects, so
+     it holds whether the row is two columns or stacked */
+  .projects {
+    overflow-x: clip;
+  }
+
+  .project {
+    position: relative;
+  }
+
+  .project::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100vw;
+    right: -100vw;
+    height: 1px;
+    background: var(--w-rule);
   }
 
   .project {
     display: grid;
     grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
-    gap: clamp(1.5rem, 1rem + 6vw, 7rem);
+    gap: clamp(1.5rem, 1rem + 6cqw, 7rem);
     align-items: center;
     color: inherit;
     text-decoration: none;
@@ -437,20 +341,30 @@ const quotes = [
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.4rem;
+    /* Framer: kicker + title 8px apart, then 24px to "See project" */
+    gap: 24px;
+    /* sit on the media's bottom edge rather than its middle */
+    align-self: end;
+  }
+
+  .project-titles {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
 
   .kicker {
     margin: 0;
     font-size: 0.875rem;
-    letter-spacing: 0.02em;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
     text-transform: uppercase;
   }
 
   .project-title {
     margin: 0;
     font-weight: 500;
-    font-size: clamp(1.125rem, 1rem + 0.9vw, 1.5rem);
+    font-size: clamp(1.125rem, 1rem + 0.9cqw, 1.5rem);
     line-height: 1.3;
     letter-spacing: -0.01em;
     text-wrap: balance;
@@ -461,11 +375,12 @@ const quotes = [
     font-size: 1.25rem;
     line-height: 1.2;
     color: var(--w-ink);
-    transition: opacity 0.18s ease;
+    transition: color 0.18s ease;
   }
 
-  .project:hover .see {
-    opacity: 0.62;
+  /* white at rest, grey only under the pointer — not whenever the row is */
+  .see:hover {
+    color: var(--w-ink-soft);
   }
 
   /* media wrappers */
@@ -476,9 +391,19 @@ const quotes = [
     object-fit: cover;
   }
 
-  .media--single video {
-    aspect-ratio: 798 / 573;
-    border-radius: 8px;
+  /* Questrade Pro: the live chain-to-order loop (ChainLoop.tsx) in the
+     old video's frame */
+  .media--single {
+    /* matches GROUND in ChainLoop.tsx; the loop sets the card's shape */
+    background: #17181a;
+    overflow: hidden;
+  }
+
+  :global(.chain-loop) {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border-radius: inherit;
   }
 
   /* Fractional: tall phone card + two stacked cards, all on white */
@@ -490,12 +415,12 @@ const quotes = [
   }
 
   .media--frac > div {
-    background: #fff;
+    background: #f2f2f2;
     border-radius: 8px;
     overflow: hidden;
     display: grid;
     place-items: center;
-    padding: clamp(0.75rem, 2vw, 1.25rem);
+    padding: clamp(0.75rem, 2cqw, 1.25rem);
   }
 
   .frac-phone {
@@ -503,17 +428,42 @@ const quotes = [
     aspect-ratio: 394 / 440;
   }
 
-  .frac-phone video {
-    width: 82%;
-    height: 82%;
-    object-fit: contain;
+  /* the live order flow's phone, cut off by the card's bottom edge
+     (FracFlowPhone sizes it) */
+  .media--frac > .frac-phone {
+    position: relative;
+    padding: 0;
   }
 
-  .frac-a video,
-  .frac-b video {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
+  :global(.frac-flow-fit) {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  /* the flow's own page stage: a full-viewport photo ground — here the
+     card's white shows through instead */
+  :global(.frac-flow-fit .fof-stage) {
+    min-height: 0;
+    padding: 0;
+    background: none !important;
+    display: block;
+  }
+
+  /* the live pill and banner: FracBanner.tsx scales each with its card,
+     the pill's type matched 1:1 to the banner's */
+  .media--frac > .frac-a,
+  .media--frac > .frac-b {
+    position: relative;
+    padding: 0;
+  }
+
+  :global(.frac-fit) {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: "DM Sans", system-ui, sans-serif;
   }
 
   /* EdgeMobile: two independent column stacks (like the case-study
@@ -576,7 +526,8 @@ const quotes = [
   }
 
   .media--single::after,
-  .media--edge .col > div::after {
+  .media--edge .col > div::after,
+  .quote::after {
     content: "";
     position: absolute;
     inset: 0;
@@ -620,15 +571,57 @@ const quotes = [
   .media--edge .fit-price {
     aspect-ratio: 26 / 10;
   }
-  .media--edge .col > div.fit-price > video {
-    max-width: 48%;
+  /* the ticker without its logo: the clip (3840 wide) has the icon in
+     x 190–525 and the text in 673–3571, so a window over x 600–3644 —
+     centred on the text — cuts the icon. 29% of the card: a quarter under
+     its old size, in scale with the bell and the ticket */
+  .media--edge .fit-price .hood-crop {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 29%;
+    aspect-ratio: 3044 / 1296;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
   }
-  /* chart — the one near-filled card; aspect matched to the clip */
+
+  .media--edge .fit-price .hood-crop video {
+    width: 126.15%;
+    height: 100%;
+    margin-left: -19.71%;
+  }
+  /* the holdings magnifier's card (HoldingsLoop scales it to the slot) */
   .media--edge .fit-fill {
     aspect-ratio: 8 / 5;
-    /* the live chart's footprint — the clip's old caps */
-    --ec-w: 92%;
-    --ec-h: 92%;
+  }
+
+  :global(.holdings-fit) {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  /* the piece's own page stage — a full-window gradient — gives way to
+     the card's ground */
+  :global(.holdings-fit .he-root) {
+    min-height: 0;
+    padding: 0;
+    background: none;
+  }
+
+  /* no card inside the card: the piece's black square and its lens's lit
+     copy both take this card's ground (they must match each other for the
+     lens to read as a window), and its hairline goes */
+  :global(.holdings-fit .he-card),
+  :global(.holdings-fit .he-glass) {
+    background: #0c0c0c;
+  }
+
+  :global(.holdings-fit .he-card::after),
+  :global(.holdings-fit .he-logo::after) {
+    display: none;
   }
   .media--edge .col > div.fit-fill > video {
     max-width: 92%;
@@ -644,8 +637,9 @@ const quotes = [
   }
 
   /* ---- testimonials ------------------------------------------- */
+  /* Framer: 16px from the title to the cards */
   #team .statement {
-    margin-bottom: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    margin-bottom: 16px;
   }
 
   .quotes {
@@ -662,7 +656,9 @@ const quotes = [
     flex-direction: column;
     gap: 1.25rem;
     background: var(--w-surface);
-    border-radius: 20px;
+    /* the project images' corner and rim (see the ::after rule below) */
+    position: relative;
+    border-radius: 8px;
     padding: 20px;
   }
 
@@ -692,7 +688,8 @@ const quotes = [
 
   /* ---- contact ---------------------------------------------------- */
   .contact-line {
-    margin: clamp(1.25rem, 1rem + 1.5vw, 2rem) 0 0;
+    /* Framer: 16px under the heading, as in #team */
+    margin: 16px 0 0;
     display: flex;
     flex-wrap: wrap;
     gap: 0.6rem;
@@ -723,7 +720,7 @@ const quotes = [
   @media (max-width: 1080px) {
     .project {
       grid-template-columns: 1fr;
-      gap: clamp(1.5rem, 4vw, 2.5rem);
+      gap: clamp(1.5rem, 4cqw, 2.5rem);
       max-width: 640px;
       margin-inline: auto;
     }
@@ -736,16 +733,6 @@ const quotes = [
   @media (max-width: 820px) {
     .quotes {
       grid-template-columns: 1fr;
-    }
-
-    .id-name {
-      font-size: 0.8125rem;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .links {
-      gap: 1.1rem;
     }
   }
 </style>

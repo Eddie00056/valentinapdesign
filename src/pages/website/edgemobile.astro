@@ -2,7 +2,6 @@
 import Website from "../../layouts/Website.astro";
 import { EdgeChart } from "../../components/website/EdgeChart";
 import SiteHeader from "../../components/website/SiteHeader.astro";
-import { Reveal } from "../../components/website/Reveal";
 import "../../components/website/case-study.css";
 
 const V = "/website/case/edge";
@@ -16,16 +15,16 @@ const P = "/website/video"; // shared prototype clips from the homepage
   <SiteHeader />
 
   <main class="cs">
-    <section class="cs-hero w-wrap">
+    <section class="cs-hero w-wrap" data-reveal>
       <h1 class="cs-title">Designing Questrade’s top income-generating app</h1>
     </section>
 
-    <div class="cs-media w-wrap">
+    <div class="cs-media w-wrap" data-reveal>
       <video src={`${V}/hero.mp4`} autoplay loop muted playsinline preload="metadata"></video>
     </div>
 
-    <section class="cs-overview w-wrap">
-      <div class="cs-block">
+    <section class="cs-overview w-wrap" data-reveal>
+      <div class="cs-block" data-r>
         <p class="cs-label">Project overview</p>
         <p class="cs-body">
           Questrade faced an outdated mobile experience and decided to split it
@@ -34,7 +33,7 @@ const P = "/website/video"; // shared prototype clips from the homepage
         </p>
       </div>
 
-      <div class="cs-block">
+      <div class="cs-block" data-r>
         <p class="cs-label">What I led</p>
         <p class="cs-body">
           Shipped core features including alerts, bracket orders, options
@@ -47,49 +46,48 @@ const P = "/website/video"; // shared prototype clips from the homepage
       </div>
 
       <div class="cs-meta">
-        <div class="cs-block">
+        <div class="cs-block" data-r>
           <p class="cs-label">My role</p>
           <p class="cs-body">
             1 Product Manager, 1 UX Researcher, 1 Content Designer, 4 Engineering
             squads
           </p>
         </div>
-        <div class="cs-block">
+        <div class="cs-block" data-r>
           <p class="cs-label">Timeline</p>
           <p class="cs-body">1.5 years</p>
         </div>
       </div>
     </section>
 
-    <Reveal client:load>
-      <section class="cs-impact w-wrap">
-        <h2>Project impact</h2>
-        <ul class="cs-stats">
-          <li><span class="n">$45M</span><span class="l">incremental trading volume</span></li>
-          <li><span class="n">+10K</span><span class="l">incremental increase in active traders</span></li>
-          <li><span class="n">4.5</span><span class="l">stars on App Store and Google Play</span></li>
-        </ul>
-      </section>
-    </Reveal>
+    <section class="cs-impact w-wrap" data-reveal>
+      <h2 data-r>Project impact</h2>
+      <ul class="cs-stats">
+        <li data-r><span class="n">$45M</span><span class="l">incremental trading volume</span></li>
+        <li data-r><span class="n">+10K</span><span class="l">incremental increase in active traders</span></li>
+        <li data-r><span class="n">4.5</span><span class="l">stars on App Store and Google Play</span></li>
+      </ul>
+    </section>
 
-    <Reveal client:load>
-      <section class="cs-bento cs-bento--cols w-wrap">
-        <div class="col">
-          <div class="dark fit-wide"><video src={`${P}/edge-order.mp4`} autoplay loop muted playsinline></video></div>
-          <div class="dark fit-price"><video src={`${P}/edge-hood.mp4`} autoplay loop muted playsinline></video></div>
-          <div class="dark fit-panel"><video src={`${V}/chain.mp4`} autoplay loop muted playsinline preload="metadata"></video></div>
-          <div class="dark fit-fill"><EdgeChart client:visible /></div>
-        </div>
-        <div class="col">
-          <div class="dark fit-bell"><video src={`${P}/edge-bell.mp4`} autoplay loop muted playsinline></video></div>
-          <div class="dark fit-square"><video src={`${V}/alerts.mp4`} autoplay loop muted playsinline></video></div>
-          <div class="dark phone"><video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video></div>
-        </div>
-      </section>
-    </Reveal>
+    <section class="cs-bento cs-bento--cols w-wrap" data-reveal>
+      <div class="col">
+        <div class="dark fit-wide"><video src={`${P}/edge-order.mp4`} autoplay loop muted playsinline></video></div>
+        <div class="dark fit-price"><video src={`${P}/edge-hood.mp4`} autoplay loop muted playsinline></video></div>
+        <div class="dark fit-panel"><video src={`${V}/chain.mp4`} autoplay loop muted playsinline preload="metadata"></video></div>
+        <div class="dark fit-fill"><EdgeChart client:visible /></div>
+      </div>
+      <div class="col">
+        <div class="dark fit-bell"><video src={`${P}/edge-bell.mp4`} autoplay loop muted playsinline></video></div>
+        <div class="dark fit-square"><video src={`${V}/alerts.mp4`} autoplay loop muted playsinline></video></div>
+        <div class="dark phone"><video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video></div>
+      </div>
+    </section>
   </main>
 
   <script>
+    import { initReveal } from "../../components/website/reveal";
+    initReveal();
+
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
       document.querySelectorAll("video").forEach((v) => {
         v.removeAttribute("autoplay");

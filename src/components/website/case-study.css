@@ -2,7 +2,7 @@
    Rides on the tokens defined in Website.astro (--w-*). */
 
 .cs {
-  padding-bottom: clamp(4rem, 10vw, 8rem);
+  padding-bottom: clamp(4rem, 10cqw, 8rem);
 }
 
 .cs-section {
@@ -11,8 +11,8 @@
 
 /* ---- hero ------------------------------------------------------- */
 .cs-hero {
-  padding-top: clamp(3.5rem, 2rem + 8vw, 8rem);
-  padding-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
+  padding-top: clamp(3.5rem, 2rem + 8cqw, 8rem);
+  padding-bottom: clamp(2rem, 1rem + 3cqw, 3.5rem);
 }
 
 .cs-title {
@@ -20,7 +20,7 @@
   max-width: 24ch;
   text-align: center;
   font-weight: 400;
-  font-size: clamp(2.25rem, 1.3rem + 4.4vw, 4.375rem);
+  font-size: clamp(2.25rem, 1.3rem + 4.4cqw, 4.375rem);
   line-height: 1.08;
   letter-spacing: -0.035em;
   text-wrap: balance;
@@ -28,7 +28,7 @@
 
 /* ---- media blocks -------------------------------------------- */
 .cs-media {
-  margin-block: clamp(1.5rem, 4vw, 3.5rem);
+  margin-block: clamp(1.5rem, 4cqw, 3.5rem);
 }
 
 .cs-media video,
@@ -60,13 +60,13 @@
 .cs-ba,
 .cs-gallery,
 .cs-media--cap {
-  border-top: 1px solid var(--w-line);
+  border-top: 1px solid var(--w-rule);
 }
 
 /* ---- overview / meta --------------------------------------- */
 .cs-overview {
-  margin-block: clamp(2.5rem, 6vw, 5rem);
-  padding-block: clamp(2rem, 4vw, 3rem);
+  margin-block: clamp(2.5rem, 6cqw, 5rem);
+  padding-block: clamp(2rem, 4cqw, 3rem);
 }
 
 /* the copy blocks inside sit at a readable measure, flush left
@@ -77,7 +77,7 @@
 }
 
 .cs-block + .cs-block {
-  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  margin-top: clamp(1.75rem, 4cqw, 2.75rem);
 }
 
 .cs-label {
@@ -93,7 +93,7 @@
 .cs-body {
   margin: 0;
   max-width: 42ch !important;
-  font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+  font-size: clamp(1rem, 0.95rem + 0.3cqw, 1.125rem);
   line-height: 1.55;
   color: var(--w-ink-soft);
 }
@@ -101,20 +101,20 @@
 .cs-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: clamp(2rem, 8vw, 6rem);
-  margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  gap: clamp(2rem, 8cqw, 6rem);
+  margin-top: clamp(1.75rem, 4cqw, 2.75rem);
 }
 
 /* ---- impact -------------------------------------------------- */
 .cs-impact {
-  padding-block: clamp(3.5rem, 8vw, 7rem);
+  padding-block: clamp(3.5rem, 8cqw, 7rem);
   text-align: center;
 }
 
 .cs-impact h2 {
-  margin: 0 0 clamp(2rem, 5vw, 3.5rem);
+  margin: 0 0 clamp(2rem, 5cqw, 3.5rem);
   font-weight: 400;
-  font-size: clamp(2rem, 1.4rem + 3vw, 3.5rem);
+  font-size: clamp(2rem, 1.4rem + 3cqw, 3.5rem);
   letter-spacing: -0.02em;
 }
 
@@ -124,7 +124,7 @@
   padding: 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: clamp(2rem, 5vw, 3rem);
+  gap: clamp(2rem, 5cqw, 3rem);
 }
 
 .cs-stats li {
@@ -136,7 +136,7 @@
 
 .cs-stats .n {
   font-weight: 600;
-  font-size: clamp(2.25rem, 1.4rem + 3.2vw, 3.25rem);
+  font-size: clamp(2.25rem, 1.4rem + 3.2cqw, 3.25rem);
   line-height: 1;
   letter-spacing: -0.02em;
   color: var(--w-accent); /* fallback */
@@ -160,14 +160,14 @@
 
 /* ---- award flourish -------------------------------------- */
 .cs-award {
-  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-block: clamp(2rem, 5cqw, 3.5rem);
   text-align: center;
 }
 
 .cs-award .headline {
   margin: 0;
   font-weight: 600;
-  font-size: clamp(1.75rem, 1.1rem + 3vw, 3rem);
+  font-size: clamp(1.75rem, 1.1rem + 3cqw, 3rem);
   letter-spacing: -0.02em;
   color: var(--w-accent);
 }
@@ -182,19 +182,19 @@
 .cs-panels {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(1rem, 2vw, 1.5rem);
-  padding-block: clamp(1.5rem, 4vw, 3rem);
+  gap: clamp(1rem, 2cqw, 1.5rem);
+  padding-block: clamp(1.5rem, 4cqw, 3rem);
 }
 
 .cs-panels figure {
   margin: 0;
   background: #0e0e0e;
   border-radius: 20px;
-  padding: clamp(1.75rem, 4vw, 3rem);
+  padding: clamp(1.75rem, 4cqw, 3rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1.25rem, 3vw, 2rem);
+  gap: clamp(1.25rem, 3cqw, 2rem);
   overflow: hidden;
 }
 
@@ -235,15 +235,15 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: start;
-  gap: clamp(1rem, 2vw, 1.5rem);
-  padding-block: clamp(1.5rem, 4vw, 3rem);
+  gap: clamp(1rem, 2cqw, 1.5rem);
+  padding-block: clamp(1.5rem, 4cqw, 3rem);
 }
 
 .cs-bento .col {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 2vw, 1.5rem);
+  gap: clamp(1rem, 2cqw, 1.5rem);
 }
 
 .cs-bento .col > * {
@@ -344,7 +344,7 @@
   background: #f4f4f2;
   display: grid;
   place-items: center;
-  padding: clamp(1.75rem, 5vw, 3.5rem);
+  padding: clamp(1.75rem, 5cqw, 3.5rem);
 }
 
 .cs-bento .light > video,
@@ -382,19 +382,19 @@
 .cs-ba {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(1rem, 2vw, 1.5rem);
-  padding-block: clamp(1.5rem, 4vw, 3rem);
+  gap: clamp(1rem, 2cqw, 1.5rem);
+  padding-block: clamp(1.5rem, 4cqw, 3rem);
 }
 
 .cs-ba figure {
   margin: 0;
   background: #0e0e0e;
   border-radius: 20px;
-  padding: clamp(1.75rem, 4.5vw, 3.25rem);
+  padding: clamp(1.75rem, 4.5cqw, 3.25rem);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1rem, 2.5vw, 1.75rem);
+  gap: clamp(1rem, 2.5cqw, 1.75rem);
 }
 
 .cs-ba figcaption {
@@ -432,14 +432,14 @@
 .cs-gallery {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(1rem, 2vw, 1.5rem);
-  padding-block: clamp(1rem, 3vw, 2rem);
+  gap: clamp(1rem, 2cqw, 1.5rem);
+  padding-block: clamp(1rem, 3cqw, 2rem);
 }
 
 .cs-gallery > div {
   background: var(--w-surface);
   border-radius: 20px;
-  padding: clamp(1.5rem, 4vw, 2.5rem);
+  padding: clamp(1.5rem, 4cqw, 2.5rem);
   display: grid;
   place-items: center;
   overflow: hidden;

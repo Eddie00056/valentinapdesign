@@ -4,11 +4,12 @@ import { site } from "../data/site";
 interface Props {
   title?: string;
   description?: string;
-  /** enable full-page scroll-snap (the /website homepage only) */
-  snap?: boolean;
 }
 
-const { title, description, snap = false } = Astro.props;
+const { title, description } = Astro.props;
+/* the portfolio pages are drawn at 125% on desktop (see .site-zoom below);
+   the presentation deck at / fits itself to the window and stays at 100% */
+const siteZoom = Astro.url.pathname.startsWith("/website");
 const pageTitle = title ? `${title} — ${site.name}` : `${site.name} — Product Designer`;
 const canonical = new URL(
   Astro.url.pathname,
@@ -17,7 +18,7 @@ const canonical = new URL(
 ---
 
 <!doctype html>
-<html lang="en" class:list={[{ snap }]}>
+<html lang="en" class:list={[{ "site-zoom": siteZoom }]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -34,9 +35,20 @@ const canonical = new URL(
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
       rel="stylesheet"
     />
+    <!-- section reveals (reveal.ts): hide the parts before first paint, and
+         give them back if the module never arrives -->
+    <script is:inline>
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        var h = document.documentElement;
+        h.classList.add("reveal-on");
+        setTimeout(function () {
+          if (!window.__revealReady) h.classList.remove("reveal-on");
+        }, 4000);
+      }
+    </script>
   </head>
   <body>
     <slot />
@@ -44,6 +56,35 @@ const canonical = new URL(
 </html>
 
 <style is:global>
+  /* The site as it looks at 125% browser zoom, at 100%: `zoom` re-lays the
+     page out bigger (crisp, not a bitmap stretch), the way browser zoom does.
+     Desktop only: from 1350px, so the page still has 1080px of layout — the
+     width the project rows stack at. Viewport units are not zoomed, so
+     anything sized off the window divides by --zoom. */
+  :root {
+    --zoom: 1;
+  }
+
+  @media (min-width: 1350px) {
+    html.site-zoom {
+      zoom: 1.25;
+      --zoom: 1.25;
+    }
+  }
+
+  /* …and the fluid sizes are written in cqw against the body, not vw: a
+     container's width is in the page's own (zoomed) pixels, so a clamp()
+     lands where it would at real 125% zoom. vw would see the raw window. */
+  html.site-zoom body {
+    container-type: inline-size;
+  }
+
+  /* section reveals: parts wait hidden until reveal.ts animates them in */
+  html.reveal-on [data-reveal]:not([data-revealed]) [data-r],
+  html.reveal-on [data-reveal]:not([data-revealed]):not(:has([data-r])) {
+    opacity: 0;
+  }
+
   /* Elza Text — self-hosted, matched to the Framer source ------------- */
   @font-face {
     font-family: "Elza Text";
@@ -83,6 +124,8 @@ const canonical = new URL(
     --w-ink-mute: rgba(255, 255, 255, 0.5);
     --w-ink-faint: #565656;
     --w-line: #1e1e1e;
+    /* section dividers — a step brighter than --w-line so they read on the black */
+    --w-rule: #2e2e2e;
     --w-accent: #00ff9d;
     --w-cream: #fffced;
 
@@ -90,7 +133,7 @@ const canonical = new URL(
     --w-font-alt: "Instrument Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
       Roboto, Helvetica, Arial, sans-serif;
 
-    --w-gutter: clamp(1.25rem, 4.5vw, 2.5rem);
+    --w-gutter: clamp(1.25rem, 4.5cqw, 2.5rem);
     --w-maxw: 1400px;
   }
 
@@ -105,11 +148,6 @@ const canonical = new URL(
     scroll-behavior: smooth;
     scroll-padding-top: 4.75rem;
   }
-
-  /* The homepage (html.snap) does NOT use CSS scroll-snap — a small
-     script settles the nearest section to the top only once scrolling
-     has fully stopped, so free-scrolling (slow or fast) is never
-     fought. See the scroll-settle <script> in website.astro. */
 
   @media (prefers-reduced-motion: reduce) {
     html {

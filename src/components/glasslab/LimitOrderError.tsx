@@ -88,8 +88,14 @@ export function LimitOrderError({
 
   useEffect(() => {
     if (!auto) return clear;
-    const id = window.setInterval(() => toggleRef.current(), 3000);
+    /* first ring almost at once, then the 3s rhythm from there */
+    let id: number | undefined;
+    const kick = window.setTimeout(() => {
+      toggleRef.current();
+      id = window.setInterval(() => toggleRef.current(), 3000);
+    }, 400);
     return () => {
+      window.clearTimeout(kick);
       window.clearInterval(id);
       clear();
     };
