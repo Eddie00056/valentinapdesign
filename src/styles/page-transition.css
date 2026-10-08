@@ -1,0 +1,84 @@
+/* Page transition — the incoming page rises over the outgoing one.
+
+   Native cross-document View Transitions: the browser holds a snapshot of
+   the page you're leaving, renders the new page underneath it, then hands
+   both to these pseudo-elements. The old snapshot stays put; the new page —
+   live, so its own load animations play as it rises — wipes up from the
+   bottom until it covers the viewport, then it IS the page. No router, no
+   overlay element, nothing for back/forward or deep links to trip on.
+   Browsers without support (Firefox today) just navigate. Both pages must
+   opt in, so this is loaded by the Website layout only.
+
+   Tune here: */
+:root {
+  --vt-duration: 800ms;
+  --vt-easing: cubic-bezier(0.76, 0, 0.24, 1);
+  /* where the incoming page starts: 100% = from below, -100% = from above */
+  --vt-from: 100%;
+  /* behind both layers (only shows if a snapshot has transparency) */
+  --vt-color: #030205;
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition {
+  background: var(--vt-color);
+}
+
+/* no default crossfade on the root group */
+::view-transition-group(root) {
+  animation: none;
+}
+
+/* the page you're leaving: perfectly still, held for the whole wipe */
+::view-transition-old(root) {
+  animation: vt-hold var(--vt-duration) linear both;
+}
+
+/* the page you're going to: a full-viewport sheet, rising */
+::view-transition-new(root) {
+  z-index: 1;
+  animation: vt-rise var(--vt-duration) var(--vt-easing) both;
+  will-change: transform;
+}
+
+@keyframes vt-hold {
+  from,
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes vt-rise {
+  from {
+    transform: translate3d(0, var(--vt-from), 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* reduced motion: a short dissolve instead of the travel */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root) {
+    animation: vt-fade-out 160ms ease both;
+  }
+  ::view-transition-new(root) {
+    animation: vt-fade-in 160ms ease both;
+  }
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}

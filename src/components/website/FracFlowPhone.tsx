@@ -17,7 +17,7 @@ const TOP = 0.2;
  * the top so the card crops the lower half. Look-only: the keypad and the
  * Review button sit below the crop, and the card itself is the link.
  */
-export function FracFlowPhone() {
+export function FracFlowPhone({ fill = FILL, top = TOP }: { fill?: number; top?: number } = {}) {
   const ref = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);
 
@@ -29,7 +29,7 @@ export function FracFlowPhone() {
     return () => ro.disconnect();
   }, []);
 
-  const scale = (FILL * w) / PHONE_W;
+  const scale = (fill * w) / PHONE_W;
 
   return (
     <div ref={ref} className="frac-flow-fit" aria-hidden="true" inert>
@@ -37,7 +37,7 @@ export function FracFlowPhone() {
         style={{
           position: "absolute",
           left: "50%",
-          top: TOP * w,
+          top: top * w,
           width: PHONE_W,
           height: PHONE_H,
           marginLeft: -PHONE_W / 2,

@@ -1,0 +1,79 @@
+---
+// The closing "Currently looking for new roles" block, shared by the /website
+// homepage and every case study. Its rule spans the section's box; a page can
+// run it further out with --rule-bleed (the case studies take it to the
+// window edge, clipped by .cs).
+---
+
+<section id="contact" class="w-wrap contact" data-reveal>
+  <h2 class="contact-title" data-r>Currently looking for new roles</h2>
+  <p class="contact-line" data-r>
+    <a href="mailto:valeapad@gmail.com">valeapad@gmail.com</a>
+    <span class="dot">•</span>
+    <a href="tel:+19292716949">929-271-6949</a>
+    <span class="dot">•</span>
+    <a
+      class="u"
+      href="https://www.linkedin.com/in/valentinapadure"
+      target="_blank"
+      rel="noopener">Linkedin</a
+    >
+  </p>
+</section>
+
+<style>
+  /* tucked right under its rule, no cavernous gap under the last line */
+  .contact {
+    position: relative;
+    padding-top: clamp(1.75rem, 1.25rem + 1.4cqw, 2.5rem);
+    padding-bottom: clamp(2.5rem, 1.75rem + 2cqw, 3.75rem);
+  }
+
+  .contact::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: calc(-1 * var(--rule-bleed, 0px));
+    right: calc(-1 * var(--rule-bleed, 0px));
+    height: 1px;
+    background: var(--w-rule);
+    pointer-events: none;
+  }
+
+  .contact-title {
+    margin: 0;
+    font-weight: 400;
+    font-size: clamp(1.75rem, 1.1rem + 2.6cqw, 2.5rem);
+    line-height: 1.16;
+    letter-spacing: -0.018em;
+    text-wrap: balance;
+  }
+
+  .contact-line {
+    /* Framer: 16px under the heading */
+    margin: 16px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    font-size: 1rem;
+    color: var(--w-ink-soft);
+  }
+
+  .contact-line a {
+    color: var(--w-ink-soft);
+    transition: color 0.18s ease;
+  }
+
+  .contact-line a:hover {
+    color: var(--w-ink);
+  }
+
+  .contact-line .u {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .contact-line .dot {
+    color: var(--w-ink-faint);
+  }
+</style>

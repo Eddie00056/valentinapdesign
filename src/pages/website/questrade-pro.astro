@@ -1,9 +1,17 @@
 ---
 import Website from "../../layouts/Website.astro";
 import SiteHeader from "../../components/website/SiteHeader.astro";
+import ContactFooter from "../../components/website/ContactFooter.astro";
+import { LiveFit } from "../../components/website/LiveFit";
+import { ChainLoop } from "../../components/website/ChainLoop";
 import "../../components/website/case-study.css";
 
 const V = "/website/case/questrade";
+
+/* deck slide 17: the options builder adding legs on its own loop, dressed
+   as on the slide */
+const BUILDER_CSS =
+  ".ob-stage{background:none!important}.ob-cost{display:none!important}.ob-foot{justify-content:flex-end!important}html.is-bare .wshell.wshell{background:#010101!important}";
 ---
 
 <Website
@@ -19,14 +27,11 @@ const V = "/website/case/questrade";
       </h1>
     </section>
 
-    <div class="cs-media w-wrap" data-reveal>
-      <video
-        src="/website/video/questrade.mp4"
-        autoplay
-        loop
-        muted
-        playsinline
-        preload="metadata"></video>
+    <div class="cs-media cs-media--hero w-wrap" data-reveal>
+      <!-- deck slide 51: the chain to its ticket, playing itself on a loop -->
+      <div class="cs-loop">
+        <ChainLoop client:visible ground="#030205" />
+      </div>
     </div>
 
     <section class="cs-overview w-wrap" data-reveal>
@@ -65,15 +70,11 @@ const V = "/website/case/questrade";
       </div>
     </section>
 
-    <div class="cs-media w-wrap" data-reveal>
-      <video src={`${V}/order-entry-3up.mp4`} autoplay loop muted playsinline></video>
-    </div>
-
     <section class="cs-impact w-wrap" data-reveal>
       <h2 data-r>Project impact</h2>
       <ul class="cs-stats">
         <li data-r><span class="n">65%</span><span class="l">decrease in time to submit a trade</span></li>
-        <li data-r><span class="n">3×</span><span class="l">fewer errors when placing an equity trade</span></li>
+        <li data-r><span class="n">3X</span><span class="l">fewer errors when placing an equity trade</span></li>
         <li data-r><span class="n">60K</span><span class="l">options contracts traded</span></li>
       </ul>
     </section>
@@ -85,30 +86,31 @@ const V = "/website/case/questrade";
       </figure>
       <figure class="is-after">
         <figcaption>After</figcaption>
-        <video src={`${V}/tall.mp4`} autoplay loop muted playsinline></video>
+        <div class="ba-live">
+          <LiveFit
+            client:visible
+            src="/work/options-strategy-builder?bare&auto"
+            fit=".wshell"
+            css={BUILDER_CSS}
+            vw={1280}
+            vh={960}
+            freeze
+            title="Options strategy builder"
+          />
+        </div>
       </figure>
     </section>
 
     <section class="cs-ba cs-ba--wide w-wrap" data-reveal>
       <figure class="is-before">
-        <figcaption>Before</figcaption>
         <img src={`${V}/before.png`} alt="The previous desktop platform" loading="lazy" />
       </figure>
       <figure class="is-after">
-        <figcaption>After</figcaption>
         <img src={`${V}/after.png`} alt="The redesigned desktop platform" loading="lazy" />
       </figure>
     </section>
 
-    <div class="cs-media cs-media--cap w-wrap" data-reveal>
-      <video
-        src={`${V}/options-chain.mp4`}
-        autoplay
-        loop
-        muted
-        playsinline
-        preload="metadata"></video>
-    </div>
+    <ContactFooter />
   </main>
 
   <script>

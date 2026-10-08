@@ -24,11 +24,15 @@ const MARGIN_X = 40;
 const MARGIN_Y = 32;
 const CROP_W = PAIR.w + MARGIN_X * 2;
 const CROP_H = PAIR.h + MARGIN_Y * 2;
-const CROP_X = PAIR.x + PAIR.w / 2 - CROP_W / 2;
-/* centred on the pair the crop would start above the screen, and the screen
-   clips the confirmation's dimmed backdrop — so the pair is pushed down
-   inside the screen instead and the crop starts at its top edge */
-const DROP = Math.max(0, CROP_H / 2 - (PAIR.y + PAIR.h / 2));
+/* The workspace canvas (top-left at 122, 40) clips everything inside it,
+   the confirmation's dimmed backdrop included. Centred on the pair, the
+   crop would start 40px left of it and 32px above, and the backdrop left
+   an undimmed strip down that side and across the top. So the pair is
+   moved into the canvas by that much and the crop starts on its corner. */
+const CANVAS = { x: 122, y: 40 };
+const SHIFT_X = Math.max(0, CANVAS.x - (PAIR.x + PAIR.w / 2 - CROP_W / 2));
+const DROP = Math.max(0, CANVAS.y - (PAIR.y + PAIR.h / 2 - CROP_H / 2));
+const CROP_X = PAIR.x + SHIFT_X + PAIR.w / 2 - CROP_W / 2;
 const CROP_Y = PAIR.y + DROP + PAIR.h / 2 - CROP_H / 2;
 const px = (n: number) => `${Math.round(n)}px`;
 /* the card's ground: a step lighter than the widgets so they stand off it.
@@ -36,7 +40,6 @@ const px = (n: number) => `${Math.round(n)}px`;
 const GROUND = "#17181a";
 
 const CSS = `
-html, body, html.is-bare, html.is-bare body { background: ${GROUND} !important; }
 .wsp-rail { visibility: hidden !important; }
 .wsp, .wsp-stage, .wsp-screen, .wsp-canvas {
   background: none !important; box-shadow: none !important; border: none !important;
@@ -44,6 +47,7 @@ html, body, html.is-bare, html.is-bare body { background: ${GROUND} !important; 
 .ctt {
   min-height: 0 !important; padding: 0 !important; width: max-content !important;
   margin-top: ${px(DROP)} !important;
+  margin-left: ${px(SHIFT_X)} !important;
 }
 .cmt-fab, .cmt-root, .oc-back, astro-dev-toolbar { display: none !important; }
 /* the widgets are see-through in bare mode; they go solid, as
@@ -194,7 +198,9 @@ function wired(d: Document) {
 
 type Copy = { key: number; shown: boolean };
 
-export function ChainLoop() {
+/** `ground`: the card's colour, painted behind the frame and in it (the
+    homepage card is the charcoal GROUND; the case study's is near-black) */
+export function ChainLoop({ ground = GROUND }: { ground?: string } = {}) {
   const box = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
   /* no copy until hydrated: a frame in the server markup finishes loading
@@ -227,7 +233,10 @@ export function ChainLoop() {
     const d = f?.contentDocument;
     if (!f || !d) return;
     const style = d.createElement("style");
-    style.textContent = CSS + POINTER_CSS;
+    style.textContent =
+      `html, body, html.is-bare, html.is-bare body { background: ${ground} !important; }` +
+      CSS +
+      POINTER_CSS;
     d.head.append(style);
     /* No focus inside a copy. The confirmation focuses its first button on
        open and hands focus back on close, and focusing anything inside a
@@ -283,7 +292,13 @@ export function ChainLoop() {
       ref={box}
       className="chain-loop"
       aria-hidden="true"
-      style={{ aspectRatio: `${CROP_W} / ${CROP_H}` }}
+      style={{
+        position: "relative",
+        width: "100%",
+        overflow: "hidden",
+        background: ground,
+        aspectRatio: `${CROP_W} / ${CROP_H}`,
+      }}
     >
       {copies.map((c) => (
         <iframe

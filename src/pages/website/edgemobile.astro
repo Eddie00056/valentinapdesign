@@ -2,6 +2,7 @@
 import Website from "../../layouts/Website.astro";
 import { EdgeChart } from "../../components/website/EdgeChart";
 import SiteHeader from "../../components/website/SiteHeader.astro";
+import ContactFooter from "../../components/website/ContactFooter.astro";
 import "../../components/website/case-study.css";
 
 const V = "/website/case/edge";
@@ -19,7 +20,7 @@ const P = "/website/video"; // shared prototype clips from the homepage
       <h1 class="cs-title">Designing Questrade’s top income-generating app</h1>
     </section>
 
-    <div class="cs-media w-wrap" data-reveal>
+    <div class="cs-media cs-media--hero w-wrap" data-reveal>
       <video src={`${V}/hero.mp4`} autoplay loop muted playsinline preload="metadata"></video>
     </div>
 
@@ -82,6 +83,8 @@ const P = "/website/video"; // shared prototype clips from the homepage
         <div class="dark phone"><video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video></div>
       </div>
     </section>
+
+    <ContactFooter />
   </main>
 
   <script>

@@ -1,6 +1,13 @@
 ---
 import Website from "../../layouts/Website.astro";
 import SiteHeader from "../../components/website/SiteHeader.astro";
+import ContactFooter from "../../components/website/ContactFooter.astro";
+import { LiveFit } from "../../components/website/LiveFit";
+import { FracFlowPhone } from "../../components/website/FracFlowPhone";
+import { FracBanner, FracPill } from "../../components/website/FracBanner";
+import { BeamDemo } from "../../components/beamring/BeamDemo";
+import "../../components/beamring/beam-ring.css";
+import "../../components/beamring/beam-demo.css";
 import "../../components/website/case-study.css";
 
 const V = "/website/case/fractional";
@@ -18,7 +25,7 @@ const P = "/website/video"; // shared prototype clips from the homepage
       <h1 class="cs-title">1 Feature. 2 Platforms. 2 Personas. $33M in Revenue</h1>
     </section>
 
-    <div class="cs-media w-wrap" data-reveal>
+    <div class="cs-media cs-media--hero w-wrap" data-reveal>
       <video src={`${V}/hero.mp4`} autoplay loop muted playsinline preload="metadata"></video>
     </div>
 
@@ -76,38 +83,78 @@ const P = "/website/video"; // shared prototype clips from the homepage
     <section class="cs-panels w-wrap" data-reveal>
       <figure class="panel-light">
         <figcaption>Regular trading platform</figcaption>
-        <video src={`${V}/regular.mp4`} autoplay loop muted playsinline></video>
+        <!-- deck slide 92: the novice platform's live order flow -->
+        <div class="panel-live">
+          <LiveFit
+            client:visible
+            src="/work/fractional-order-flow"
+            fit=".fof-frame"
+            css=".fof-stage{background:none!important}"
+            retouch="flowToPhoneFrame"
+            vw={1280}
+            vh={1000}
+            pad={0}
+            byHeight
+            title="Fractional order flow"
+          />
+        </div>
       </figure>
       <figure class="panel-dark">
         <figcaption>Advanced trading platform</figcaption>
-        <video src={`${V}/advanced.mp4`} autoplay loop muted playsinline></video>
+        <!-- deck slide 94: the advanced platform's live order placement -->
+        <div class="panel-live">
+          <LiveFit
+            client:visible
+            src="/work/order-placement-boxed"
+            fit={'img[src*="iphone"]'}
+            css=".phone-stage{background:none!important}"
+            vw={1280}
+            vh={1000}
+            pad={0}
+            byHeight
+            title="Order placement"
+          />
+        </div>
       </figure>
     </section>
 
     <section class="cs-bento w-wrap" data-reveal>
-      <div class="col">
-        <div class="light phone">
-          <video src={`${P}/fractional-phone.mp4`} autoplay loop muted playsinline></video>
+      <!-- Framer's first row: the phone, and the banner over the pill, the
+           pair as tall as the phone card -->
+      <div class="bento-row">
+        <!-- the homepage card's live pieces: the order flow, the banner,
+             the limit-order ring -->
+        <div class="light phone phone--foot live-card">
+          <FracFlowPhone client:visible fill={0.532} top={0.155} />
         </div>
-        <div class="dark fit-fill">
-          <video src={`${V}/chart.mp4`} autoplay loop muted playsinline></video>
+        <div class="col">
+          <div class="light live-card">
+            <FracBanner client:visible />
+          </div>
+          <div class="light live-card">
+            <FracPill client:visible />
+          </div>
         </div>
-        <div class="dark fit-fill">
+      </div>
+      <!-- second row: the chart over the stepper, as tall together as the
+           placing phone beside them -->
+      <div class="bento-row bento-row--dark">
+        <div class="col">
+          <!-- /work/beam-ring: the light running round the Place order button -->
+          <div class="dark clip--chart clip--beam">
+            <BeamDemo client:visible />
+          </div>
+          <div class="dark clip--stepper">
+            <video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video>
+          </div>
+        </div>
+        <div class="dark phone phone--foot phone--placing">
           <video src={`${V}/stepper.mp4`} autoplay loop muted playsinline></video>
         </div>
       </div>
-      <div class="col">
-        <div class="light">
-          <video src={`${P}/fractional-icon.mp4`} autoplay loop muted playsinline></video>
-        </div>
-        <div class="light">
-          <video src={`${P}/fractional-limit.mp4`} autoplay loop muted playsinline></video>
-        </div>
-        <div class="dark phone">
-          <video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video>
-        </div>
-      </div>
     </section>
+
+    <ContactFooter />
   </main>
 
   <script>

@@ -2,7 +2,10 @@
    Rides on the tokens defined in Website.astro (--w-*). */
 
 .cs {
-  padding-bottom: clamp(4rem, 10cqw, 8rem);
+  /* Type is set at Framer's sizes and divided by the desktop zoom, so on
+     screen it reads at exactly Framer's px (70px title, 18px body…); the
+     layout around it keeps the zoom. */
+  --type: calc(1 / var(--zoom));
 }
 
 .cs-section {
@@ -10,9 +13,12 @@
 }
 
 /* ---- hero ------------------------------------------------------- */
+/* Framer at 100%: the title 100px under the header, the hero clip 80px
+   under the title at 74% of the window. In the page's own pixels (the
+   desktop zoom is 1.25) that's 80 and 64. */
 .cs-hero {
-  padding-top: clamp(3.5rem, 2rem + 8cqw, 8rem);
-  padding-bottom: clamp(2rem, 1rem + 3cqw, 3.5rem);
+  padding-top: clamp(2.5rem, 1rem + 5cqw, 5rem);
+  padding-bottom: 0;
 }
 
 .cs-title {
@@ -20,15 +26,30 @@
   max-width: 24ch;
   text-align: center;
   font-weight: 400;
-  font-size: clamp(2.25rem, 1.3rem + 4.4cqw, 4.375rem);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+  /* Framer: 70/77, -0.04em */
+  font-size: calc(clamp(2.25rem, 1.3rem + 4.4cqw, 4.375rem) * var(--type));
+  line-height: 1.1;
+  letter-spacing: -0.04em;
   text-wrap: balance;
 }
 
 /* ---- media blocks -------------------------------------------- */
 .cs-media {
   margin-block: clamp(1.5rem, 4cqw, 3.5rem);
+}
+
+.cs-media.cs-media--hero {
+  margin-top: clamp(2rem, 1rem + 4cqw, 4rem);
+}
+
+/* The hero clip's inset is the page's column: every section of a case
+   study — copy, stats, figures, rules — sits in the same 74% so its left
+   edge lines up with the clip's. Phones keep the full gutter column. */
+@media (min-width: 760px) {
+  .cs .w-wrap {
+    max-width: 74cqw;
+    padding-inline: 0;
+  }
 }
 
 .cs-media video,
@@ -50,22 +71,71 @@
   max-width: min(100%, 960px);
 }
 
+/* the chain-to-order loop (ChainLoop) as a case study's hero: the full
+   column, in the before/after cards' shell — near-black, a 1px #303639
+   rim, 12px corners */
+.cs-loop {
+  width: 100%;
+  border: 1px solid #303639;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
 /* ---- section separators ----------------------------------- */
-/* one hairline at every major section boundary below the hero media */
+/* one hairline at every major section boundary below the hero media,
+   running the full width of the window while the section itself keeps
+   the 74% column: drawn overlong and clipped by .cs */
+.cs {
+  overflow-x: clip;
+  /* the shared contact footer's rule runs to the window edge here too */
+  --rule-bleed: 100vw;
+}
+
+/* the footer closes the page (its own padding is the page's end) and
+   stands 70px clear of the last section, like the gaps above it */
+.cs > #contact {
+  margin-top: calc(70px * var(--type));
+}
+
+/* …measured from the last section's content, not its padding */
+.cs > :has(+ #contact) {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
 .cs-overview,
-.cs-impact,
-.cs-award,
-.cs-panels,
-.cs-bento,
-.cs-ba,
-.cs-gallery,
-.cs-media--cap {
-  border-top: 1px solid var(--w-rule);
+.cs-impact {
+  position: relative;
+}
+
+/* only the overview and the impact get a rule; the run of visuals under
+   the impact (before/after, award, panels, bento) goes without, as on
+   Framer */
+:is(.cs-overview, .cs-impact)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100vw;
+  right: -100vw;
+  height: 1px;
+  background: var(--w-rule);
+  pointer-events: none;
+}
+
+/* no rule under the impact block (Framer runs straight on): the next
+   section starts the impact's own 70px under the captions */
+.cs-impact + *::before {
+  display: none;
+}
+
+.cs .cs-impact + * {
+  margin-top: 0;
+  padding-top: 0;
 }
 
 /* ---- overview / meta --------------------------------------- */
 .cs-overview {
-  margin-block: clamp(2.5rem, 6cqw, 5rem);
+  margin-block: clamp(2.5rem, 6cqw, 5rem) 0;
   padding-block: clamp(2rem, 4cqw, 3rem);
 }
 
@@ -76,45 +146,64 @@
   max-width: 44rem;
 }
 
+/* Framer's overview rhythm, in its on-screen px (× --type undoes the
+   desktop zoom): 6px label → copy, 30px between blocks, 713px copy */
 .cs-block + .cs-block {
-  margin-top: clamp(1.75rem, 4cqw, 2.75rem);
+  margin-top: calc(30px * var(--type));
 }
 
 .cs-label {
-  margin: 0 0 0.7rem;
+  margin: 0 0 calc(6px * var(--type));
   font-family: var(--w-font-alt);
-  font-size: 0.8125rem;
-  font-weight: 500;
-  letter-spacing: 0.07em;
+  /* Framer: 15/21, -0.02em, regular, uppercase (its face is Switzer; the
+     house alt face stands in) */
+  font-size: calc(0.9375rem * var(--type));
+  font-weight: 400;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
   color: var(--w-ink);
 }
 
 .cs-body {
   margin: 0;
-  max-width: 42ch !important;
-  font-size: clamp(1rem, 0.95rem + 0.3cqw, 1.125rem);
-  line-height: 1.55;
+  /* 15% under Framer's 713px */
+  max-width: calc(713px * 0.85 * var(--type)) !important;
+  /* Framer: 18/30.6 */
+  font-size: calc(clamp(1rem, 0.95rem + 0.3cqw, 1.125rem) * var(--type));
+  line-height: 1.7;
   color: var(--w-ink-soft);
 }
 
+/* the role and timeline values set tighter in Framer: 18/27 */
+.cs-meta .cs-body {
+  line-height: 1.5;
+}
+
+/* My role and Timeline stack under the copy, as on Framer (side by side,
+   the second block's top margin dropped it below the first) */
 .cs-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(2rem, 8cqw, 6rem);
-  margin-top: clamp(1.75rem, 4cqw, 2.75rem);
+  margin-top: calc(30px * var(--type));
 }
 
 /* ---- impact -------------------------------------------------- */
+/* Framer's impact wrapper: 100px above the heading; 70px from the
+   captions to what follows (on-screen px, × --type undoes the zoom) */
 .cs-impact {
-  padding-block: clamp(3.5rem, 8cqw, 7rem);
+  padding-block: calc(100px * var(--type)) calc(70px * var(--type));
   text-align: center;
 }
 
+/* Framer's impact block, in its on-screen px (× --type undoes the zoom):
+   24px from the heading to the numbers, the three stats in a tight
+   centred cluster of 165px columns 18px apart, each caption tucked 15px
+   into its number's 88px line box */
 .cs-impact h2 {
-  margin: 0 0 clamp(2rem, 5cqw, 3.5rem);
+  margin: 0 0 calc(24px * var(--type));
   font-weight: 400;
-  font-size: clamp(2rem, 1.4rem + 3cqw, 3.5rem);
+  /* Framer: 56/61.6, -0.02em */
+  font-size: calc(clamp(2rem, 1.4rem + 3cqw, 3.5rem) * var(--type));
+  line-height: 1.1;
   letter-spacing: -0.02em;
 }
 
@@ -123,58 +212,82 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(2rem, 5cqw, 3rem);
+  grid-template-columns: repeat(3, minmax(0, calc(165px * var(--type))));
+  justify-content: center;
+  gap: calc(18px * var(--type));
 }
 
 .cs-stats li {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.6rem;
 }
 
 .cs-stats .n {
   font-weight: 600;
-  font-size: clamp(2.25rem, 1.4rem + 3.2cqw, 3.25rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: var(--w-accent); /* fallback */
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--w-accent) 70%, #ffffff) 0%,
-    var(--w-accent) 55%,
-    color-mix(in srgb, var(--w-accent) 82%, #000000) 100%
-  );
+  /* Framer: 52/88.4 semibold, no tracking, its green gradient top to
+     bottom */
+  font-size: calc(clamp(2.25rem, 1.4rem + 3.2cqw, 3.25rem) * var(--type));
+  line-height: 1.7;
+  letter-spacing: normal;
+  color: #74c75d; /* fallback */
+  background: linear-gradient(180deg, #23752a 10%, #74c75d 58%, #d4dbc1 132%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .cs-stats .l {
-  max-width: 18ch;
-  font-size: 0.9375rem;
+  margin-top: calc(-15px * var(--type));
+  /* Framer: 15/21, centred */
+  font-size: calc(0.9375rem * var(--type));
   line-height: 1.4;
+  text-align: center;
   color: var(--w-ink-soft);
 }
 
 /* ---- award flourish -------------------------------------- */
 .cs-award {
-  padding-block: clamp(2rem, 5cqw, 3.5rem);
   text-align: center;
 }
 
+/* the visuals run (Framer's Fractional rhythm, on-screen px × --type):
+   50px from the award to the panels, 16px between panels and bento */
+.cs .cs-award + * {
+  margin-top: calc(50px * var(--type));
+}
+
+.cs .cs-panels + .cs-bento {
+  margin-top: calc(16px * var(--type));
+}
+
 .cs-award .headline {
-  margin: 0;
+  /* the impact numbers' 1.7 line box, so the gradient (which spans the
+     box) lands on the glyphs exactly as it does on the numbers; the
+     negative margins give back Framer's 52/62.4 spacing */
+  margin: -0.25em 0;
   font-weight: 600;
-  font-size: clamp(1.75rem, 1.1rem + 3cqw, 3rem);
-  letter-spacing: -0.02em;
-  color: var(--w-accent);
+  font-size: calc(clamp(1.75rem, 1.1rem + 3cqw, 3.25rem) * var(--type));
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+/* Framer's green gradient — the impact numbers, the award line and the
+   AFTER caption all wear it */
+.cs-award .headline,
+.cs-ba .is-after figcaption {
+  color: #74c75d; /* fallback */
+  background: linear-gradient(180deg, #23752a 10%, #74c75d 58%, #d4dbc1 132%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .cs-award .sub {
   margin: 0.5rem 0 0;
-  font-size: 0.9375rem;
+  /* Framer: 15/18 */
+  font-size: calc(0.9375rem * var(--type));
+  line-height: 1.2;
   color: var(--w-ink-soft);
 }
 
@@ -182,26 +295,30 @@
 .cs-panels {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(1rem, 2cqw, 1.5rem);
-  padding-block: clamp(1.5rem, 4cqw, 3rem);
+  gap: calc(16px * var(--type));
 }
 
+/* the before/after cards' shell: 12px corners, the caption 32px from the
+   top and the media 24px under it (Framer's panels) */
 .cs-panels figure {
   margin: 0;
   background: #0e0e0e;
-  border-radius: 20px;
+  border-radius: 12px;
   padding: clamp(1.75rem, 4cqw, 3rem);
+  padding-top: calc(32px * var(--type));
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1.25rem, 3cqw, 2rem);
+  gap: calc(24px * var(--type));
   overflow: hidden;
 }
 
 .cs-panels figcaption {
-  font-size: 0.8125rem;
+  /* Framer: 15/21 semibold, uppercase, no tracking */
+  font-size: calc(0.9375rem * var(--type));
   font-weight: 600;
-  letter-spacing: 0.06em;
+  line-height: 1.4;
+  letter-spacing: normal;
   text-transform: uppercase;
 }
 
@@ -215,6 +332,7 @@
 
 .cs-panels .panel-dark {
   background: #0e0e0e;
+  border: 1px solid #303639;
 }
 
 .cs-panels .panel-dark figcaption {
@@ -228,6 +346,29 @@
   height: auto;
 }
 
+/* the live phones (deck slides 92 and 94), both in PhoneFrame's
+   iPhone: the panel 688×610, each phone whole between the caption and the
+   panel's foot */
+/* in the column's width, but tall enough for the phones at Framer's size
+   (~610px on screen at 1710, 77px under the top, 18px over the foot) */
+.cs-panels figure:has(.panel-live) {
+  aspect-ratio: 625 / 705;
+  padding-inline: 0;
+  padding-bottom: 0;
+}
+
+/* sized by HEIGHT so both phones start on the same line under the
+   caption and end on the same line above the panel's bottom edge */
+.cs-panels .panel-live {
+  flex: 1;
+  min-height: 0;
+  /* the whole phone inside the panel, 18px clear of its bottom edge
+     (Framer) */
+  margin-bottom: calc(18px * var(--type));
+  display: flex;
+  justify-content: center;
+}
+
 /* ---- bento of prototype fragments ------------------------ */
 /* two INDEPENDENT column stacks so every card sizes to its own content
    (no grid row-height stretching that blows small cards up). */
@@ -235,25 +376,32 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: start;
-  gap: clamp(1rem, 2cqw, 1.5rem);
-  padding-block: clamp(1.5rem, 4cqw, 3rem);
+  /* Framer: 16px between cards */
+  gap: calc(16px * var(--type));
 }
 
 .cs-bento .col {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(1rem, 2cqw, 1.5rem);
+  gap: calc(16px * var(--type));
 }
 
 .cs-bento .col > * {
   width: 100%;
 }
 
+/* the before/after cards' shell: 12px corners, the 1px #303639 rim on
+   the dark ones (their #0c0c0c ground stays: the clips' margins are
+   baked in that colour) */
 .cs-bento .light,
 .cs-bento .dark {
-  border-radius: 20px;
+  border-radius: 12px;
   overflow: hidden;
+}
+
+.cs-bento .dark {
+  border: 1px solid #303639;
 }
 
 /* dark cards: a near-black band; the clip FLOATS centred at a fraction
@@ -378,29 +526,187 @@
   object-fit: contain;
 }
 
+/* Fractional's first bento row (Framer): the phone card on the left, the
+   banner and the pill stacked on the right, the pair stretched to the
+   phone card's height; white cards (the clips' own ground), the clips at
+   Framer's share of the card */
+.cs-bento .bento-row {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: calc(16px * var(--type));
+  align-items: stretch;
+}
+
+.cs-bento .bento-row .col > * {
+  flex: 1;
+}
+
+/* the panels' colours: #f4f4f2 light, #0e0e0e dark */
+.cs-bento .bento-row .light {
+  background: #f4f4f2;
+  padding: 0;
+}
+
+/* phone: 53% of the card, its top 29% down, cut by the card's foot */
+.cs-bento .phone--foot {
+  aspect-ratio: 684 / 462;
+}
+
+.cs-bento .phone--foot > video {
+  inset: auto 0 0;
+  margin: 0 auto;
+  width: 53.2%;
+  max-width: none;
+  max-height: none;
+  height: auto;
+}
+
+/* second row (Framer): the placing phone 59.5% of its card, its top 34%
+   down; the chart and the stepper share the column 323 : 217 */
+.cs-bento .bento-row--dark .col > * {
+  aspect-ratio: auto;
+  min-height: 0;
+}
+
+.cs-bento .bento-row--dark .dark {
+  background: #0e0e0e;
+}
+
+/* these clips are cut on #000: lighten lets the card's #0e0e0e through
+   their black ground, so no box shows, while the UI on it is untouched */
+.cs-bento .bento-row--dark .dark > video {
+  mix-blend-mode: lighten;
+}
+
+/* the same row height as the light row above, and the same even split
+   as the banner over the pill */
+.cs-bento .bento-row--dark .clip--chart,
+.cs-bento .bento-row--dark .clip--stepper {
+  flex: 1;
+}
+
+/* the beam-ring button, centred in its card, as tall as the Limit order
+   pill in the row above (~53px on screen) */
+.cs-bento .clip--beam .bd-stage {
+  position: absolute;
+  inset: 0;
+  min-height: 0;
+  padding: 0;
+  zoom: 1.12;
+}
+
+.cs-bento .clip--chart > video {
+  max-width: 54%;
+  max-height: 78%;
+}
+
+/* the stepper at the pill's height too: the clip's baked margin runs off
+   the card (clipped), the stepper itself stays centred */
+.cs-bento .clip--stepper > video {
+  max-width: 86%;
+  max-height: none;
+}
+
+.cs-bento .phone--placing {
+  aspect-ratio: 684 / 462;
+}
+
+/* the clip stops short of the phone's foot, so it stands on the card's
+   bottom edge, sized so its top sits ~20% down like the order flow's */
+.cs-bento .phone--placing > video {
+  width: 63.5%;
+}
+
+.cs-bento .clip--banner > video {
+  width: 75%;
+  max-width: none;
+  max-height: none;
+}
+
+.cs-bento .clip--pill > video {
+  width: 40%;
+  max-width: none;
+  max-height: none;
+}
+
+/* the homepage's live Fractional pieces (FracFlowPhone, FracBanner,
+   FracPill) filling their cards */
+.cs-bento .live-card {
+  position: relative;
+}
+
+.cs-bento .live-card :is(.frac-fit, .frac-flow-fit) {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cs-bento .live-card .frac-fit {
+  font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.cs-bento .live-card .frac-flow-fit .fof-stage {
+  min-height: 0;
+  padding: 0;
+  background: none !important;
+  display: block;
+}
+
 /* ---- before / after --------------------------------------- */
+/* Framer's before/after cards: 538×525, 12px corners, a 1px #303639
+   rim, #060e0f behind the old UI and #030205 behind the new, 10px apart.
+   Sizes in on-screen px × --type (undoes the desktop zoom); the media is
+   placed in % of the card so it holds at any width. */
 .cs-ba {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(1rem, 2cqw, 1.5rem);
-  padding-block: clamp(1.5rem, 4cqw, 3rem);
+  gap: calc(10px * var(--type));
+}
+
+/* no rules through the before/after run (Framer has none): the pairs sit
+   34px apart and the closing clip 70px under them */
+.cs-ba + .cs-ba::before,
+.cs-ba + .cs-media--cap::before {
+  display: none;
+}
+
+.cs .cs-ba + .cs-ba {
+  margin-top: calc(34px * var(--type));
+}
+
+.cs .cs-ba + .cs-media--cap {
+  margin-top: calc(70px * var(--type));
+  padding-top: 0;
 }
 
 .cs-ba figure {
+  position: relative;
   margin: 0;
-  background: #0e0e0e;
-  border-radius: 20px;
-  padding: clamp(1.75rem, 4.5cqw, 3.25rem);
+  aspect-ratio: 538 / 525;
+  border: 1px solid #303639;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #060e0f;
+  /* the caption 32px from the top, the media 20px under it */
+  padding-top: calc(32px * var(--type));
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1rem, 2.5cqw, 1.75rem);
+  gap: calc(20px * var(--type));
+}
+
+.cs-ba figure.is-after {
+  background: #030205;
 }
 
 .cs-ba figcaption {
-  font-size: 0.875rem;
+  /* Framer: 15/21 semibold, uppercase, no tracking */
+  font-size: calc(0.9375rem * var(--type));
   font-weight: 600;
-  letter-spacing: 0.05em;
+  line-height: 1.4;
+  letter-spacing: normal;
   text-transform: uppercase;
 }
 
@@ -408,24 +714,44 @@
   color: var(--w-ink);
 }
 
-.cs-ba .is-after figcaption {
-  color: var(--w-accent);
-}
-
 .cs-ba img,
 .cs-ba video {
   display: block;
-  width: 100%;
   height: auto;
-  border-radius: 8px;
+  max-width: none;
 }
 
-/* the order-entry pair: a small old widget vs a tall new flow — cap
-   their height so the cards stay balanced */
-.cs-ba:not(.cs-ba--wide) figure > :is(img, video) {
-  max-height: 460px;
-  width: auto;
-  max-width: 100%;
+/* the order-entry pair: the old widget at 65% of the card, the new flow
+   at 63%, both centred under the caption */
+.cs-ba:not(.cs-ba--wide) .is-before > img {
+  width: 65.4%;
+}
+
+.cs-ba:not(.cs-ba--wide) .is-after > :is(video, .ba-live) {
+  width: 62.6%;
+}
+
+/* the desktop pair: no captions; each screen stands on the card's bottom
+   edge and runs off the outer side — the old one 120% wide, 7.4% in from
+   the right, the new one 137% wide, 7.4% in from the left */
+.cs-ba--wide figure > img {
+  position: absolute;
+  bottom: 0;
+  /* Framer's boxes are 77.5% of the card tall, the shot cropped to fill */
+  height: 77.5%;
+  object-fit: cover;
+}
+
+.cs-ba--wide .is-before > img {
+  right: 7.43%;
+  width: 120.3%;
+  /* keep the right-hand side of the old screen (the order panels) */
+  object-position: 100% 50%;
+}
+
+.cs-ba--wide .is-after > img {
+  left: 7.43%;
+  width: 137%;
 }
 
 /* ---- secondary gallery ------------------------------------ */
