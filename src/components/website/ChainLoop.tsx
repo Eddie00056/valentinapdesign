@@ -229,6 +229,13 @@ export function ChainLoop() {
     const style = d.createElement("style");
     style.textContent = CSS + POINTER_CSS;
     d.head.append(style);
+    /* No focus inside a copy. The confirmation focuses its first button on
+       open and hands focus back on close, and focusing anything inside a
+       frame makes the browser scroll the PAGE to bring it into view — the
+       homepage jumped every time the toast came up, and the page lost the
+       keyboard. The run clicks; it never needs focus. */
+    const fw = f.contentWindow as (Window & typeof globalThis) | null;
+    if (fw) fw.HTMLElement.prototype.focus = function () {};
 
     const timers: number[] = [];
     timersOf.current.set(key, timers);
