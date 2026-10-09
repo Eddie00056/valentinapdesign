@@ -16,7 +16,7 @@ const FILL = 0.95;
  * its slot. Look-only: the
  * card it sits in is the project link.
  */
-export function HoldingsLoop() {
+export function HoldingsLoop({ fill = FILL }: { fill?: number } = {}) {
   const ref = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
 
@@ -25,12 +25,12 @@ export function HoldingsLoop() {
     if (!el) return;
     const ro = new ResizeObserver(([e]) =>
       setScale(
-        Math.min(FILL * e.contentRect.height, FILL * e.contentRect.width) / CARD,
+        Math.min(fill * e.contentRect.height, fill * e.contentRect.width) / CARD,
       ),
     );
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [fill]);
 
   return (
     <div ref={ref} className="holdings-fit" aria-hidden="true" inert>

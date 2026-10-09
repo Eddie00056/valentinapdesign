@@ -39,6 +39,16 @@ const canonical = new URL(
       href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,500;9..40,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
       rel="stylesheet"
     />
+    <!-- the owner's links: hidden for visitors. ?me turns them on in this
+         browser (remembered), ?me=off turns them off again. Before first
+         paint, so they never flash in or out. -->
+    <script is:inline>
+      try {
+        var q = new URLSearchParams(location.search).get("me");
+        if (q !== null) localStorage.setItem("vp-owner", q === "off" ? "" : "1");
+        if (localStorage.getItem("vp-owner")) document.documentElement.classList.add("is-owner");
+      } catch (e) {}
+    </script>
     <!-- section reveals (reveal.ts): hide the parts before first paint, and
          give them back if the module never arrives -->
     <script is:inline>
@@ -126,7 +136,7 @@ const canonical = new URL(
     --w-ink-faint: #565656;
     --w-line: #1e1e1e;
     /* section dividers — a step brighter than --w-line so they read on the black */
-    --w-rule: #2e2e2e;
+    --w-rule: #222222;
     --w-accent: #00ff9d;
     --w-cream: #fffced;
 

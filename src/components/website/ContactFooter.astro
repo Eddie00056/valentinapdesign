@@ -49,23 +49,26 @@
     text-wrap: balance;
   }
 
+  /* Framer, on screen (÷ the desktop zoom): 15px under the heading, the
+     items 18px white, 38px from one to the next with the dot centred */
   .contact-line {
-    /* Framer: 16px under the heading */
-    margin: 16px 0 0;
+    margin: calc(15px / var(--zoom)) 0 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.6rem;
-    font-size: 1rem;
-    color: var(--w-ink-soft);
+    align-items: baseline;
+    gap: calc(14.5px / var(--zoom));
+    font-size: calc(18px / var(--zoom));
+    line-height: 1.2;
+    color: var(--w-ink);
   }
 
   .contact-line a {
-    color: var(--w-ink-soft);
+    color: var(--w-ink);
     transition: color 0.18s ease;
   }
 
   .contact-line a:hover {
-    color: var(--w-ink);
+    color: var(--w-ink-soft);
   }
 
   .contact-line .u {

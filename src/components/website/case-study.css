@@ -39,7 +39,7 @@
 }
 
 .cs-media.cs-media--hero {
-  margin-top: clamp(2rem, 1rem + 4cqw, 4rem);
+  margin-top: calc(40px * var(--type));
 }
 
 /* The hero clip's inset is the page's column: every section of a case
@@ -71,12 +71,81 @@
   max-width: min(100%, 960px);
 }
 
+/* the MacBook hero: macbook.png (2170 × 1430) has its screen cut out at
+   x 221–1949, y 157–1273; the window (bar + workspace) fills that opening
+   under the frame */
+.cs-laptop {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2170 / 1430;
+  /* the PNG carries 128px of empty space above the lid and 14 below the
+     feet (of 2170 wide): take them back so the hero's own spacing is the
+     gap to the title (percent margins resolve against the width) */
+  margin-top: calc(-128 / 2170 * 100%);
+  margin-bottom: calc(-14 / 2170 * 100%);
+}
+
+.cs-laptop > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  pointer-events: none;
+}
+
+.cs-laptop-screen {
+  position: absolute;
+  left: 10.184%;
+  top: 10.979%;
+  width: 79.631%;
+  height: 78.042%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #222225;
+}
+
+/* a browser window's title bar: the three traffic lights on #222225 */
+.cs-browser-bar {
+  flex: none;
+  height: 4%;
+  display: flex;
+  align-items: center;
+  gap: 0.55%;
+  padding-left: 1.4%;
+  border-bottom: 1px solid #2c2c30;
+}
+
+.cs-browser-bar i {
+  width: 0.8%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ec6a5e;
+}
+
+.cs-browser-bar i:nth-child(2) {
+  background: #f4bf4f;
+}
+
+.cs-browser-bar i:nth-child(3) {
+  background: #61c554;
+}
+
+/* the page in the window: the GlobalShell empty state (rail on the left,
+   dotted canvas), fitted to its height from the left so the rail shows */
+.cs-browser-view {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #070d0f url("/website/case/questrade/shell-empty.webp") left center / auto 100% no-repeat;
+}
+
 /* the chain-to-order loop (ChainLoop) as a case study's hero: the full
-   column, in the before/after cards' shell — near-black, a 1px #303639
+   column, in the before/after cards' shell — near-black, the solid card
    rim, 12px corners */
 .cs-loop {
   width: 100%;
-  border: 1px solid #303639;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -86,6 +155,8 @@
    running the full width of the window while the section itself keeps
    the 74% column: drawn overlong and clipped by .cs */
 .cs {
+  /* the page ends on its last section, with room under it */
+  padding-bottom: calc(120px * var(--type));
   overflow-x: clip;
   /* the shared contact footer's rule runs to the window edge here too */
   --rule-bleed: 100vw;
@@ -332,7 +403,6 @@
 
 .cs-panels .panel-dark {
   background: #0e0e0e;
-  border: 1px solid #303639;
 }
 
 .cs-panels .panel-dark figcaption {
@@ -391,7 +461,7 @@
   width: 100%;
 }
 
-/* the before/after cards' shell: 12px corners, the 1px #303639 rim on
+/* the before/after cards' shell: 12px corners, the solid card rim on
    the dark ones (their #0c0c0c ground stays: the clips' margins are
    baked in that colour) */
 .cs-bento .light,
@@ -401,7 +471,6 @@
 }
 
 .cs-bento .dark {
-  border: 1px solid #303639;
 }
 
 /* dark cards: a near-black band; the clip FLOATS centred at a fraction
@@ -411,7 +480,8 @@
    Absolute-positioned so the clip can never stretch the card. */
 .cs-bento .dark {
   position: relative;
-  background: #0c0c0c;
+  /* the middle of the clips' own grounds (#0e–#10) */
+  background: #0f0f0f;
   aspect-ratio: 5 / 2;
   overflow: hidden;
 }
@@ -428,6 +498,13 @@
   object-position: center;
 }
 
+.cs-bento > .col .dark > video {
+  /* the clips' grounds render a shade darker than the card (#0b–#0e on
+     #0f): lighten lets the card through them, so no box shows, and
+     leaves the UI (all lighter than the card) untouched */
+  mix-blend-mode: lighten;
+}
+
 /* order ticket — 3 rows */
 .cs-bento .fit-wide {
   aspect-ratio: 5 / 2;
@@ -441,9 +518,26 @@
 .cs-bento .fit-price {
   aspect-ratio: 16 / 5;
 }
-.cs-bento .dark.fit-price > video {
-  max-width: 38%;
-  max-height: 62%;
+/* the ticker without its logo (as on the homepage card): the clip, 3840
+   wide, has the icon in x 190–525 and the text in 673–3571; a window over
+   x 600–3644 keeps the text, at the size the whole clip had at 38% */
+.cs-bento .fit-price .hood-crop {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 30.1%;
+  aspect-ratio: 3044 / 1296;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  mix-blend-mode: lighten;
+}
+
+.cs-bento .fit-price .hood-crop video {
+  display: block;
+  width: 126.15%;
+  height: 100%;
+  margin-left: -19.71%;
+  max-width: none;
 }
 
 /* chart */
@@ -471,9 +565,16 @@
 .cs-bento .fit-square {
   aspect-ratio: 4 / 3;
 }
-.cs-bento .dark.fit-square > video {
-  max-width: 74%;
-  max-height: 82%;
+/* deck slide 79's original quote page: the phone (cut out of its white
+   ground) big and cut by the card's foot, as the Fractional phones are */
+.cs-bento .dark.fit-square > img {
+  position: absolute;
+  left: 50%;
+  /* the image's foot is the cut: it stands on the card's bottom edge */
+  bottom: 0;
+  width: 62%;
+  height: auto;
+  transform: translateX(-50%);
 }
 
 /* the bell — a tiny icon in a wide shallow band (Framer). The clip is
@@ -524,6 +625,95 @@
   max-width: min(58%, 320px);
   max-height: 88%;
   object-fit: contain;
+}
+
+/* EdgeMobile: the two column stacks end level (the shorter one's last card
+   takes up the slack), then the closing pair, two cards of one size */
+.cs-bento--cols {
+  align-items: stretch;
+}
+
+.cs-bento--cols > .col > :last-child {
+  flex: 1 0 auto;
+}
+
+/* as tall as the quote card above, so the two phones show the same */
+.cs-bento .bento-pair > * {
+  aspect-ratio: 625 / 524;
+}
+
+.cs-bento .bento-pair > .dark > video {
+  mix-blend-mode: lighten;
+}
+
+/* a clip's screen in the quote page's phone (phone-bezel.webp is that
+   phone with its screen cut out). The phone matches the quote card's: 62%
+   of the card, standing on its foot. The opening is x 52–1270, y 41 of the
+   1321×1400 frame; the placing clip's own screen is x 462–2422, y 132 of
+   2816 — so the clip is drawn at 2816/1960 of the opening and shifted
+   onto it. Lighten lets the card colour through the clip's black. */
+.cs-bento .bento-pair .phone-card {
+  position: relative;
+}
+
+.cs-bento .bezel-phone {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 62%;
+  aspect-ratio: 1321 / 1400;
+  transform: translateX(-50%);
+}
+
+.cs-bento .bezel-phone > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.cs-bento .bezel-screen {
+  position: absolute;
+  left: 3.936%;
+  width: 92.203%;
+  top: 2.929%;
+  bottom: 0;
+  overflow: hidden;
+  background: #0f0f0f;
+}
+
+.cs-bento .bezel-screen > video {
+  display: block;
+  width: 143.673%;
+  max-width: none;
+  margin-left: -23.571%;
+  margin-top: -6.735%;
+  mix-blend-mode: lighten;
+}
+
+/* the holdings magnifier (HoldingsLoop) as on the homepage card: no card
+   inside the card, the piece's ground and its lens's lit copy both on the
+   card's colour (they must match for the lens to read as a window) */
+.cs-bento .holdings-fit {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.cs-bento .holdings-fit .he-root {
+  min-height: 0;
+  padding: 0;
+  background: none;
+}
+
+.cs-bento .holdings-fit :is(.he-card, .he-glass) {
+  background: #0f0f0f;
+}
+
+.cs-bento .holdings-fit :is(.he-card, .he-logo)::after {
+  display: none;
 }
 
 /* Fractional's first bento row (Framer): the phone card on the left, the
@@ -655,7 +845,7 @@
 }
 
 /* ---- before / after --------------------------------------- */
-/* Framer's before/after cards: 538×525, 12px corners, a 1px #303639
+/* Framer's before/after cards: 538×525, 12px corners, the solid card
    rim, #060e0f behind the old UI and #030205 behind the new, 10px apart.
    Sizes in on-screen px × --type (undoes the desktop zoom); the media is
    placed in % of the card so it holds at any width. */
@@ -685,7 +875,6 @@
   position: relative;
   margin: 0;
   aspect-ratio: 538 / 525;
-  border: 1px solid #303639;
   border-radius: 12px;
   overflow: hidden;
   background: #060e0f;
@@ -797,4 +986,34 @@
   .cs-bento {
     grid-template-columns: 1fr;
   }
+}
+
+/* ---- card rim ---------------------------------------------------- */
+/* every dark card wears the homepage cards' rim (website.astro): a solid
+   1px hairline, drawn with the padding-box mask so it sits on the card's
+   edge without a border */
+.cs-loop,
+.cs-panels .panel-dark,
+.cs-bento .dark,
+.cs-ba figure {
+  position: relative;
+}
+
+.cs-loop::after,
+.cs-panels .panel-dark::after,
+.cs-bento .dark::after,
+.cs-ba figure::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }

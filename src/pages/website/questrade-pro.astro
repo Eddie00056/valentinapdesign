@@ -1,7 +1,6 @@
 ---
 import Website from "../../layouts/Website.astro";
 import SiteHeader from "../../components/website/SiteHeader.astro";
-import ContactFooter from "../../components/website/ContactFooter.astro";
 import { LiveFit } from "../../components/website/LiveFit";
 import { ChainLoop } from "../../components/website/ChainLoop";
 import "../../components/website/case-study.css";
@@ -28,9 +27,16 @@ const BUILDER_CSS =
     </section>
 
     <div class="cs-media cs-media--hero w-wrap" data-reveal>
-      <!-- deck slide 51: the chain to its ticket, playing itself on a loop -->
-      <div class="cs-loop">
-        <ChainLoop client:visible ground="#030205" />
+      <!-- deck slide 51's chain-to-order workspace, side panel and all,
+           playing itself on the screen of a MacBook -->
+      <div class="cs-laptop">
+        <div class="cs-laptop-screen">
+          <div class="cs-browser-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="cs-browser-view">
+            <ChainLoop client:visible mode="screen" ground="transparent" />
+          </div>
+        </div>
+        <img src={`${V}/macbook.png`} alt="" />
       </div>
     </div>
 
@@ -110,7 +116,6 @@ const BUILDER_CSS =
       </figure>
     </section>
 
-    <ContactFooter />
   </main>
 
   <script>

@@ -2,6 +2,7 @@
 import Website from "../layouts/Website.astro";
 import { caseStudies } from "../data/site";
 import { HoldingsLoop } from "../components/website/HoldingsLoop";
+import { DotField } from "../components/website/DotField";
 import { FracBanner, FracPill } from "../components/website/FracBanner";
 import { ChainLoop } from "../components/website/ChainLoop";
 import { FracFlowPhone } from "../components/website/FracFlowPhone";
@@ -63,6 +64,16 @@ const quotes = [
 
   <main>
     <div class="hero-screen">
+      <!-- the GlobalShell canvas, live: its ground, and its dot grid
+           reacting to the cursor -->
+      <div class="hero-field" aria-hidden="true">
+        <DotField
+          client:idle
+          dotColor={[40, 47, 49]}
+          lineOpacity={0.12}
+          falloff={{ cx: 0.45, cy: 0.42, rx: 0.62, ry: 0.62, inner: 0.35 }}
+        />
+      </div>
       <section class="w-wrap bay hero">
         <p class="statement hero-statement">
           {heroWords.map((w, i) => (
@@ -73,20 +84,6 @@ const quotes = [
     </div>
 
     <section id="projects" class="w-wrap projects">
-      <!-- Questrade Pro -->
-      <a class="project" data-reveal href={`/website/${qp.slug}`}>
-        <div class="project-copy">
-          <div class="project-titles">
-            <p class="kicker" data-r>{qp.title}</p>
-            <h2 class="project-title" data-r>{qp.summary}</h2>
-          </div>
-          <span class="see" data-r>See project →</span>
-        </div>
-        <div class="media media--single" data-r>
-          <ChainLoop client:visible />
-        </div>
-      </a>
-
       <!-- Fractional Shares -->
       <a class="project" data-reveal href={`/website/${fs.slug}`}>
         <div class="project-copy">
@@ -137,6 +134,20 @@ const quotes = [
               <video src="/website/video/edge-order.mp4" autoplay loop muted playsinline></video>
             </div>
           </div>
+        </div>
+      </a>
+
+      <!-- Questrade Pro -->
+      <a class="project" data-reveal href={`/website/${qp.slug}`}>
+        <div class="project-copy">
+          <div class="project-titles">
+            <p class="kicker" data-r>{qp.title}</p>
+            <h2 class="project-title" data-r>{qp.summary}</h2>
+          </div>
+          <span class="see" data-r>See project →</span>
+        </div>
+        <div class="media media--single" data-r>
+          <ChainLoop client:visible />
         </div>
       </a>
     </section>
@@ -216,10 +227,29 @@ const quotes = [
 
   /* the hero fills the first screen under the header, line centred */
   .hero-screen {
+    position: relative;
+    isolation: isolate;
     min-height: calc(100svh / var(--zoom) - 76px);
     display: flex;
     flex-direction: column;
     justify-content: center;
+  }
+
+  /* the shell's ground (#070f11, lighter toward the edges) under the dot
+     field, both fading into the page at the top and bottom */
+  /* the dots dissolve on their own (DotField's falloff); behind them only
+     the faintest breath of the shell's tint, gone well before any edge */
+  .hero-field {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      ellipse 55% 50% at 45% 42%,
+      rgba(10, 20, 23, 0.55) 0%,
+      rgba(10, 20, 23, 0.25) 45%,
+      rgba(10, 20, 23, 0.08) 75%,
+      transparent 100%
+    );
   }
 
   /* one padding between every divider and its section: the project rows
@@ -237,9 +267,11 @@ const quotes = [
     padding-block: clamp(3.5rem, 4rem + 6cqw, 8.5rem);
   }
 
+  /* more room below than above, so the line sits a little above the
+     screen's middle */
   .hero {
-    padding-top: clamp(4rem, 3rem + 8cqw, 9rem);
-    padding-bottom: clamp(4rem, 3rem + 8cqw, 9rem);
+    padding-top: clamp(2rem, 1rem + 5cqw, 5rem);
+    padding-bottom: clamp(6rem, 5rem + 11cqw, 13rem);
   }
 
 
@@ -271,9 +303,9 @@ const quotes = [
 
   @media (min-width: 700px) {
     .hero .statement {
-      /* 15% narrower than the old 46ch at 40px (≈962px), held in rem so
-         the smaller hero type keeps the same box — three lines */
-      max-width: 60rem;
+      /* three lines, "limits," starting the last: anything from ~840 to
+         ~920px breaks there; 55rem sits in the middle of that range */
+      max-width: 55rem;
     }
   }
 
@@ -373,7 +405,7 @@ const quotes = [
      old video's frame */
   .media--single {
     /* matches GROUND in ChainLoop.tsx; the loop sets the card's shape */
-    background: #17181a;
+    background: #0f0f0f;
     overflow: hidden;
   }
 
@@ -489,7 +521,8 @@ const quotes = [
      continuous dark surface with the UI floating in it. No cropping. */
   .media--edge .col > div {
     position: relative;
-    background: #0c0c0c;
+    /* the middle of the clips' own grounds (#0e–#10) */
+    background: #0f0f0f;
     border-radius: 20px;
     overflow: hidden;
   }
@@ -511,12 +544,7 @@ const quotes = [
     inset: 0;
     border-radius: inherit;
     padding: 1px;
-    background: linear-gradient(
-      66deg,
-      rgba(255, 255, 255, 0.18) 0%,
-      rgba(255, 255, 255, 0.03) 42%,
-      rgba(255, 255, 255, 0.09) 100%
-    );
+    background: rgba(255, 255, 255, 0.08);
     -webkit-mask:
       linear-gradient(#fff 0 0) content-box,
       linear-gradient(#fff 0 0);
@@ -529,6 +557,13 @@ const quotes = [
      card — the card's aspect-ratio alone sets its size. The clip floats
      at its natural size, capped well below the card edges, so it reads
      as content-in-a-frame, not a zoomed-in fill. */
+  .media--edge .col > div > video {
+    /* the clips' grounds render a shade darker than the card (#0b–#0e on
+       #0f): lighten lets the card through them, so no box shows, and
+       leaves the UI (all lighter than the card) untouched */
+    mix-blend-mode: lighten;
+  }
+
   .media--edge .col > div > video {
     position: absolute;
     inset: 0;
@@ -554,6 +589,8 @@ const quotes = [
      centred on the text — cuts the icon. 29% of the card: a quarter under
      its old size, in scale with the bell and the ticket */
   .media--edge .fit-price .hood-crop {
+    /* the crop is its own layer (transform), so it blends as a whole */
+    mix-blend-mode: lighten;
     position: absolute;
     left: 50%;
     top: 50%;
@@ -594,7 +631,7 @@ const quotes = [
      lens to read as a window), and its hairline goes */
   :global(.holdings-fit .he-card),
   :global(.holdings-fit .he-glass) {
-    background: #0c0c0c;
+    background: #0f0f0f;
   }
 
   :global(.holdings-fit .he-card::after),

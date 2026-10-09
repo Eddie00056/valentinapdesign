@@ -2,7 +2,7 @@
 import Website from "../../layouts/Website.astro";
 import { EdgeChart } from "../../components/website/EdgeChart";
 import SiteHeader from "../../components/website/SiteHeader.astro";
-import ContactFooter from "../../components/website/ContactFooter.astro";
+import { HoldingsLoop } from "../../components/website/HoldingsLoop";
 import "../../components/website/case-study.css";
 
 const V = "/website/case/edge";
@@ -73,18 +73,31 @@ const P = "/website/video"; // shared prototype clips from the homepage
     <section class="cs-bento cs-bento--cols w-wrap" data-reveal>
       <div class="col">
         <div class="dark fit-wide"><video src={`${P}/edge-order.mp4`} autoplay loop muted playsinline></video></div>
-        <div class="dark fit-price"><video src={`${P}/edge-hood.mp4`} autoplay loop muted playsinline></video></div>
-        <div class="dark fit-panel"><video src={`${V}/chain.mp4`} autoplay loop muted playsinline preload="metadata"></video></div>
-        <div class="dark fit-fill"><EdgeChart client:visible /></div>
+        <div class="dark fit-price"><div class="hood-crop"><video src={`${P}/edge-hood.mp4`} autoplay loop muted playsinline></video></div></div>
+        <!-- the homepage card's holdings magnifier, on its loop -->
+        <div class="dark fit-panel"><HoldingsLoop client:visible fill={1} /></div>
       </div>
       <div class="col">
         <div class="dark fit-bell"><video src={`${P}/edge-bell.mp4`} autoplay loop muted playsinline></video></div>
-        <div class="dark fit-square"><video src={`${V}/alerts.mp4`} autoplay loop muted playsinline></video></div>
-        <div class="dark phone"><video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video></div>
+        <!-- deck slide 79's original quote page -->
+        <div class="dark fit-square"><img src={`${V}/quote-original.webp`} alt="The original EdgeMobile quote page" loading="lazy" /></div>
+      </div>
+      <!-- the closing pair, one size: the order going through on the left,
+           the live chart on the right -->
+      <div class="bento-row bento-pair">
+        <!-- the placing clip's screen, re-framed in the quote page's phone -->
+        <div class="dark phone-card">
+          <div class="bezel-phone">
+            <div class="bezel-screen">
+              <video src={`${V}/placing.mp4`} autoplay loop muted playsinline></video>
+            </div>
+            <img src={`${V}/phone-bezel.webp`} alt="" />
+          </div>
+        </div>
+        <div class="dark fit-fill"><EdgeChart client:visible /></div>
       </div>
     </section>
 
-    <ContactFooter />
   </main>
 
   <script>

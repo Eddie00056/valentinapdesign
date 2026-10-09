@@ -61,6 +61,21 @@
   }
 }
 
+/* the header is the same on every page: it holds still above the rising
+   page — no animation, the new one shown from the first frame, on top */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 2;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
 /* reduced motion: a short dissolve instead of the travel */
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-old(root) {

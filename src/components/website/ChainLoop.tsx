@@ -17,6 +17,9 @@ const SRC = "/work/chain-to-order?static&bare";
 const SCREEN_W = 1440;
 const SCREEN_H = 900;
 
+const px = (n: number) => `${Math.round(n)}px`;
+type Geo = { x: number; y: number; w: number; h: number; css: string };
+
 /* the chain + ticket pair, in screen pixels, with the rail hidden */
 const PAIR = { x: 122, y: 40, w: 877, h: 464 };
 /* the crop hugs the pair; the card takes its shape from it */
@@ -34,12 +37,11 @@ const SHIFT_X = Math.max(0, CANVAS.x - (PAIR.x + PAIR.w / 2 - CROP_W / 2));
 const DROP = Math.max(0, CANVAS.y - (PAIR.y + PAIR.h / 2 - CROP_H / 2));
 const CROP_X = PAIR.x + SHIFT_X + PAIR.w / 2 - CROP_W / 2;
 const CROP_Y = PAIR.y + DROP + PAIR.h / 2 - CROP_H / 2;
-const px = (n: number) => `${Math.round(n)}px`;
 /* the card's ground: a step lighter than the widgets so they stand off it.
    The frame is painted the same so the crop never shows a seam. */
-const GROUND = "#17181a";
+const GROUND = "#0f0f0f";
 
-const CSS = `
+const PAIR_CSS = `
 .wsp-rail { visibility: hidden !important; }
 .wsp, .wsp-stage, .wsp-screen, .wsp-canvas {
   background: none !important; box-shadow: none !important; border: none !important;
@@ -64,6 +66,51 @@ html.is-bare .wshell.wshell { background: #010101 !important; }
   left: ${px(CROP_X)} !important; right: ${px(SCREEN_W - CROP_X - CROP_W)} !important;
   bottom: ${px(SCREEN_H - CROP_Y - CROP_H + 32)} !important;
 }`;
+
+const PAIR_GEO: Geo = { x: CROP_X, y: CROP_Y, w: CROP_W, h: CROP_H, css: PAIR_CSS };
+
+/* "screen": the whole workspace — its left rail and all — as on a laptop
+   display (the Questrade hero shows it inside a MacBook). The crop is the
+   workspace screen (64, 40, 1312 × 820) grown to the MacBook's 1728:1116
+   screen, and the page behind is painted the workspace's own ground so the
+   extra rows read as more of the same screen. Nothing is re-pinned: the
+   confirmation and the toast centre on the window, which is the crop. */
+/* the laptop screen less the browser bar drawn above it (4% of its height) */
+const SCREEN_RATIO = 1728 / (1116 * 0.96);
+/* zoomed in on the widgets (1312 → 1020 wide, ~1.3× larger on the
+   screen). In this layout the pair sits at x 144–1021, y 84–547 of the
+   window: the crop leaves ~7% of its width at the left (the shell's rail
+   is drawn there) and 4px above them, under the browser bar */
+const SCR_W = 1020;
+const SCR_H = SCR_W / SCREEN_RATIO;
+const SCREEN_GEO: Geo = {
+  x: 73,
+  y: 80,
+  w: SCR_W,
+  h: SCR_H,
+  css: `
+.cmt-fab, .cmt-root, .oc-back, astro-dev-toolbar { display: none !important; }
+/* the shell is drawn by the laptop's own background (GlobalShell empty
+   state); the prototype's rail and grounds step aside, widgets only */
+.wsp-rail { visibility: hidden !important; }
+.wsp, .wsp-stage, .wsp-screen, .wsp-canvas {
+  background: none !important; box-shadow: none !important; border: none !important;
+}
+html.is-bare .wshell.wshell { background: #010101 !important; }
+/* the window shows only the crop (x 73–1093, y 80–713 of 1440 × 900):
+   the confirmation centres on it, the toast sits at its foot, centred.
+   (Both are fixed against a container offset 12px right and 6px down of
+   the window, hence 61 / 74 — measured on screen.) */
+.ob-stage .ob-modal-wrap {
+  inset: auto !important;
+  left: 61px !important; width: 1020px !important;
+  top: 74px !important; height: 633px !important;
+}
+.ob-stage .ob-toast-wrap {
+  left: 61px !important; right: 359px !important;
+  bottom: 191px !important;
+}`,
+};
 
 /* The pointer: an arrow drawn inside the frame, so it scales with the
    prototype. `:hover` can't be set from a script, so the pointer marks
@@ -104,7 +151,7 @@ const ARROW = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v15.2l3.
 /* where the pointer waits: the empty corner right of the chain, under the
    ticket. A run starts and ends here, so the crossfade between copies
    doesn't move it. */
-const REST = { x: CROP_X + CROP_W - 110, y: CROP_Y + CROP_H - 90 };
+const restOf = (g: Geo) => ({ x: g.x + g.w - 110, y: g.y + g.h - 90 });
 
 /* when the next copy starts loading (the toast has had its moment) */
 const CYCLE = 9800;
@@ -115,7 +162,8 @@ const FADE = 500;
  * prices it crosses — presses, and the target is clicked. Every wait is a
  * timer in `timers`, so clearing those stops the run where it stands.
  */
-async function play(d: Document, timers: number[]) {
+async function play(d: Document, timers: number[], g: Geo) {
+  const REST = restOf(g);
   const w = d.defaultView;
   if (!w) return;
   const sleep = (ms: number) =>
@@ -200,7 +248,16 @@ type Copy = { key: number; shown: boolean };
 
 /** `ground`: the card's colour, painted behind the frame and in it (the
     homepage card is the charcoal GROUND; the case study's is near-black) */
-export function ChainLoop({ ground = GROUND }: { ground?: string } = {}) {
+export function ChainLoop({
+  ground = GROUND,
+  mode = "pair",
+}: {
+  ground?: string;
+  /** "pair": the chain and ticket cropped close; "screen": the whole
+      workspace, rail included, for a laptop mockup */
+  mode?: "pair" | "screen";
+} = {}) {
+  const geo = mode === "screen" ? SCREEN_GEO : PAIR_GEO;
   const box = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
   /* no copy until hydrated: a frame in the server markup finishes loading
@@ -216,7 +273,7 @@ export function ChainLoop({ ground = GROUND }: { ground?: string } = {}) {
   useLayoutEffect(() => {
     const el = box.current;
     if (!el) return;
-    const ro = new ResizeObserver(([e]) => setScale(e.contentRect.width / CROP_W));
+    const ro = new ResizeObserver(([e]) => setScale(e.contentRect.width / geo.w));
     ro.observe(el);
     const io = new IntersectionObserver(([e]) => (visible.current = e.isIntersecting));
     io.observe(el);
@@ -235,7 +292,7 @@ export function ChainLoop({ ground = GROUND }: { ground?: string } = {}) {
     const style = d.createElement("style");
     style.textContent =
       `html, body, html.is-bare, html.is-bare body { background: ${ground} !important; }` +
-      CSS +
+      geo.css +
       POINTER_CSS;
     d.head.append(style);
     /* No focus inside a copy. The confirmation focuses its first button on
@@ -255,7 +312,7 @@ export function ChainLoop({ ground = GROUND }: { ground?: string } = {}) {
         window.setTimeout(() => setCopies((cs) => cs.filter((c) => c.key >= key)), FADE + 50),
       );
       if (reduce) return;
-      void play(d, timers);
+      void play(d, timers, geo);
       const next = () => {
         /* off screen: hold here rather than load copies nobody sees */
         if (!visible.current) return void timers.push(window.setTimeout(next, 600));
@@ -297,7 +354,7 @@ export function ChainLoop({ ground = GROUND }: { ground?: string } = {}) {
         width: "100%",
         overflow: "hidden",
         background: ground,
-        aspectRatio: `${CROP_W} / ${CROP_H}`,
+        aspectRatio: `${geo.w} / ${geo.h}`,
       }}
     >
       {copies.map((c) => (
@@ -319,7 +376,7 @@ export function ChainLoop({ ground = GROUND }: { ground?: string } = {}) {
             height: SCREEN_H,
             border: 0,
             transformOrigin: "0 0",
-            transform: `scale(${scale}) translate(${-CROP_X}px, ${-CROP_Y}px)`,
+            transform: `scale(${scale}) translate(${-geo.x}px, ${-geo.y}px)`,
             opacity: c.shown && scale ? 1 : 0,
             transition: `opacity ${FADE}ms ease`,
             pointerEvents: "none",
