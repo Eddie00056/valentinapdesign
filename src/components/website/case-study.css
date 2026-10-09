@@ -17,7 +17,7 @@
    under the title at 74% of the window. In the page's own pixels (the
    desktop zoom is 1.25) that's 80 and 64. */
 .cs-hero {
-  padding-top: clamp(2.5rem, 1rem + 5cqw, 5rem);
+  padding-top: calc(48px * var(--type));
   padding-bottom: 0;
 }
 
