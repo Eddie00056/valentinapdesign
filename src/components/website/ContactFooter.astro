@@ -1,8 +1,6 @@
 ---
-// The closing "Currently looking for new roles" block, shared by the /website
-// homepage and every case study. Its rule spans the section's box; a page can
-// run it further out with --rule-bleed (the case studies take it to the
-// window edge, clipped by .cs).
+// The closing "Currently looking for new roles" block. Its rule spans the
+// window, like every divider (--w-rule-line).
 ---
 
 <section id="contact" class="w-wrap contact" data-reveal>
@@ -25,6 +23,7 @@
   /* tucked right under its rule, no cavernous gap under the last line */
   .contact {
     position: relative;
+    overflow-x: clip;
     padding-top: clamp(1.75rem, 1.25rem + 1.4cqw, 2.5rem);
     padding-bottom: clamp(2.5rem, 1.75rem + 2cqw, 3.75rem);
   }
@@ -33,10 +32,11 @@
     content: "";
     position: absolute;
     top: 0;
-    left: calc(-1 * var(--rule-bleed, 0px));
-    right: calc(-1 * var(--rule-bleed, 0px));
+    left: calc(50% - 50vw / var(--zoom));
+    width: calc(100vw / var(--zoom));
+    right: auto;
     height: 1px;
-    background: var(--w-rule);
+    background: var(--w-rule-line);
     pointer-events: none;
   }
 

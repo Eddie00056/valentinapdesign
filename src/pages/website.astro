@@ -16,7 +16,7 @@ const em = bySlug["edgemobile"];
 
 // the hero line, split so each word can be revealed in turn on load
 const heroLine =
-  "Product Designer with 5+ years experience shaping fintech products while focusing on fostering collaboration, pushing limits, and delivering high-impact work.";
+  "Product Designer with over 5 years of experience shaping fintech products while focusing on fostering collaboration, pushing limits, and delivering high-impact work.";
 const heroWords = heroLine.split(" ");
 
 /* the references (#team) are hidden for now; flip to bring them back */
@@ -61,6 +61,23 @@ const quotes = [
       }
     </style>
   </noscript>
+
+  <!-- the homepage always opens at the top — back from a case study too
+       (the browser would restore the old scroll); a #projects link still
+       lands on its section -->
+  <script is:inline>
+    (function () {
+      if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+      var top = function () {
+        if (!location.hash) window.scrollTo(0, 0);
+      };
+      top();
+      // pages restored from the back/forward cache keep their scroll
+      window.addEventListener("pageshow", function (e) {
+        if (e.persisted) top();
+      });
+    })();
+  </script>
 
   <main>
     <div class="hero-screen">
@@ -260,7 +277,8 @@ const quotes = [
   }
 
   #team {
-    border-top: 1px solid var(--w-rule);
+    border-top: 1px solid;
+    border-image: var(--w-rule-line) 1;
   }
 
   .bay {
@@ -332,10 +350,11 @@ const quotes = [
     content: "";
     position: absolute;
     top: 0;
-    left: -100vw;
-    right: -100vw;
+    left: calc(50% - 50vw / var(--zoom));
+    width: calc(100vw / var(--zoom));
+    right: auto;
     height: 1px;
-    background: var(--w-rule);
+    background: var(--w-rule-line);
   }
 
   .project {

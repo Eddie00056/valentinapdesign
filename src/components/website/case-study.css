@@ -158,8 +158,6 @@
   /* the page ends on its last section, with room under it */
   padding-bottom: calc(120px * var(--type));
   overflow-x: clip;
-  /* the shared contact footer's rule runs to the window edge here too */
-  --rule-bleed: 100vw;
 }
 
 /* the footer closes the page (its own padding is the page's end) and
@@ -186,10 +184,10 @@
   content: "";
   position: absolute;
   top: 0;
-  left: -100vw;
-  right: -100vw;
+  left: calc(50% - 50vw / var(--zoom));
+  width: calc(100vw / var(--zoom));
   height: 1px;
-  background: var(--w-rule);
+  background: var(--w-rule-line);
   pointer-events: none;
 }
 

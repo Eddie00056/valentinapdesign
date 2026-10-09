@@ -29,6 +29,16 @@
      reached. */
   const email = "valeapad@gmail.com";
   let hide = 0;
+
+  /* The projects section, just under the header. Measured, not left to the
+     browser: its scroll-padding lands ~100px short under the desktop zoom. */
+  const toProjects = (behavior: ScrollBehavior) => {
+    const target = document.getElementById("projects");
+    const header = document.querySelector("header.nav");
+    if (!target) return;
+    const y = target.getBoundingClientRect().top + window.scrollY - (header?.getBoundingClientRect().bottom ?? 0);
+    window.scrollTo({ top: y, behavior });
+  };
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(email);
@@ -49,16 +59,31 @@
     hide = window.setTimeout(() => toast.classList.remove("is-on"), 2600);
   };
   document.addEventListener("click", (e) => {
-    if ((e.target as Element | null)?.closest(".contact-copy")) copy();
+    const el = e.target as Element | null;
+    if (el?.closest(".contact-copy")) copy();
+    /* Projects while already on the homepage: glide there ourselves — the
+       browser's own jump lands short under the desktop zoom */
+    const proj = el?.closest('a[href="/website#projects"]');
+    const here = location.pathname.replace(/\/$/, "") === "/website";
+    if (proj && here) {
+      e.preventDefault();
+      toProjects("smooth");
+      history.replaceState(null, "", "#projects");
+    }
   });
 
   /* Arriving at /website#projects from another page: the browser jumps
      before the hero has settled, and lands short. Jump again once it has. */
   if (location.hash === "#projects") {
-    const land = () =>
-      document.getElementById("projects")?.scrollIntoView({ behavior: "instant" as ScrollBehavior });
-    if (document.readyState === "complete") setTimeout(land, 50);
-    else window.addEventListener("load", () => setTimeout(land, 50), { once: true });
+    const land = () => toProjects("instant" as ScrollBehavior);
+    /* again a beat later: the page transition and late layout can still
+       move it once */
+    const twice = () => {
+      setTimeout(land, 50);
+      setTimeout(land, 700);
+    };
+    if (document.readyState === "complete") twice();
+    else window.addEventListener("load", twice, { once: true });
   }
 </script>
 

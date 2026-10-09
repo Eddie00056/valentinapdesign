@@ -137,6 +137,14 @@ const canonical = new URL(
     --w-line: #1e1e1e;
     /* section dividers — a step brighter than --w-line so they read on the black */
     --w-rule: #222222;
+    /* the dividers: white fading in from both ends to a soft middle — the
+       Framer stops (0% · 100% · 0%) at a quiet peak, spanning the window */
+    --w-rule-line: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.16) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
     --w-accent: #00ff9d;
     --w-cream: #fffced;
 
