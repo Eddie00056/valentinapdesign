@@ -61,19 +61,15 @@
   }
 }
 
-/* the header is the same on every page: it holds still above the rising
-   page — no animation, the new one shown from the first frame, on top */
-::view-transition-group(site-header) {
-  animation: none;
-  z-index: 2;
-}
-
-::view-transition-old(site-header) {
-  display: none;
-}
-
-::view-transition-new(site-header) {
-  animation: none;
+/* The header is the same on every page and must not move or flicker. It
+   gets no layer of its own (a captured header is drawn as a picture for the
+   800ms — soft under the desktop zoom, then it snaps back sharp): instead
+   the incoming page is cut off under the header line (76px of page), so for
+   the whole wipe the header on screen is the outgoing page's own, which is
+   identical. Only on /website pages (html.site-zoom), the ones that have
+   this header. */
+html.site-zoom::view-transition-new(root) {
+  clip-path: inset(76px 0 0 0);
 }
 
 /* reduced motion: a short dissolve instead of the travel */
