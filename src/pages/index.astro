@@ -1,5 +1,8 @@
 ---
-/* The site's front door is the presentation: the deck fills the window
+/* The site's front door is the presentation — the full deck, with the
+   order entry case study in the Veda direction (theme="mixed": only slides
+   11–53 change; the intro and the fractional shares study are untouched).
+   The deck fills the window
    and starts on slide 1 (or the #slide-N deep link). A hidden side-nav on
    the left edge — a hairline handle until hovered, then a panel slides in
    with the gallery header's own pair of links: the website and the
@@ -12,8 +15,9 @@ import GustoDeck from "../components/website/deck/GustoDeck.astro";
   title="Portfolio presentation"
   description="The portfolio presentation — three active-trader case studies at Questrade, end to end."
 >
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=DM+Mono:wght@400&display=swap" />
   <main class="gp">
-    <GustoDeck solo />
+    <GustoDeck solo theme="mixed" />
     <nav class="gp-nav" aria-label="Site">
       <span class="gp-nav-handle" aria-hidden="true"></span>
       <div class="gp-nav-panel">
