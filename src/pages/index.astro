@@ -1,5 +1,8 @@
 ---
-/* The site's front door is the presentation: the deck fills the window
+/* The site's front door is the presentation — the Veda deck since
+   2026-11-04 (the order entry case study, GustoDeck theme="veda", the
+   same as /presentation-veda; the previous deck is /presentation-classic).
+   The deck fills the window
    and starts on slide 1 (or the #slide-N deep link). A hidden side-nav on
    the left edge — a hairline handle until hovered, then a panel slides in
    with the gallery header's own pair of links: the website and the
@@ -10,10 +13,11 @@ import GustoDeck from "../components/website/deck/GustoDeck.astro";
 
 <Website
   title="Portfolio presentation"
-  description="The portfolio presentation — three active-trader case studies at Questrade, end to end."
+  description="The portfolio presentation — order entry for active traders at Questrade, end to end."
 >
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=DM+Mono:wght@400&display=swap" />
   <main class="gp">
-    <GustoDeck solo />
+    <GustoDeck solo theme="veda" range={[11, 53]} />
     <nav class="gp-nav" aria-label="Site">
       <span class="gp-nav-handle" aria-hidden="true"></span>
       <div class="gp-nav-panel">
@@ -30,14 +34,14 @@ import GustoDeck from "../components/website/deck/GustoDeck.astro";
   body {
     height: 100%;
     overflow: hidden;
-    background: #000;
+    background: #070707;
   }
 </style>
 
 <style>
   .gp {
     min-height: 100vh;
-    background: #000;
+    background: #070707;
   }
   /* The side-nav sits above the deck (its stage is z 1000). At rest it is
      a 2px hairline at the top-left edge, faint; the hot zone around it is
