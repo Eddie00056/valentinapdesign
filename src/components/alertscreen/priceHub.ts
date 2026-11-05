@@ -1,3 +1,5 @@
+import { priceOr } from "../shared/quoteOverride";
+
 // Shared price clock — ported from the .dc.html `pxHub`.
 // One timer advances a mean-reverting walk and pushes {price, prev, dir, n}
 // to every subscriber.
@@ -5,7 +7,8 @@
 /* Exported: anything that wants to beat in time with the quote needs this,
    not a number of its own that happens to match today. */
 export const PX_STEP = 2200;
-export const PX_BASE = 194.29;
+// the presentation can ask for another price (?px=) — see quoteOverride
+export const PX_BASE = priceOr(194.29);
 
 export type PriceState = {
   price: number;
@@ -68,7 +71,7 @@ export function pxHub(): Hub {
 
   const tick = () => {
     const pull = (PX_BASE - h.price) * 0.14;
-    const d = (Math.random() - 0.5) * 0.34 + pull;
+    const d = (Math.random() - 0.5) * 0.34 * (PX_BASE / 194.29) + pull;
     h.prev = h.price;
     h.price = +(h.price + d).toFixed(2);
     h.dir = d >= 0 ? 1 : -1;

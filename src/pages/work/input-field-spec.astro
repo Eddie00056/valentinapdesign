@@ -1,0 +1,18 @@
+---
+/* The input-field spec for the order tickets (unlinked). Built from the
+   real ticket fields — see components/inputspec/InputFieldSpec.tsx. */
+import Bare from "../../layouts/Bare.astro";
+import { InputFieldSpec } from "../../components/inputspec/InputFieldSpec";
+---
+
+<Bare title="Input field — spec" bg="#000">
+  <InputFieldSpec client:load />
+
+  <style is:global>
+    html,
+    body {
+      overflow-y: auto !important;
+      height: auto !important;
+    }
+  </style>
+</Bare>

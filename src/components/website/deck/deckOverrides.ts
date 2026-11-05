@@ -79,6 +79,9 @@ export function applyText(el: HTMLElement, o: Override | undefined) {
 
 export function applyOverrides(stage: HTMLElement, ov: Overrides) {
   stage.querySelectorAll<HTMLElement>(".gd-slide").forEach((slide) => {
+    // a slide rebuilt for a theme (VedaSlide) doesn't take the hand edits
+    // made to the original's elements
+    if (slide.dataset.rebuilt) return;
     keyElements(slide);
     const mine = ov[slide.dataset.n || ""];
     slide.dataset.skip = mine?._slide?.hidden ? "1" : "";

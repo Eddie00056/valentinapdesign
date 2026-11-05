@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { PX_OVERRIDE } from "../shared/quoteOverride";
 import type React from "react";
 import { motion } from "motion/react";
 import { WidgetShell } from "../shared/WidgetShell";
@@ -47,7 +48,11 @@ const TICK_MS = 2200;
 const SPOT_SEQ = [
   174.62, 174.08, 173.31, 172.76, 173.14, 173.85, 174.41, 174.07, 173.52,
   172.94, 173.63, 174.26,
-];
+].map((v) =>
+  /* asked for another price (?px=): the same walk, opening on it and kept
+     inside one strike band (a 2.5 ladder under $100) at 7% of the swing */
+  PX_OVERRIDE == null ? v : +(PX_OVERRIDE + (v - 174.62) * 0.07).toFixed(2),
+);
 
 /** Yesterday's close, set so the demo opens at the familiar +$3.18. */
 const PREV_CLOSE = SPOT_SEQ[0] - UNDERLYING.change;

@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { applyTickToRow, buildChain, EXPIRIES } from "./mock";
+import { PX_OVERRIDE } from "../shared/quoteOverride";
 import { type ChainRow, type OptionSide } from "./types";
 
 /** Strikes step $5 either side of the $175 anchor, and the anchor itself
@@ -7,7 +8,9 @@ import { type ChainRow, type OptionSide } from "./types";
     ladder scrolls, and the overflow is what makes it read as a real chain
     running past both edges rather than a short fixed list. The spot line
     rides between whichever two strikes straddle price. */
-export const STRIKE_STEP = 5;
+// another price asked for (?px=, the presentation's HOOD $87.41): the
+// $2.50 ladder a sub-$100 name lists, anchored on the strike nearest it
+export const STRIKE_STEP = PX_OVERRIDE != null && PX_OVERRIDE < 100 ? 2.5 : 5;
 export const ROWS_PER_SIDE = 11;
 
 /**
@@ -76,4 +79,5 @@ export function useChainState(spot: number, tick: number) {
 }
 
 /** The line sits at $175; the ladder is built off that, not off the tick. */
-export const ANCHOR_SPOT = 175;
+export const ANCHOR_SPOT =
+  PX_OVERRIDE == null ? 175 : Math.round(PX_OVERRIDE / STRIKE_STEP) * STRIKE_STEP;

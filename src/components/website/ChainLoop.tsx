@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { priceOr, withOverride } from "../shared/quoteOverride";
 
 /* The chain-to-order prototype (deck slide 51), playing itself on a loop:
    a drawn pointer crosses the chain (rows and prices light as it passes),
@@ -13,7 +14,15 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
    into the crop with CSS (the deck pins them by measuring; here the crop is
    a known box, so plain numbers do). */
 
-const SRC = "/work/chain-to-order?static&bare";
+/* The page's own ?sym=&px= rides along (the presentation asks for HOOD) */
+const SRC = withOverride("/work/chain-to-order?static&bare");
+/* The two calls the pointer picks: just out of the money, one strike apart
+   — $180 / $185 on PLTR at ~$175; recomputed when the page asks for
+   another price (a $2.50 ladder under $100) */
+const SPOT0 = priceOr(174.62);
+const INC = SPOT0 < 100 ? 2.5 : 5;
+const K1 = Math.round((SPOT0 * 1.035) / INC) * INC;
+const K2 = K1 + INC;
 const SCREEN_W = 1440;
 const SCREEN_H = 900;
 
@@ -216,11 +225,11 @@ async function play(d: Document, timers: number[], g: Geo) {
   };
 
   await sleep(500);
-  const buy = q('[aria-label^="Buy 180 call"]');
+  const buy = q(`[aria-label^="Buy ${K1} call"]`);
   await go(buy, 900);
   await press(buy);
   await sleep(500);
-  const sell = q('[aria-label^="Sell 185 call"]');
+  const sell = q(`[aria-label^="Sell ${K2} call"]`);
   await go(sell, 650);
   await press(sell);
   await sleep(600);
@@ -240,7 +249,7 @@ async function play(d: Document, timers: number[], g: Geo) {
 /* React has wired the chain once its pills carry props — before that a
    click lands on server markup and does nothing */
 function wired(d: Document) {
-  const pill = d.querySelector('[aria-label^="Buy 180 call"]');
+  const pill = d.querySelector(`[aria-label^="Buy ${K1} call"]`);
   return !!pill && Object.keys(pill).some((k) => k.startsWith("__reactProps"));
 }
 

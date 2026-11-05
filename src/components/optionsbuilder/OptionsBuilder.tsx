@@ -8,6 +8,7 @@ import {
 } from "motion/react";
 import type { Transition } from "motion/react";
 import { pxHub, PX_BASE } from "../alertscreen/priceHub";
+import { symbolOr } from "../shared/quoteOverride";
 import type { PriceState } from "../alertscreen/priceHub";
 import { UP, DOWN } from "../alertscreen/chart";
 import { WidgetShell } from "../shared/WidgetShell";
@@ -113,7 +114,7 @@ const total = (x: number) =>
 /** The underlying this ticket is written on when nothing else decides —
     the same one the alert and order-placement screens use, which is why
     it shares their pxHub clock. */
-const SYMBOL = "DASH";
+const SYMBOL = symbolOr("DASH");
 
 /** Shares per option contract. */
 const CONTRACT_MULTIPLIER = 100;
@@ -190,7 +191,8 @@ const signedMoney = (x: number) =>
 /** A strike in a sentence, not in a field: "$195", "$197.50". The ticket
     used to print $195.00 because it sat in a fixed-width chip beside
     another one; on a line of prose the trailing zeros are just noise. */
-const strikeLabel = (s: number) => `$${(+s.toFixed(2)).toString()}`;
+/* Always two decimals, so every leg reads alike: $90.00 beside $92.50 */
+const strikeLabel = (s: number) => `$${s.toFixed(2)}`;
 
 /* ---- what the strategy is worth at expiry ---- */
 
@@ -958,7 +960,8 @@ export function OptionsBuilder({
                       a plain positive number — you do not type a minus to
                       take in a credit. */}
                   <span className="ob-line-label">
-                    Limit price ({debit ? "debit" : "credit"})
+                    Limit price{" "}
+                    <span className="ob-line-side">({debit ? "debit" : "credit"})</span>
                   </span>
 
                   {/* "Mid", not "Mark": the number between the bid and the
@@ -1075,9 +1078,10 @@ export function OptionsBuilder({
               aria-modal="true"
               aria-label="Order confirmation"
               tabIndex={-1}
-              initial={
-                reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 6 }
-              }
+              /* Solid from its first frame: no fade in. Mid-fade the panel
+                 let the ticket behind show through it, and a confirmation
+                 should never read as see-through. Only the small lift. */
+              initial={reduce ? false : { opacity: 1, scale: 0.96, y: 6 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={
                 reduce

@@ -1,0 +1,510 @@
+/* The input-field spec board (/work/input-field-spec). Page layout, the
+   deck's look for the ticket fields, and the held states. */
+
+/* ---- the board ------------------------------------------------------ */
+.ifs {
+  --ifs-ground: #000;
+  --ifs-panel: #141414;
+  --ifs-rule: #262626;
+  --ifs-text: #fefffd;
+  --ifs-muted: #9b9f9f;
+  /* the deck's field look (GustoDeck's injected ticket css, theme new) */
+  --chip: rgba(255, 255, 255, 0.08);
+  --sunk: rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 1760px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 72px 64px 120px;
+  color: var(--ifs-text);
+  font-family: "DM Sans", system-ui, sans-serif;
+  /* .ob-stage centres its card; the board is a page */
+  display: block !important;
+  min-height: 0 !important;
+  background: none !important;
+}
+
+.ifs-head,
+.ifs-sec {
+  width: 100%;
+}
+.ifs-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--ifs-rule);
+}
+.ifs-head h1 {
+  margin: 0;
+  font-size: 40px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.ifs-badges {
+  display: flex;
+  gap: 10px;
+}
+.ifs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border: 1px solid #2f3b36;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #48d597;
+}
+.ifs-badge.is-go {
+  background: rgba(72, 213, 151, 0.12);
+  border-color: transparent;
+}
+.ifs-badge i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #48d597;
+}
+
+.ifs-sec {
+  margin-top: 56px;
+}
+.ifs-sec h2 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.ifs-sec-note {
+  margin: 0 0 14px;
+  font-size: 14px;
+  color: var(--ifs-muted);
+}
+.ifs-panel {
+  margin-top: 14px;
+  padding: 48px;
+  border: 1px solid var(--ifs-rule);
+  border-radius: 12px;
+  background: var(--ifs-panel);
+}
+.ifs h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+}
+.ifs p {
+  margin: 0 0 16px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ifs-muted);
+}
+
+/* ---- the deck's field look ------------------------------------------- */
+.ifs .ob-field {
+  border-radius: 6px;
+  background: var(--chip);
+}
+.ifs .ob-field-k {
+  background: transparent;
+}
+.ifs .ob-stepper-btns svg * {
+  fill: rgba(255, 255, 255, 0.55);
+}
+.ifs .ob-chevron {
+  color: rgba(255, 255, 255, 0.55);
+}
+.ifs .ob-chevron path {
+  display: none;
+}
+.ifs .ob-chevron {
+  background: currentColor;
+  clip-path: polygon(22% 38%, 78% 38%, 50% 68%);
+}
+.ifs .ob-line-sub {
+  font-size: 10px;
+}
+
+/* a field on its own: the ticket's width */
+.ifs-solo,
+.ifs-cell > .ob-field,
+.ifs-cell > label.ob-field,
+.ifs-example .ob-field,
+.ifs-line > .ob-field,
+.ifs-line > label.ob-field,
+.ifs-line > button.ob-field {
+  width: 168px;
+}
+.ifs-solo > * {
+  width: 100%;
+}
+.ifs-line {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  width: 280px;
+}
+
+/* ---- held states --------------------------------------------------- */
+/* hover: the fill is the deck's (it doesn't change), the stepper shows,
+   the select's caret shows */
+.ifs-cell.is-hover .ob-stepper-hit,
+.ifs-cell.is-selected .ob-stepper-hit,
+.ifs-cell.is-error-selected .ob-stepper-hit,
+.ifs-cell.is-prefix-open .ob-stepper-hit {
+  opacity: 1;
+}
+.ifs-cell.is-hover .ob-chevron,
+.ifs-cell.is-selected .ob-chevron,
+.ifs-cell.is-error-selected .ob-chevron {
+  opacity: 1;
+}
+/* selected: the mint rim, closed over the prefix divider */
+.ifs-cell.is-selected .ob-field::after,
+.ifs-cell.is-error .ob-field::after,
+.ifs-cell.is-error-hover .ob-field::after,
+.ifs-cell.is-error-selected .ob-field::after,
+.ifs-cell.is-prefix-open .ob-field-k::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 1px solid #48d597;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.ifs-cell.is-prefix-open .ob-field-k {
+  position: relative;
+  border-radius: 6px 0 0 6px;
+  background: #112d25;
+}
+/* error (proposed): the ticket's own error tokens */
+.ifs-cell.is-error .ob-field,
+.ifs-cell.is-error-hover .ob-field,
+.ifs-cell.is-error-selected .ob-field {
+  background: #2c1921;
+}
+.ifs-cell.is-error .ob-field::after,
+.ifs-cell.is-error-hover .ob-field::after {
+  border-color: rgba(245, 82, 120, 0.55);
+}
+.ifs-cell.is-error-hover .ob-stepper-hit,
+.ifs-cell.is-error-hover .ob-chevron {
+  opacity: 1;
+}
+.ifs-cell.is-error-selected .ob-field::after {
+  border-color: #f55278;
+}
+/* the field's box: the message hangs 6px under it, on its left edge,
+   without lifting the field out of line */
+.ifs-fieldwrap {
+  position: relative;
+  flex: none;
+  width: 168px;
+}
+.ifs-fieldwrap > .ob-field,
+.ifs-fieldwrap > label.ob-field,
+.ifs-fieldwrap > button.ob-field {
+  width: 100%;
+}
+/* the error message: 6px under the field, on its left edge; it hangs
+   below without lifting the field out of line */
+.ifs-err {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  margin: 0 !important;
+  white-space: nowrap;
+  font-size: 11px !important;
+  line-height: 14px !important;
+  color: #ff557d !important;
+}
+/* a field in error: the value goes red */
+.ifs-cell.is-error .ob-field input,
+.ifs-cell.is-error-hover .ob-field input,
+.ifs-cell.is-error-selected .ob-field input,
+.ifs-cell.is-error .ob-field--switch,
+.ifs-cell.is-error-hover .ob-field--switch,
+.ifs-cell.is-error-selected .ob-field--switch,
+.ifs-fieldwrap.is-error .ob-field input,
+.ifs-cell.is-error .ob-stepper-num,
+.ifs-cell.is-error-hover .ob-stepper-num,
+.ifs-cell.is-error-selected .ob-stepper-num,
+.ifs-fieldwrap.is-error .ob-stepper-num {
+  color: #ff557d;
+}
+/* the live example's field in error: fill and rim follow the states */
+.ifs-fieldwrap.is-error .ob-field {
+  position: relative;
+  background: #2c1921;
+}
+.ifs-fieldwrap.is-error .ob-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 1px solid rgba(245, 82, 120, 0.55);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.ifs-fieldwrap.is-error.is-active .ob-field::after {
+  border-color: #f55278;
+}
+/* disabled (proposed): the ticket's own .is-disabled */
+.ifs-cell.is-disabled .ob-field {
+  opacity: 0.45;
+}
+/* read only (proposed): no fill, no stepper — a reading */
+.ifs-cell.is-readonly .ob-field {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+.ifs-cell.is-readonly .ob-stepper-hit,
+.ifs-cell.is-readonly .ob-chevron {
+  display: none;
+}
+
+/* ---- example ------------------------------------------------------- */
+.ifs-example {
+  display: grid;
+  justify-content: center;
+  gap: 14px;
+}
+/* the example's caption ("Mid $19.84 · Ask $19.94", ~125px) needs a wider
+   label column than the board's: 136 + the 16 gap + the 168 field */
+.ifs-example .ifs-line {
+  width: 320px;
+}
+
+/* ---- breakdown ----------------------------------------------------- */
+.ifs-break {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 96px;
+}
+.ifs-break-art {
+  position: relative;
+  padding: 64px 24px;
+  zoom: 1.6;
+}
+.ifs-pin {
+  position: absolute;
+  width: 0;
+  height: 28px;
+  border-left: 1px solid #b07cf0;
+}
+.ifs-pin.is-top {
+  transform: translateY(-100%);
+}
+.ifs-pin i {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 600;
+  color: #b07cf0;
+}
+.ifs-pin.is-top i {
+  top: -14px;
+}
+.ifs-pin.is-bottom i {
+  bottom: -14px;
+}
+.ifs-legend {
+  margin: 0;
+  padding-left: 20px;
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--ifs-text);
+}
+
+/* ---- states grid --------------------------------------------------- */
+/* every column is one field wide (168), spread across the panel, so the
+   seven states fit and every field in a column shares its left edge */
+.ifs-grid {
+  display: grid;
+  grid-template-columns: 112px repeat(var(--cols), 168px);
+  justify-content: space-between;
+  column-gap: 16px;
+  row-gap: 0;
+  overflow-x: auto;
+}
+.ifs-row {
+  display: contents;
+}
+/* the states board needs the panel's width more than its air */
+.ifs-panel:has(> .ifs-grid),
+.ifs-panel:has(> .ifs-lines) {
+  padding: 40px 32px;
+}
+.ifs-colh,
+.ifs-rowh {
+  font-size: 12px;
+  color: var(--ifs-muted);
+}
+.ifs-colh {
+  padding-bottom: 22px;
+}
+.ifs-rowh {
+  display: flex;
+  align-items: center;
+  min-height: 74px;
+}
+/* every field sits on its row's centre line; an error message hangs
+   below it without lifting it out of line with the row */
+/* rows with room for a message under the field */
+.ifs-grid .ifs-cell,
+.ifs-lines .ifs-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 80px;
+}
+.ifs-grid .ifs-rowh {
+  min-height: 80px;
+}
+
+/* ---- in a ticket line ---------------------------------------------- */
+.ifs-lines {
+  display: grid;
+  grid-template-columns: 160px repeat(3, 280px);
+  column-gap: 72px;
+  justify-content: start;
+}
+.ifs-lines .ifs-rowh,
+.ifs-lines .ifs-cell {
+  min-height: 84px;
+}
+.ifs-lines {
+  grid-template-columns: 136px repeat(4, 280px) !important;
+  column-gap: 24px !important;
+}
+
+/* ---- spacing + height ---------------------------------------------- */
+.ifs-dims {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 96px;
+  align-items: center;
+}
+.ifs-dims figure {
+  margin: 0;
+  zoom: 1.6;
+}
+.ifs-measure {
+  position: relative;
+  width: 168px;
+}
+.ifs-h {
+  position: absolute;
+  right: -14px;
+  top: 0;
+  height: 30px;
+  border-left: 1px solid #b07cf0;
+}
+.ifs-h::before,
+.ifs-h::after {
+  content: "";
+  position: absolute;
+  left: -4px;
+  width: 7px;
+  border-top: 1px solid #b07cf0;
+}
+.ifs-h::before { top: 0; }
+.ifs-h::after { bottom: 0; }
+.ifs-dims figcaption {
+  margin-top: 10px;
+  font-size: 9px;
+  color: #b07cf0;
+}
+.ifs-specs {
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+.ifs-specs div {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  font-size: 14px;
+}
+.ifs-specs dt {
+  color: var(--ifs-muted);
+}
+.ifs-specs dd {
+  margin: 0;
+}
+
+/* ---- error rules ---------------------------------------------------- */
+.ifs-rules {
+  display: grid;
+  gap: 48px;
+}
+.ifs-rulelist {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px 48px;
+}
+.ifs-rulelist dt {
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.ifs-rulelist dd {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--ifs-muted);
+}
+/* each example leaves room under its field for the message */
+.ifs-errs .ifs-cell {
+  margin-top: 14px;
+  padding-bottom: 20px;
+}
+
+/* ---- errors / notes ------------------------------------------------ */
+.ifs-errs,
+.ifs-notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 48px;
+}
+.ifs-notes .ifs-cell > .ob-field,
+.ifs-notes .ifs-cell > label.ob-field,
+.ifs-notes .ifs-cell > button.ob-field {
+  width: 168px;
+}
+/* the open prefix's menu, set in place under the field (it's a portal in
+   the ticket) */
+.ifs-menu {
+  position: absolute !important;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 168px;
+}
+/* the four notes' fields on one line: each note's text takes the slack,
+   so a description that wraps longer doesn't push its field down; the
+   open menu hangs below without stretching its column */
+.ifs-notes {
+  padding-bottom: 64px;
+}
+.ifs-notes > div {
+  display: flex;
+  flex-direction: column;
+}
+.ifs-notes > div > p {
+  flex: 1;
+}
+.ifs-notes .ifs-cell {
+  position: relative;
+}
+
+/* the live example: a line showing a message makes room for it, so the
+   message never sits on the next line's field */
+.ifs-example .ifs-line:has(.ifs-err) {
+  padding-bottom: 20px;
+}

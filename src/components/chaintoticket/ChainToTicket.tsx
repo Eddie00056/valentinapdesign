@@ -151,13 +151,18 @@ function useCanvasDrag(enabled: boolean) {
   };
 }
 
+const CLOSED =
+  typeof window !== "undefined" && new URLSearchParams(window.location.search).has("closed");
+
 export function ChainToTicket({ plain = false }: { plain?: boolean }) {
   const reduce = useReducedMotion();
   const chainDrag = useCanvasDrag(!reduce);
   const ticketDrag = useCanvasDrag(!reduce);
   /* The ticket can be dismissed. Picking a price opens a fresh one — a
      chain with nowhere to send a quote would be a dead end. */
-  const [open, setOpen] = useState(!plain);
+  /* `?closed` (the presentation): the chain alone on arrival, the
+     ticket arriving in its reserved column with the first bid or ask. */
+  const [open, setOpen] = useState(!plain && !CLOSED);
   /* `plain` (the option chain's own page): the chain is the piece there,
      so it opens alone and the ticket arrives with the first pick. Once it
      has been, its column stays reserved — the same rule the canvas keeps,

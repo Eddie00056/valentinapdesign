@@ -3,6 +3,7 @@ import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Transition } from "motion/react";
 import { pxHub, PX_BASE } from "../alertscreen/priceHub";
+import { rebase, symbolOr } from "../shared/quoteOverride";
 import type { PriceState } from "../alertscreen/priceHub";
 import { Close, WidgetShell } from "../shared/WidgetShell";
 /* The two unit marks, shared with the mobile order screen — its own
@@ -228,11 +229,11 @@ type Tif = (typeof TIFS)[number];
 
 /** The symbol this ticket is written on — the same one the alert and
     order-placement screens use, which is why it shares their clock. */
-const SYMBOL = "DASH";
+const SYMBOL = symbolOr("DASH");
 
 /** Yesterday's close, shared verbatim with the order-placement screens so
     the change this pill reports matches the one they do. */
-const PREV_CLOSE = 192.91;
+const PREV_CLOSE = rebase(192.91, 194.29);
 
 /** A price, as prices are written on this ticket. */
 const money = (x: number) => `$${Math.abs(x).toFixed(2)}`;
@@ -1215,9 +1216,10 @@ export function StockTicket({
               aria-modal="true"
               aria-label="Order confirmation"
               tabIndex={-1}
-              initial={
-                reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 6 }
-              }
+              /* Solid from its first frame: no fade in. Mid-fade the panel
+                 let the ticket behind show through it, and a confirmation
+                 should never read as see-through. Only the small lift. */
+              initial={reduce ? false : { opacity: 1, scale: 0.96, y: 6 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={
                 reduce

@@ -422,7 +422,18 @@
 /* The divider, and only between legs — not above the first or below the
    last. A rule that boxed the list in would just be the container again,
    drawn thinner. */
-.ob-leg + .ob-leg { border-top: 1px solid var(--rule); }
+/* Drawn inset 6 each side, the length of the rule under the last leg
+   (.ob-params' border-top): a border on the row ran 6 further out at both
+   ends, so the card had two lengths of divider. */
+.ob-leg + .ob-leg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 6px;
+  right: 6px;
+  height: 1px;
+  background: var(--rule);
+}
 
 /* What you are doing, and the contract you are doing it to, as ONE
    sentence — the action first.
@@ -910,6 +921,13 @@ button.ob-chip--strike {
   place-items: center;
   cursor: pointer;
   transition: color 0.14s ease;
+}
+
+/* The X's ink centres on the same vertical as the steppers' arrows and
+   the dropdown chevron below it (it sat 5px to their right). Under
+   .ob-stage, because `.ob-stage button` resets every button's margin. */
+.ob-stage .ob-x {
+  margin-right: 5px;
 }
 
 .ob-x:focus-visible {
@@ -1575,6 +1593,8 @@ button.ob-chip--strike:active,
    with an unrelated rule. */
 .ob-chevron {
   flex: none;
+  /* 1px in, onto the steppers' arrows' vertical (and the legs' X). */
+  margin-right: 1px;
   /* Same hex as .ob-x (--muted) reads visibly dimmer here because this
      sits on the lighter --chip field background instead of --sunk's
      darker row background — a brighter value compensates so the two

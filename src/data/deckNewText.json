@@ -1,0 +1,239 @@
+{
+  "1": {
+    "label": "Portfolio presentation",
+    "text": "Valentina Padure"
+  },
+  "11": {
+    "label": "Case study",
+    "text": "Order entry modernization"
+  },
+  "12": {
+    "text": "Background"
+  },
+  "13": {
+    "label": "Problem",
+    "text": "Questrade was experiencing slower growth among the active traders"
+  },
+  "14": {
+    "label": "Solution",
+    "text": "Launch a new, modernized trading platform"
+  },
+  "18": {
+    "text": "The journey"
+  },
+  "19": {
+    "label": "Existing client sentiment",
+    "text": "“Don’t change order entry. It’s the only feature no one complains about.”"
+  },
+  "20": {
+    "label": "Pivoting the research",
+    "text": "Led foundational research with active traders to evaluate the full trading journey."
+  },
+  "21": {
+    "label": "Problem",
+    "text": "The current order placement is slow, particularly for option traders."
+  },
+  "22": {
+    "label": "Solution",
+    "text": "Make trade submission fast and frictionless."
+  },
+  "24": {
+    "text": "How?"
+  },
+  "25": {
+    "label": "Reducing time to trade",
+    "text": "What data do we show and how?"
+  },
+  "33": {
+    "label": "Reducing time to trade",
+    "text": "How do we make the option trade experience faster?"
+  },
+  "34": {
+    "text": "What are options?"
+  },
+  "36": {
+    "label": "Reducing time to trade",
+    "text": "The journey between finding an option and placing an option trade was broken"
+  },
+  "39": {
+    "label": "The problem",
+    "text": "80% of Questrade’s revenue = the most complex industry experience"
+  },
+  "40": {
+    "label": "The solution",
+    "text": "Tailor the order placement experience to a security type"
+  },
+  "48": {
+    "text": "Final designs"
+  },
+  "52": {
+    "text": "Impact"
+  },
+  "54": {
+    "label": "Case study",
+    "text": "Fractional shares",
+    "bg": "white"
+  },
+  "55": {
+    "text": "Background",
+    "bg": "white"
+  },
+  "56": {
+    "label": "Questrade mission",
+    "text": "Make trading frictionless",
+    "bg": "white"
+  },
+  "57": {
+    "label": "Solution",
+    "text": "Introduce fractional trading",
+    "bg": "white"
+  },
+  "58": {
+    "text": "What is fractional trading?",
+    "bg": "white"
+  },
+  "62": {
+    "label": "Problem",
+    "text": "Traders need affordable and flexible ways to trade.",
+    "bg": "white"
+  },
+  "63": {
+    "label": "Design challenge",
+    "text": "1 Feature.",
+    "bg": "white"
+  },
+  "64": {
+    "label": "Design challenge",
+    "text": "1 Feature. 2 Personas.",
+    "bg": "white"
+  },
+  "65": {
+    "label": "Design challenge",
+    "text": "1 Feature. 2 Personas. 2 Design languages",
+    "bg": "white"
+  },
+  "70": {
+    "label": "The challenge",
+    "text": "How might we make investing accessible to new investors without slowing down advanced traders?",
+    "bg": "white"
+  },
+  "90": {
+    "text": "Final designs",
+    "bg": "white"
+  },
+  "95": {
+    "text": "Impact",
+    "bg": "white"
+  },
+  "98": {
+    "text": "Reflections",
+    "bg": "white"
+  },
+  "69": {
+    "label": "Project scope",
+    "bg": "white",
+    "table": {
+      "head": [
+        "Feature",
+        "North star",
+        "MVP scope"
+      ],
+      "rows": [
+        [
+          "US symbols",
+          1,
+          1
+        ],
+        [
+          "CAD symbols",
+          1,
+          0
+        ],
+        [
+          "Market orders",
+          1,
+          1
+        ],
+        [
+          "Limit orders",
+          1,
+          0
+        ],
+        [
+          "Buy orders",
+          1,
+          1
+        ],
+        [
+          "Sell orders",
+          1,
+          0
+        ],
+        [
+          "Order placement",
+          1,
+          1
+        ],
+        [
+          "Order modification",
+          1,
+          0
+        ]
+      ]
+    }
+  },
+  "68": {
+    "label": "Project scope",
+    "bg": "white",
+    "table": {
+      "head": [
+        "Feature",
+        "North star",
+        "MVP scope"
+      ],
+      "rows": [
+        [
+          "US symbols",
+          1,
+          1
+        ],
+        [
+          "CAD symbols",
+          1,
+          0
+        ],
+        [
+          "Market orders",
+          1,
+          1
+        ],
+        [
+          "Limit orders",
+          1,
+          0
+        ],
+        [
+          "Buy orders",
+          1,
+          1
+        ],
+        [
+          "Sell orders",
+          1,
+          0
+        ],
+        [
+          "Order placement",
+          1,
+          1
+        ],
+        [
+          "Order modification",
+          1,
+          0
+        ]
+      ],
+      "hideLast": true
+    }
+  }
+}

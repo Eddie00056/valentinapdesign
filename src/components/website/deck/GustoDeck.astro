@@ -12,7 +12,9 @@
  */
 import deck from "../../../data/gustoDeck.json";
 import overrides from "../../../data/gustoDeckOverrides.json";
+import newText from "../../../data/deckNewText.json";
 import Shot from "./DeckShot.astro";
+import VedaSlide from "./VedaSlide.astro";
 import { InlineClock } from "./InlineClock";
 import { OwnershipStack } from "./OwnershipStack";
 
@@ -31,11 +33,343 @@ const title = (s: Slide): string | undefined =>
   s.corner ?? s.heading ?? (s.kind === "titlecard" ? undefined : s.kicker);
 /* `solo`: the deck is the whole window and starts at once — the
    presentation page is nothing but the presentation. Same as `?solo`. */
-const { solo = false } = Astro.props as { solo?: boolean };
+/* `theme="new"`: the new presentation UI (/presentation-new) — the same
+   slides under the new chrome: #0b0b0b ground, Plus Jakarta Sans for the
+   live type, and the underlined section label. */
+/* `theme="veda"`: the new UI in the Veda direction (/presentation-veda) —
+   every slide on black, Elza Text, mono section labels, and the text
+   slides that carry a visual rebuilt in VedaSlide (VEDA below). `range`
+   keeps only those slides in the show; the rest render empty and are
+   skipped, so slide numbers (and #slide-N) stay the deck's own. */
+const { solo = false, theme, range } = Astro.props as {
+  solo?: boolean;
+  theme?: "new" | "veda";
+  range?: [number, number];
+};
+const newUI = theme === "new" || theme === "veda";
+const veda = theme === "veda";
+const inRange = (s: Slide) =>
+  veda ? VEDA_ORDER.includes(s.n) : !range || (s.n >= range[0] && s.n <= range[1]);
+/* veda: image slides keep their images and live frames, but their text
+   baked into an image is rebuilt live — `corner` is the slide title,
+   `hide` the shots it replaces, `rows` the label / value pairs */
+const VEDA_MEDIA: Record<number, { corner?: string; hide?: string[]; rows?: [string, string[]][] }> = {
+  17: {
+    corner: "My role",
+    hide: ["017c"],
+    rows: [
+      ["Team", ["2 Engineering teams", "1 DS Designer", "1 UX Researcher"]],
+      ["Design timeline", ["6 months"]],
+    ],
+  },
+};
+const vm = (s: Slide) => (veda ? VEDA_MEDIA[s.n] : undefined);
+/* veda: the show's running order — the user's Figma (Presentation — Veda
+   (editable) (Copy), 2026-11-04), its main grid read row by row. Slide
+   numbers stay the deck's own (#slide-N, overrides), so the slides the
+   show adds take free numbers past the case study's range (55–61, the
+   Figma frames' names) and render as VEDA / VEDA_CLONE below. */
+const VEDA_ORDER = [
+  11, 13, 14, 15, 16, 17, 18, 19, 20, 55, 58, 26, 30, 31, 32, 59, 33, 60, 67, 41, 42, 71, 39,
+  38, 61, 72, 48, 50, 51, 52, 53,
+];
+/* veda: a slide shown twice — the number it shows again */
+const VEDA_CLONE: Record<number, number> = { 59: 32, 61: 51, 62: 41 };
+/* veda: a slide that continues the one before it (same widget, same
+   place) — arriving from that slide it doesn't fade its contents in, so
+   only what's new (30's and 59's eye-path dots) animates (the user: it
+   "looks like a new page") */
+const VEDA_SAME: Record<number, number> = { 30: 26, 59: 32 };
+/* veda: every live widget quotes one instrument (the user, 2026-11-04):
+   HOOD at $87.41 — passed to each embedded page as ?sym=&px= (see
+   shared/quoteOverride); the website's own pages keep DASH / PLTR */
+const VEDA_QUOTE = "sym=HOOD&px=87.41";
+// the user's Figma (2026-11-04): the Problem #1 run carries its solution
+const P1 = "Problem #1: Optimizing information hierarchy for faster scanning and quicker trade reactions.";
+const P2 = "Problem #2: Improving trade ergonomics";
+// the security-type menu and the widgets after it (19–22 in the show)
+const STYPE = "Simplified the experience by security type.";
+/* veda: fields of a media slide replaced for this show only (gustoDeck.json
+   stays the other decks' source). `marks` are plain rules in canvas px. */
+const VEDA_PATCH: Record<number, Slide> = {
+  // 26 draws its widget exactly as 30 does (the crop + an empty path), not
+  // the full-slide 026a, so the step to 30 is pixel-identical
+  26: {
+    corner: P1,
+    shots: [{ src: "widget-tsla", x: 27.08, y: 27.42, w: 45.91, annot: { w: 609.41, h: 297.96, line: "#E03E1A", points: [] } }],
+  },
+  30: { corner: P1 },
+  31: { corner: P1 },
+  32: { corner: P1 },
+  /* 59: the counterpart of 30's eye path. 30 zigzags across the legacy
+     ticket; here the bracket is open on arrival and the eye runs straight
+     down the new one in four stops, each centred on its section (the
+     user's call): 1 the symbol, 2 the order details (quantity / type /
+     duration), 3 the bracket order, 4 Sell / Buy — on the rule at x 660,
+     one per click */
+  59: {
+    corner: P1,
+    steps: 3,
+    live: [{ ...slides[31].live[0], step: undefined, unstep: undefined, init: "openBracket" }],
+    eye: { line: "#E03E1A", x: 660, ys: [336, 448, 636, 807] },
+  },
+  /* 38: placing an option order in IQ Edge (the user's "placing an option
+     order iq edge.mp4", 2026-11-04), in slide 16's box: the same top and
+     height, centred, so the two legacy recordings sit alike */
+  38: {
+    corner: P2,
+    videos: [
+      {
+        src: "iq-edge-option-order.mp4",
+        y: 14.72,
+        w: (74.65 * (1768 / 1080)) / (1828 / 1080),
+        x: (100 - (74.65 * (1768 / 1080)) / (1828 / 1080)) / 2,
+      },
+    ],
+  },
+  /* 51: the Questrade Pro case study's hero (/website/questrade-pro): the
+     MacBook with the chain-to-order workspace playing itself (ChainLoop),
+     embedded live — the page isolated to its .cs-laptop and fitted to the
+     slide below the label (the user, 2026-11-04: in place of the bare
+     chain + ticket frame) */
+  51: {
+    shots: [],
+    live: [
+      {
+        // live pages resolve under /work/ — this one lives at /website/
+        page: "../website/questrade-pro",
+        // a touch smaller than full bleed (the user): ~78% of the slide
+        x: 11,
+        y: 12,
+        w: 78,
+        h: 80,
+        vw: 1440,
+        vh: 900,
+        fit: ".cs-laptop",
+        css:
+          "body *{visibility:hidden!important}.cs-laptop,.cs-laptop *{visibility:visible!important}" +
+          "[data-reveal],[data-r]{opacity:1!important;transform:none!important;translate:none!important}" +
+          ".site-header,header{display:none!important}",
+      },
+    ],
+  },
+  /* 41: the existing widget (041a, left half, card x 209–749, top 339)
+     and, in the empty right half, the final vision — 42's re-inked picture
+     (042-final-ink) at 42's size (718 wide), centred on 1440, its top on
+     the existing widget's (the user, 2026-11-04) */
+  41: {
+    corner: STYPE,
+    // the final vision only (the user, 2026-11-04): the existing widget
+    // stays on 62, the slide before; this one swaps it for the vision
+    // centred both ways (the user, 2026-11-04), 718 wide (2157×1627 →
+    // 541.6 tall); "Vision", on the house gap above it (the label's y sat
+    // 38.65px over the picture's top before, kept)
+    shots: [
+      // 042-final-even: the ink cut with the card's right margin evened to
+      // its left (12px of source, was ~44 — "more padding on the right"),
+      // 2126 wide; drawn at the same scale (718 × 2126/2157), centred
+      // 042-final-legs: the same card with its three leg rows rebuilt as
+      // field rows (Buy chip · qty · expiry | strike | type, the user's
+      // reference) — 1772 tall, so re-centred for its new height
+      { src: "042-final-v3", x: ((960 - (718 * 2126) / 2157 / 2) / 1920) * 100, y: ((1080 - (718 * 1795) / 2157) / 2 / 1080) * 100, w: ((718 * 2126) / 2157 / 1920) * 100 },
+    ],
+    labels: [{ text: "Vision", x: 50, y: (((1080 - (718 * 1795) / 2157) / 2 - 38.65) / 1080) * 100, size: "lg" }],
+  },
+  /* 67: the legacy ticket's security-type menu (STK / OPT / STG) — the
+     user's screenshot, centred (a free number: deck 67 belonged to the
+     fractional chapter). The image: /website/case/gusto/v2/sectype-menu.webp */
+  67: {
+    bg: "black",
+    corner: STYPE,
+    // 1148×932 drawn 400 wide (325 tall) — well under half its pixels, so it
+    // stays sharp on a 2× screen (at 702 it was upscaled: "the quality is
+    // low"; 520 was still too big) — centred both ways
+    shots: [{ src: "sectype-menu", x: (1920 / 2 - 200) / 19.2, y: (540 - (400 * 932) / 1148 / 2) / 10.8, w: 400 / 19.2 }],
+    labels: [],
+    live: [],
+  },
+  /* 50: Then / Now without the Then (the user, 2026-11-04): the legacy
+     COIN ticket, its label and the divider go; the two new tickets, one
+     48px gutter apart, centred on the slide both ways (tops level) */
+  50: {
+    shots: [],
+    boxes: [],
+    labels: [],
+    live: [
+      {
+        ...slides[49].live[0],
+        x: (100 - (25.68 * 2 + 2.5)) / 2,
+        y: (100 - 35.28) / 2,
+        h: 35.28,
+        /* same height as the option ticket (243.07 native px), Sell/Buy
+           pinned to the bottom so it sits level with Submit */
+        css:
+          slides[49].live[0].css +
+          "html.is-bare .wshell.wshell{min-height:243.07px!important;display:flex!important;flex-direction:column!important}.ob-card{flex:1 1 auto!important;display:flex!important;flex-direction:column!important}.ob-foot{margin-top:auto!important;transform:translateY(3.71px)}",
+      },
+      { ...slides[49].live[1], x: (100 - (25.68 * 2 + 2.5)) / 2 + 25.68 + 2.5, y: (100 - 35.28) / 2 },
+    ],
+  },
+  /* 16: the widget-based system, re-recorded (the user's "iq edge widget
+     system new.mp4", 2026-11-04) */
+  16: {
+    /* the old recording's still (016a) goes: it is wider than the new
+       video and showed down both sides */
+    shots: [],
+    /* 3536×2160, a touch squarer than the old 1828×1080: held to the old
+       height (same top and bottom) and centred on the same axis */
+    videos: [
+      {
+        ...slides[15].videos[0],
+        src: "iq-edge-widget-system.mp4",
+        w: (74.65 * (3536 / 2160)) / (1828 / 1080),
+        x: 12.65 + (74.65 - (74.65 * (3536 / 2160)) / (1828 / 1080)) / 2,
+      },
+    ],
+  },
+  /* 72: after "Design system" — the input-field spec (/work/input-field-
+     spec), its three boards captured at 2×: the states grid across the
+     slide's full width (56 margins), the error rules and the notes side by
+     side under it, 24 apart, tops level (the user, 2026-11-04) */
+  72: {
+    bg: "black",
+    corner: "Design system: input field",
+    // the set 1600 wide, centred (the user: "slightly smaller" than 1808)
+    shots: [
+      { src: "ifs-states", x: 160 / 19.2, y: 120 / 10.8, w: 1600 / 19.2 },
+      { src: "ifs-rules", x: 160 / 19.2, y: (120 + (1600 * 1039) / 2944 + 24) / 10.8, w: 788 / 19.2 },
+      { src: "ifs-notes", x: (160 + 788 + 24) / 19.2, y: (120 + (1600 * 1039) / 2944 + 24) / 10.8, w: 788 / 19.2 },
+    ],
+    labels: [],
+    boxes: [],
+    live: [],
+    videos: [],
+    connectors: undefined,
+  },
+  /* 61: the option chain alone on arrival (the user, 2026-11-04); a bid
+     or ask opens the ticket in its reserved column, where it always sat */
+  61: {
+    live: [{ ...slides[50].live[0], page: "chain-to-order?static&bare&closed" }],
+  },
+  /* 62: 41 split in two (the user, 2026-11-04) — the existing widget alone
+     first, in its place, then 41 adds the final vision beside it */
+  62: {
+    corner: STYPE,
+    shots: [{ src: "041a", x: 0, y: 0, w: 100 }],
+    labels: [{ text: "Existing widget", x: 24.6, y: 27.81, size: "lg" }],
+  },
+  /* 42: the MVP ticket alone, centred on the slide (the user, 2026-11-04:
+     the final vision and the divider came off — the final vision now
+     sits on 41). 45's own live MVP at 480 wide (k fits the rest of the
+     show's tickets), its card ≈ 326 tall, so its top at 377 centres it */
+  42: {
+    corner: STYPE,
+    shots: [],
+    boxes: [],
+    live: [
+      {
+        ...slides[44].live[0],
+        mode: "width",
+        x: ((960 - 240) / 1920) * 100,
+        y: (377 / 1080) * 100,
+        w: (480 / 1920) * 100,
+        h: (slides[44].live[0].h * 480) / 519.4,
+      },
+    ],
+    labels: [{ text: "MVP", x: 50, y: 33, size: "lg" }],
+  },
+
+};
+/* veda: the copy as the user rewrote it in the Figma — label / text per
+   slide, over deckNewText.json (which /presentation-new still reads).
+   `fs` a type size of its own, `note` the user's red note-to-self. */
+const VEDA_TEXT: Record<number, { label?: string; text?: string; fs?: number; note?: boolean; bg?: string; none?: boolean }> = {
+  13: { fs: 64, text: "Questrade saw a 20% decline in active traders since 2021." },
+  18: { text: "Design process" },
+  19: { text: "“No one complains about order entry.\nDon’t fix what isn’t broken.”" },
+  21: { text: "The current order placement is slow." },
+  22: { label: "Goal", text: "Make trade submission fast and frictionless." },
+  25: { label: P1, text: "How do we show our data?" },
+  33: { label: "Impact", text: "Decreased time to submit an order by 25%." },
+  // 62 reuses a number deckNewText gives another deck's statement: it's a
+  // picture slide here (41's existing widget alone)
+  62: { none: true },
+  36: { label: P2, text: "Why?" },
+  39: { text: "80% of Questrade’s revenue. 3x the steps." },
+  57: { label: "Goal", text: "Make trade submission fast and frictionless\none step at a time.", bg: "black" },
+  40: { text: "Simplify the experience by security type." },
+};
+/* the problem slides' four points (55, then 58 / 60 lighting one row each);
+   the copy is the Figma's placeholder until the real points arrive */
+// the user's three problems (2026-11-04); the solutions are still to come
+const POINTS = [
+  "Information layout isn’t optimized for trade ergonomics.",
+  "Options workflows don’t align with how traders evaluate and build strategies.",
+  "The option chain lacks a direct path to trade execution.",
+];
+const SOLUTIONS: string[] = [
+  "Optimized information hierarchy for faster scanning and quicker trading reactions.",
+  "Simplified the experience by security type.",
+  "Enabled trade execution directly from the option chain.",
+];
+const STRATEGY = "Make order placement faster and seamless.";
+const PLABEL = "Goal";
+const VEDA: Record<number, { kind: any; num?: string; text?: string; label?: string; items?: string[]; solutions?: string[]; lit?: number[]; src?: string; steps?: number }> = {
+  // the opener: the title alone, centred — no "Case study 01" label, no 01 (the user)
+  11: { kind: "chapter", text: "Order entry<br />modernization", src: "/website/case/questrade/edge-web.webp" },
+  12: { kind: "section" },
+  // 14: the new web platform (Edge web, Beta V0.8) front-on in the MacBook
+  14: { kind: "laptop", src: "/website/case/questrade/edge-web.webp" },
+  15: { kind: "platforms" },
+  18: { kind: "section" },
+  // 21 is the statement alone (VEDA_TEXT); its dot rows follow as 54
+  54: { kind: "bars", label: "Problem", text: "" },
+  24: { kind: "section" },
+  34: { kind: "section" },
+  48: { kind: "section" },
+  // the user's added section, before Final designs (66: a free number)
+  66: { kind: "section", text: "Design system", label: "" },
+  52: { kind: "section" },
+  53: { kind: "impact" },
+  // lit: the rows at full white (by problem); 55 all, 58 the first, 60 the second
+  // built one click at a time (the user): the goal, then problem 1,
+  // solution 1, problem 2… — 2 steps per row
+  55: { kind: "points", label: PLABEL, text: STRATEGY, items: POINTS, solutions: SOLUTIONS, lit: [0, 1, 2], steps: 6 },
+  58: { kind: "points", label: PLABEL, text: STRATEGY, items: POINTS, solutions: SOLUTIONS, lit: [0] },
+  60: { kind: "points", label: PLABEL, text: STRATEGY, items: POINTS, solutions: SOLUTIONS, lit: [1] },
+  // 60 again with problem 3 lit, before the chain-to-order slides (71: free)
+  71: { kind: "points", label: PLABEL, text: STRATEGY, items: POINTS, solutions: SOLUTIONS, lit: [2] },
+};
+/* the hand edits keyed to the numbers this show reuses for its own slides
+   (55, 57–61) belong to other decks' slides — drop them here */
+const vedaOverrides = Object.fromEntries(
+  Object.entries(overrides as Record<string, any>).filter(([k]) => !(+k > 53 && VEDA_ORDER.includes(+k))),
+);
+const vslide = (s: Slide): Slide => {
+  if (!veda) return s;
+  const base = VEDA_CLONE[s.n] ? { ...slides[VEDA_CLONE[s.n] - 1], n: s.n } : s;
+  return VEDA_PATCH[s.n] ? { ...base, ...VEDA_PATCH[s.n] } : base;
+};
+/* in the new UI, the slides that were only text baked into an image are
+   rebuilt as live text in the statement template (data/deckNewText.json) */
+/* new UI: screenshots re-cut for it — src → its replacement, and where
+   the crop moved, its new rect on the canvas */
+const NEW_SHOTS: Record<string, { src: string; x?: number; y?: number; w?: number }> = {
+  // the COIN legacy ticket without its window title bar or quote strip
+  "049c": { src: "049c-body", x: 5.55 + 32.55 * (12 / 1670), y: 24.63 + (32.55 * (79 / 1670) * 1920) / 1080, w: 32.55 * (1646 / 1670) },
+};
+const nt = (
+  s: Slide,
+): { label?: string; text?: string; bg?: string; fs?: number; note?: boolean; table?: { head: string[]; rows: (string | number)[][]; hideLast?: boolean } } | undefined => {
+  if (!newUI) return undefined;
+  const base = (newText as Record<string, any>)[String(s.n)];
+  if (veda && VEDA_TEXT[s.n]?.none) return undefined;
+  return veda && VEDA_TEXT[s.n] ? { ...base, ...VEDA_TEXT[s.n] } : base;
+};
 ---
 
-<section class="gd w-wrap">
-  <div class="gd-stage" data-count={COUNT} data-overrides={JSON.stringify(overrides)} data-solo={solo ? "1" : undefined}>
+<section class:list={["gd w-wrap", newUI && "gd-theme-new", veda && "gd-theme-veda"]}>
+  <div class="gd-stage" data-count={COUNT} data-overrides={JSON.stringify(veda ? vedaOverrides : overrides)} data-order={veda ? JSON.stringify(VEDA_ORDER) : undefined} data-solo={solo ? "1" : undefined}>
     <button type="button" class="gd-play">
       <span class="gd-play-icon" aria-hidden="true">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"
@@ -54,14 +388,61 @@ const { solo = false } = Astro.props as { solo?: boolean };
       <div class="gd-frame">
         <div class="gd-canvas">
           {
-            slides.map((s) => (
+            slides.map(vslide).map((s) => !inRange(s) ? (
+              <article class="gd-slide" data-n={s.n} data-out="1" hidden />
+            ) : veda && VEDA[s.n] ? (
+              <article class="gd-slide gd-slide--black" data-n={s.n} data-rebuilt="1" data-steps={VEDA[s.n].steps || undefined} hidden>
+                <VedaSlide
+                  kind={VEDA[s.n].kind}
+                  num={VEDA[s.n].num}
+                  label={VEDA[s.n].kind === "chapter" ? undefined : VEDA[s.n].label ?? nt(s)?.label ?? s.corner ?? (VEDA[s.n].kind === "impact" ? "Impact" : undefined)}
+                  text={VEDA[s.n].text ?? nt(s)?.text}
+                  items={VEDA[s.n].items}
+                  solutions={VEDA[s.n].solutions}
+                  build={!!VEDA[s.n].steps}
+                  lit={VEDA[s.n].lit}
+                  src={VEDA[s.n].src}
+                />
+              </article>
+            ) : (
               <article
-                class:list={["gd-slide", `gd-slide--${s.bg}`]}
+                class:list={["gd-slide", `gd-slide--${nt(s)?.bg ?? s.bg}`]}
                 data-n={s.n}
                 data-steps={s.steps || undefined}
                 data-enter={s.enter ? JSON.stringify(s.enter) : undefined}
+                data-same={veda ? VEDA_SAME[s.n] : undefined}
                 hidden
               >
+                {nt(s) ? (
+                  <div class="gd-nt">
+                    {nt(s)!.label && <p class="gd-nt-label">{nt(s)!.label}</p>}
+                    {nt(s)!.text && <h2 class:list={["gd-nt-text", nt(s)!.note && "is-note"]} style={nt(s)!.fs ? `font-size:${nt(s)!.fs}px;line-height:1.2` : undefined}>{nt(s)!.text}</h2>}
+                    {nt(s)!.table && (
+                      <div class:list={["gd-tbl", nt(s)!.table!.hideLast && "is-partial"]} role="table">
+                        <div class="gd-tbl-row gd-tbl-head" role="row">
+                          {nt(s)!.table!.head.map((h, ci, all) => (
+                            <span role="columnheader">{nt(s)!.table!.hideLast && ci === all.length - 1 ? "" : h}</span>
+                          ))}
+                        </div>
+                        {nt(s)!.table!.rows.map((r) => (
+                          <div class="gd-tbl-row" role="row">
+                            <span role="cell">{r[0]}</span>
+                            {r.slice(1).map((v, ci, all) => (
+                              <span role="cell">
+                                {nt(s)!.table!.hideLast && ci === all.length - 1 ? null : v ? (
+                                  <i class="gd-tbl-check" aria-label="Included" />
+                                ) : (
+                                  <i class="gd-tbl-check is-no" aria-label="Not included" />
+                                )}
+                              </span>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                <>
                 {(s.panels || []).map((p: any) => (
                   <div
                     class="gd-panel"
@@ -87,7 +468,7 @@ const { solo = false } = Astro.props as { solo?: boolean };
                     </div>
                   </div>
                 ) : (
-                  title(s) && <p class:list={["gd-corner", s.cornerInk && `is-${s.cornerInk}`]}>{title(s)}</p>
+                  (vm(s)?.corner ?? title(s)) && <p class:list={["gd-corner", s.cornerInk && `is-${s.cornerInk}`]}>{vm(s)?.corner ?? title(s)}</p>
                 )}
                 {s.corner2 && (
                   <p class="gd-corner" style={`left:${s.corner2.x}%`}>
@@ -271,6 +652,29 @@ const { solo = false } = Astro.props as { solo?: boolean };
                         {s.bigAccent && <span class="g">{s.bigAccent}</span>}
                       </p>
                     )}
+                    {(s.marks || []).map((m: any) => (
+                      <div class="gd-rule" style={`left:${m.x}px;top:${m.y}px;width:${m.w}px;height:${m.h}px;background:${m.c}`} />
+                    ))}
+                    {s.eye && (
+                      /* an eye path in canvas px (59), drawn like 30's: a line
+                         per click, each stop's number popping in as it lands.
+                         Sizes are 30's annotation at its 1.446× scale */
+                      <div class="gd-annot gd-annot--canvas">
+                        <svg viewBox="0 0 1920 1080" aria-hidden="true">
+                          {s.eye.ys.slice(1).map((y: number, k: number) => (
+                            <line class="gd-annot-line" data-s={k + 1} x1={s.eye.x} y1={s.eye.ys[k]} x2={s.eye.x} y2={y} stroke={s.eye.line} pathLength="1" style="stroke-width:1.6" />
+                          ))}
+                          {s.eye.ys.map((y: number, k: number) => (
+                            <g class="gd-annot-dot" data-s={k} transform={`translate(${s.eye.x} ${y})`}>
+                              <g class="gd-annot-pop">
+                                <circle r="11.6" fill={s.eye.line} />
+                                <text text-anchor="middle" dy="4.8" style="font-size:13.7px">{k + 1}</text>
+                              </g>
+                            </g>
+                          ))}
+                        </svg>
+                      </div>
+                    )}
                     {(s.boxes || []).map((b: any) => (
                       <div
                         class="gd-box"
@@ -285,7 +689,7 @@ const { solo = false } = Astro.props as { solo?: boolean };
                         the width; max-content frees it, the cap wraps it. */}
                     {(s.labels || []).map((l: any) => (
                       <p
-                        class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade", l.wrap && "is-wrap"]}
+                        class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade", l.wrap && "is-wrap", l.fresh && "gd-fresh"]}
                         data-s={l.s ?? undefined}
                         style={`left:${l.x}%;top:${l.y ?? 19}%${l.fs ? `;font-size:${l.fs}px` : ""}${l.mw ? `;width:max-content;max-width:${l.mw}em;text-align:center` : ""}${l.op != null ? `;opacity:${l.op}` : ""}`}
                       >
@@ -293,7 +697,17 @@ const { solo = false } = Astro.props as { solo?: boolean };
                         {l.accent && <span class="gd-media-l-accent">{l.accent}</span>}
                       </p>
                     ))}
-                    {(s.shots || []).map((sh: any) =>
+                    {vm(s)?.rows && (
+                      <dl class="gd-vrows">
+                        {vm(s)!.rows!.map(([k, vs]) => (
+                          <div>
+                            <dt>{k}</dt>
+                            {vs.map((v) => <dd>{v}</dd>)}
+                          </div>
+                        ))}
+                      </dl>
+                    )}
+                    {(s.shots || []).filter((sh: any) => !vm(s)?.hide?.includes(sh.src)).map((sh: any) =>
                       sh.annot ? (
                         /* an image with a drawn path over it, built one line per click */
                         <div
@@ -339,7 +753,7 @@ const { solo = false } = Astro.props as { solo?: boolean };
                           ))}
                         </div>
                       ) : (
-                        <Shot {...sh} />
+                        <Shot {...(newUI ? (NEW_SHOTS[sh.src] ? { ...sh, ...NEW_SHOTS[sh.src] } : sh) : sh)} />
                       ),
                     )}
                     {(s.videos || []).map((v: any) => (
@@ -385,11 +799,12 @@ const { solo = false } = Astro.props as { solo?: boolean };
                       class:list={["gd-live", { "is-clip": l.clip, "gd-fade": l.s != null, "is-rise": l.rise }]}
                       data-s={l.s ?? undefined}
                       data-stack={l.stack ? "" : undefined}
+                      data-page={l.page.split("?")[0]}
                       style={`left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%${l.op != null ? `;opacity:${l.op}` : ""}`}
                     >
                       <iframe
                         title={l.page}
-                        data-src={`/work/${l.page}`}
+                        data-src={`/work/${l.page}${veda ? (l.page.includes("?") ? "&" : "?") + VEDA_QUOTE : ""}`}
                         data-css={l.css || ""}
                         data-fit={l.fit || ""}
                         data-pad={l.pad || 0}
@@ -407,6 +822,8 @@ const { solo = false } = Astro.props as { solo?: boolean };
                     </div>
                   );
                 })}
+                </>
+                )}
               </article>
             ))
           }
@@ -465,6 +882,172 @@ const { solo = false } = Astro.props as { solo?: boolean };
     const canvas = stage.querySelector<HTMLElement>(".gd-canvas")!;
     const slides = Array.from(stage.querySelectorAll<HTMLElement>(".gd-slide"));
     const countEl = stage.querySelector<HTMLElement>(".gd-count")!;
+    /* New UI: the image titles were placed for the old, larger type — set
+       each one a fixed 6px above the image or widget under it instead */
+    const newUI = !!stage.closest(".gd-theme-new");
+    /* where an image's content starts below a point: scan its pixels down
+       from y (canvas px) under the title's span until they leave the
+       ground the title sits on. Cached per image. */
+    const pix = new Map<HTMLImageElement, ImageData | null>();
+    const pixels = (img: HTMLImageElement) => {
+      if (!pix.has(img)) {
+        try {
+          const cv = document.createElement("canvas");
+          cv.width = img.naturalWidth;
+          cv.height = img.naturalHeight;
+          const cx = cv.getContext("2d", { willReadFrequently: true })!;
+          cx.drawImage(img, 0, 0);
+          pix.set(img, cx.getImageData(0, 0, cv.width, cv.height));
+        } catch {
+          pix.set(img, null);
+        }
+      }
+      return pix.get(img);
+    };
+    const contentTop = (img: HTMLImageElement, b: DOMRect, fromY: number, x0: number, x1: number) => {
+      const d = pixels(img);
+      if (!d || !img.naturalWidth) return null;
+      const sx = img.naturalWidth / b.width;
+      const sy = img.naturalHeight / b.height;
+      const px = (x: number, y: number) => {
+        const i = (Math.round(y) * d.width + Math.round(x)) * 4;
+        return d.data[i] + d.data[i + 1] + d.data[i + 2];
+      };
+      const ix0 = Math.max(0, (x0 - b.left) * sx);
+      const ix1 = Math.min(d.width - 1, (x1 - b.left) * sx);
+      const iy0 = Math.max(0, (fromY - b.top) * sy);
+      const ground = px((ix0 + ix1) / 2, iy0);
+      for (let y = iy0; y < d.height; y++) {
+        for (let x = ix0; x <= ix1; x += 2) {
+          if (Math.abs(px(x, y) - ground) > 36) return b.top + y / sy;
+        }
+      }
+      return null;
+    };
+    /* New UI: each live widget's shadow, drawn on the slide under its card —
+       inside its frame it would be cut at the frame's edge */
+    const shade = (slide?: HTMLElement) => {
+      if (!slide) return;
+      const canvasEl = slide.closest<HTMLElement>(".gd-canvas");
+      if (!canvasEl) return;
+      const c = canvasEl.getBoundingClientRect();
+      const k = c.width / 1920;
+      if (!k) return;
+      /* a re-measure (shade runs as each frame is placed, on arrival and
+         900ms later) reuses the shadows already drawn — moved, not
+         replaced — so one never blinks off and fades back in */
+      const old = [...slide.querySelectorAll<HTMLElement>(".gd-shade")];
+      let used = 0;
+      // a card that grows (17's ticket adds legs) takes its shadow with it
+      const held = slide as HTMLElement & { _shadeObs?: ResizeObserver[]; _shadeOff?: (() => void)[] };
+      held._shadeObs?.forEach((o) => o.disconnect());
+      held._shadeObs = [];
+      held._shadeOff?.forEach((off) => off());
+      held._shadeOff = [];
+      slide.querySelectorAll<HTMLIFrameElement>(".gd-live iframe").forEach((f) => {
+        const live = f.closest<HTMLElement>(".gd-live");
+        /* a frame hidden on purpose (`op: 0`) has no shadow — read its own
+           opacity, not the computed one: the slide's arrival fade starts
+           every child at 0, and reading that dropped each shadow on
+           arrival and redrew it 900ms later (the ground darkened late) */
+        if (!live || live.style.opacity === "0") return;
+        let d: Document | null = null;
+        try {
+          d = f.contentDocument;
+        } catch {}
+        if (!d) return;
+        d.querySelectorAll<HTMLElement>(".wshell").forEach((w) => {
+          if (w.closest(".ob-modal-wrap, .ob-toast-wrap")) return;
+          if (!w.getBoundingClientRect().width) return;
+          const sh = old[used++] ?? document.createElement("div");
+          sh.className = "gd-shade";
+          const place = () => {
+            const c = canvasEl.getBoundingClientRect();
+            const k = c.width / 1920;
+            const fb = f.getBoundingClientRect();
+            const sc = f.offsetWidth ? fb.width / f.offsetWidth : 1;
+            const r = w.getBoundingClientRect();
+            if (!k || !r.width || !r.height) return;
+            sh.style.left = `${(fb.left + r.left * sc - c.left) / k}px`;
+            sh.style.top = `${(fb.top + r.top * sc - c.top) / k}px`;
+            sh.style.width = `${(r.width * sc) / k}px`;
+            sh.style.height = `${(r.height * sc) / k}px`;
+            sh.style.borderRadius = `${(8 * sc) / k}px`;
+          };
+          place();
+          // (re-inserting a node restarts its fade, so only when it moved)
+          if (sh.nextElementSibling !== live) live.before(sh);
+          /* Motion grows a card with a transform (layout animation), which
+             a ResizeObserver only sees at its ends — so the shadow sat at
+             the old size for the length of the spring. Any resize, or a
+             click inside the frame, follows the card every frame for a
+             second instead. */
+          let until = 0;
+          const follow = () => {
+            const run = !until;
+            until = performance.now() + 1000;
+            if (!run) return;
+            const tick = () => {
+              place();
+              if (performance.now() < until) requestAnimationFrame(tick);
+              else until = 0;
+            };
+            requestAnimationFrame(tick);
+          };
+          const doc = d;
+          doc.addEventListener("click", follow, true);
+          doc.addEventListener("keydown", follow, true);
+          held._shadeOff!.push(() => {
+            doc.removeEventListener("click", follow, true);
+            doc.removeEventListener("keydown", follow, true);
+          });
+          const RO = (f.contentWindow as (Window & typeof globalThis) | null)?.ResizeObserver;
+          if (RO) {
+            const o = new RO(follow);
+            o.observe(w);
+            held._shadeObs!.push(o);
+          }
+        });
+      });
+      old.slice(used).forEach((n) => n.remove());
+    };
+
+    const tighten = (slide?: HTMLElement) => {
+      if (!slide) return;
+      shade(slide);
+      const canvasEl = slide.closest<HTMLElement>(".gd-canvas");
+      if (!canvasEl) return;
+      const c = canvasEl.getBoundingClientRect();
+      const k = c.width / 1920;
+      if (!k) return;
+      const media = [...slide.querySelectorAll<HTMLElement>("img, .gd-live")]
+        .filter((m) => !m.closest(".gd-media-l"))
+        .map((m) => ({ el: m, b: m.getBoundingClientRect() }))
+        .filter(({ b }) => b.width > 40 && b.height > 40);
+      slide.querySelectorAll<HTMLElement>(".gd-media-l").forEach((l) => {
+        if (!l.dataset.top) l.dataset.top = l.style.top;
+        l.style.top = l.dataset.top;
+        const r = l.getBoundingClientRect();
+        const cx = (r.left + r.right) / 2;
+        // the first content under the title: a live frame or image box
+        // starting below it, or an image's own pixels when it spans the title
+        let best = Infinity;
+        for (const { el, b } of media) {
+          // under the title, or (a title centred over a pair) within reach
+          const reach = 220 * k;
+          if (b.right < cx - reach || b.left > cx + reach || b.bottom < r.bottom) continue;
+          if (b.top >= r.bottom - 2) best = Math.min(best, b.top);
+          else if (el instanceof HTMLImageElement) {
+            const y = contentTop(el, b, r.bottom + 2, r.left, r.right);
+            if (y != null) best = Math.min(best, y);
+          }
+        }
+        if (!Number.isFinite(best)) return;
+        // the house rule: a title sits 6px above what it names (its box is
+        // trimmed to cap height and baseline, so this is baseline → edge)
+        l.style.top = `${(best - c.top) / k - 6 - r.height / k}px`;
+      });
+    };
     const bar = stage.querySelector<HTMLElement>(".gd-progress span")!;
     const fsBtn = stage.querySelector<HTMLButtonElement>(".gd-fs")!;
     const prevBtn = stage.querySelector<HTMLButtonElement>(".gd-edge--prev")!;
@@ -492,10 +1075,15 @@ const { solo = false } = Astro.props as { solo?: boolean };
     /* Hidden slides (toggled in ?edit) drop out of the show: arrows skip
        them and the counter doesn't count them. Edit mode still shows them. */
     const editing = import.meta.env.DEV && new URLSearchParams(location.search).has("edit");
-    const skipped = (n: number) => !editing && slides[n - 1]?.dataset.skip === "1";
-    const order = () => slides.map((el) => parseInt(el.dataset.n || "0", 10)).filter((n) => !skipped(n));
+    const skipped = (n: number) =>
+      slides[n - 1]?.dataset.out === "1" || (!editing && slides[n - 1]?.dataset.skip === "1");
+    /* a show can run its own order (veda: data-order); otherwise the deck's */
+    const runOrder: number[] | null = stage.dataset.order ? JSON.parse(stage.dataset.order) : null;
+    const order = () =>
+      (runOrder ?? slides.map((el) => parseInt(el.dataset.n || "0", 10))).filter((n) => !skipped(n));
     const nearest = (n: number) => {
       const o = order();
+      if (o.includes(n)) return n;
       return o.find((x) => x >= n) ?? o[o.length - 1] ?? 1;
     };
     /* Builds: a slide with data-steps reveals its [data-s] parts one per
@@ -578,7 +1166,40 @@ const { solo = false } = Astro.props as { solo?: boolean };
                  side i cannot see the stroke"); 0.75px lands at ≥1 device
                  px on every edge without reading heavier */
               "html.is-bare .wshell.wshell{border-width:0.75px!important}" +
-              (f.dataset.css || "");
+              (f.dataset.css || "") +
+              /* new UI: the widget card from the user's Figma — #010101 at
+                 50% under a 20% black wash, a 10% white edge. After the
+                 slide's own css, so it wins over its #010101. */
+              (stage.closest(".gd-theme-new")
+                ? "html.is-bare .wshell.wshell,.wshell.wshell{background:linear-gradient(0deg,rgba(0,0,0,.2),rgba(0,0,0,.2)),rgba(1,1,1,.5)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:8px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;-webkit-backdrop-filter:blur(100px);backdrop-filter:blur(100px)}" +
+                  /* the order tickets in the user's updated design: no title
+                     bar, lighter fields with rounder corners, "Limit price"
+                     on its own with a smaller Mid / Ask line, a solid caret */
+                  ".ob-stage .wshell-bar,.wshell-bar{display:none!important}" +
+                  ".ob-stage .ob-field{background:rgba(255,255,255,.08)!important;border-radius:6px!important}" +
+                  // the field's prefix (the quantity unit) shares its ground
+                  ".ob-stage .ob-field-k{background:transparent!important}" +
+                  ".ob-stage .ob-line-side{display:none}" +
+                  ".ob-stage .ob-line-sub{font-size:10px!important}" +
+                  ".ob-stage .ob-x{color:rgba(255,255,255,.55)!important}" +
+                  // the stepper arrows and the caret in the X's grey, so the
+                  // three icons down the right edge are one colour
+                  ".ob-stage .ob-stepper-btns svg *{fill:rgba(255,255,255,.55)!important}" +
+                  ".ob-stage .ob-chevron{color:rgba(255,255,255,.55)!important}" +
+                  ".ob-stage .ob-payoff{border-color:rgba(255,255,255,.1)!important}" +
+                  ".ob-stage .ob-chevron path{display:none}" +
+                  ".ob-stage .ob-chevron{background:currentColor;clip-path:polygon(22% 38%,78% 38%,50% 68%)}" +
+                  /* veda: the card's edge a clear cool grey (the user's
+                     chart reference, 2026-11-04), so it holds on the ground */
+                  (stage.closest(".gd-theme-veda")
+                    ? "html.is-bare .wshell.wshell,.wshell.wshell{border-color:#5b5f62!important}" +
+                      /* the order confirmation solid from its first frame
+                         (the user, 2026-11-04): its glass (50% + a 100px
+                         backdrop blur) showed the chain through it until
+                         the blur was painted */
+                      "html.is-bare .ob-stage .wshell.wshell.ob-modal,.ob-stage .wshell.wshell.ob-modal{background:#010101!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}"
+                    : "")
+                : "");
             d.head.appendChild(st);
             f.contentWindow!.addEventListener("keydown", (e) => {
               if (!NAV.has(e.key) || typing(e.target)) return;
@@ -1055,6 +1676,10 @@ const { solo = false } = Astro.props as { solo?: boolean };
         f.dataset.initAt = String(performance.now());
         f.classList.add("is-in");
         if (f.closest(".gd-slide") === slides[i - 1]) runArrive(f);
+        /* its shadow now, while the slide is still a neighbour being
+           preloaded — not a beat after you arrive (the user saw the ground
+           darken under the card late) */
+        if (newUI) requestAnimationFrame(() => shade(f.closest<HTMLElement>(".gd-slide") ?? undefined));
       });
     const unmount = (f: HTMLIFrameElement) => {
       if (!f.getAttribute("src")) return;
@@ -1096,6 +1721,39 @@ const { solo = false } = Astro.props as { solo?: boolean };
       });
     };
 
+    /* veda: the parts of an arriving slide that are the same as on the
+       slide just left — the same words, picture or widget, in the same
+       place (the user, 2026-11-04: "if the title stays the same … we dont
+       need to reload it") — are marked .gd-keep and skip the arrival fade.
+       The slide left is still laid out (a neighbour), so its rects are
+       real. Compared by content and place, not by class, so a title on a
+       media slide matches the same title on a VedaSlide. */
+    const keep = (fromN: number, toN: number) => {
+      stage.querySelectorAll(".gd-keep").forEach((e) => e.classList.remove("gd-keep"));
+      if (!stage.closest(".gd-theme-veda") || !fromN || fromN === toN) return;
+      const a = slides[fromN - 1];
+      const b = slides[toN - 1];
+      if (!a || !b || a.hidden) return;
+      const PARTS = ":scope > :not(.vs, .gd-media), :scope > .vs > *, :scope > .gd-media > *, :scope > .gd-media > .gd-annot > *";
+      const sig = (el: Element) => {
+        const r = el.getBoundingClientRect();
+        if (!r.width || !r.height) return null;
+        const media = [
+          ...(el.matches("img, video") ? [el] : []),
+          ...el.querySelectorAll("img, video, iframe"),
+        ]
+          .map((m) => m.getAttribute("src") || (m as HTMLElement).dataset.src || "")
+          .join(",");
+        const text = (el.textContent || "").replace(/\s+/g, " ").trim().slice(0, 600);
+        return [text, media, ...[r.left, r.top, r.width, r.height].map((v) => Math.round(v / 3))].join("|");
+      };
+      const before = new Set([...a.querySelectorAll(PARTS)].map(sig).filter(Boolean));
+      b.querySelectorAll<HTMLElement>(PARTS).forEach((el) => {
+        const s = sig(el);
+        if (s && before.has(s)) el.classList.add("gd-keep");
+      });
+    };
+
     const show = (n: number) => {
       const next = nearest(Math.min(count, Math.max(1, n)));
       // ?edit can hold a slide change (unsaved edits) and resume it later
@@ -1119,6 +1777,9 @@ const { solo = false } = Astro.props as { solo?: boolean };
         const n = parseInt(el.dataset.n || "0", 10);
         el.hidden = n !== i && !neighbours.has(n);
         el.classList.toggle("is-near", neighbours.has(n));
+        el.classList.toggle("is-cur", n === i);
+        // continuing the slide just left (data-same): no arrival fade
+        el.classList.toggle("is-same", n === i && !!el.dataset.same && parseInt(el.dataset.same, 10) === from);
         /* `autoplay` alone doesn't reliably start a <video> that begins
            inside a `hidden` article — kick it explicitly once the slide
            it belongs to is actually shown, and pause it off-slide. */
@@ -1127,6 +1788,7 @@ const { solo = false } = Astro.props as { solo?: boolean };
           else v.pause();
         });
       });
+      if (arrived) keep(from, i);
       warm(i);
       warm(i + 1);
       warm(i + 2);
@@ -1142,6 +1804,11 @@ const { solo = false } = Astro.props as { solo?: boolean };
           }
         });
       countEl.textContent = `${at + 1} / ${o.length}`;
+      if (newUI) {
+        tighten(slides[i - 1]);
+        // live frames place themselves a beat later
+        setTimeout(() => tighten(slides[i - 1]), 900);
+      }
       bar.style.transform = `scaleX(${(at + 1) / o.length})`;
       if (started) history.replaceState(null, "", `#slide-${i}`);
       if (arrived && started) enter(from, i);
@@ -2063,6 +2730,10 @@ const { solo = false } = Astro.props as { solo?: boolean };
   .gd-annot {
     position: absolute;
   }
+  .gd-annot--canvas {
+    inset: 0;
+    z-index: 2;
+  }
   .gd-annot-img {
     display: block;
     width: 100%;
@@ -2542,5 +3213,467 @@ const { solo = false } = Astro.props as { solo?: boolean };
       text-align: center;
       align-items: center;
     }
+  }
+
+  /* ---- theme: the new presentation UI ------------------------------ */
+  .gd-theme-new {
+    --gd-font: "Plus Jakarta Sans", "Inter", -apple-system, sans-serif;
+  }
+  .gd-theme-new .gd-slide--black {
+    background: #1e1e1e;
+  }
+  /* the section label: small, light, uppercase, underlined to its width,
+     on the left margin (40px of 1920) */
+  .gd-theme-new .gd-corner,
+  .gd-theme-new .gd-corner-row {
+    left: 40px;
+    top: 40px;
+  }
+  .gd-theme-new .gd-corner {
+    padding-bottom: 19px;
+    border-bottom: 1px solid currentColor;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 26px;
+    letter-spacing: -0.008em;
+  }
+  .gd-theme-new .gd-slide--black .gd-corner {
+    color: #e6e6e6;
+  }
+  /* live headings and statements: light, tight */
+  .gd-theme-new :is(.gd-statement-t, .gd-titlecard h2, .gd-titlecard p, .gd-divider) {
+    /* over the data's own weights (a statement can carry fw 700 inline) */
+    font-weight: 300 !important;
+    letter-spacing: -0.025em;
+  }
+  /* image titles ("Then", "Now", "Current widget layout"…): the deck's own
+     small titles, as baked into slide 17 (MY ROLE / DESIGN TIMELINE / TEAM)
+     — Inter regular, 14px, uppercase, no tracking (measured: 120px for
+     "DESIGN TIMELINE" there, 120.7 here) */
+  .gd-theme-new .gd-media-l,
+  .gd-theme-new .gd-media-l:is(.is-lg, .is-sm, .is-xl) {
+    text-box: trim-both cap alphabetic;
+    font-family: "Inter", system-ui, sans-serif;
+    font-size: 14px !important;
+    font-weight: 400 !important;
+    line-height: 18px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: #eeeeee;
+  }
+  .gd-theme-new :is(.gd-slide--white, .gd-slide--canvas) .gd-media-l,
+  .gd-theme-new .gd-media-l.tone-dark {
+    color: #0b0b0b;
+  }
+  /* images cut from the old deck sit on its #010101: lighten lets the new
+     #0b0b0b through their black, so none of them shows as a box */
+  .gd-theme-new .gd-slide--black img {
+    mix-blend-mode: lighten;
+  }
+  /* rebuilt text slides: the statement template (as /deck) — the label
+     with its rule, the line on a 120px pitch, 40px margins */
+  /* the page's title sits top-left on every slide, as the image slides'
+     section labels do (40, 40) */
+  .gd-nt-label {
+    position: absolute;
+    left: 40px;
+    top: 40px;
+    margin: 0;
+    padding-bottom: 19px;
+    border-bottom: 1px solid currentColor;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 26px;
+    letter-spacing: -0.008em;
+    text-transform: uppercase;
+    opacity: 0.9;
+  }
+  .gd-nt-text {
+    position: absolute;
+    left: 39px;
+    top: 431px;
+    max-width: 1450px;
+    margin: 0;
+    font-size: 80px;
+    font-weight: 300;
+    line-height: 96px;
+    letter-spacing: -0.025em;
+  }
+  /* comparison table (the user's reference): three equal columns, the
+     last one lifted; a mono header row, hairlines between rows, check
+     discs — grey in the middle column, mint in the lifted one */
+  .gd-tbl {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    top: 150px;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+    color: #f2f2f2;
+    background: linear-gradient(90deg, transparent 66.667%, #19191b 66.667%);
+  }
+  .gd-tbl-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    height: 96px;
+    border-bottom: 1px solid #2a2a2c;
+  }
+  .gd-tbl-row > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    font-size: 21px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .gd-tbl-row > span:first-child {
+    justify-content: flex-start;
+    padding-left: 32px;
+  }
+  .gd-tbl-head {
+    background: #1c1c1e;
+  }
+  .gd-tbl-head > span {
+    font-family: "DM Mono", ui-monospace, monospace;
+    font-size: 19px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #c8c8c8;
+  }
+  .gd-tbl-head > span:last-child {
+    background: #232326;
+    color: #46d497;
+  }
+  /* on the white slides (the Fractional chapter): the same table in light
+     — ink #0b0b0b, a #f2f2f2 header band and lifted column, #e6e6e6
+     hairlines, grey checks and the chapter's green for the lifted one */
+  .gd-slide--white .gd-tbl {
+    color: #0b0b0b;
+    background: linear-gradient(90deg, transparent 66.667%, #f6f6f4 66.667%);
+  }
+  .gd-slide--white .gd-tbl-row {
+    border-bottom-color: #e6e6e6;
+  }
+  .gd-slide--white .gd-tbl-head {
+    background: #f2f2f2;
+  }
+  .gd-slide--white .gd-tbl-head > span {
+    color: #5c5c5c;
+  }
+  .gd-slide--white .gd-tbl-head > span:last-child {
+    background: #ebebe8;
+    color: #23752a;
+  }
+  .gd-slide--white .gd-tbl-check {
+    background-color: #e4e4e4;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b0b0b' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E");
+  }
+  .gd-slide--white .gd-tbl-row > span:last-child .gd-tbl-check {
+    background-color: rgba(35, 117, 42, 0.14);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2323752a' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E");
+  }
+
+  /* the build's first step: the last column there but empty and unlit */
+  /* left out: an X in the same disc, in red */
+  .gd-tbl .gd-tbl-check.is-no,
+  .gd-tbl .gd-tbl-row > span:last-child .gd-tbl-check.is-no {
+    background-color: rgba(229, 72, 77, 0.2);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e5484d' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M7.5 7.5l9 9M16.5 7.5l-9 9'/%3E%3C/svg%3E");
+    background-size: 18px;
+  }
+  .gd-slide--white .gd-tbl .gd-tbl-check.is-no,
+  .gd-slide--white .gd-tbl .gd-tbl-row > span:last-child .gd-tbl-check.is-no {
+    background-color: rgba(208, 42, 42, 0.1);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c62828' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M7.5 7.5l9 9M16.5 7.5l-9 9'/%3E%3C/svg%3E");
+  }
+
+  .gd-slide .gd-tbl.is-partial {
+    background: none;
+  }
+  .gd-slide .gd-tbl.is-partial .gd-tbl-head > span:last-child {
+    background: none;
+  }
+  .gd-tbl-check {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #4a4a50 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 20px no-repeat;
+  }
+  .gd-tbl-row > span:last-child .gd-tbl-check {
+    background-color: rgba(70, 212, 151, 0.22);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2346d497' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E");
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  /* widget depth: a soft pool under each card and a tight contact shadow,
+     drawn on the slide (see shade()) */
+  :global(.gd-shade) {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    box-shadow:
+      0 24px 48px -12px rgba(0, 0, 0, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+  .gd-theme-new .gd-live {
+    z-index: 1;
+  }
+  /* veda 17: the ticket at 1.35× (its frame is fitted at its data size,
+     then scaled from its top-left: the card is ~751px wide), its right
+     edge on the right margin (1864) and its full four-leg state (~724px
+     tall) centred on the slide's middle — in % like the frame's own rect */
+  /* 1.2× now (the user, 2026-11-04: a touch smaller): card 556 → 668
+     wide, its four-leg 536 → 643 tall, so the right edge stays on 1864
+     and the middle on 540 */
+  .gd-theme-veda .gd-slide[data-n="17"] .gd-live {
+    /* 120px in from the right margin (the user: a bit to the left) */
+    left: calc((1744 - 668) / 1920 * 100%) !important;
+    top: calc((540 - 322) / 1080 * 100%) !important;
+    transform: scale(1.2);
+    transform-origin: 0 0;
+  }
+  /* veda: a black shadow (the user's call — the pale pool read green),
+     with a faint rim so the card's edge still holds on the black ground */
+  /* stronger (the user, 2026-11-04): a crisp light rim, a deep soft
+     drop and a tight contact shadow — on the lifted ground they read */
+  /* it arrives a beat after the slide: fade it in rather than pop */
+  @keyframes gd-shade-in {
+    from { opacity: 0; }
+  }
+  .gd-theme-veda :global(.gd-shade) {
+    animation: gd-shade-in 0.6s ease both;
+    box-shadow: var(--veda-card-shadow);
+  }
+  /* the final vision picture on 41 wears the same depth as the live cards */
+  /* its stroke the live cards' own (the user: "match the widget stroke"):
+     an inset shadow paints UNDER a picture's pixels, so the edge never
+     showed — an outline sits on top, 1px in, following the 8px corner */
+  .gd-theme-veda :global(.gd-media-shot[src*="042-final"]) {
+    border-radius: 8px;
+    box-shadow: var(--veda-card-shadow);
+    outline: 1px solid var(--veda-edge);
+    outline-offset: -1px;
+  }
+  /* the re-cut COIN ticket wears the same depth as the live ones */
+  .gd-theme-new :global(img[src$="049c-body.webp"]) {
+    border-radius: 6px;
+    box-shadow:
+      0 24px 48px -12px rgba(0, 0, 0, 0.4),
+      0 4px 12px rgba(0, 0, 0, 0.25);
+    mix-blend-mode: normal;
+  }
+
+  /* the chain-to-order slides: the pair 20% bigger, about its own centre */
+  .gd-theme-new .gd-live[data-page="chain-to-order"] {
+    transform: scale(1.2);
+    transform-origin: 50% 50%;
+  }
+
+  /* the edge arrows sat on the text's margin: shown only under the pointer */
+  .gd-theme-new .gd-edge span {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .gd-theme-new .gd-edge:hover span {
+    opacity: 1;
+  }
+
+  /* ---- theme: Veda (/presentation-veda) ------------------------------
+     one black ground on every slide, Elza Text set plain, the section
+     label in DM Mono, the image titles in mono caps, and a calm arrival:
+     the slide's content fades in (VedaSlide's own parts rise) */
+  .gd-theme-veda {
+    --gd-font: "Elza Text", system-ui, sans-serif;
+  }
+  /* the ground (the user, 2026-11-04: the widgets blended into pure
+     black): a near-black charcoal, a touch lighter where the work sits,
+     so the cards' black shadows have something to fall on */
+  .gd-theme-veda {
+    --veda-ground: radial-gradient(120% 95% at 50% 50%, #141414 0%, #0c0c0c 55%, #070707 100%);
+    --veda-mid: #131313;
+    /* the cards' depth (the user 2026-11-04): a light rim, a close dark
+       halo, a long soft drop and a tight contact shadow. No wide halo:
+       the shadow lands once the card is measured (after the slide arrives)
+       and a wide one dimmed the whole slide a beat late */
+    /* the cards' edge: a clear cool grey (the user's chart reference) —
+       the live cards draw it themselves (injected css), the picture cards
+       take it here */
+    --veda-edge: #5b5f62;
+    /* tightened (the user: "bleeding too much"): the depth sits close
+       under the card — a short soft drop and a contact shadow, no halo */
+    /* no bleed (the user, 2026-11-04: "a shadow but without the bleed"):
+       each layer is inset by its whole blur radius (spread = −blur: a
+       blur reaches its full radius past the shape), so nothing reaches
+       past the card's sides or top — the depth falls only below it,
+       ~28px, darkest at the edge */
+    --veda-card-shadow:
+      0 28px 24px -24px rgba(0, 0, 0, 0.95),
+      0 6px 6px -6px rgba(0, 0, 0, 0.8);
+  }
+  .gd-theme-veda .gd-slide,
+  .gd-theme-veda .gd-slide--black,
+  .gd-theme-veda .gd-slide--white,
+  .gd-theme-veda .gd-slide--canvas {
+    background: var(--veda-ground);
+    color: #fff;
+  }
+  /* pictures cut with a pure-black ground (041a, the legacy-platform
+     videos, the macs): their black gives way to the ground instead of
+     printing a black box on it. The final vision is a card of its own and
+     keeps its dark fill. */
+  .gd-theme-veda :global(img.gd-media-shot) {
+    mix-blend-mode: lighten;
+  }
+  /* not the videos (16, 38): they're full screens of the app, not cut on
+     black, and lighten washed their dark UI out (the user: "broken") */
+  .gd-theme-veda :global(.gd-media-shot[src*="042-final"]) {
+    mix-blend-mode: normal;
+  }
+  /* backwards only: a build's hidden parts (.gd-fade) keep their own
+     opacity, and nothing is held once the fade is done */
+  /* The media wrapper itself never fades: opacity < 1 on it isolates its
+     group, and the pictures that blend their black away (mix-blend
+     lighten) then printed it — the whole ground went dark for the length
+     of the fade (the user: "the background color changes"). Its children
+     fade instead, where the blend still reaches the ground. */
+  .gd-theme-veda .gd-slide.is-cur > :not(.gd-fade, .gd-media, .vs),
+  .gd-theme-veda .gd-slide.is-cur > .gd-media > :global(:not(.gd-fade, .gd-annot)),
+  /* the annotated picture (26/30/31) is a wrapper too: its image blends
+     its black margin away, so the fade goes on the image and the path,
+     not the wrapper — or the margin shows as a black box mid-fade */
+  .gd-theme-veda .gd-slide.is-cur > .gd-media > .gd-annot > * {
+    animation: gd-veda-in 0.45s ease-out backwards;
+  }
+  /* what is the same as on the slide just left — the same words, picture
+     or widget in the same place — stays put: no fade (see keep()) */
+  .gd-theme-veda .gd-slide.is-cur :global(.gd-keep),
+  .gd-theme-veda .gd-slide.is-cur :global(.gd-keep *) {
+    animation: none !important;
+  }
+  /* a slide that continues the last (VEDA_SAME): it's already there */
+  .gd-theme-veda .gd-slide.is-cur.is-same > :not(.gd-fade, .gd-fresh),
+  .gd-theme-veda .gd-slide.is-cur.is-same > .gd-media > :global(:not(.gd-fade, .gd-fresh)),
+  .gd-theme-veda .gd-slide.is-cur.is-same > .gd-media > .gd-annot > *,
+  .gd-theme-veda .gd-slide.is-cur.is-same > :global(.gd-shade) {
+    animation: none;
+  }
+  /* ...but what's new on it fades in (pictures are DeckShot's, so global) */
+  .gd-theme-veda .gd-slide.is-cur.is-same :global(.gd-fresh) {
+    animation: gd-veda-in 0.45s ease-out backwards;
+  }
+  @keyframes gd-veda-in {
+    from { opacity: 0; }
+  }
+  .gd-theme-veda .gd-corner,
+  .gd-theme-veda .gd-corner-row,
+  .gd-theme-veda .gd-nt-label {
+    left: 56px;
+    top: 48px;
+  }
+  .gd-theme-veda .gd-corner,
+  .gd-theme-veda .gd-nt-label {
+    padding-bottom: 0;
+    border-bottom: 0;
+    font-family: "DM Mono", ui-monospace, monospace;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 20px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 1;
+  }
+  /* the statement: centred on the slide, both ways — the user's Figma
+     (2026-11-04) moved every statement and section title off the
+     top-left anchor to the middle; balanced lines, as the Figma breaks them */
+  .gd-theme-veda .gd-nt-text {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: max-content;
+    max-width: 1500px;
+    text-align: center;
+    text-wrap: balance;
+    white-space: pre-line;
+    font-family: "Elza Text", system-ui, sans-serif;
+    font-size: 72px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+  /* the user's note-to-self (33), red as they set it in the Figma */
+  .gd-theme-veda .gd-nt-text.is-note {
+    left: 274px;
+    transform: translateY(-50%);
+    color: #e5484d;
+    text-align: left;
+  }
+  /* a plain rule on the canvas (59's red mark down the ticket) */
+  .gd-rule {
+    position: absolute;
+    z-index: 2;
+  }
+  .gd-theme-veda :is(.gd-statement-t, .gd-titlecard h2, .gd-titlecard p, .gd-divider) {
+    font-weight: 400 !important;
+    letter-spacing: -0.01em;
+  }
+  .gd-theme-veda .gd-media-l,
+  .gd-theme-veda .gd-media-l:is(.is-lg, .is-sm, .is-xl) {
+    font-family: "DM Mono", ui-monospace, monospace;
+    font-size: 14px !important;
+    letter-spacing: 0.04em;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .gd-theme-veda .gd-tbl {
+    font-family: "Elza Text", system-ui, sans-serif;
+  }
+
+  /* veda: label / value rows rebuilt from a baked image (17's role card):
+     the label in the mono caps, the value in Elza, set where the image
+     had them, centred on the live ticket's height */
+  /* side by side, on the headline's line (left 56, centred on the
+     slide's middle — 13/14's .vs-head--mid), the values a step under
+     those headlines so the ticket stays the focus, the labels as the
+     slide label */
+  .gd-vrows {
+    position: absolute;
+    left: 56px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    grid-auto-flow: column;
+    column-gap: 96px;
+    align-items: start;
+    margin: 0;
+    color: #fff;
+  }
+  .gd-vrows dt {
+    margin-bottom: 28px;
+    text-box: trim-both cap alphabetic;
+    font: 16px "DM Mono", ui-monospace, monospace;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .gd-vrows dd {
+    margin: 0;
+  }
+  /* the user: space the list out — a clear step between the lines */
+  .gd-vrows dd + dd {
+    margin-top: 14px;
+  }
+  .gd-vrows dd {
+    font-family: "Elza Text", system-ui, sans-serif;
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
   }
 </style>

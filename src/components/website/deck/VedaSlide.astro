@@ -1,0 +1,996 @@
+---
+/* The Veda-direction slides (GustoDeck theme="veda"): the text slides that
+   carry a visual, drawn in the hero's dot field — every chart is dots on
+   one pitch, faint where empty, grey where filled, a green hairline over
+   the tops, one red dot where it ends up. Animations run when the slide
+   is the current one (.gd-slide.is-cur). Numbers marked illustrative are
+   placeholders until the real series arrive. */
+type Kind = "chapter" | "section" | "chart" | "quote" | "journey" | "bars" | "dots" | "impact" | "peek" | "platforms" | "points" | "laptop";
+const { kind, label, text, num, items = [], solutions = [], lit = [], src, build = false } = Astro.props as {
+  kind: Kind;
+  /* points: reveal on clicks — headers + problem 1 on the first, then
+     each solution and the next problem in turn (the deck's data-s build) */
+  build?: boolean;
+  /* laptop: the screenshot shown in the window */
+  src?: string;
+  label?: string;
+  text?: string;
+  num?: string;
+  /* points: the numbered points, two columns of two; `lit` the ones at
+     full white (the rest dimmed) */
+  items?: string[];
+  lit?: number[];
+  /* points: the solution beside each problem (same order) */
+  solutions?: string[];
+};
+
+const P = 28;
+/* the falling series (illustrative): a climb, a plateau, then the slide,
+   with a fixed wobble so it reads as real data — drawn as one smooth line
+   (Catmull-Rom → cubic Béziers) over the dot field */
+/* 13's chart sits right of the headline (the user's Frame 13), from x 1040
+   and on past the slide's right edge (1000 wide, the last 120 off-slide):
+   one thick, smooth line in a few broad waves — growth that climbs,
+   crests and slides — glowing, fading in from its start, and no end
+   point: it just leaves the slide (the user's references). Behind it,
+   very fine dotted guides. The knots are illustrative: x, then height
+   as a share of the chart */
+const CW = 1000;
+const CH = 400;
+const KNOTS: [number, number][] = [
+  [0, 0.2],
+  [0.11, 0.34],
+  [0.23, 0.29],
+  [0.37, 0.6],
+  [0.48, 0.8],
+  [0.58, 0.74],
+  [0.71, 0.47],
+  [0.84, 0.3],
+  [1, 0.18],
+];
+// the dotted guides: every 112px (4 dot pitches), running above and below
+const GUIDES = Array.from({ length: Math.floor(CW / (P * 4)) }, (_, k) => (k + 1) * P * 4);
+const GUIDE_PAD = 160;
+const SERIES = KNOTS.map(([x, v]) => [x * CW, CH - v * CH] as [number, number]);
+const smooth = (pts: [number, number][]) => {
+  let d = `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+  for (let k = 0; k < pts.length - 1; k++) {
+    const p0 = pts[Math.max(0, k - 1)];
+    const p1 = pts[k];
+    const p2 = pts[k + 1];
+    const p3 = pts[Math.min(pts.length - 1, k + 2)];
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;
+  }
+  return d;
+};
+const LINE = smooth(SERIES);
+// time to place an options order, as rows of dots: Questrade's takes
+// three times the competitors' (18 of 54 lit against all 54)
+const BAR_COLS = 54;
+const BAR_ROWS = 3;
+const BARS = [
+  { label: "Competitors", lit: 18 },
+  { label: "Questrade", lit: 54, hot: true },
+];
+// the trading journey as the original deck had it, Execution lit
+const STOPS = ["Idea generation", "Conviction building", "Execution", "Monitoring"];
+/* the two platforms, each in the MacBook Pro (macbook.png), front-on.
+   Each screenshot carries its own thin frame: `c` is its screen inside
+   that — left, top, height as fractions of the image — and it fills the
+   MacBook's opening by height, anchored top-left */
+const PLATFORMS = [
+  { label: "Regular trading platform", src: "015b", c: { l: 0.0205, t: 0.0288, h: 0.94 } },
+  { label: "Advanced trading platform", src: "015c", c: { l: 0.024, t: 0.0322, h: 0.9332 } },
+];
+// the quote's own marks are drawn: the opening one hangs in the margin
+const quote = (text || "").replace(/^[“"]|[”"]$/g, "");
+---
+
+<div class:list={["vs", `vs--${kind}`]}>
+  {label && <p class="vs-kicker">{label}</p>}
+
+  {kind === "chapter" && (
+    <>
+      {num && <p class="vs-num" aria-hidden="true">{num}</p>}
+      <h2 class:list={["vs-giant", src && "vs-giant--mid"]} set:html={text} />
+      {src && (
+        /* the opener (the user, 2026-11-04): the title on the slide's
+           middle, the NEW platform beside it in the angled MacBook peek
+           (the format slide 14 had), in its browser window */
+        <div class="vs-peek" aria-hidden="true">
+          <div class="vs-mac">
+            {Array.from({ length: 12 }, (_, k) => (
+              <span class="vs-mac-edge" style={`--z:${k + 1}`} />
+            ))}
+            <div class="vs-mac-screen vs-mac-screen--web">
+              <div class="vs-browser-bar"><i /><i /><i /></div>
+              <img class="vs-peek-web" src={src} alt="" draggable="false" />
+            </div>
+            <img class="vs-mac-frame" src="/website/case/questrade/macbook.png" alt="" draggable="false" />
+          </div>
+        </div>
+      )}
+    </>
+  )}
+
+  {kind === "section" && <h2 class="vs-section">{text}</h2>}
+
+  {kind === "chart" && (
+    <>
+      <h2 class="vs-head vs-head--mid">{text}</h2>
+      <figure class="vs-chart">
+        <svg viewBox={`0 0 ${CW} ${CH}`} aria-hidden="true">
+          <defs>
+            {/* the guides fade out above and below */}
+            <linearGradient id="vs-guidefade" x1="0" y1={-GUIDE_PAD} x2="0" y2={CH + GUIDE_PAD} gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="#fff" stop-opacity="0" />
+              <stop offset="0.3" stop-color="#fff" stop-opacity="1" />
+              <stop offset="0.7" stop-color="#fff" stop-opacity="1" />
+              <stop offset="1" stop-color="#fff" stop-opacity="0" />
+            </linearGradient>
+            <mask id="vs-guidemask" maskUnits="userSpaceOnUse" x="0" y={-GUIDE_PAD} width={CW} height={CH + GUIDE_PAD * 2}>
+              <rect y={-GUIDE_PAD} width={CW} height={CH + GUIDE_PAD * 2} fill="url(#vs-guidefade)" />
+            </mask>
+            {/* the line fades in from its start */}
+            <linearGradient id="vs-ln" x1="0" y1="0" x2={CW} y2="0" gradientUnits="userSpaceOnUse">
+              <stop offset="0" stop-color="rgb(72,213,151)" stop-opacity="0" />
+              <stop offset="0.35" stop-color="rgb(72,213,151)" stop-opacity="0.6" />
+              <stop offset="1" stop-color="rgb(72,213,151)" stop-opacity="1" />
+            </linearGradient>
+            <filter id="vs-blur" x="-20%" y="-50%" width="140%" height="200%">
+              <feGaussianBlur stdDeviation="9" />
+            </filter>
+          </defs>
+          <g class="vs-guides" mask="url(#vs-guidemask)">
+            {GUIDES.map((x) => <line x1={x} y1={-GUIDE_PAD} x2={x} y2={CH + GUIDE_PAD} />)}
+          </g>
+          <path class="vs-tline vs-tglow" pathLength="1" d={LINE} filter="url(#vs-blur)" />
+          <path class="vs-tline" pathLength="1" d={LINE} />
+        </svg>
+      </figure>
+    </>
+  )}
+
+  {kind === "peek" && (
+    <>
+      {text && <h2 class="vs-head vs-head--mid">{text}</h2>}
+      {/* a peek of the existing platform: the MacBook Pro (macbook.png, the
+          Questrade case study's) turned away to the right, running off the
+          slide's corner (the Kalshi Pro reference) */}
+      <div class="vs-peek" aria-hidden="true">
+        <div class="vs-mac">
+          {/* the lid's thickness: its outline stacked back in depth, so the
+              aluminium edge follows it all the way round — side, corner, top */}
+          {Array.from({ length: 12 }, (_, k) => (
+            <span class="vs-mac-edge" style={`--z:${k + 1}`} />
+          ))}
+          <div class="vs-mac-screen">
+            <img src="/website/case/gusto/v2/015c.webp" alt="" draggable="false" />
+          </div>
+          <img class="vs-mac-frame" src="/website/case/questrade/macbook.png" alt="" draggable="false" />
+        </div>
+      </div>
+    </>
+  )}
+
+  {kind === "platforms" && (
+    <div class="vs-macs">
+      {PLATFORMS.map((pl, k) => (
+        <p class:list={["vs-plat-l", k ? "is-right" : "is-left"]}>{pl.label}</p>
+      ))}
+      {PLATFORMS.map((pl) => (
+        <figure class="vs-flat">
+          <div class="vs-flat-mac">
+            <div class="vs-mac-screen">
+              <img
+                class="vs-flat-shot"
+                src={`/website/case/gusto/v2/${pl.src}.webp`}
+                alt=""
+                draggable="false"
+                style={`top:${(-pl.c.t / pl.c.h) * 100}%;height:${(1 / pl.c.h) * 100}%;transform:translateX(${-pl.c.l * 100}%)`}
+              />
+            </div>
+            <img class="vs-mac-frame" src="/website/case/questrade/macbook.png" alt="" draggable="false" />
+          </div>
+        </figure>
+      ))}
+    </div>
+  )}
+
+  {kind === "quote" && (
+    <blockquote class="vs-quote">
+      <span aria-hidden="true">“</span>{quote}<span aria-hidden="true">”</span>
+    </blockquote>
+  )}
+
+  {kind === "journey" && (
+    <>
+      <h2 class="vs-head">{text}</h2>
+      <ol class="vs-journey">
+        {STOPS.map((b) => (
+          <li class:list={[b === "Execution" && "is-hot"]}>
+            <i />
+            <b>{b}</b>
+          </li>
+        ))}
+      </ol>
+    </>
+  )}
+
+  {kind === "bars" && (
+    <>
+      {text && <h2 class="vs-head vs-head--centre">{text}</h2>}
+      <div class:list={["vs-bars", !text && "vs-bars--solo"]}>
+        {BARS.map((b) => (
+          <div class:list={["vs-bar", b.hot && "is-hot"]}>
+            <span>{b.label}</span>
+            <svg viewBox={`-6 -6 ${(BAR_COLS - 1) * P + 12} ${(BAR_ROWS - 1) * P + 12}`} aria-hidden="true">
+              {Array.from({ length: BAR_COLS }, (_, i) =>
+                Array.from({ length: BAR_ROWS }, (_, r) => (
+                  <circle class={i < b.lit ? "on" : "g"} cx={i * P} cy={r * P} r={i < b.lit ? 3.2 : 2.4} style={`--c:${i}`} />
+                )),
+              )}
+            </svg>
+          </div>
+        ))}
+      </div>
+    </>
+  )}
+
+  {kind === "dots" && (
+    <div class="vs-split">
+      <h2 class="vs-head vs-head--split">{text}</h2>
+      <div class="vs-dots" aria-label="80 of 100">
+        {Array.from({ length: 100 }, (_, k) => <i class={k < 80 ? "on" : ""} style={`--k:${k}`} />)}
+      </div>
+    </div>
+  )}
+
+  {kind === "laptop" && (
+    /* the platform front-on in the MacBook (the Questrade Pro hero's
+       mockup: macbook.png, its screen rect, a browser title bar with the
+       three traffic lights), the screenshot filling the window from the
+       top-left (the user, 2026-11-04) */
+    <div class="vs-laptop" aria-hidden="true">
+      <div class="vs-laptop-screen">
+        <div class="vs-browser-bar"><i /><i /><i /></div>
+        <div class="vs-browser-view" style={`background-image:url(${src})`} />
+      </div>
+      <img src="/website/case/questrade/macbook.png" alt="" draggable="false" />
+    </div>
+  )}
+  {/* the soft dark foot over the MacBooks: slide 3's, and the two
+      platforms' too (the user, 2026-11-04: "the way we did in slide 3") */}
+  {kind === "laptop" && <div class="vs-laptop-fade" aria-hidden="true" />}
+  {/* the platforms: only the advanced (dark) MacBook takes slide 3's fade —
+      the regular platform's white screen has none (the user tried white,
+      then grey, and preferred it clean) */}
+  {kind === "platforms" && <div class="vs-plat-fade is-dark" aria-hidden="true" />}
+
+  {kind === "points" && (
+    /* the goal as the slide's headline, then a table: Problem | Solution,
+       one ruled row per pair (the user, 2026-11-04: "less overwhelming") */
+    <>
+      {text && <h2 class="vs-pgoal">{text}</h2>}
+      <div class="vs-points">
+        <p class:list={["vs-phead", build && "gd-fade"]} data-s={build ? 1 : undefined}>Problem</p>
+        <p class:list={["vs-phead", build && "gd-fade"]} data-s={build ? 2 : undefined}>Solution</p>
+        {items.map((t, r) => (
+          <div class:list={["vs-prow", lit.includes(r) && "is-lit"]}>
+            <p class:list={["vs-pt", build && "gd-fade"]} data-s={build ? 1 + r * 2 : undefined}>
+              <span class="vs-pn">{String(r + 1).padStart(2, "0")}</span>
+              <span>{t}</span>
+            </p>
+            <p class:list={["vs-pt vs-pt--sol", build && "gd-fade"]} data-s={build ? 2 + r * 2 : undefined}>{solutions[r] ?? ""}</p>
+          </div>
+        ))}
+      </div>
+    </>
+  )}
+
+  {kind === "impact" && (
+    <>
+      <div class="vs-field" aria-hidden="true" />
+      <div class="vs-figs">
+        <div class="vs-fig"><b>60%</b><span>faster to place trades</span></div>
+        <div class="vs-fig vs-fig--accent"><b>85%</b><span>satisfaction score during the closed beta</span></div>
+      </div>
+    </>
+  )}
+</div>
+
+<style>
+  .vs {
+    position: absolute;
+    inset: 0;
+    color: #fff;
+    font-family: "Elza Text", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    --accent: #00e88f;
+  }
+  .vs h2,
+  .vs p,
+  .vs figure,
+  .vs blockquote,
+  .vs ol {
+    margin: 0;
+  }
+
+  /* arrival: one quiet fade, all parts together (the user, 2026-11-04:
+     "a lot of transitions … overkill" — it was a staggered rise, under the
+     slide's own fade). The deck skips any part that is the same as on the
+     slide just left (.gd-keep), so a title that stays doesn't blink. */
+  :global(.gd-slide.is-cur) .vs > * {
+    animation: vs-rise 0.45s ease-out both;
+  }
+  @keyframes vs-rise {
+    from { opacity: 0; }
+  }
+
+  .vs-kicker,
+  .vs-num {
+    position: absolute;
+    top: 48px;
+    font-family: "DM Mono", monospace;
+    font-size: 16px;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .vs-kicker { left: 56px; }
+  .vs-num {
+    right: 56px;
+    color: var(--accent);
+  }
+
+  /* chapter and section openers */
+  /* every headline hangs from one line: left 56, its cap height's top at
+     200px (text-box trims the leading, so sizes don't shift it) */
+  .vs-giant,
+  .vs-section,
+  .vs-head,
+  .vs-quote {
+    text-box: trim-both cap alphabetic;
+  }
+  /* the opener's title, top-left again (the user's Figma, 2026-11-04) */
+  .vs-giant {
+    position: absolute;
+    left: 50px;
+    top: 200px;
+    max-width: 1500px;
+    font-size: 160px;
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+  /* the user's Figma (2026-11-04): section titles centred on the slide */
+  /* beside the peek: on the slide's middle, a step smaller so
+     "modernization" clears the MacBook's lid */
+  .vs-giant--mid {
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 128px;
+    text-box: normal;
+  }
+  /* the new platform in the peek: a browser window filling the screen,
+     the shot full-width from the top (no frame of its own to crop) */
+  .vs-mac-screen--web {
+    display: flex;
+    flex-direction: column;
+    background: #070d0f;
+  }
+  .vs-mac-screen--web .vs-browser-bar {
+    background: #222225;
+  }
+  .vs-mac-screen img.vs-peek-web {
+    position: static;
+    width: 100%;
+    transform: none;
+    filter: brightness(0.92);
+  }
+  .vs-section {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: max-content;
+    max-width: 1500px;
+    text-box: normal;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: 112px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+
+  /* the headline over a visual: top-left, large and plain */
+  .vs-head {
+    position: absolute;
+    left: 56px;
+    top: 200px;
+    max-width: 1500px;
+    font-size: 72px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+  }
+
+  /* 13–14 (the user's Frame 13/14): the headline in the left half,
+     centred on the slide's middle, the visual beside it on the right */
+  .vs-head--mid {
+    top: 50%;
+    max-width: 900px;
+    transform: translateY(-50%);
+    font-size: 56px;
+    line-height: 1.2;
+    text-wrap: balance;
+  }
+
+  /* ---- the falling chart: one faint line over the dot field --------- */
+  .vs-chart {
+    position: absolute;
+    left: 1040px;
+    right: -120px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .vs-chart svg,
+  .vs-bar svg {
+    display: block;
+    width: 100%;
+    overflow: visible;
+  }
+  /* very fine dots: a 1.4px round cap every 6px */
+  .vs-guides line {
+    stroke: rgba(255, 255, 255, 0.32);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-dasharray: 0 6;
+  }
+  .vs-tline {
+    fill: none;
+    stroke: url(#vs-ln);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  .vs-tglow {
+    stroke-width: 16;
+    opacity: 0.5;
+  }
+  :global(.gd-slide.is-cur) .vs-tline {
+    animation: vs-draw 1.8s cubic-bezier(0.55, 0, 0.25, 1) 0.4s forwards;
+  }
+
+  @keyframes vs-draw {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes vs-show {
+    to { opacity: 1; }
+  }
+  .vs-bar circle {
+    opacity: 0;
+  }
+  .vs .g { fill: rgba(255, 255, 255, 0.1); }
+  :global(.gd-slide.is-cur) .vs-bar circle {
+    animation: vs-show 0.45s ease forwards;
+    animation-delay: calc(0.35s + var(--c, 0) * 45ms);
+  }
+
+  /* ---- the existing platform, peeking in on a turned monitor --------- */
+  .vs--peek {
+    overflow: hidden;
+  }
+  /* a faint green light where the reference has its mint wall */
+  .vs--peek::before {
+    content: "";
+    position: absolute;
+    right: -200px;
+    bottom: -300px;
+    width: 1500px;
+    height: 1100px;
+    background: radial-gradient(closest-side, rgba(72, 213, 151, 0.12), transparent);
+    pointer-events: none;
+  }
+  .vs-peek {
+    position: absolute;
+    left: 840px;
+    top: 110px;
+    width: 2500px;
+    perspective: 2400px;
+    perspective-origin: 0% 30%;
+    /* it runs off the slide, but never ends on a hard cut: it dissolves
+       into the black before the right edge and fades into the bottom
+       edge (the user's Frame 14), so a letterboxed window shows no seam */
+    -webkit-mask-image:
+      linear-gradient(90deg, #000 900px, transparent 1210px),
+      linear-gradient(180deg, #000 700px, transparent 1000px);
+    -webkit-mask-composite: source-in;
+    mask-image:
+      linear-gradient(90deg, #000 900px, transparent 1210px),
+      linear-gradient(180deg, #000 700px, transparent 1000px);
+    mask-composite: intersect;
+  }
+  /* macbook.png is 2170 × 1430 with its screen cut out at x 221–1949,
+     y 157–1273; the screenshot sits in that opening, under the frame */
+  .vs-mac {
+    position: relative;
+    aspect-ratio: 2170 / 1430;
+    transform-origin: 0% 50%;
+    transform: rotateY(36deg) rotateX(2deg);
+    transform-style: preserve-3d;
+  }
+  /* the lid's thickness: 12 copies of its outline (macbook.png's lid is
+     x 193–1977, y 129–1333 of 2170 × 1430, corner radius 60) stepped
+     back 1.5px each — 18px of aluminium, lit at the front, darker behind */
+  .vs-mac-edge {
+    position: absolute;
+    left: 8.894%;
+    top: 9.021%;
+    width: 82.212%;
+    height: 84.196%;
+    border-radius: 69px;
+    transform: translateZ(calc(var(--z) * -1.5px));
+    background: linear-gradient(180deg, #e3e6e8, #a9aeb2 30%, #8b9094 70%, #6f7478);
+    filter: brightness(calc(1 - var(--z) * 0.035));
+  }
+  .vs-mac-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .vs-mac-screen {
+    position: absolute;
+    left: 10.184%;
+    top: 10.979%;
+    width: 79.631%;
+    height: 78.042%;
+    overflow: hidden;
+    background: #000;
+  }
+  /* the screenshot cut out of its own frame (64 / 51px of 2690 × 1589)
+     and scaled to fill the opening's height: it leads with the menu bar
+     and toolbar, the rest runs past the right edge */
+  .vs-mac-screen img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 114%;
+    transform: translate(-2.38%, -3.2%);
+    filter: brightness(0.92);
+  }
+  /* glass: a soft sheen across the top-left */
+  .vs-mac-screen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(118deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 38%);
+    pointer-events: none;
+  }
+  /* the opener's one gesture, kept but calmer: a short glide in */
+  :global(.gd-slide.is-cur) .vs-peek {
+    animation: vs-peek-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  }
+  @keyframes vs-peek-in {
+    from { opacity: 0; translate: 32px 0; }
+  }
+
+  /* ---- the two platforms, each on a MacBook, front-on ---------------- */
+  /* big, and cut off: each MacBook is 1400 wide and runs off its outer
+     edge (the left one off the left, the right one off the right) with a
+     84px gutter between the lids (the user's reference). The hinge (93.3% of macbook.png's height)
+     sits on the slide's bottom edge, so the base and feet are below it;
+     each lid's top lands ~300px down. */
+  .vs-macs {
+    position: absolute;
+    inset: 0;
+  }
+  .vs-flat {
+    position: absolute;
+    /* 44px lower than the hinge: the bottom bezel goes under the edge
+       too, the screens run off (the user's reference) */
+    bottom: calc(-1 * (1 - 0.933) * 1430 / 2170 * 1400px - 44px - 27px);
+    width: 1400px;
+    margin: 0;
+  }
+  /* the lid starts 193px into macbook.png's 2170 (124.5px here): the
+     gutter is measured between the lids, not the image boxes */
+  /* the labels, 6px above the lids — the house rule, baseline to the lid's rim. The
+     MacBook is 922.6px tall (1400 wide); its box sits 44px + the base
+     (6.7%) below the slide, and the lid's rim starts 9.02% down it, so
+     the rim is at 1124 − 84.28% × 922.6 from the slide's top */
+  .vs-plat-l {
+    position: absolute;
+    bottom: calc(1080px - (1124px + 27px - 0.8428 * 1430 / 2170 * 1400px) + 6px);
+    margin: 0;
+    text-box: trim-both cap alphabetic;
+    font: 14px "DM Mono", monospace;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  /* each centred on its whole lid (and screen), off-slide part included:
+     the box is the lid's width (1784 of macbook.png's 2170) and its edge
+     sits on the lid's inner edge, 42px from the slide's centre */
+  .vs-plat-l {
+    width: calc(1784 / 2170 * 1400px);
+    text-align: center;
+  }
+  .vs-plat-l.is-left {
+    right: calc(50% + 42px);
+  }
+  .vs-plat-l.is-right {
+    left: calc(50% + 42px);
+  }
+  .vs-flat:nth-of-type(1) {
+    right: calc(50% + 42px - 193 / 2170 * 1400px);
+  }
+  .vs-flat:nth-of-type(2) {
+    left: calc(50% + 42px - 193 / 2170 * 1400px);
+  }
+  .vs-flat-mac {
+    position: relative;
+    aspect-ratio: 2170 / 1430;
+    filter: drop-shadow(0 40px 50px rgba(0, 0, 0, 0.7));
+  }
+  .vs-flat-mac .vs-mac-screen img.vs-flat-shot {
+    position: absolute;
+    left: 0;
+    width: auto;
+    max-width: none;
+    filter: brightness(0.94);
+  }
+  /* (the MacBooks arrive with their slide's fade: no rise of their own) */
+
+  /* 21: the headline centred on the slide like every statement (the
+     user's Figma), the dot rows staying on the foot */
+  .vs-head--centre {
+    left: 50%;
+    top: 50%;
+    width: max-content;
+    text-box: normal;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  /* ---- the points: the goal, then Problem | Solution ----------------
+     The goal is the headline (left 56, the label's line); under it a
+     table of ruled rows — a mono number, the problem in grey, the
+     solution in white — at 30/400, so three pairs read as a list, not a
+     wall. Unlit rows (58/60/71's focus) drop to 20%. */
+  .vs-pgoal {
+    position: absolute;
+    left: 56px;
+    top: 150px;
+    max-width: 1500px;
+    margin: 0;
+    font-size: 64px;
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+  .vs-points {
+    position: absolute;
+    left: 56px;
+    top: 380px;
+    display: grid;
+    /* narrower columns (the user): ~10 words a line */
+    grid-template-columns: 600px 600px;
+    column-gap: 96px;
+  }
+  .vs-phead {
+    margin: 0 0 18px !important;
+    font: 16px "DM Mono", monospace;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+  }
+  .vs-prow {
+    display: contents;
+  }
+  .vs-prow > * {
+    padding: 30px 0 34px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    transition: color 0.5s ease, opacity 0.5s ease;
+  }
+  /* the number beside the problem it counts, on its first line */
+  .vs-pn {
+    flex: none;
+    width: 40px;
+    font: 16px/39px "DM Mono", monospace;
+    color: rgba(255, 255, 255, 0.45);
+  }
+  .vs-pt {
+    margin: 0 !important;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+    color: rgba(255, 255, 255, 0.62);
+  }
+  .vs-pt:not(.vs-pt--sol) {
+    display: flex;
+    gap: 8px;
+  }
+  .vs-pt--sol {
+    color: #fff;
+  }
+  /* a focus slide (the user's Figma): only the SOLUTION in question
+     stays white — every problem, the other solutions and the goal step
+     back */
+  .vs-points:has(.vs-prow:not(.is-lit)) .vs-prow > *,
+  .vs-points:has(.vs-prow:not(.is-lit)) .vs-phead,
+  .vs:has(.vs-prow:not(.is-lit)) .vs-pgoal {
+    /* 10% (the user): the one sentence carries the slide */
+    opacity: 0.1;
+  }
+  .vs-points:has(.vs-prow:not(.is-lit)) .vs-prow.is-lit > .vs-pt--sol {
+    opacity: 1;
+    /* its rule steps back with everything else — 10% of the 12% line */
+    border-top-color: rgba(255, 255, 255, 0.012);
+  }
+
+  /* ---- the laptop: front-on MacBook + browser window (Questrade Pro's
+     hero mockup), big, running off the foot of the slide (the user: "I
+     cannot see the bottom of the mac"). The screenshot shows its full
+     width, so it's shorter than the window (3404×1792 vs the window's
+     ~1.61): the laptop is sized so the slide's edge cuts the window just
+     where the shot ends — lid top at 110, shot bottom at 1080:
+     L = (1080 − 110) / 0.4531 ≈ 2141 wide (lid top = top + 128/2170·L,
+     shot bottom = top + 0.5121·L) */
+  .vs-laptop {
+    position: absolute;
+    /* a touch smaller (the user): 1960 wide, the shot's bottom still on
+       the slide's edge (top = 1080 − 0.5121·L), so the lid sits ~190 */
+    left: calc((1920px - 1960px) / 2);
+    top: calc(1080px - 0.5121 * 1960px);
+    width: 1960px;
+    aspect-ratio: 2170 / 1430;
+  }
+  /* the foot of the mockup fades into the ground: a dark wash, no blur
+     (the user kept the shadow, dropped the blur) */
+  .vs-laptop-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 300px;
+    pointer-events: none;
+    background: linear-gradient(to bottom, rgba(9, 9, 9, 0) 0%, rgba(9, 9, 9, 0.55) 55%, rgba(9, 9, 9, 0.92) 100%);
+  }
+  /* slide 4's two fades, the bottom 300px like slide 3's. The light one
+     stops at the left screen's inner edge (the lid's inner edge, 42px off
+     centre, + the 28/2170 bezel = 18px) so it never greys the bezel; the
+     dark one takes the right half, gutter and all */
+  .vs-plat-fade {
+    position: absolute;
+    bottom: 0;
+    height: 300px;
+    pointer-events: none;
+  }
+  .vs-plat-fade.is-dark {
+    left: 50%;
+    right: 0;
+    background: linear-gradient(to bottom, rgba(9, 9, 9, 0) 0%, rgba(9, 9, 9, 0.55) 55%, rgba(9, 9, 9, 0.92) 100%);
+  }
+  .vs-laptop > img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .vs-laptop-screen {
+    position: absolute;
+    left: 10.184%;
+    top: 10.979%;
+    width: 79.631%;
+    height: 78.042%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: #222225;
+  }
+  .vs-browser-bar {
+    flex: none;
+    height: 4%;
+    display: flex;
+    align-items: center;
+    gap: 0.55%;
+    padding-left: 1.4%;
+    border-bottom: 1px solid #2c2c30;
+  }
+  .vs-browser-bar i {
+    width: 0.8%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #ec6a5e;
+  }
+  .vs-browser-bar i:nth-child(2) { background: #f4bf4f; }
+  .vs-browser-bar i:nth-child(3) { background: #61c554; }
+  .vs-browser-view {
+    flex: 1;
+    min-height: 0;
+    /* its full width, from the top (nothing cut off at the sides — the
+       user); the slide's edge hides the window below it */
+    background: #070d0f left top / 100% auto no-repeat;
+  }
+
+  /* ---- the quote ------------------------------------------------------ */
+  .vs-quote {
+    position: absolute;
+    left: 56px;
+    top: 200px;
+    max-width: 1500px;
+    font-size: 72px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.025em;
+    text-indent: -0.42em;
+  }
+
+  /* ---- the journey: a dotted rail, four stops, one lit ----------------- */
+  .vs-journey {
+    position: absolute;
+    left: 56px;
+    right: 56px;
+    bottom: 120px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 0;
+    list-style: none;
+    background: radial-gradient(circle, rgba(150, 158, 160, 0.55) 1.6px, transparent 2.2px) 0 -14px / 28px 28px repeat-x;
+  }
+  .vs-journey li {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-top: 40px;
+  }
+  .vs-journey i {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .vs-journey b {
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  .vs-journey .is-hot i {
+    background: var(--accent);
+    box-shadow: 0 0 0 7px #000, 0 0 0 8px rgba(72, 213, 151, 0.7);
+  }
+  .vs-journey .is-hot b {
+    color: var(--accent);
+  }
+  /* (the journey arrives with its slide: no per-step stagger) */
+
+  /* ---- time as rows of dots ------------------------------------------ */
+  .vs-bars {
+    position: absolute;
+    left: 56px;
+    right: 56px;
+    bottom: 110px;
+    display: grid;
+    gap: 48px;
+  }
+  /* the rows on a slide of their own (54): centred on the slide's height */
+  .vs-bars--solo {
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .vs-bar {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    align-items: center;
+    font-size: 22px;
+  }
+  .vs-bar .on { fill: #fff; }
+  .vs-bar.is-hot .on { fill: #e5484d; }
+
+  /* ---- 80 of 100 ------------------------------------------------------ */
+  .vs-split {
+    position: absolute;
+    inset: 0;
+  }
+  .vs-head--split {
+    max-width: 1240px;
+  }
+  .vs-split .vs-dots {
+    position: absolute;
+    right: 120px;
+    top: 200px;
+  }
+  .vs-dots {
+    display: grid;
+    grid-template-columns: repeat(10, 12px);
+    gap: 36px;
+  }
+  .vs-dots i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  :global(.gd-slide.is-cur) .vs-dots i.on {
+    animation: vs-light 0.4s ease forwards;
+    animation-delay: calc(0.3s + var(--k) * 12ms);
+  }
+  @keyframes vs-light {
+    to { background: var(--accent); }
+  }
+
+  /* ---- impact: the figures as pills over a still dot field ----------- */
+  .vs-field {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(150, 158, 160, 0.5) 1.6px, transparent 2.2px);
+    background-size: 28px 28px;
+    background-position: 14px 14px;
+    -webkit-mask-image: radial-gradient(ellipse 46% 60% at 50% 48%, #000 25%, transparent 100%);
+    mask-image: radial-gradient(ellipse 46% 60% at 50% 48%, #000 25%, transparent 100%);
+  }
+  .vs-figs {
+    position: absolute;
+    left: 50%;
+    top: 47%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+  .vs-fig {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+  }
+  .vs-fig b {
+    display: block;
+    padding: 34px 72px 40px;
+    border-radius: 999px;
+    color: #fff;
+    /* the ring masks the dot field around the pill in the ground's own
+       middle tone (the ground is lifted off pure black) */
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.7), 0 0 0 28px var(--veda-mid, #000);
+    background: var(--veda-mid, #000);
+    font-size: 120px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+  .vs-fig--accent b {
+    background: var(--accent);
+    color: #0a0a0a;
+    box-shadow: 0 0 0 28px var(--veda-mid, #000);
+  }
+  .vs-fig span {
+    font-size: 20px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.gd-slide.is-cur) .vs * ,
+    :global(.gd-slide.is-cur) .vs > * {
+      animation: none !important;
+    }
+    .vs circle { opacity: 1; }
+    .vs-tline { stroke-dashoffset: 0; }
+    .vs-dots i.on { background: var(--accent); }
+  }
+</style>

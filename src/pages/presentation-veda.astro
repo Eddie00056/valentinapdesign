@@ -1,0 +1,24 @@
+---
+/* The order entry case study in the Veda direction: the deck's own slides
+   (GustoDeck, theme="veda") — every screenshot, live widget and build —
+   on one black ground, in Elza Text, with the dot-field visuals. Unlinked.
+   The first 14-slide exploration is at /presentation-veda-v1. */
+import Website from "../layouts/Website.astro";
+import GustoDeck from "../components/website/deck/GustoDeck.astro";
+---
+
+<Website title="Presentation — Veda direction" description="The order entry case study in the Veda direction.">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400&family=DM+Mono:wght@400&display=swap" />
+  <main class="gp">
+    <GustoDeck solo theme="veda" range={[11, 53]} />
+  </main>
+</Website>
+
+<style is:global>
+  html,
+  body {
+    overflow: hidden;
+    height: 100%;
+    background: #070707;
+  }
+</style>

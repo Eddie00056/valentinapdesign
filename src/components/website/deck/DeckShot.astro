@@ -8,12 +8,15 @@ interface Props {
   cls?: string;
   /** step index: the crop fades in on that arrow, like a label or a live frame */
   s?: number;
+  /* new on a slide that continues the last (veda's VEDA_SAME): it still
+     fades in while what carried over stays put */
+  fresh?: boolean;
 }
-const { src, x, y, w, cls = "gd-media-shot", s } = Astro.props;
+const { src, x, y, w, cls = "gd-media-shot", s, fresh } = Astro.props;
 ---
 
 <img
-  class:list={[cls, s != null && "gd-fade"]}
+  class:list={[cls, s != null && "gd-fade", fresh && "gd-fresh"]}
   data-s={s ?? undefined}
   src={`/website/case/gusto/v2/${src}.webp`}
   alt=""

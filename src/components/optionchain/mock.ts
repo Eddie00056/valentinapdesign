@@ -1,3 +1,4 @@
+import { NAMES, rebase, symbolOr } from '../shared/quoteOverride';
 /**
  * Deterministic synthetic option chain.
  *
@@ -133,10 +134,11 @@ function impliedVol(
 /* ------------------------------------------------------------------ */
 
 export const UNDERLYING: Underlying = {
-  symbol: 'PLTR',
-  name: 'Palantir Technologies',
-  last: 175,
-  change: 3.18,
+  // the presentation can ask for another instrument (?sym=&px=)
+  symbol: symbolOr('PLTR'),
+  name: NAMES[symbolOr('PLTR')] ?? 'Palantir Technologies',
+  last: rebase(175, 174.62),
+  change: rebase(3.18, 174.62),
   changePct: 0.0185,
   currency: 'USD',
   marketStatus: 'open',
