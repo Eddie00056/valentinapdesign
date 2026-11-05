@@ -1132,13 +1132,28 @@
   {
     "n": 54,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
     "shots": [
       {
         "src": "053full",
         "x": 0,
         "y": 0,
         "w": 100
+      }
+    ],
+    "live": [
+      {
+        "page": "fractional-order-flow?static",
+        "init": "fracAmountFill",
+        "x": 58.97,
+        "y": 22.57,
+        "w": 32.09,
+        "h": 79.3,
+        "vw": 1280,
+        "vh": 1000,
+        "fit": ".fof-frame",
+        "mode": "width",
+        "css": ".fof-stage{background:none!important}.fof-screen button[style*=\"352.523\"]{visibility:hidden!important}"
       }
     ]
   },
@@ -1224,15 +1239,16 @@
     "live": [
       {
         "page": "fractional-order-flow",
-        "x": 57.04,
-        "y": 7.57,
+        "arrive": "fracAmountType",
+        "x": 58.97,
+        "y": 22.57,
         "w": 32.09,
         "h": 79.3,
         "vw": 1280,
         "vh": 1000,
         "fit": ".fof-frame",
         "mode": "width",
-        "css": ".fof-stage{background:none!important}"
+        "css": ".fof-stage{background:none!important}.fof-screen button[style*=\"352.523\"]{visibility:hidden!important}"
       }
     ]
   },
@@ -1378,13 +1394,14 @@
   },
   {
     "n": 71,
+    "steps": 1,
     "kind": "media",
     "bg": "white",
     "corner": "Goal",
     "live": [
       {
-        "page": "holdings-empty-state?auto",
-        "x": 16.9,
+        "page": "holdings-empty-state?auto&scatter",
+        "x": 13.9,
         "y": 23.05,
         "w": 22.2,
         "h": 40.0,
@@ -1393,27 +1410,28 @@
         "fit": ".he-card",
         "pad": 0,
         "clip": true,
-        "css": ".he-root,.he-card{background:none!important;box-shadow:none!important;border:none!important}.he-card::after{display:none!important}.he-scene:not(.he-scene--lit) .he-logo img{opacity:.22!important}.he-glass{background:#fff!important}.he-rim{background:linear-gradient(160deg,#9aa3b5 0%,#4b5563 48%,#1f2937 72%,#8b93a4 100%)!important}.he-handle{background:linear-gradient(90deg,#4b5563 0%,#9aa3b5 45%,#1f2937 100%)!important;box-shadow:0 3px 8px rgba(0,0,0,.25)!important}.back{display:none!important}"
+        "css": ".he-root,.he-card{background:none!important;box-shadow:none!important;border:none!important}.he-card::after{display:none!important}.he-scene:not(.he-scene--lit) .he-logo img{opacity:.6!important}.he-glass{background:#f2f2f2!important}html,body{background:transparent!important}.he-logo{border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.10)}.he-logo::after{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)!important}.he-rim{background:linear-gradient(160deg,#9aa3b5 0%,#4b5563 48%,#1f2937 72%,#8b93a4 100%)!important}.he-handle{background:linear-gradient(90deg,#4b5563 0%,#9aa3b5 45%,#1f2937 100%)!important;box-shadow:0 3px 8px rgba(0,0,0,.25)!important}.back{display:none!important}"
       },
       {
         "page": "order-placed-animation",
-        "x": 67.0,
-        "y": 35.09,
-        "w": 10.0,
-        "h": 18.0,
+        "x": 70.48,
+        "y": 36.81,
+        "w": 9.04,
+        "h": 16.28,
         "vw": 1280,
         "vh": 1000,
         "fit": ".opa-badge",
         "pad": 26,
         "clip": true,
         "init": "mute",
-        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}.opa-glow{animation:none!important;opacity:.06!important;transform:translate(-50%,-50%) scale(1.3)!important}.opa-caption{display:none!important}"
+        "dim": 1,
+        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}.opa-glow{animation:none!important;opacity:.06!important;transform:translate(-50%,-50%) scale(1.3)!important}.opa-caption{display:none!important}.opa-badge::before{content:\"\";position:absolute;left:50%;top:50%;width:99.5px;height:99.5px;margin:-49.75px 0 0 -49.75px;border-radius:50%;background:#fff;box-shadow:0 1.6px 6.4px rgba(0,0,0,.10)}"
       }
     ],
     "labels": [
       {
         "text": "Help traders discover\nfractional symbols",
-        "x": 28.0,
+        "x": 25.0,
         "y": 51.11,
         "size": "lg",
         "tone": "dark",
@@ -1423,7 +1441,8 @@
       },
       {
         "text": "Allow traders to place\na fractional trade",
-        "x": 72.0,
+        "dim": 1,
+        "x": 75.0,
         "y": 51.11,
         "size": "lg",
         "tone": "dark",
@@ -1440,8 +1459,8 @@
     "corner": "Goal",
     "live": [
       {
-        "page": "holdings-empty-state?auto",
-        "x": 16.9,
+        "page": "holdings-empty-state?auto&scatter",
+        "x": 13.9,
         "y": 23.05,
         "w": 22.2,
         "h": 40.0,
@@ -1450,28 +1469,28 @@
         "fit": ".he-card",
         "pad": 0,
         "clip": true,
-        "css": ".he-root,.he-card{background:none!important;box-shadow:none!important;border:none!important}.he-card::after{display:none!important}.he-scene:not(.he-scene--lit) .he-logo img{opacity:.22!important}.he-glass{background:#fff!important}.he-rim{background:linear-gradient(160deg,#9aa3b5 0%,#4b5563 48%,#1f2937 72%,#8b93a4 100%)!important}.he-handle{background:linear-gradient(90deg,#4b5563 0%,#9aa3b5 45%,#1f2937 100%)!important;box-shadow:0 3px 8px rgba(0,0,0,.25)!important}.back{display:none!important}"
+        "css": ".he-root,.he-card{background:none!important;box-shadow:none!important;border:none!important}.he-card::after{display:none!important}.he-scene:not(.he-scene--lit) .he-logo img{opacity:.6!important}.he-glass{background:#f2f2f2!important}html,body{background:transparent!important}.he-logo{border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.10)}.he-logo::after{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)!important}.he-rim{background:linear-gradient(160deg,#9aa3b5 0%,#4b5563 48%,#1f2937 72%,#8b93a4 100%)!important}.he-handle{background:linear-gradient(90deg,#4b5563 0%,#9aa3b5 45%,#1f2937 100%)!important;box-shadow:0 3px 8px rgba(0,0,0,.25)!important}.back{display:none!important}"
       },
       {
         "page": "order-placed-animation",
-        "x": 67.0,
-        "y": 35.09,
-        "w": 10.0,
-        "h": 18.0,
+        "x": 70.48,
+        "y": 36.81,
+        "w": 9.04,
+        "h": 16.28,
         "vw": 1280,
         "vh": 1000,
         "fit": ".opa-badge",
         "pad": 26,
         "clip": true,
         "init": "mute",
-        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}.opa-glow{animation:none!important;opacity:.06!important;transform:translate(-50%,-50%) scale(1.3)!important}.opa-caption{display:none!important}",
+        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}.opa-glow{animation:none!important;opacity:.06!important;transform:translate(-50%,-50%) scale(1.3)!important}.opa-caption{display:none!important}.opa-badge::before{content:\"\";position:absolute;left:50%;top:50%;width:99.5px;height:99.5px;margin:-49.75px 0 0 -49.75px;border-radius:50%;background:#fff;box-shadow:0 1.6px 6.4px rgba(0,0,0,.10)}",
         "op": 0.24
       }
     ],
     "labels": [
       {
         "text": "Help traders discover\nfractional symbols",
-        "x": 28.0,
+        "x": 25.0,
         "y": 51.11,
         "size": "lg",
         "tone": "dark",
@@ -1481,7 +1500,7 @@
       },
       {
         "text": "Allow traders to place\na fractional trade",
-        "x": 72.0,
+        "x": 75.0,
         "y": 51.11,
         "size": "lg",
         "tone": "dark",
@@ -1777,7 +1796,7 @@
     ],
     "shots": [
       {
-        "src": "075a",
+        "src": "075a-cut",
         "x": 3.07,
         "y": 40.57,
         "w": 44.47
@@ -1805,7 +1824,7 @@
     ],
     "shots": [
       {
-        "src": "076a",
+        "src": "076a-cut",
         "x": 3.07,
         "y": 40.57,
         "w": 44.47
@@ -1822,7 +1841,7 @@
         "vh": 1000,
         "mode": "width",
         "fit": "img[src*=\"iphone\"]",
-        "css": ".acs-root{background:none!important}",
+        "css": "#bg-wrap.theme-light.theme-light .acs-root.acs-root,#bg-wrap .acs-root.acs-root.acs-root{background:transparent!important}",
         "clip": true
       }
     ]
@@ -1834,8 +1853,8 @@
     "corner": "Goal",
     "live": [
       {
-        "page": "holdings-empty-state?auto",
-        "x": 16.9,
+        "page": "holdings-empty-state?auto&scatter",
+        "x": 13.9,
         "y": 23.05,
         "w": 22.2,
         "h": 40.0,
@@ -1844,28 +1863,28 @@
         "fit": ".he-card",
         "pad": 0,
         "clip": true,
-        "css": ".he-root,.he-card{background:none!important;box-shadow:none!important;border:none!important}.he-card::after{display:none!important}.he-scene:not(.he-scene--lit) .he-logo img{opacity:.22!important}.he-glass{background:#fff!important}.he-rim{background:linear-gradient(160deg,#9aa3b5 0%,#4b5563 48%,#1f2937 72%,#8b93a4 100%)!important}.he-handle{background:linear-gradient(90deg,#4b5563 0%,#9aa3b5 45%,#1f2937 100%)!important;box-shadow:0 3px 8px rgba(0,0,0,.25)!important}.back{display:none!important}",
+        "css": ".he-root,.he-card{background:none!important;box-shadow:none!important;border:none!important}.he-card::after{display:none!important}.he-scene:not(.he-scene--lit) .he-logo img{opacity:.6!important}.he-glass{background:#f2f2f2!important}html,body{background:transparent!important}.he-logo{border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.10)}.he-logo::after{box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)!important}.he-rim{background:linear-gradient(160deg,#9aa3b5 0%,#4b5563 48%,#1f2937 72%,#8b93a4 100%)!important}.he-handle{background:linear-gradient(90deg,#4b5563 0%,#9aa3b5 45%,#1f2937 100%)!important;box-shadow:0 3px 8px rgba(0,0,0,.25)!important}.back{display:none!important}",
         "op": 0.24
       },
       {
         "page": "order-placed-animation",
-        "x": 67.0,
-        "y": 35.09,
-        "w": 10.0,
-        "h": 18.0,
+        "x": 70.48,
+        "y": 36.81,
+        "w": 9.04,
+        "h": 16.28,
         "vw": 1280,
         "vh": 1000,
         "fit": ".opa-badge",
         "pad": 26,
         "clip": true,
         "init": "mute",
-        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}.opa-glow{animation:none!important;opacity:.06!important;transform:translate(-50%,-50%) scale(1.3)!important}.opa-caption{display:none!important}"
+        "css": ".opa-stage{background:none!important}.opa-phone{filter:none!important}.opa-phone>img{visibility:hidden!important}.opa-ring-track{stroke:rgba(0,0,0,0.1)!important}.opa-caption--from{color:rgba(0,0,0,0.45)!important}.opa-caption--to{color:rgba(0,0,0,0.92)!important}.opa-glow{animation:none!important;opacity:.06!important;transform:translate(-50%,-50%) scale(1.3)!important}.opa-caption{display:none!important}.opa-badge::before{content:\"\";position:absolute;left:50%;top:50%;width:99.5px;height:99.5px;margin:-49.75px 0 0 -49.75px;border-radius:50%;background:#fff;box-shadow:0 1.6px 6.4px rgba(0,0,0,.10)}"
       }
     ],
     "labels": [
       {
         "text": "Help traders discover\nfractional symbols",
-        "x": 28.0,
+        "x": 25.0,
         "y": 51.11,
         "size": "lg",
         "tone": "dark",
@@ -1876,7 +1895,7 @@
       },
       {
         "text": "Allow traders to place\na fractional trade",
-        "x": 72.0,
+        "x": 75.0,
         "y": 51.11,
         "size": "lg",
         "tone": "dark",
@@ -1892,17 +1911,17 @@
     "bg": "white",
     "shots": [
       {
-        "src": "078a",
-        "x": 0,
-        "y": 0,
-        "w": 100
+        "src": "078a-wizard4",
+        "x": 12.5211,
+        "y": 25.74,
+        "w": 74.9578
       }
     ],
     "corner": "Helping traders place a fractional trade",
     "labels": [
       {
         "text": "Original order entry wizard",
-        "x": 47.96,
+        "x": 50,
         "y": 22.31,
         "size": "lg",
         "tone": "dark"
@@ -1913,15 +1932,29 @@
     "n": 82,
     "kind": "media",
     "bg": "white",
-    "shots": [
+    "panels": [
       {
-        "src": "079a",
-        "x": 0,
+        "x": 64.3056,
         "y": 0,
-        "w": 100
+        "w": 35.6944,
+        "c": "#f2f2f2"
       }
     ],
-    "corner": "Original design",
+    "shots": [
+      {
+        "src": "079a-old-cut",
+        "x": 0,
+        "y": 0,
+        "w": 64.3056
+      },
+      {
+        "src": "079a-phone-cut",
+        "x": 72.0833,
+        "y": 18.3642,
+        "w": 21.1111
+      }
+    ],
+    "corner": "Helping traders place a fractional trade",
     "labels": [
       {
         "text": "Original order entry wizard",
@@ -2031,6 +2064,7 @@
   {
     "n": 85,
     "kind": "statement",
+    "corner": "Helping traders place a fractional trade",
     "bg": "white",
     "text": "But there’s more..",
     "fw": 700,
@@ -2144,7 +2178,7 @@
     ],
     "shots": [
       {
-        "src": "091a",
+        "src": "091a-cut",
         "x": 14.0,
         "y": 16.8,
         "w": 22.3
@@ -2375,7 +2409,8 @@
   {
     "n": 96,
     "kind": "media",
-    "bg": "black",
+    "bg": "white",
+    "steps": 1,
     "shots": [
       {
         "src": "093full",
@@ -2387,16 +2422,12 @@
   },
   {
     "n": 97,
-    "kind": "media",
-    "bg": "black",
-    "shots": [
-      {
-        "src": "094full",
-        "x": 0,
-        "y": 0,
-        "w": 100
-      }
-    ]
+    "kind": "statement",
+    "corner": "Helping traders place a fractional trade",
+    "bg": "white",
+    "text": "Navigating edge cases",
+    "fw": 700,
+    "fs": 64
   },
   {
     "n": 98,

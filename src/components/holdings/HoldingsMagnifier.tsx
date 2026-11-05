@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { KeyboardEvent } from "react";
 import {
   motion,
@@ -36,7 +36,13 @@ export function HoldingsMagnifier({
   /** one lap of the wander, ms */
   wanderMs?: number;
 } = {}) {
-  const layout = cluster ? CLUSTER : SQUARE;
+  // ?scatter (the deck's Goal slide): the reference's four sizes, larger
+  // and loosely packed. Read after mount so the server render still agrees
+  const [scatter, setScatter] = useState(false);
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).has("scatter")) setScatter(true);
+  }, []);
+  const layout = scatter ? SCATTER : cluster ? CLUSTER : SQUARE;
   const reduce = useReducedMotion() ?? false;
 
   // One drift for the whole unit, off the frame clock rather than a
@@ -65,6 +71,11 @@ export function HoldingsMagnifier({
   // the pointer.
   const lensX = useMotionValue(lensHome(layout).x);
   const lensY = useMotionValue(lensHome(layout).y);
+  useEffect(() => {
+    lensX.set(lensHome(layout).x);
+    lensY.set(lensHome(layout).y);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scatter]);
   const innerX = useTransform(lensX, (x) => -x);
   const innerY = useTransform(lensY, (y) => -y);
 
@@ -134,7 +145,7 @@ export function HoldingsMagnifier({
     });
     return unsub;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reduce, auto, cluster, wanderMs]);
+  }, [reduce, auto, cluster, scatter, wanderMs]);
 
   return (
     <div className="he-root">
@@ -296,6 +307,20 @@ const CLUSTER: Layout = {
     { x: 48, y: 10, size: 24 },
     { x: 24, y: 44, size: 28 },
     { x: 56, y: 36, size: 36 },
+  ],
+};
+
+/** ?scatter — the empty-state reference's sizes (MSFT 22, META 18, AAPL 34,
+    GOOGL 27) ×1.5, packed round their mass centre with a looser 10px
+    clearance so they read scattered rather than tight */
+const SCATTER: Layout = {
+  w: 115,
+  h: 81,
+  tiles: [
+    { x: 0, y: 0, size: 33 },
+    { x: 43, y: 4, size: 27 },
+    { x: 64, y: 28, size: 51 },
+    { x: 14, y: 40, size: 41 },
   ],
 };
 

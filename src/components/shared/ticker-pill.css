@@ -35,6 +35,10 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  /* one line, always: a tick that runs a hair past the fixed width
+     (HOOD's $87.40 frame measured 194.25 in a 194 pill) broke the change
+     onto a second line, out of the pill (the user, 2026-11-05) */
+  white-space: nowrap;
   display: flex;
   align-items: center;
   /* 7 — the same gap the price keeps from its change, so the pill holds

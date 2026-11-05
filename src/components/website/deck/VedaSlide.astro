@@ -5,8 +5,8 @@
    the tops, one red dot where it ends up. Animations run when the slide
    is the current one (.gd-slide.is-cur). Numbers marked illustrative are
    placeholders until the real series arrive. */
-type Kind = "chapter" | "section" | "chart" | "quote" | "journey" | "bars" | "dots" | "impact" | "peek" | "platforms" | "points" | "laptop";
-const { kind, label, text, num, items = [], solutions = [], lit = [], src, build = false } = Astro.props as {
+type Kind = "chapter" | "section" | "chart" | "quote" | "journey" | "bars" | "dots" | "impact" | "peek" | "platforms" | "points" | "laptop" | "ps" | "cover";
+const { kind, label, text, num, items = [], solutions = [], lit = [], src, build = false, focus, hideSol = false, focusSol = false, label2, revealSol } = Astro.props as {
   kind: Kind;
   /* points: reveal on clicks — headers + problem 1 on the first, then
      each solution and the next problem in turn (the deck's data-s build) */
@@ -22,6 +22,17 @@ const { kind, label, text, num, items = [], solutions = [], lit = [], src, build
   lit?: number[];
   /* points: the solution beside each problem (same order) */
   solutions?: string[];
+  /* ps: the row that stays bright on the focus click — the click after
+     the build (or the first click, with no build); the others dim.
+     hideSol: the solution column held back; focusSol: the focus keeps the
+     row's solution (not its problem) */
+  focus?: number;
+  hideSol?: boolean;
+  focusSol?: boolean;
+  /* ps with build: the title the slide changes to on the solutions' click */
+  label2?: string;
+  /* ps without build: the one solution that fades in on the slide's click */
+  revealSol?: number;
 };
 
 const P = 28;
@@ -89,7 +100,14 @@ const quote = (text || "").replace(/^[“"]|[”"]$/g, "");
 ---
 
 <div class:list={["vs", `vs--${kind}`]}>
-  {label && <p class="vs-kicker">{label}</p>}
+  {label && kind !== "cover" && !(kind === "ps" && label2 && build) && <p class="vs-kicker">{label}</p>}
+
+  {kind === "cover" && (
+    <div class="vs-cover">
+      <h2 class="vs-cover-name">{text}</h2>
+      {label && <p class="vs-cover-sub">{label}</p>}
+    </div>
+  )}
 
   {kind === "chapter" && (
     <>
@@ -275,8 +293,10 @@ const quote = (text || "").replace(/^[“"]|[”"]$/g, "");
     <>
       {text && <h2 class="vs-pgoal">{text}</h2>}
       <div class="vs-points">
-        <p class:list={["vs-phead", build && "gd-fade"]} data-s={build ? 1 : undefined}>Problem</p>
-        <p class:list={["vs-phead", build && "gd-fade"]} data-s={build ? 2 : undefined}>Solution</p>
+        {/* with no goal above it, the heads are there on arrival — the
+            slide never lands empty; the rows still build in beneath */}
+        <p class:list={["vs-phead", build && text && "gd-fade"]} data-s={build && text ? 1 : undefined}>Problem</p>
+        <p class:list={["vs-phead", build && text && "gd-fade"]} data-s={build && text ? 2 : undefined}>Solution</p>
         {items.map((t, r) => (
           <div class:list={["vs-prow", lit.includes(r) && "is-lit"]}>
             <p class:list={["vs-pt", build && "gd-fade"]} data-s={build ? 1 + r * 2 : undefined}>
@@ -290,9 +310,42 @@ const quote = (text || "").replace(/^[“"]|[”"]$/g, "");
     </>
   )}
 
+  {kind === "ps" && (
+    /* the Problem | Solution table, built on clicks (the user, 2026-11-05):
+       on the Problem slide the solution column is held back and the rows
+       come in one per click, then the first problem takes the focus; on
+       the Solution slide the same table, the solutions in place, and its
+       click keeps only the first solution bright. Same geometry on both,
+       so the step between them is the table filling in. */
+    <>
+    {/* the title follows the build: "Problem" while the problems come
+        in, "Solution" once the solutions land */}
+    {label2 && build && (
+      <>
+        <p class="vs-kicker vs-kick-out" data-s={items.length}>{label}</p>
+        <p class="vs-kicker gd-fade" data-s={items.length}>{label2}</p>
+      </>
+    )}
+    <div class:list={["vs-points vs-ps", focusSol && "is-sol", hideSol && "is-nosol", focus != null && !build && "is-on"]} data-s={focus != null && build ? items.length : undefined}>
+      <p class="vs-phead">Problem</p>
+      <p class="vs-phead vs-phead--sol">Solution</p>
+      {items.map((t, r) => (
+        <div class:list={["vs-prow", r === focus && "is-focus"]}>
+          {/* build: the first problem is there on arrival, each next one
+              a click, then the solutions together on the last click */}
+          <p class:list={["vs-pt", build && r > 0 && "gd-fade"]} data-s={build && r > 0 ? r : undefined}>
+            <span class="vs-pn">{String(r + 1).padStart(2, "0")}</span>
+            <span>{t}</span>
+          </p>
+          <p class:list={["vs-pt vs-pt--sol", (build || r === revealSol) && "gd-fade"]} data-s={build ? items.length : r === revealSol ? 1 : undefined}>{solutions[r] ?? ""}</p>
+        </div>
+      ))}
+    </div>
+    </>
+  )}
+
   {kind === "impact" && (
     <>
-      <div class="vs-field" aria-hidden="true" />
       <div class="vs-figs">
         <div class="vs-fig"><b>60%</b><span>faster to place trades</span></div>
         <div class="vs-fig vs-fig--accent"><b>85%</b><span>satisfaction score during the closed beta</span></div>
@@ -368,6 +421,31 @@ const quote = (text || "").replace(/^[“"]|[”"]$/g, "");
   /* the user's Figma (2026-11-04): section titles centred on the slide */
   /* beside the peek: on the slide's middle, a step smaller so
      "modernization" clears the MacBook's lid */
+  /* the cover: the opener's title type (128 / 500 / -0.045em) on the
+     slide's middle, left 50 like it; the subtitle in the statements'
+     grey, at the captions' scale up a step */
+  .vs-cover {
+    position: absolute;
+    left: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .vs-cover-name {
+    margin: 0;
+    font-size: 128px;
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+  }
+  .vs-cover-sub {
+    /* !important: the slide's p reset (.vs p) outranks this */
+    margin: 28px 0 0 !important;
+    font-size: 40px;
+    font-weight: 400;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: rgba(255, 255, 255, 0.55);
+  }
   .vs-giant--mid {
     top: 50%;
     transform: translateY(-50%);
@@ -685,6 +763,57 @@ const quote = (text || "").replace(/^[“"]|[”"]$/g, "");
     grid-template-columns: 600px 600px;
     column-gap: 96px;
   }
+  /* no goal headline over it (the strategy has its own slide now):
+     the table alone, centred on the slide's height */
+  .vs:not(:has(.vs-pgoal)) .vs-points {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  /* ps: the solution column held back (its rules and all) on the Problem
+     slide; the focus click steps everything back but the one cell */
+  /* no column heads on these (the user): the slide's title says it */
+  .vs-kick-out {
+    transition: opacity 0.5s ease;
+  }
+  .vs-kick-out.is-on {
+    opacity: 0;
+  }
+  /* the arrow from problem 01 to its solution (the user): in the 96px
+     gutter, on the pair's first line, a hairline shaft with an open head —
+     part of the solution cell, so it fades in with it */
+  .vs-ps .vs-prow.is-focus > .vs-pt--sol {
+    position: relative;
+  }
+  .vs-ps .vs-prow.is-focus > .vs-pt--sol:not(:empty)::before {
+    content: "";
+    position: absolute;
+    left: -76px;
+    top: 30px;
+    width: 56px;
+    height: 39px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='39' viewBox='0 0 56 39' fill='none' stroke='%23fff' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 19.5h50M45 13l7 6.5-7 6.5'/%3E%3C/svg%3E") center / 56px 39px no-repeat;
+    opacity: 0.6;
+  }
+  .vs-ps .vs-phead {
+    display: none;
+  }
+  .vs-ps.is-nosol .vs-phead--sol,
+  .vs-ps.is-nosol .vs-pt--sol {
+    visibility: hidden;
+  }
+  .vs-ps .vs-prow > * {
+    transition: opacity 0.5s ease;
+  }
+  .vs-ps.is-on:not(.is-sol) .vs-prow:not(.is-focus) > * {
+    opacity: 0.1;
+  }
+  .vs-ps.is-sol.is-on .vs-phead,
+  .vs-ps.is-sol.is-on .vs-prow > * {
+    opacity: 0.1;
+  }
+  .vs-ps.is-sol.is-on .vs-prow.is-focus > .vs-pt--sol {
+    opacity: 1;
+  }
   .vs-phead {
     margin: 0 0 18px !important;
     font: 16px "DM Mono", monospace;
@@ -726,13 +855,13 @@ const quote = (text || "").replace(/^[“"]|[”"]$/g, "");
   /* a focus slide (the user's Figma): only the SOLUTION in question
      stays white — every problem, the other solutions and the goal step
      back */
-  .vs-points:has(.vs-prow:not(.is-lit)) .vs-prow > *,
-  .vs-points:has(.vs-prow:not(.is-lit)) .vs-phead,
+  .vs-points:not(.vs-ps):has(.vs-prow:not(.is-lit)) .vs-prow > *,
+  .vs-points:not(.vs-ps):has(.vs-prow:not(.is-lit)) .vs-phead,
   .vs:has(.vs-prow:not(.is-lit)) .vs-pgoal {
     /* 10% (the user): the one sentence carries the slide */
     opacity: 0.1;
   }
-  .vs-points:has(.vs-prow:not(.is-lit)) .vs-prow.is-lit > .vs-pt--sol {
+  .vs-points:not(.vs-ps):has(.vs-prow:not(.is-lit)) .vs-prow.is-lit > .vs-pt--sol {
     opacity: 1;
     /* its rule steps back with everything else — 10% of the 12% line */
     border-top-color: rgba(255, 255, 255, 0.012);
@@ -945,43 +1074,60 @@ const quote = (text || "").replace(/^[“"]|[”"]$/g, "");
     -webkit-mask-image: radial-gradient(ellipse 46% 60% at 50% 48%, #000 25%, transparent 100%);
     mask-image: radial-gradient(ellipse 46% 60% at 50% 48%, #000 25%, transparent 100%);
   }
+  /* impact (the user, 2026-11-05: no other slide has the dots — bigger,
+     more impactful numbers): the two figures alone, huge, a hairline
+     between them; the second in the accent */
   .vs-figs {
     position: absolute;
     left: 50%;
-    top: 47%;
+    top: 50%;
     transform: translate(-50%, -50%);
-    display: flex;
-    gap: 40px;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    align-items: start;
   }
   .vs-fig {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 22px;
+    gap: 28px;
+    padding: 0 96px;
+  }
+  .vs-fig + .vs-fig {
+    box-shadow: inset 1px 0 0 rgba(255, 255, 255, 0.14);
   }
   .vs-fig b {
     display: block;
-    padding: 34px 72px 40px;
-    border-radius: 999px;
     color: #fff;
-    /* the ring masks the dot field around the pill in the ground's own
-       middle tone (the ground is lifted off pure black) */
-    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.7), 0 0 0 28px var(--veda-mid, #000);
-    background: var(--veda-mid, #000);
-    font-size: 120px;
+    font-size: 240px;
     font-weight: 500;
-    line-height: 1;
-    letter-spacing: -0.045em;
+    line-height: 0.82;
+    letter-spacing: -0.055em;
+  }
+  /* a soft vertical gradient in each figure (the user): white fading to
+     55% down the glyphs; the accent from mint through the green to a
+     deeper green */
+  .vs-fig b {
+    background: linear-gradient(180deg, #fff 10%, rgba(255, 255, 255, 0.55) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    /* the gradient paints the box: room for the % sign's overhang (the
+       tight tracking pushes it past the box), given back in margin */
+    padding: 0 0.1em 0.06em 0;
+    margin-right: -0.1em;
+    /* the numerals' side bearing (~10px at 240) pulled back, so the 6 and
+       the 8 stand on the captions' left edge (the user: not aligned) */
+    margin-left: -0.043em;
   }
   .vs-fig--accent b {
-    background: var(--accent);
-    color: #0a0a0a;
-    box-shadow: 0 0 0 28px var(--veda-mid, #000);
+    background-image: linear-gradient(180deg, #8affd2 5%, var(--accent) 50%, #00a866 98%);
   }
   .vs-fig span {
-    font-size: 20px;
-    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    font-size: 26px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: rgba(255, 255, 255, 0.6);
   }
 
   @media (prefers-reduced-motion: reduce) {

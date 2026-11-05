@@ -1,0 +1,122 @@
+---
+/* The legacy order-entry widget (Questrade IQ Edge), as a click-through of
+   the user's own Figma variants (playground, "Property 1" — exported 2x,
+   2026-11-05). Each state is the exported render, pixel for pixel; the
+   controls the user clicked in the Figma prototype are hotspots over it:
+
+     stock ──STK──▶ stock-menu ──Option──▶ option ──OPT──▶ option-menu
+     (either menu) ──Stock──▶ stock · ──Option──▶ option · ──Strategy──▶ vertical
+     vertical ──Customize──▶ custom ──Add put──▶ custom-put ──×──▶ custom
+     a strategy's STG badge goes back to the stock menu; a click off an
+     open menu closes it
+
+   Hotspot boxes are in the widget's 1x px (the renders are 2x). The deck
+   embeds this page as a live tile (fit: .lw). */
+import Bare from "../../layouts/Bare.astro";
+
+const SRC = "/website/case/gusto/v2/legacy";
+const STATES = ["stock", "stock-menu", "option", "option-menu", "vertical", "custom", "custom-put"];
+---
+
+<Bare title="Legacy order entry" bg="transparent">
+  <div class="lw" data-state="stock">
+    {STATES.map((s) => (
+      <img class="lw-img" data-for={s} src={`${SRC}/${s}.webp`} alt="" draggable="false" />
+    ))}
+    <div class="lw-hits" aria-hidden="true"></div>
+  </div>
+</Bare>
+
+<style is:global>
+  html,
+  body {
+    margin: 0;
+    background: transparent;
+  }
+  body {
+    display: grid;
+    place-items: start center;
+    padding: 24px;
+  }
+  .lw {
+    position: relative;
+    width: 1082px;
+    user-select: none;
+  }
+  .lw-img {
+    display: none;
+    width: 100%;
+    height: auto;
+  }
+  /* every state's render is 2x of the same 1082px widget */
+  .lw[data-state="stock"] .lw-img[data-for="stock"],
+  .lw[data-state="stock-menu"] .lw-img[data-for="stock-menu"],
+  .lw[data-state="option"] .lw-img[data-for="option"],
+  .lw[data-state="option-menu"] .lw-img[data-for="option-menu"],
+  .lw[data-state="vertical"] .lw-img[data-for="vertical"],
+  .lw[data-state="custom"] .lw-img[data-for="custom"],
+  .lw[data-state="custom-put"] .lw-img[data-for="custom-put"] {
+    display: block;
+  }
+  .lw-hits {
+    position: absolute;
+    inset: 0;
+  }
+  .lw-hit {
+    position: absolute;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  /* the scrim behind an open menu: a click off it closes the menu */
+  .lw-off {
+    position: absolute;
+    inset: 0;
+    cursor: default;
+  }
+</style>
+
+<script>
+  type Box = [x: number, y: number, w: number, h: number];
+  type Hit = { box: Box; to: string };
+  const BADGE: Box = [186, 48, 46, 42];
+  const menu = (back: string): Hit[] => [
+    { box: [186, 100, 284, 48], to: "stock" },
+    { box: [186, 160, 284, 48], to: "option" },
+    { box: [186, 220, 284, 48], to: "vertical" },
+  ];
+  const HITS: Record<string, { hits: Hit[]; off?: string }> = {
+    stock: { hits: [{ box: BADGE, to: "stock-menu" }] },
+    "stock-menu": { hits: menu("stock"), off: "stock" },
+    option: { hits: [{ box: BADGE, to: "option-menu" }] },
+    "option-menu": { hits: menu("option"), off: "option" },
+    vertical: { hits: [{ box: BADGE, to: "stock-menu" }, { box: [30, 470, 126, 32], to: "custom" }] },
+    custom: { hits: [{ box: BADGE, to: "stock-menu" }, { box: [346, 470, 100, 32], to: "custom-put" }] },
+    "custom-put": { hits: [{ box: BADGE, to: "stock-menu" }, { box: [1010, 266, 36, 38], to: "custom" }] },
+  };
+
+  const root = document.querySelector<HTMLElement>(".lw")!;
+  const layer = root.querySelector<HTMLElement>(".lw-hits")!;
+  const go = (state: string) => {
+    root.dataset.state = state;
+    const def = HITS[state];
+    layer.replaceChildren();
+    if (def.off) {
+      const off = document.createElement("div");
+      off.className = "lw-off";
+      off.addEventListener("click", () => go(def.off!));
+      layer.append(off);
+    }
+    for (const h of def.hits) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "lw-hit";
+      b.style.cssText = `left:${h.box[0]}px;top:${h.box[1]}px;width:${h.box[2]}px;height:${h.box[3]}px;background:none;border:0;padding:0`;
+      b.addEventListener("click", (e) => {
+        e.stopPropagation();
+        go(h.to);
+      });
+      layer.append(b);
+    }
+  };
+  go(new URLSearchParams(location.search).get("state") || "stock");
+</script>

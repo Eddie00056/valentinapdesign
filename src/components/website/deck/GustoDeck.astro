@@ -61,7 +61,11 @@ const mixed = theme === "mixed";
 const key = (s: Slide): number => (s as any).vn ?? s.n;
 /* this slide in the Veda look / in the new UI */
 const isV = (s: Slide) => veda || (mixed && (!!(s as any).vn || (s.n >= 11 && s.n <= 53)));
-const isN = (s: Slide) => newUI || isV(s);
+/* mixed: the fractional shares study (54–100) keeps its own slides and
+   grounds, but its text is the live text of the new UI, set in the order
+   entry study's type (.gd-f) — the user, 2026-11-04 */
+const isF = (s: Slide) => mixed && !isV(s) && s.n >= 54 && s.n <= 100;
+const isN = (s: Slide) => newUI || isV(s) || isF(s);
 /* veda: image slides keep their images and live frames, but their text
    baked into an image is rebuilt live — `corner` is the slide title,
    `hide` the shots it replaces, `rows` the label / value pairs */
@@ -75,15 +79,62 @@ const VEDA_MEDIA: Record<number, { corner?: string; hide?: string[]; rows?: [str
     ],
   },
 };
-const vm = (s: Slide) => (isV(s) ? VEDA_MEDIA[key(s)] : undefined);
+/* mixed: the same rebuild for the fractional study's baked text — 60's
+   role card in 17's columns, under 17's title (the user, 2026-11-04:
+   "follow the columns structure", no "Product designer") */
+const FRAC_MEDIA: Record<number, { corner?: string; hide?: string[]; rows?: [string, string[]][]; impact?: { figs: [string, string][]; award: [string, string] }; hero?: { label: string; title: string }; pairs?: { head: [string, string]; rows: [string, string, string][]; phones?: [string, string] } }> = {
+  /* 54 the study's title card as a hero (the user, 2026-11-05: "a good
+     hero image"): order entry's opener — the title left, the product
+     right, bleeding off the foot — in this study's light look: the title
+     on white, the two final designs (novice + advanced) live on the grey */
+  54: { hide: ["053full"], hero: { label: "Case study", title: "Fractional shares" } },
+  /* 96 Impact (the user picked the quiet row, 2026-11-05): the two figures
+     and the award as one row of three, hairline-divided; the award column
+     comes in on the click (97, its old second picture, is dropped) */
+  96: { corner: "Impact", hide: ["093full"], impact: { figs: [["60K", "increase in trading volume"], ["$33M", "total value traded"]], award: ["UX Design Awards", "Fall 2025 Nominee"] } },
+  /* 66's persona cards as the order entry Problem | Solution table (55):
+     two mono heads, ruled numbered rows (the user, 2026-11-04) */
+  66: {
+    corner: "Personas and their platforms",
+    hide: ["065a"],
+    pairs: {
+      head: ["Regular trader", "Advanced trader"],
+      rows: [
+        ["Fractional shares", "Primary feature", "Nice to have"],
+        ["Goal", "Invest every dollar", "Mitigate risk"],
+        ["Knowledge of rules", "Limited", "Some"],
+      ],
+      /* each persona's platform, cut from 67's picture (066b) */
+      phones: ["frac-phone-regular", "frac-phone-advanced"],
+    },
+  },
+  60: {
+    corner: "My role",
+    hide: ["059a"],
+    rows: [
+      ["Team", ["4 Engineering teams", "1 UX Researcher", "3 Product Managers"]],
+      ["Design timeline", ["4 months"]],
+    ],
+  },
+};
+/* mixed: fractional slides folded into another — 67's two platforms now
+   sit under 66's personas (the user, 2026-11-04) */
+const FRAC_DROP = [58, 59, 67, 72];
+/* a retired slide re-used out of its place: shown right after another.
+   97 (the old award picture, folded into 96) is the section card
+   "Navigating edge cases", after 85's "But there's more.." (2026-11-05) */
+const FRAC_AFTER: Record<number, number> = { 97: 85 };
+const vm = (s: Slide): { corner?: string; hide?: string[]; rows?: [string, string[]][]; pairs?: { head: [string, string]; rows: [string, string, string][]; phones?: [string, string] } } | undefined =>
+  isV(s) ? VEDA_MEDIA[key(s)] : isF(s) ? FRAC_MEDIA[s.n] : undefined;
 /* veda: the show's running order — the user's Figma (Presentation — Veda
    (editable) (Copy), 2026-11-04), its main grid read row by row. Slide
    numbers stay the deck's own (#slide-N, overrides), so the slides the
    show adds take free numbers past the case study's range (55–61, the
    Figma frames' names) and render as VEDA / VEDA_CLONE below. */
 const VEDA_ORDER = [
-  11, 13, 14, 15, 16, 17, 18, 19, 20, 55, 58, 26, 30, 31, 32, 59, 33, 60, 67, 41, 42, 71, 39,
-  38, 61, 72, 48, 50, 51, 52, 53,
+  11, 13, 14, 15, 16, 17, 18, 57, 19, 20, 58, 26, 30, 31, 32, 59, 60, 67, 38, 61, 41,
+  // hidden (the user, 2026-11-05): 42 the MVP widget, 71 the old 3-row table, 39 "80% of revenue"
+  72, 48, 50, 51, 52, 53,
 ];
 /* veda: a slide shown twice — the number it shows again */
 const VEDA_CLONE: Record<number, number> = { 59: 32, 61: 51, 62: 41 };
@@ -196,9 +247,27 @@ const VEDA_PATCH: Record<number, Slide> = {
     // 1148×932 drawn 400 wide (325 tall) — well under half its pixels, so it
     // stays sharp on a 2× screen (at 702 it was upscaled: "the quality is
     // low"; 520 was still too big) — centred both ways
-    shots: [{ src: "sectype-menu", x: (1920 / 2 - 200) / 19.2, y: (540 - (400 * 932) / 1148 / 2) / 10.8, w: 400 / 19.2 }],
+    /* the legacy widget itself, live (the user, 2026-11-05): the Figma
+       playground's seven states as a click-through (work/legacy-order-
+       entry) in place of the menu crop — native 1082 wide, centred; its
+       top held where the tallest state (808) sits centred, so the stock
+       state grows down into the strategy layouts and stays on the slide */
+    shots: [],
     labels: [],
-    live: [],
+    live: [
+      {
+        page: "legacy-order-entry",
+        // at 85% (the user: "slightly smaller")
+        x: ((1920 - 1082 * 0.85) / 2 / 1920) * 100,
+        y: ((1080 - 808 * 0.85) / 2 / 1080) * 100,
+        w: ((1082 * 0.85) / 1920) * 100,
+        h: ((808 * 0.85) / 1080) * 100,
+        vw: 1280,
+        vh: 1000,
+        fit: ".lw",
+        mode: "width",
+      },
+    ],
   },
   /* 50: Then / Now without the Then (the user, 2026-11-04): the legacy
      COIN ticket, its label and the divider go; the two new tickets, one
@@ -308,7 +377,9 @@ const VEDA_TEXT: Record<number, { label?: string; text?: string; fs?: number; no
   62: { none: true },
   36: { label: P2, text: "Why?" },
   39: { text: "80% of Questrade’s revenue. 3x the steps." },
-  57: { label: "Goal", text: "Make trade submission fast and frictionless\none step at a time.", bg: "black" },
+  /* the design strategy, its own statement after Design process (the
+     user, 2026-11-05) — taken off the Problem / Solution slides' head */
+  57: { label: "Design strategy", text: "Make order placement fast and seamless.", bg: "black" },
   40: { text: "Simplify the experience by security type." },
 };
 /* the problem slides' four points (55, then 58 / 60 lighting one row each);
@@ -324,9 +395,12 @@ const SOLUTIONS: string[] = [
   "Simplified the experience by security type.",
   "Enabled trade execution directly from the option chain.",
 ];
-const STRATEGY = "Make order placement faster and seamless.";
-const PLABEL = "Goal";
-const VEDA: Record<number, { kind: any; num?: string; text?: string; label?: string; items?: string[]; solutions?: string[]; lit?: number[]; src?: string; steps?: number }> = {
+const VEDA: Record<number, { kind: any; num?: string; text?: string; label?: string; items?: string[]; solutions?: string[]; lit?: number[]; src?: string; steps?: number; focus?: number; hideSol?: boolean; focusSol?: boolean; label2?: string; revealSol?: number }> = {
+  /* the deck's cover (the user, 2026-11-05: "prettier and more aligned
+     with the other slides") — order entry's opener type on its ground:
+     the name at the chapter size, the line under it in the captions'
+     grey. Drawn for slide 1 in the mixed deck only. */
+  1: { kind: "cover", text: "Valentina Padure", label: "Portfolio presentation" },
   // the opener: the title alone, centred — no "Case study 01" label, no 01 (the user)
   11: { kind: "chapter", text: "Order entry<br />modernization", src: "/website/case/questrade/edge-web.webp" },
   12: { kind: "section" },
@@ -346,11 +420,27 @@ const VEDA: Record<number, { kind: any; num?: string; text?: string; label?: str
   // lit: the rows at full white (by problem); 55 all, 58 the first, 60 the second
   // built one click at a time (the user): the goal, then problem 1,
   // solution 1, problem 2… — 2 steps per row
-  55: { kind: "points", label: PLABEL, text: STRATEGY, items: POINTS, solutions: SOLUTIONS, lit: [0, 1, 2], steps: 6 },
-  58: { kind: "points", label: PLABEL, text: STRATEGY, items: POINTS, solutions: SOLUTIONS, lit: [0] },
-  60: { kind: "points", label: PLABEL, text: STRATEGY, items: POINTS, solutions: SOLUTIONS, lit: [1] },
+  /* the user, 2026-11-05: the Problem | Solution table on two slides —
+     Problem: two problems (the third is cut), a row per click, the
+     solutions held back, then the first problem in focus; Solution: the
+     same table with its solutions, the first solution in focus on its
+     click */
+  55: { kind: "ps", label: "Problem", text: "", items: POINTS.slice(0, 2), solutions: SOLUTIONS, hideSol: true, focus: 0, steps: 3 },
+  /* (later the same day) the Problem slide is cut, and the Solution
+     slide gives only the first problem its solution */
+  /* on the last click the solution lands, the title becomes "Problem +
+     Solution" and the second problem steps back to 10% (focus: row 1) */
+  58: { kind: "ps", label: "Problem", label2: "Problem + Solution", text: "", items: POINTS.slice(0, 2), solutions: SOLUTIONS.slice(0, 1), focus: 0, steps: 2 },
+  /* 21's table again (the user, 2026-11-05; the Impact statement before
+     it is cut): both solutions in, the second pair bright with its arrow,
+     the first stepped back — shown so on arrival */
+  // problem 2 in focus on arrival; its solution (and arrow) fade in on the click — in place, no slide change
+  /* its solution in the user's words (2026-11-05): the security-type
+     split and the chain's direct execution as one answer, now that the
+     third problem is cut */
+  60: { kind: "ps", label: "Problem + Solution", text: "", items: POINTS.slice(0, 2), solutions: [SOLUTIONS[0], "Simplify the experience by security type and enable direct execution from option chain."], focus: 1, revealSol: 1, steps: 1 },
   // 60 again with problem 3 lit, before the chain-to-order slides (71: free)
-  71: { kind: "points", label: PLABEL, text: STRATEGY, items: POINTS, solutions: SOLUTIONS, lit: [2] },
+  71: { kind: "points", label: "", text: "", items: POINTS, solutions: SOLUTIONS, lit: [2] },
 };
 /* the hand edits keyed to the numbers this show reuses for its own slides
    (55, 57–61) belong to other decks' slides — drop them here */
@@ -388,7 +478,9 @@ const RUN_ORDER = veda
     ? [
         ...slides.filter((s) => s.n < 11).map((s) => s.n),
         ...VEDA_ORDER.map(mapN),
-        ...slides.filter((s) => s.n > 53).map((s) => s.n),
+        ...slides
+          .filter((s) => s.n > 53 && !FRAC_DROP.includes(s.n) && !(s.n in FRAC_AFTER))
+          .flatMap((s) => [s.n, ...Object.keys(FRAC_AFTER).map(Number).filter((m) => FRAC_AFTER[m] === s.n)]),
       ]
     : undefined;
 /* in the new UI, the slides that were only text baked into an image are
@@ -403,6 +495,8 @@ const nt = (
   s: Slide,
 ): { label?: string; text?: string; bg?: string; fs?: number; note?: boolean; table?: { head: string[]; rows: (string | number)[][]; hideLast?: boolean } } | undefined => {
   if (!isN(s)) return undefined;
+  // a fractional slide drawn by the media template instead (54's hero)
+  if (isF(s) && FRAC_MEDIA[s.n]?.hero) return undefined;
   const k = key(s);
   const base = (newText as Record<string, any>)[String(k)];
   if (isV(s) && VEDA_TEXT[k]?.none) return undefined;
@@ -432,23 +526,28 @@ const nt = (
           {
             ALL.map(vslide).map((s) => !inRange(s) ? (
               <article class="gd-slide" data-n={s.n} data-out="1" hidden />
-            ) : isV(s) && VEDA[key(s)] ? (
+            ) : (isV(s) || (mixed && s.n === 1)) && VEDA[key(s)] ? (
               <article class="gd-slide gd-slide--black gd-v gd-n" data-n={s.n} data-rebuilt="1" data-steps={VEDA[key(s)].steps || undefined} hidden>
                 <VedaSlide
                   kind={VEDA[key(s)].kind}
                   num={VEDA[key(s)].num}
-                  label={VEDA[key(s)].kind === "chapter" ? undefined : VEDA[key(s)].label ?? nt(s)?.label ?? s.corner ?? (VEDA[key(s)].kind === "impact" ? "Impact" : undefined)}
+                  label={VEDA[key(s)].kind === "chapter" ? undefined : VEDA[key(s)].kind === "cover" ? VEDA[key(s)].label : VEDA[key(s)].label ?? nt(s)?.label ?? s.corner ?? (VEDA[key(s)].kind === "impact" ? "Impact" : undefined)}
                   text={VEDA[key(s)].text ?? nt(s)?.text}
                   items={VEDA[key(s)].items}
                   solutions={VEDA[key(s)].solutions}
-                  build={!!VEDA[key(s)].steps}
+                  build={VEDA[key(s)].kind === "ps" ? (VEDA[key(s)].steps ?? 0) > 1 : !!VEDA[key(s)].steps}
                   lit={VEDA[key(s)].lit}
+                  focus={VEDA[key(s)].focus}
+                  hideSol={VEDA[key(s)].hideSol}
+                  focusSol={VEDA[key(s)].focusSol}
+                  label2={VEDA[key(s)].label2}
+                  revealSol={VEDA[key(s)].revealSol}
                   src={VEDA[key(s)].src}
                 />
               </article>
             ) : (
               <article
-                class:list={["gd-slide", `gd-slide--${nt(s)?.bg ?? s.bg}`, isV(s) && "gd-v", isN(s) && "gd-n"]}
+                class:list={["gd-slide", `gd-slide--${nt(s)?.bg ?? s.bg}`, isV(s) && "gd-v", isN(s) && "gd-n", isF(s) && "gd-f"]}
                 data-n={s.n}
                 data-steps={s.steps || undefined}
                 data-enter={s.enter ? JSON.stringify(s.enter) : undefined}
@@ -731,14 +830,54 @@ const nt = (
                         the width; max-content frees it, the cap wraps it. */}
                     {(s.labels || []).map((l: any) => (
                       <p
-                        class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade", l.wrap && "is-wrap", l.fresh && "gd-fresh"]}
-                        data-s={l.s ?? undefined}
+                        class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade", l.dim != null && "gd-dim", l.wrap && "is-wrap", l.fresh && "gd-fresh"]}
+                        data-s={l.s ?? l.dim ?? undefined}
                         style={`left:${l.x}%;top:${l.y ?? 19}%${l.fs ? `;font-size:${l.fs}px` : ""}${l.mw ? `;width:max-content;max-width:${l.mw}em;text-align:center` : ""}${l.op != null ? `;opacity:${l.op}` : ""}`}
                       >
                         {l.text}
                         {l.accent && <span class="gd-media-l-accent">{l.accent}</span>}
                       </p>
                     ))}
+                    {vm(s)?.pairs && (
+                      <div class="gd-pairs">
+                        {vm(s)!.pairs!.head.map((h, c) => (
+                          <section class:list={["gd-ptab", c === 0 && "is-tint"]}>
+                            <div class="gd-pairs-txt">
+                              <h3 class="gd-pairs-h">{h}</h3>
+                              {vm(s)!.pairs!.rows.map((r) => (
+                                <div class="gd-pairs-it">
+                                  <p class="gd-pairs-k">{r[0]}</p>
+                                  <p class="gd-pairs-t">{r[c + 1]}</p>
+                                </div>
+                              ))}
+                            </div>
+                            {vm(s)!.pairs!.phones && (
+                              <img class="gd-pairs-ph" src={`/website/case/gusto/v2/${vm(s)!.pairs!.phones![c]}.webp`} alt="" draggable="false" />
+                            )}
+                          </section>
+                        ))}
+                      </div>
+                    )}
+                    {vm(s)?.hero && (
+                      <div class="gd-hero">
+                        <p class="gd-hero-k">{vm(s)!.hero!.label}</p>
+                        <h2 class="gd-hero-t">{vm(s)!.hero!.title}</h2>
+                      </div>
+                    )}
+                    {vm(s)?.impact && (
+                      <div class="gd-impact" data-s="1">
+                        {vm(s)!.impact!.figs.map(([v], c) => (
+                          <p class="gd-impact-v" style={`grid-column:${c + 1}`}>{v}</p>
+                        ))}
+                        <p class="gd-impact-v is-award gd-fade" data-s="1" style="grid-column:3">{vm(s)!.impact!.award[0]}</p>
+                        {vm(s)!.impact!.figs.map(([, k], c) => (
+                          <p class="gd-impact-k" style={`grid-column:${c + 1}`}>{k}</p>
+                        ))}
+                        <p class="gd-impact-k gd-fade" data-s="1" style="grid-column:3">{vm(s)!.impact!.award[1]}</p>
+                        <i class="gd-impact-rule" style="grid-column:2" aria-hidden="true" />
+                        <i class="gd-impact-rule gd-fade" data-s="1" style="grid-column:3" aria-hidden="true" />
+                      </div>
+                    )}
                     {vm(s)?.rows && (
                       <dl class="gd-vrows">
                         {vm(s)!.rows!.map(([k, vs]) => (
@@ -838,8 +977,8 @@ const nt = (
                   const vh = l.fit ? l.vh : Math.round(bh / k);
                   return (
                     <div
-                      class:list={["gd-live", { "is-clip": l.clip, "gd-fade": l.s != null, "is-rise": l.rise }]}
-                      data-s={l.s ?? undefined}
+                      class:list={["gd-live", { "is-clip": l.clip, "gd-fade": l.s != null, "gd-dim": l.dim != null, "is-rise": l.rise }]}
+                      data-s={l.s ?? l.dim ?? undefined}
                       data-stack={l.stack ? "" : undefined}
                       data-page={l.page.split("?")[0]}
                       style={`left:${l.x}%;top:${l.y}%;width:${l.w}%;height:${l.h}%${l.op != null ? `;opacity:${l.op}` : ""}`}
@@ -856,6 +995,7 @@ const nt = (
                         data-step={l.step || undefined}
                         data-unstep={l.unstep || undefined}
                         data-clip={l.clip ? "1" : ""}
+                        data-sh={isF(s) && l.fit && /iphone|fof-frame/.test(l.fit) && !(l.css || "").includes("drop-shadow") ? "1" : undefined}
                         data-bw={bw}
                         data-bh={bh}
                         tabindex="-1"
@@ -1267,6 +1407,68 @@ const nt = (
        and centred onto the slide rect it replaces. Measured once — a card
        that later grows (a bracket order opening) grows from there rather
        than rescaling under the pointer. */
+    /* The fractional study's phones lift off the ground with slide 60's
+       shadow (the user, 2026-11-05: "apply this to all the mockups"). Drawn
+       deck-side, not in the page: each page's phone sits in a wrapper
+       that masks or clips its edge, and a clip tile cuts at its own box.
+       So a rounded box the size of the measured phone sits just before the
+       tile, under it, its shadow scaled to the phone (60's values per
+       440px of phone). It carries the tile's build step, so it fades with
+       it. */
+    const shadePhone = (
+      f: HTMLIFrameElement,
+      wrap: HTMLElement,
+      r: { left: number; top: number; width: number; height: number },
+      k: number,
+      bw: number,
+      bh: number,
+      byWidth: boolean,
+    ) => {
+      const ox = bw / 2 - (r.left + r.width / 2) * k;
+      const oy = byWidth ? -r.top * k : bh / 2 - (r.top + r.height / 2) * k;
+      /* the iPhone 17 Pro picture is wider than its body by the side
+         buttons (9px of 1218 each side): hug the body, or the box's edge
+         shows as a hairline just outside the frame. Both frames' corners
+         are 15.8% of the body's width. */
+      const inset = /iphone/.test(f.dataset.fit || "") ? r.width * k * 0.0074 : 0;
+      const w = r.width * k - 2 * inset;
+      /* in the tile's own px (bw × bh), then offset by its percentage
+         left/top — the slide may still be hidden here, so offsets read 0 */
+      let x = ox + r.left * k + inset;
+      let y = oy + r.top * k;
+      let h = r.height * k;
+      let ww = w;
+      if (f.dataset.clip) {
+        const x2 = Math.min(x + ww, bw), y2 = Math.min(y + h, bh);
+        x = Math.max(x, 0);
+        y = Math.max(y, 0);
+        ww = x2 - x;
+        h = y2 - y;
+      }
+      /* a phone that runs off the slide's foot: carry the box past the
+         edge, so its rounded corners and their shadow fall off-slide too */
+      if (parseFloat(wrap.style.top) + parseFloat(wrap.style.height) >= 99.5 && y + h >= bh - 1) h += 80;
+      let sh = wrap.previousElementSibling as HTMLElement | null;
+      if (!sh?.classList.contains("gd-live-sh")) {
+        sh = document.createElement("div");
+        sh.className = "gd-live-sh";
+        sh.setAttribute("aria-hidden", "true");
+        if (wrap.dataset.s != null) {
+          sh.dataset.s = wrap.dataset.s;
+          sh.classList.add("gd-fade");
+          sh.classList.toggle("is-on", wrap.classList.contains("is-on"));
+        }
+        wrap.parentElement!.insertBefore(sh, wrap);
+      }
+      /* one shadow for every mockup, in slide px — not scaled to the
+         phone (the user: "the exact same shadow behind them") */
+      const u = 1;
+      sh.style.cssText =
+        `position:absolute;z-index:2;pointer-events:none;left:calc(${wrap.style.left} + ${x}px);top:calc(${wrap.style.top} + ${y}px);width:${ww}px;height:${h}px;border-radius:${(w * 0.158).toFixed(1)}px;` +
+        /* a tight contact edge, a soft lift and a wide ambient fall-off
+           (the user: the white page needs the phones to pop more) */
+        `box-shadow:0 ${u.toFixed(2)}px ${(3 * u).toFixed(2)}px rgba(0,0,0,.10),0 ${(12 * u).toFixed(2)}px ${(28 * u).toFixed(2)}px rgba(0,0,0,.16),0 ${(30 * u).toFixed(2)}px ${(64 * u).toFixed(2)}px rgba(0,0,0,.10)`;
+    };
     const place = async (f: HTMLIFrameElement) => {
       const sel = f.dataset.fit;
       const wrap = f.parentElement as HTMLElement;
@@ -1353,6 +1555,7 @@ const nt = (
         r = q;
         apply(r);
       }
+      if (f.dataset.sh) shadePhone(f, wrap, r, k, bw, bh, byWidth);
       /* The iframe is a whole page, mostly transparent and far wider than
          the work — left unclipped it swallows clicks meant for whatever sits
          beside it. Clip (clip-path clips hit-testing too) to the card's
@@ -1453,6 +1656,32 @@ const nt = (
           w.setTimeout(tick, 2000);
         };
         w.setTimeout(tick, 1200);
+      },
+      /* fractional-order-flow, the amount typed in (the user, 2026-11-05):
+         a tap on "Total amount" opens the pad (the page only takes keys
+         while it is open), $250 is keyed in and the pad closes — the share
+         quantity rolls to 0.8333 as the digits land.
+         fracAmountType: on arrival, a key at a readable pace (45 My role).
+         fracAmountFill: at load, at once — 42's hero holds it filled. */
+      fracAmountType: (w, d) => {
+        const open = () => {
+          const label = [...d.querySelectorAll<HTMLElement>("span")].find((e) => e.textContent === "Total amount");
+          label?.parentElement?.click();
+        };
+        const key = (k: string) => w.dispatchEvent(new w.KeyboardEvent("keydown", { key: k, bubbles: true }));
+        open();
+        [["2", 350], ["5", 550], ["0", 750], ["Escape", 1550]].forEach(([k, ms]) => w.setTimeout(() => key(k as string), ms as number));
+      },
+      fracAmountFill: (w, d) => {
+        let tries = 0;
+        const go = () => {
+          const label = [...d.querySelectorAll<HTMLElement>("span")].find((e) => e.textContent === "Total amount");
+          if (!label) return tries++ < 80 && w.setTimeout(go, 25);
+          label.parentElement!.click();
+          const key = (k: string) => w.dispatchEvent(new w.KeyboardEvent("keydown", { key: k, bubbles: true }));
+          ["2", "5", "0", "Escape"].forEach((k, i) => w.setTimeout(() => key(k), 120 + i * 60));
+        };
+        go();
       },
       /* fractional-order-flow's amount/quantity swap glyph, tapping itself */
       swapLoop: (w, d) => {
@@ -2863,6 +3092,15 @@ const nt = (
   .gd-slide :global(.gd-fade[data-s].is-on) {
     transition-delay: calc(var(--d, 0) * 1ms);
   }
+  /* build parts that stay put and step BACK on their click (`dim`): the
+     Goal slide's second goal recedes so the first has the focus — in
+     place, no slide change, so nothing reloads or jumps (71) */
+  .gd-slide :global(.gd-dim[data-s]) {
+    transition: opacity 0.5s ease;
+  }
+  .gd-slide :global(.gd-dim[data-s].is-on) {
+    opacity: 0.24 !important;
+  }
   /* ...and ones that also rise into place, top to bottom (slide 32) */
   .gd-slide :global(.gd-fade.is-rise[data-s]) {
     transition:
@@ -3723,5 +3961,402 @@ const nt = (
     font-weight: 500;
     line-height: 1.2;
     letter-spacing: -0.02em;
+  }
+  /* ---- mixed: the fractional shares study in the order entry type ----
+     its slides and grounds stay its own; only the type follows the Veda
+     slides: Elza Text, the section label in DM Mono caps at 16 (left 56,
+     top 48, no rule), the statements Elza 500, the image titles DM Mono 14 */
+  .gd-f {
+    --gd-font: "Elza Text", system-ui, sans-serif;
+  }
+  .gd-slide.gd-f .gd-corner,
+  .gd-slide.gd-f .gd-corner-row,
+  .gd-slide.gd-f .gd-nt-label {
+    left: 56px;
+    top: 48px;
+  }
+  .gd-slide.gd-f .gd-corner,
+  .gd-slide.gd-f .gd-nt-label {
+    padding-bottom: 0;
+    border-bottom: 0;
+    /* the slide's own face in sentence case, not the mono caps (the
+       user, 2026-11-04: the caps looked thin on the white) — as 66's topics */
+    font-family: "Elza Text", system-ui, sans-serif;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 28px;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    color: rgba(0, 0, 0, 0.45);
+    opacity: 1;
+  }
+  .gd-slide--black.gd-f .gd-corner,
+  .gd-slide--black.gd-f .gd-nt-label {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  /* centred on the slide both ways, as the order entry statements */
+  .gd-slide.gd-f .gd-nt-text {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: max-content;
+    max-width: 1500px;
+    text-align: center;
+    text-wrap: balance;
+    white-space: pre-line;
+    font-family: "Elza Text", system-ui, sans-serif;
+    font-size: 72px;
+    /* sleeker on the white (the user, 2026-11-04: "reads ugly"): dark ink
+       on white reads a weight heavier than the order entry's white on
+       black, so a step lighter, a touch tighter, and not quite black */
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.032em;
+    color: #1a1a1a;
+  }
+  .gd-slide--black.gd-f .gd-nt-text {
+    color: #fff;
+  }
+  .gd-slide.gd-f :is(.gd-statement-t, .gd-titlecard h2, .gd-titlecard p, .gd-divider) {
+    font-weight: 400 !important;
+    letter-spacing: -0.01em;
+  }
+  .gd-slide.gd-f .gd-media-l,
+  .gd-slide.gd-f .gd-media-l:is(.is-lg, .is-sm, .is-xl) {
+    font-family: "DM Mono", ui-monospace, monospace;
+    font-size: 14px !important;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  .gd-slide--black.gd-f .gd-media-l {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  /* 87's limit-error phones are cut-outs (alpha), so they take the phone
+     shadow as a filter, at their on-screen size (~1.3× 60's per-440px) */
+  /* the cut-out phone pictures (87's pair, 78/79/89's, 82's suggested
+     design): the live phones' one shadow, as a filter on their alpha */
+  /* 64's old wizard row is flat screens with their own hairline borders:
+     four side by side, the shadow's wide layer summed to a grey haze over
+     the white (the user: "this one should be white"), so they go without */
+  .gd-slide.gd-f :global(img[src*="079a-old-cut"]) {
+    filter: none !important;
+  }
+  .gd-slide.gd-f :global(:is(img[src*="090-limit-error"], img[src*="-cut"])) {
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.1)) drop-shadow(0 12px 28px rgba(0, 0, 0, 0.16)) drop-shadow(0 30px 64px rgba(0, 0, 0, 0.1));
+  }
+  /* the phone slides on the persona slide's grey, so the phones and
+     their shadows lift off the ground (the user: "this page feels very
+     white"). 78/79/89's phone pictures were cut off their baked white
+     (the *-cut files) so they sit on it too. */
+  .gd-slide.gd-f:is([data-n="73"], [data-n="74"], [data-n="75"], [data-n="78"], [data-n="79"], [data-n="81"], [data-n="86"], [data-n="87"], [data-n="88"], [data-n="89"]) {
+    background: #f2f2f2;
+  }
+  /* 54 hero: the title on the white half, the phones on the grey one */
+  .gd-slide.gd-f[data-n="54"] {
+    background: linear-gradient(90deg, #fff 50%, #f2f2f2 50%);
+  }
+  .gd-hero {
+    position: absolute;
+    left: 120px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: "Elza Text", system-ui, sans-serif;
+    color: #1a1a1a;
+  }
+  .gd-hero-k {
+    margin: 0 0 18px;
+    font-size: 22px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: rgba(0, 0, 0, 0.45);
+  }
+  .gd-hero-t {
+    margin: 0;
+    font-size: 96px;
+    font-weight: 500;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+  }
+  /* 96 Impact: three columns, the figures at 112/500 and the award's two
+     lines at 45/47 — measured so its cap top and "Awards" baseline land on
+     the figures' cap top and baseline; captions share one baseline (the
+     grid's last-baseline row). Hairlines between columns. */
+  .gd-impact {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    align-items: last baseline;
+    font-family: "Elza Text", system-ui, sans-serif;
+    color: #1a1a1a;
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  /* before the click the award column is empty: hold the two figures in
+     the middle (half the award column, 965px, to the right), and glide
+     them left as it fades in */
+  .gd-impact:not(.is-on) {
+    transform: translate(calc(-50% + 482px), -50%);
+  }
+  .gd-impact p {
+    margin: 0;
+    padding: 0 40px;
+  }
+  /* each divider its own item down both rows, so it runs the column's
+     full height whatever its text's box (the award's is shorter) */
+  .gd-impact-rule {
+    grid-row: 1 / 3;
+    align-self: stretch;
+    justify-self: start;
+    width: 1px;
+    background: rgba(0, 0, 0, 0.1);
+  }
+  .gd-impact-v {
+    grid-row: 1;
+    font-size: 112px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.045em;
+  }
+  .gd-impact-v {
+    white-space: nowrap;
+  }
+  .gd-impact-k {
+    grid-row: 2;
+    /* the gap under the figures lives in the caption, so each column's
+       hairline runs unbroken from figure to caption */
+    padding-top: 20px !important;
+    font-size: 22px;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: rgba(0, 0, 0, 0.45);
+  }
+  /* 60 My role: the persona slide's grey as the right half, behind the phone */
+  .gd-slide.gd-f[data-n="60"] {
+    background: linear-gradient(90deg, #fff 50%, #f2f2f2 50%);
+  }
+  /* 71/72 Goal: split ground like the persona slide, grey left, white right */
+  .gd-slide.gd-f:is([data-n="71"], [data-n="72"], [data-n="80"]) {
+    background: linear-gradient(90deg, #f2f2f2 50%, #fff 50%);
+  }
+  /* 71/72 Goal: the two goals read as headings (the persona heading
+     style), not mono captions */
+  .gd-slide.gd-f:is([data-n="71"], [data-n="72"], [data-n="80"]) .gd-media-l.is-lg {
+    font-family: "Elza Text", system-ui, sans-serif;
+    font-size: 40px !important;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    text-transform: none;
+    white-space: pre-line;
+    color: #1a1a1a;
+    margin-top: 16px;
+  }
+  .gd-slide.gd-f .gd-tbl {
+    font-family: "Elza Text", system-ui, sans-serif;
+  }
+  /* 60's role columns, in ink on the white ground — the answers in the
+     persona slide's answer style (30/400, #1a1a1a), not order entry's
+     40/500 (the user: "doesn't seem aligned with the other font") */
+  .gd-slide.gd-f .gd-vrows {
+    color: #1a1a1a;
+  }
+  .gd-slide.gd-f .gd-vrows dd {
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .gd-slide.gd-f .gd-vrows dd + dd {
+    margin-top: 8px;
+  }
+  .gd-slide.gd-f .gd-vrows dt {
+    margin-bottom: 10px;
+    /* the persona captions: Elza 22 sentence case, soft grey */
+    font: 22px/1.25 "Elza Text", system-ui, sans-serif;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    color: rgba(0, 0, 0, 0.45);
+  }
+  /* 66's personas (the user, 2026-11-04, after four mock-ups: "i like
+     this" — the split): the slide cut in two, the regular trader on a
+     warm grey half, the advanced trader on the white one. Each half: the
+     trader's name, then the three topics as a small caption over a two-
+     or three-word answer. No cards, no rules, no label column. */
+  .gd-pairs {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    font-family: "Elza Text", system-ui, sans-serif;
+    color: #1a1a1a;
+  }
+  .gd-ptab {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* both blocks drawn in to the centre line (the user: "closer to each
+       other"): each sits 120px off the seam, the left one on a 360px
+       measure so its lines still start on one edge */
+    padding-left: 120px;
+  }
+  /* the left block packed against the seam by its widest line: one
+     grid column (max-content) pushed to the end, its lines still left-set */
+  .gd-ptab.is-tint {
+    display: grid;
+    grid-template-columns: max-content;
+    justify-content: end;
+    align-content: center;
+    padding-left: 0;
+    padding-right: 120px;
+    background: #f2f2f2;
+  }
+  /* the type is the deck's own, nothing new (the user: "we don't have
+     this style titles anywhere"): the names as the role slides' values
+     (17/60's .gd-vrows dd, 40/500), the captions as the fractional slide
+     labels (22, 45% ink), the answers as the order entry Problem |
+     Solution lines (.vs-pt, 30/400) */
+  .gd-pairs-h {
+    margin: 0 0 36px;
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+  .gd-pairs-it + .gd-pairs-it {
+    margin-top: 26px;
+  }
+  .gd-pairs-k {
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 400;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    color: rgba(0, 0, 0, 0.45);
+  }
+  .gd-pairs-t {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  /* the slide's label stays over the grey half */
+  .gd-slide.gd-f:has(.gd-pairs) .gd-corner,
+  .gd-slide.gd-f:has(.gd-pairs) .gd-nt-label {
+    z-index: 3;
+  }
+  /* 68/69's scope table, calmer (the user, 2026-11-04: "make this look
+     better"): narrower and centred, no header band, the heads in the
+     slide's sentence-case caption, hairline rows; the checks drawn bare
+     (no discs) — grey under North star, green under MVP scope, a quiet
+     dash for what the MVP left out; the MVP column lifted as one soft
+     rounded card behind its cells, as 66's grey half */
+  .gd-slide.gd-f .gd-tbl {
+    left: 50%;
+    right: auto;
+    top: 50%;
+    width: 1120px;
+    transform: translate(-50%, -50%);
+    background: none;
+    color: #1a1a1a;
+  }
+  .gd-slide.gd-f .gd-tbl::before {
+    content: "";
+    position: absolute;
+    top: -8px;
+    bottom: -8px;
+    right: 0;
+    width: 300px;
+    z-index: -1;
+    border-radius: 20px;
+    background: #f2f2f2;
+    transition: opacity 0.45s ease;
+  }
+  .gd-slide.gd-f .gd-tbl.is-partial::before {
+    opacity: 0;
+  }
+  .gd-slide.gd-f .gd-tbl-row {
+    grid-template-columns: 520px 300px 300px;
+    height: 76px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  }
+  .gd-slide.gd-f .gd-tbl-row:last-child {
+    border-bottom: 0;
+  }
+  /* type as 66's personas: the rows as the answers (30/400), the heads
+     as the captions (22, 45% ink); no firm rule — hairlines only */
+  .gd-slide.gd-f .gd-tbl-row > span {
+    font-size: 30px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+  .gd-slide.gd-f .gd-tbl-row > span:first-child {
+    padding-left: 0;
+  }
+  .gd-slide.gd-f .gd-tbl-head {
+    height: 64px;
+    background: none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  }
+  .gd-slide.gd-f .gd-tbl-head > span,
+  .gd-slide.gd-f .gd-tbl-head > span:last-child {
+    background: none;
+    font-family: "Elza Text", system-ui, sans-serif;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    text-transform: none;
+    color: rgba(0, 0, 0, 0.45);
+  }
+  /* the marks (the user: "i like having the green icon and the X"):
+     the green check in its tinted disc for what's in, the red cross in
+     its own for what the MVP left out — 32px, as 69's split had them */
+  .gd-slide.gd-f .gd-tbl .gd-tbl-check {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(35, 117, 42, 0.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2323752a' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12.5l4 4 8-9'/%3E%3C/svg%3E") center / 20px no-repeat !important;
+  }
+  .gd-slide.gd-f .gd-tbl .gd-tbl-check.is-no,
+  .gd-slide.gd-f .gd-tbl .gd-tbl-row > span:last-child .gd-tbl-check.is-no {
+    background: rgba(198, 40, 40, 0.1) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c62828' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M7.5 7.5l9 9M16.5 7.5l-9 9'/%3E%3C/svg%3E") center / 18px no-repeat !important;
+  }
+  /* 66 with 67 folded in (the user, 2026-11-04, picked B of four
+     mock-ups): in each half the persona's text and its platform side by
+     side — the text centred on the slide's height, the phone standing on
+     the foot of the slide and running off it. Both halves the same
+     pattern, centred in their half. The left ground takes the phone
+     picture's own grey (242) so its cut edge doesn't show. */
+  .gd-pairs:has(.gd-pairs-ph) {
+    overflow: hidden;
+  }
+  .gd-pairs:has(.gd-pairs-ph) .gd-ptab,
+  .gd-pairs:has(.gd-pairs-ph) .gd-ptab.is-tint {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 72px;
+    padding: 0;
+  }
+  .gd-pairs:has(.gd-pairs-ph) .gd-ptab.is-tint {
+    background: #f2f2f2;
+  }
+  /* the phone stands on the slide's foot; one scale for both (0.82 of
+     the picture's 1x — the two cuts differ in width), small enough to
+     keep clear of the slide's edges and arrows */
+  .gd-pairs-ph {
+    align-self: flex-end;
+    display: block;
+    flex: none;
+    /* sized so the frame's top lands on the "Fractional shares" caption
+       line (the user, 2026-11-05) while it still stands on the foot */
+    width: 466px;
+  }
+  .gd-ptab:not(.is-tint) .gd-pairs-ph {
+    width: 449px;
   }
 </style>

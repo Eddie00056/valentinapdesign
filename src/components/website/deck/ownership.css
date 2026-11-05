@@ -37,6 +37,11 @@
   background: rgba(255, 255, 255, 0.055);
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+  /* the rolling cells' own line-height, on the whole pill: with one
+     line box height for "$", the digits and the change, a top-aligned
+     roll shares their baseline (the user, 2026-11-05: "all numbers on
+     the same line") */
+  line-height: 1.2;
 }
 .gd-pill b {
   font-weight: 600;
@@ -51,7 +56,10 @@
 /* rolling digits: one clipped cell per glyph */
 .gd-roll {
   display: inline-flex;
-  vertical-align: bottom;
+  /* top, not bottom/baseline: a clipped (overflow: hidden) cell's
+     baseline is its bottom edge, which sat the digits ~2px under the
+     "$" and the change; tops level at the pill's 1.2 line-height */
+  vertical-align: top;
 }
 .gd-roll-cell {
   display: inline-block;

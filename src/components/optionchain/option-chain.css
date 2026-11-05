@@ -58,7 +58,8 @@
      the 14px magnifier added 2, the symbol and price going to 600 added
      3.2, and tightening the gap gave 3 back. It has to be fixed — DM Sans carries no tabular figures, so a pill sized to
      its content would resize on most ticks and drag the row with it. */
-  --ctl-id: 194px;
+  /* 198: the HOOD walk the deck quotes peaks at 194.25 (was 194) */
+  --ctl-id: 198px;
 
   /* Width is owned by the component now — it is draggable, so the value
      arrives as an inline style. This is the ceiling for narrow screens. */
