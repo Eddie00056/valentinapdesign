@@ -68,8 +68,224 @@ import { StockTicket } from "../../components/stockticket/StockTicket";
       padding-top: 11px;
       padding-bottom: 4px;
     }
+
+    /* ================= ?proposed — the craft review ================= */
+    /* 1 · one quiet edge: a faint card rim instead of a bright outline */
+    html.is-prop .wshell {
+      border-color: rgba(255, 255, 255, 0.1) !important;
+      /* less rounded (user, 2026-11-12): a crisper card, 8 */
+      border-radius: 8px !important;
+    }
+    /* narrower (user, 2026-11-12): the 357 card left a wide empty gutter
+       between the labels and the 133 fields; 324 keeps the longest label
+       row (Limit price · Bid · Ask) 12 clear of its field */
+    html.is-prop .ob-shell {
+      width: 324px !important;
+    }
+    /* the title bar's top corners follow, less the 0.5 rim */
+    html.is-prop.is-bare .wshell-bar {
+      border-radius: 7.5px 7.5px 0 0 !important;
+    }
+    /* 2 · the search pill stays exactly as it is (user, 2026-11-12) */
+    /* 3 · labels step back; the bracket title stays as it is (user, 2026-11-12) */
+    html.is-prop .ob-stage .ob-line-label {
+      color: rgba(254, 255, 253, 0.6) !important;
+    }
+    /* 4 · quieter fields: steppers only when the field is in use */
+    html.is-prop .ob-stage .ob-stepper-btns {
+      opacity: 0;
+      transition: opacity 0.14s ease;
+    }
+    html.is-prop .ob-stage .ob-field:hover .ob-stepper-btns,
+    html.is-prop .ob-stage .ob-field:focus-within .ob-stepper-btns {
+      opacity: 1;
+    }
+    /* 5 · the bracket says its outcome: Profit / Loss in ink, the dollar
+       result coloured and in full ink weight */
+    html.is-prop .st-stage .ob-line-label[data-tone] {
+      color: rgba(254, 255, 253, 0.6) !important;
+    }
+    html.is-prop .ob-line:has(.ob-line-label[data-tone="up"]) .ob-sub-v {
+      color: var(--up) !important;
+    }
+    html.is-prop .ob-line:has(.ob-line-label[data-tone="down"]) .ob-sub-v {
+      color: var(--down) !important;
+    }
+    /* 6 · the commitment: estimated total on its own line, then Sell and
+       Buy as two equal full-width halves, taller than any field */
+    html.is-prop .wshell .ob-foot {
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px !important;
+      padding-top: 12px !important;
+      /* the rule keeps the body's 6 inset; inside it, the total and the
+         buttons share the labels' left edge and the fields' right edge */
+      padding-inline: 0 !important;
+    }
+    /* no estimated total (user, 2026-11-12) — the buttons stand alone */
+    html.is-prop .ob-cost {
+      display: none !important;
+    }
+    html.is-prop .ob-ctas {
+      width: 100%;
+      gap: 6px !important;
+    }
+    html.is-prop .ob-stage .st-cta {
+      flex: 1 1 0;
+      height: 30px !important;
+      /* the fields' 4, so the controls share one corner */
+      border-radius: 4px !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+    }
+
+
+    /* ================= ?stage — hero product shot ================= */
+    /* the ground: not pure black (a shadow can't read on #000) — a soft
+       pool of light behind the card, falling off to near-black */
+    html.is-stage,
+    html.is-stage body {
+      background: radial-gradient(60% 70% at 50% 46%, #1b1f21 0%, #101213 42%, #080909 100%) !important;
+    }
+    /* the subject, centred on the slide both ways */
+    html.is-stage .ob-stage {
+      background: none !important;
+      display: grid !important;
+      place-items: center !important;
+      align-items: center !important;
+      min-height: 100dvh;
+      padding: 0 !important;
+    }
+    /* larger: the ticket is the subject of the slide, with air around it */
+    html.is-stage .ob-deck {
+      zoom: 1.4;
+      margin: 0 !important;
+    }
+    /* a real surface: a lifted fill, a lit top edge instead of the bright
+       outline, and a long soft shadow onto the ground */
+    html.is-stage .wshell {
+      background: linear-gradient(180deg, #121718 0%, #0c1011 100%) !important;
+      border: 0 !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.09),
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 2px 4px rgba(0, 0, 0, 0.4),
+        0 18px 36px -12px rgba(0, 0, 0, 0.7),
+        0 48px 96px -24px rgba(0, 0, 0, 0.8) !important;
+    }
+    html.is-stage .ob-back {
+      display: none !important;
+    }
+
+    /* ---- ?stage=plain — the bare look the user liked (2026-11-12): flat
+       ground, the proposed card as it is, no light or shadow — only
+       bigger ---- */
+    html.is-stage-plain,
+    html.is-stage-plain body {
+      background: #0e0f11 !important;
+    }
+    html.is-stage-plain .ob-deck {
+      zoom: 1.75;
+    }
+    html.is-stage-plain .wshell {
+      background: transparent !important;
+      border: 0.5px solid rgba(255, 255, 255, 0.16) !important;
+      box-shadow: none !important;
+    }
+
+    /* ---- ?stage=ctx — in context: the redesigned platform behind it,
+       dimmed and softened, the ticket sharp where order entry docks ---- */
+    html.is-stage-ctx body::before {
+      content: "";
+      position: fixed;
+      inset: -12px;
+      z-index: 0;
+      background: url(/website/case/questrade/after.png) center / cover no-repeat;
+      filter: blur(3px) brightness(0.3) saturate(0.7);
+    }
+    /* a vignette so the edges fall away and the ticket's side is lit */
+    html.is-stage-ctx body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(42% 60% at 22% 50%, transparent 0%, rgba(0, 0, 0, 0.25) 60%, transparent 100%),
+        radial-gradient(120% 120% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.75) 100%);
+    }
+    html.is-stage-ctx .ob-stage {
+      position: relative;
+      z-index: 1;
+      justify-items: start !important;
+      padding-left: 5vw !important;
+    }
+
+    /* ---- ?stage=plate — a lit plate with a dot field, the ticket on it
+       with no outline and no drop shadow ---- */
+    html.is-stage-plate,
+    html.is-stage-plate body {
+      background: #050606 !important;
+    }
+    html.is-stage-plate body::before {
+      content: "";
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: min(72vw, 128vh);
+      height: 84vh;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      border-radius: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background:
+        radial-gradient(70% 45% at 50% 0%, rgba(255, 255, 255, 0.07), transparent 70%),
+        linear-gradient(180deg, #111415 0%, #0a0c0c 100%);
+    }
+    /* the dot field: faint, strongest under the ticket, gone at the edges */
+    html.is-stage-plate body::after {
+      content: "";
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: min(72vw, 128vh);
+      height: 84vh;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      border-radius: 28px;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1.2px);
+      background-size: 14px 14px;
+      -webkit-mask-image: radial-gradient(48% 52% at 50% 50%, #000 0%, transparent 100%);
+      mask-image: radial-gradient(48% 52% at 50% 50%, #000 0%, transparent 100%);
+    }
+    html.is-stage-plate .ob-stage {
+      position: relative;
+      z-index: 1;
+    }
+    /* lit, not shadowed: a top rim and a soft glow behind the upper edge */
+    html.is-stage-plate .wshell {
+      background: linear-gradient(180deg, rgba(20, 26, 27, 0.92) 0%, rgba(12, 16, 17, 0.92) 100%) !important;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 0 1px rgba(255, 255, 255, 0.05),
+        0 -24px 90px -30px rgba(160, 255, 220, 0.12) !important;
+    }
   </style>
   <script is:inline>
-    if (new URLSearchParams(location.search).has("bare")) document.documentElement.classList.add("is-bare");
+    {
+      const q = new URLSearchParams(location.search);
+      if (q.has("bare")) document.documentElement.classList.add("is-bare");
+      /* ?proposed — the craft-review suggestions (2026-11-12), see
+         /work/stock-order-entry-review. Off by default: the deck's slide 32
+         embeds this page without it and is untouched. */
+      if (q.has("proposed")) document.documentElement.classList.add("is-prop");
+      /* ?stage — option A, the hero product shot (2026-11-12): the ticket
+         larger, lifted off a lit ground, as a slide would show it */
+      if (q.has("stage")) {
+        document.documentElement.classList.add("is-stage");
+        /* ?stage=ctx — docked over the platform; ?stage=plate — on a lit plate */
+        const v = q.get("stage");
+        if (v) document.documentElement.classList.add("is-stage-" + v);
+      }
+    }
   </script>
 </Bare>

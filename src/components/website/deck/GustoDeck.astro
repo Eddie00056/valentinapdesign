@@ -154,27 +154,72 @@ const P2 = "Problem #2: Improving trade ergonomics";
 const STYPE = "Simplified the experience by security type.";
 /* veda: fields of a media slide replaced for this show only (gustoDeck.json
    stays the other decks' source). `marks` are plain rules in canvas px. */
+/* 32's ticket (and 59's, which continues it): the new ticket UI — the
+   page's ?proposed (324 wide, full-width actions…) dressed by the deck's
+   TICKET_UI — at the original slide's control scale */
+const TICKET32 = {
+  ...slides[31].live![0],
+  page: "stock-order-entry?bare&proposed",
+  /* 26.15 — the original slide's scale (w 28.81 × 324/357), the user's
+     preferred size after trying 27.3, 28.5 and 31.5; the original top */
+  /* then 20% smaller (the user, 2026-11-12): 26.15 × 0.8 = 20.92 — then
+     10% back up: 20.92 × 1.1 = 23.01, centred, its top held */
+  x: (100 - 23.01) / 2,
+  w: 23.01,
+  h: 44.8 * 0.88,
+  css: ".ob-stage{background:none!important;align-items:flex-start!important}.ob-cost{display:none!important}",
+};
+/* 26 / 30 / 31's legacy TSLA widget — one place for all three, so the
+   steps between them stay pixel-identical. 20% smaller (the user,
+   2026-11-12) about its old centre: w 45.91 → 36.73; the picture is
+   609.41 × 297.96, so its height is 39.92% of the slide, its centre
+   at 27.42 + 19.96 = 47.38 */
+const TSLA_W = 45.91 * 0.8;
+const TSLA_H = (TSLA_W * 19.2 * (297.96 / 609.41)) / 10.8;
+const TSLA = { x: (100 - TSLA_W) / 2 + (27.08 + 45.91 / 2 - 50), y: 47.38 - TSLA_H / 2, w: TSLA_W };
 const VEDA_PATCH: Record<number, Slide> = {
   // 26 draws its widget exactly as 30 does (the crop + an empty path), not
   // the full-slide 026a, so the step to 30 is pixel-identical
   26: {
     corner: P1,
-    shots: [{ src: "widget-tsla", x: 27.08, y: 27.42, w: 45.91, annot: { w: 609.41, h: 297.96, line: "#E03E1A", points: [] } }],
+    shots: [{ src: "widget-tsla", ...TSLA, annot: { w: 609.41, h: 297.96, line: "#E03E1A", points: [] } }],
   },
-  30: { corner: P1 },
-  31: { corner: P1 },
-  32: { corner: P1 },
+  30: { corner: P1, shots: [{ ...slides[29].shots![0], ...TSLA }] },
+  31: { corner: P1, shots: [{ ...slides[30].shots![0], ...TSLA }] },
+  /* 32, the proposed ticket (user, 2026-11-12, from the
+     /work/stock-order-entry-review study): ?proposed — full-width Sell /
+     Buy, quieter labels and steppers, coloured P&L, 324 wide, 8 corners —
+     dressed "lifted": a raised fill and a lit top rim (the deck's own
+     .gd-shade draws the drop). The original slide's scale (the user:
+     31.5% was "too big"): 357 → 324 wide, so w 28.81 × 324/357 = 26.15
+     keeps every control the size it was; the original top and label.
+     59 continues it and takes the same ticket (59 below). */
+  32: {
+    corner: P1,
+    /* the caption back, at slide 31's distance from its picture (the
+       user: "look at the padding … on the slide before") */
+    labels: [{ ...slides[31].labels![0], gap: 17 }],
+    live: [
+      {
+        ...TICKET32,
+      },
+    ],
+  },
   /* 59: the counterpart of 30's eye path. 30 zigzags across the legacy
      ticket; here the bracket is open on arrival and the eye runs straight
      down the new one in four stops, each centred on its section (the
      user's call): 1 the symbol, 2 the order details (quantity / type /
-     duration), 3 the bracket order, 4 Sell / Buy — on the rule at x 660,
-     one per click */
+     duration), 3 the bracket order, 4 Sell / Buy — on a rule 24 left of
+     the card, one per click. Re-measured to the new ticket (2026-11-12):
+     the card's left is 709, so the rule is at 685 */
   59: {
     corner: P1,
     steps: 3,
-    live: [{ ...slides[31].live[0], step: undefined, unstep: undefined, init: "openBracket" }],
-    eye: { line: "#E03E1A", x: 660, ys: [336, 448, 636, 807] },
+    labels: [{ ...slides[31].labels![0], gap: 17 }],
+    live: [{ ...TICKET32, step: undefined, unstep: undefined, init: "openBracket" }],
+    // re-measured at 23.01, no title bar (2026-11-12)
+    // re-measured at 23.01 (card left 739, so the rule at 715)
+    eye: { line: "#E03E1A", x: 715, ys: [332, 440, 609, 757] },
   },
   /* 38: placing an option order in IQ Edge (the user's "placing an option
      order iq edge.mp4", 2026-11-04), in slide 16's box: the same top and
@@ -201,18 +246,23 @@ const VEDA_PATCH: Record<number, Slide> = {
       {
         // live pages resolve under /work/ — this one lives at /website/
         page: "../website/questrade-pro",
-        // a touch smaller than full bleed (the user): ~78% of the slide
-        x: 11,
-        y: 12,
-        w: 78,
-        h: 80,
+        // a touch smaller than full bleed (the user): ~78% of the slide —
+        // then 10% bigger (2026-11-12): 85.8 × 88, about the same centre
+        // (50, 52)
+        x: 50 - 85.8 / 2,
+        y: 52 - 88 / 2,
+        w: 85.8,
+        h: 88,
         vw: 1440,
         vh: 900,
         fit: ".cs-laptop",
         css:
           "body *{visibility:hidden!important}.cs-laptop,.cs-laptop *{visibility:visible!important}" +
           "[data-reveal],[data-r]{opacity:1!important;transform:none!important;translate:none!important}" +
-          ".site-header,header{display:none!important}",
+          ".site-header,header{display:none!important}" +
+          /* the new ticket UI on the MacBook's screen too (the user,
+             2026-11-12): ChainLoop reads this and dresses its copies */
+          "html{--ticket-ui:1}",
       },
     ],
   },
@@ -234,7 +284,14 @@ const VEDA_PATCH: Record<number, Slide> = {
       // 042-final-legs: the same card with its three leg rows rebuilt as
       // field rows (Buy chip · qty · expiry | strike | type, the user's
       // reference) — 1772 tall, so re-centred for its new height
-      { src: "042-final-v3", x: ((960 - (718 * 2126) / 2157 / 2) / 1920) * 100, y: ((1080 - (718 * 1795) / 2157) / 2 / 1080) * 100, w: ((718 * 2126) / 2157 / 1920) * 100 },
+      // 042-final-v4: v3 recoloured to the new ticket palette (the user,
+      // 2026-11-12) — mint → #7ed68c, pink → #e5837a, by hue, greys kept;
+      // v5: its inner panel removed for two hairline dividers, and Submit
+      // repainted in the tickets' tinted glass; v6: its black ground lifted
+      // to the live card's gradient (#141414 → #0d0d0d), fields with it;
+      // v7: Submit rendered from the live button CSS (DM Sans 500, no halo),
+      // the volatility fill at the Buy button's rim green, the track neutral
+      { src: "042-final-v7", x: ((960 - (718 * 2126) / 2157 / 2) / 1920) * 100, y: ((1080 - (718 * 1795) / 2157) / 2 / 1080) * 100, w: ((718 * 2126) / 2157 / 1920) * 100 },
     ],
     labels: [{ text: "Vision", x: 50, y: (((1080 - (718 * 1795) / 2157) / 2 - 38.65) / 1080) * 100, size: "lg" }],
   },
@@ -257,11 +314,12 @@ const VEDA_PATCH: Record<number, Slide> = {
     live: [
       {
         page: "legacy-order-entry",
-        // at 85% (the user: "slightly smaller")
-        x: ((1920 - 1082 * 0.85) / 2 / 1920) * 100,
-        y: ((1080 - 808 * 0.85) / 2 / 1080) * 100,
-        w: ((1082 * 0.85) / 1920) * 100,
-        h: ((808 * 0.85) / 1080) * 100,
+        // at 85% (the user: "slightly smaller"), then 20% smaller again
+        // (2026-11-12): 0.85 × 0.8 = 0.68
+        x: ((1920 - 1082 * 0.68) / 2 / 1920) * 100,
+        y: ((1080 - 808 * 0.68) / 2 / 1080) * 100,
+        w: ((1082 * 0.68) / 1920) * 100,
+        h: ((808 * 0.68) / 1080) * 100,
         vw: 1280,
         vh: 1000,
         fit: ".lw",
@@ -275,12 +333,22 @@ const VEDA_PATCH: Record<number, Slide> = {
   50: {
     shots: [],
     boxes: [],
-    labels: [],
+    /* a label over each card (the user, 2026-11-12), the deck's caption
+       style, at the "Updated widget design" distance (gap 17) */
+    labels: [
+      /* the snap measures to each live frame's box, not its card: the
+         stock card sits 26.7 under its box, the options card 21 — so the
+         gaps are 17 less those, which lands both 17 above their cards */
+      { text: "Stocks widget", x: 35.91, y: 31, size: "lg", gap: 17 - 26.7 },
+      { text: "Options widget", x: 64.09, y: 31, size: "lg", gap: 17 - 21 },
+    ],
     live: [
       {
         ...slides[49].live[0],
         x: (100 - (25.68 * 2 + 2.5)) / 2,
-        y: (100 - 35.28) / 2,
+        /* the two cards top-aligned (the user, 2026-11-12): the stock
+           page lays its card 5.7 canvas px lower than the options page */
+        y: (100 - 35.28) / 2 - (5.7 / 1080) * 100,
         h: 35.28,
         /* same height as the option ticket (243.07 native px), Sell/Buy
            pinned to the bottom so it sits level with Submit */
@@ -832,6 +900,7 @@ const nt = (
                       <p
                         class:list={["gd-media-l", l.size && `is-${l.size}`, l.tone && `tone-${l.tone}`, l.s && "gd-fade", l.dim != null && "gd-dim", l.wrap && "is-wrap", l.fresh && "gd-fresh"]}
                         data-s={l.s ?? l.dim ?? undefined}
+                        data-gap={l.gap ?? undefined}
                         style={`left:${l.x}%;top:${l.y ?? 19}%${l.fs ? `;font-size:${l.fs}px` : ""}${l.mw ? `;width:max-content;max-width:${l.mw}em;text-align:center` : ""}${l.op != null ? `;opacity:${l.op}` : ""}`}
                       >
                         {l.text}
@@ -987,6 +1056,7 @@ const nt = (
                         title={l.page}
                         data-src={`/work/${l.page}${isV(s) ? (l.page.includes("?") ? "&" : "?") + VEDA_QUOTE : ""}`}
                         data-css={l.css || ""}
+                        data-css-last={l.cssLast || ""}
                         data-fit={l.fit || ""}
                         data-pad={l.pad || 0}
                         data-mode={l.mode || ""}
@@ -1051,6 +1121,7 @@ const nt = (
   import { applyOverrides } from "./deckOverrides";
   import type { Overrides } from "./deckOverrides";
   import { mountNotes } from "./deckNotes";
+  import { TICKET_UI } from "../../shared/ticketUi";
 
   const stage = document.querySelector<HTMLElement>(".gd-stage");
   if (stage) {
@@ -1145,6 +1216,9 @@ const nt = (
           if (!w.getBoundingClientRect().width) return;
           const sh = old[used++] ?? document.createElement("div");
           sh.className = "gd-shade";
+          // the new ticket UI's cards take their own, softer depth
+          if (slide.classList.contains("gd-v") && /stock-order-entry|options-strategy-builder|chain-to-order/.test(f.getAttribute("src") || ""))
+            sh.classList.add("is-ticket");
           const place = () => {
             const c = canvasEl.getBoundingClientRect();
             const k = c.width / 1920;
@@ -1156,7 +1230,8 @@ const nt = (
             sh.style.top = `${(fb.top + r.top * sc - c.top) / k}px`;
             sh.style.width = `${(r.width * sc) / k}px`;
             sh.style.height = `${(r.height * sc) / k}px`;
-            sh.style.borderRadius = `${(8 * sc) / k}px`;
+            // the card's own corner: the new ticket UI's is 6 (2026-11-12)
+            sh.style.borderRadius = `${((sh.classList.contains("is-ticket") ? 6 : 8) * sc) / k}px`;
           };
           place();
           // (re-inserting a node restarts its fade, so only when it moved)
@@ -1228,8 +1303,11 @@ const nt = (
         }
         if (!Number.isFinite(best)) return;
         // the house rule: a title sits 6px above what it names (its box is
-        // trimmed to cap height and baseline, so this is baseline → edge)
-        l.style.top = `${(best - c.top) / k - 6 - r.height / k}px`;
+        // trimmed to cap height and baseline, so this is baseline → edge).
+        // A label may set its own `gap` — slide 32's caption takes slide
+        // 31's VISIBLE distance (its picture carries a dark margin), 17
+        const gap = l.dataset.gap ? parseFloat(l.dataset.gap) : 6;
+        l.style.top = `${(best - c.top) / k - gap - r.height / k}px`;
       });
     };
     const bar = stage.querySelector<HTMLElement>(".gd-progress span")!;
@@ -1383,7 +1461,16 @@ const nt = (
                          the blur was painted */
                       "html.is-bare .ob-stage .wshell.wshell.ob-modal,.ob-stage .wshell.wshell.ob-modal{background:#010101!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}"
                     : "")
-                : "");
+                : "") +
+              /* the new ticket UI (user, 2026-11-12) on every order ticket
+                 in the order entry study — Veda slides only, so the
+                 fractional study is untouched */
+              (f.closest(".gd-v") && /stock-order-entry|options-strategy-builder|chain-to-order/.test(f.getAttribute("src") || "")
+                ? TICKET_UI
+                : "") +
+              /* a slide's own last word, after the deck's theme (slide 32's
+                 proposed ticket, 2026-11-12) */
+              (f.dataset.cssLast || "");
             d.head.appendChild(st);
             f.contentWindow!.addEventListener("keydown", (e) => {
               if (!NAV.has(e.key) || typing(e.target)) return;
@@ -3735,15 +3822,38 @@ const nt = (
     animation: gd-shade-in 0.6s ease both;
     box-shadow: var(--veda-card-shadow);
   }
+  /* the new ticket UI (the user, 2026-11-12: "more modern and premium"):
+     layered depth instead of one hard drop — a tight contact shadow, a
+     soft drop, a wide ambient and a long faint falloff, all below the
+     card (the earlier "no bleed" call) */
+  .gd-v :global(.gd-shade.is-ticket) {
+    /* spread = −blur on every layer (the user: "slightly bleeding"), so
+       none reaches past the card's sides; each shows only below it */
+    /* the main drop at the old card shadow's depth (0 28 24 −24 at .95 —
+       the layers alone read too weak: "less premium"), the softer layers
+       around it */
+    box-shadow:
+      0 2px 2px -2px rgba(0, 0, 0, 0.7),
+      0 12px 12px -12px rgba(0, 0, 0, 0.85),
+      0 28px 24px -24px rgba(0, 0, 0, 0.95),
+      0 56px 48px -48px rgba(0, 0, 0, 0.6);
+  }
   /* the final vision picture on 41 wears the same depth as the live cards */
   /* its stroke the live cards' own (the user: "match the widget stroke"):
      an inset shadow paints UNDER a picture's pixels, so the edge never
      showed — an outline sits on top, 1px in, following the 8px corner */
+  /* the new ticket UI's edge and depth (2026-11-12), as the live ticket
+     cards wear them: its 1px 6% hairline just outside the card (no more
+     #5b5f62), its 6 corner at the slide's ~1.36× (≈ 8 here), and the
+     layered no-bleed shadow of .gd-shade.is-ticket */
   .gd-v :global(.gd-media-shot[src*="042-final"]) {
     border-radius: 8px;
-    box-shadow: var(--veda-card-shadow);
-    outline: 1px solid var(--veda-edge);
-    outline-offset: -1px;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 2px 2px -2px rgba(0, 0, 0, 0.7),
+      0 12px 12px -12px rgba(0, 0, 0, 0.85),
+      0 28px 24px -24px rgba(0, 0, 0, 0.95),
+      0 56px 48px -48px rgba(0, 0, 0, 0.6);
   }
   /* the re-cut COIN ticket wears the same depth as the live ones */
   .gd-n :global(img[src$="049c-body.webp"]) {

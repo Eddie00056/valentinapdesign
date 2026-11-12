@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { priceOr, withOverride } from "../shared/quoteOverride";
+import { TICKET_UI } from "../shared/ticketUi";
 
 /* The chain-to-order prototype (deck slide 51), playing itself on a loop:
    a drawn pointer crosses the chain (rows and prices light as it passes),
@@ -302,7 +303,10 @@ export function ChainLoop({
     style.textContent =
       `html, body, html.is-bare, html.is-bare body { background: ${ground} !important; }` +
       geo.css +
-      POINTER_CSS;
+      POINTER_CSS +
+      /* the deck's slide 35 flags this page with --ticket-ui: its copies
+         wear the new ticket UI there, and only there */
+      (getComputedStyle(document.documentElement).getPropertyValue("--ticket-ui").trim() ? TICKET_UI : "");
     d.head.append(style);
     /* No focus inside a copy. The confirmation focuses its first button on
        open and hands focus back on close, and focusing anything inside a

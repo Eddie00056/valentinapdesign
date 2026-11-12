@@ -1,0 +1,82 @@
+---
+import Bare from "../../layouts/Bare.astro";
+import { LadderVariants } from "../../components/tradingladder/LadderVariants";
+---
+
+<Bare title="Trading ladder" bg="#0b0b0d">
+  <main class="oc-page">
+    {/* The ladder, centred on the page ground — the option chain's page. */}
+    <LadderVariants client:load />
+  </main>
+
+  <a class="oc-back" href="/prototypes" aria-label="Back to the prototypes">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path
+        d="M12.0833 15L7.08325 10L12.0833 5"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </a>
+
+  <style is:global>
+    /* Only the root scrolls: if body is a scroll container too, the
+       live ladder's sticky column pins to body (which never scrolls). */
+    html {
+      overflow-y: auto !important;
+    }
+    body {
+      overflow: visible !important;
+    }
+
+    .oc-page {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(16px, 3vw, 44px);
+    }
+
+    /* The widget owns its own width now — it is draggable — so the page
+       only needs to keep it off the edges. */
+    .oc-page > * {
+      max-width: 100%;
+    }
+
+    /* 120% on desktop (user, 2026-10-16). zoom, not transform, so the
+       piece takes its scaled room; the page height divides back out so
+       it still centres without a scrollbar. */
+    @media (min-width: 1200px) {
+      .oc-page {
+        zoom: 1.2;
+        min-height: calc(100dvh / 1.2);
+      }
+    }
+
+    .oc-back {
+      position: fixed;
+      top: 18px;
+      left: 18px;
+      z-index: 10;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #c0c3c2;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+    }
+
+    .oc-back:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fefffd;
+    }
+  </style>
+</Bare>

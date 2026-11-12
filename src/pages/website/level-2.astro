@@ -1,0 +1,236 @@
+---
+import Website from "../../layouts/Website.astro";
+import SiteHeader from "../../components/website/SiteHeader.astro";
+import "../../components/website/case-study.css";
+
+/* The Level 2 case study as a one-pager, in the order-entry study's
+   format (/website/questrade-pro): title, live hero, overview, then each
+   problem as problem → before / after → solution. Copy and structure are
+   the user's level_2_case_study_vertical.pdf (2026-11-05). */
+
+const V = "/website/case/level2";
+
+/* The prototype lives on its own page (user, 2026-11-05); each problem
+   links into it in the state that shows the fix. */
+const PROTO = "/work/trading-ladder?v=tip&s=regular&w=534&p=pills";
+---
+
+<Website
+  title="Level 2: from market research to trade execution"
+  description="Making market depth an actionable entry point for faster trading and position management."
+>
+  <SiteHeader />
+
+  <main class="cs l2">
+    <section class="cs-hero w-wrap" data-reveal>
+      <p class="l2-kicker">Level 2</p>
+      <h1 class="cs-title">From market research to trade execution</h1>
+      <p class="l2-sub">Make market depth an actionable entry point for faster trading and position management.</p>
+    </section>
+
+    <div class="cs-media cs-media--hero w-wrap" data-reveal>
+      <div class="l2-hero">
+        <img class="l2-hero-img" src={`${V}/hero.png`} alt="The redesigned Level 2 ladder: a long position of 50 at 118.42 with its take profit and stop loss set from the ladder" />
+        <a class="l2-cta" href={`${PROTO}&h=all`}>Open the interactive prototype →</a>
+      </div>
+    </div>
+
+    <section class="cs-overview w-wrap" data-reveal>
+      <div class="cs-block" data-r>
+        <p class="cs-label">The opportunity</p>
+        <p class="cs-body">
+          <b>Move beyond observing market depth to acting on it.</b> Level 2 is primarily a research
+          widget today. Traders have limited ability to execute, find and manage working orders, or
+          manage existing positions without leaving the experience.
+        </p>
+      </div>
+      <div class="cs-block" data-r>
+        <p class="cs-label">Design intent</p>
+        <p class="cs-body">Reduce the gap between understanding market conditions and acting on them.</p>
+      </div>
+      <div class="cs-meta">
+        <div class="cs-block" data-r>
+          <p class="cs-label">Type</p>
+          <p class="cs-body">Self-initiated redesign study</p>
+        </div>
+        <div class="cs-block" data-r>
+          <p class="cs-label">Deliverable</p>
+          <p class="cs-body">Interactive, production-fidelity prototype</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cs-impact w-wrap" data-reveal>
+      <h2 data-r>Goals</h2>
+      <ul class="cs-stats l2-goals">
+        <li data-r><span class="n">01</span><span class="l">Execute trades faster by placing quick buy/sell orders based on market depth.</span></li>
+        <li data-r><span class="n">02</span><span class="l">Adjust working orders as liquidity and market conditions change.</span></li>
+        <li data-r><span class="n">03</span><span class="l">Manage open positions or close them directly from the widget.</span></li>
+      </ul>
+    </section>
+
+    <!-- 1 — fragmented order & position management -->
+    <section class="l2-problem w-wrap" data-reveal>
+      <p class="cs-label" data-r>1 / Fragmented order &amp; position management</p>
+      <p class="cs-body" data-r>
+        <b>Problem</b> — Open orders are difficult to locate and manage; traders may need to scroll or
+        move between orders. Existing positions cannot be closed directly from the widget, and the
+        cancel/close control behaves inconsistently across states.
+      </p>
+    </section>
+    <section class="cs-ba l2-pair w-wrap" data-reveal>
+      <figure class="is-before">
+        <figcaption>Current · contextual action states</figcaption>
+        <img src={`${V}/rh-states.png`} alt="The original header in three states — after hours, with a position, and empty — each with the same slashed-circle control and a different tooltip" loading="lazy" />
+      </figure>
+      <figure class="is-after">
+        <figcaption>Redesigned · orders and positions in reach</figcaption>
+        <img src={`${V}/orders-panel.png`} alt="The redesigned widget: an open-orders popover listing working orders with Cancel and Replace" loading="lazy" />
+      </figure>
+    </section>
+    <section class="cs-ba l2-pair w-wrap" data-reveal>
+      <figure class="is-after">
+        <figcaption>Redesigned · actions on the position</figcaption>
+        <img src={`${V}/pos-menu.png`} alt="The position's menu on the ladder: Close position, Set stop, Set limit, Set TP/SL" loading="lazy" />
+      </figure>
+      <figure class="is-after">
+        <figcaption>Redesigned · a bracket from the ladder</figcaption>
+        <img src={`${V}/set-stop.png`} alt="Setting a stop from the ladder: a connector from the position to the hovered price, with a Stop loss preview showing its dollar result" loading="lazy" />
+      </figure>
+    </section>
+    <section class="l2-problem l2-solution w-wrap" data-reveal>
+      <p class="cs-body" data-r>
+        <b>Solution</b> — Added an interactive open-orders pill and popover for reviewing and managing
+        working orders; retained direct actions from the ladder; made positions actionable in the
+        ladder. Reused established pill and popover patterns.
+      </p>
+      <a class="l2-try" href={`${PROTO}&h=position`} data-r>Try it · open ⋮ on the position →</a>
+    </section>
+
+    <!-- 2 — ambiguous order-entry interactions -->
+    <section class="l2-problem w-wrap" data-reveal>
+      <p class="cs-label" data-r>2 / Ambiguous order-entry interactions</p>
+      <p class="cs-body" data-r>
+        <b>Problem</b> — The quantity control between Buy and Sell makes it unclear how many shares the
+        trader is placing across order types.
+      </p>
+    </section>
+    <section class="cs-ba l2-pair w-wrap" data-reveal>
+      <figure class="is-before">
+        <figcaption>Current · original widget</figcaption>
+        <img src={`${V}/rh-sell.png`} alt="The original header: quantity stepper between Buy market and Sell market" loading="lazy" />
+      </figure>
+      <figure class="is-after">
+        <figcaption>Redesigned · one shared quantity</figcaption>
+        <div class="l2-stack">
+          <img src={`${V}/hdr-all.png`} alt="The redesigned header: Buy market and Sell market grouped, quantity as the shared final field" loading="lazy" />
+          <img src={`${V}/pill.png`} alt="Hovering a price: the pill reads Buy limit · 10 at 118.40" loading="lazy" />
+        </div>
+      </figure>
+    </section>
+    <section class="l2-problem l2-solution w-wrap" data-reveal>
+      <p class="cs-body" data-r>
+        <b>Solution</b> — Grouped Buy/Sell, moved quantity to a shared final field, and surfaced the
+        selected quantity in the pill on hover.
+      </p>
+      <a class="l2-try" href={`${PROTO}&h=all`} data-r>Try it · hover any price →</a>
+    </section>
+
+    <section class="l2-problem l2-intent w-wrap" data-reveal>
+      <p class="cs-label" data-r>Design intent</p>
+      <p class="l2-quote" data-r>Reduce the gap between understanding market conditions and acting on them.</p>
+    </section>
+  </main>
+
+  <style>
+    .l2-kicker {
+      margin: 0 auto 12px;
+      text-align: center;
+      font-size: calc(0.9375rem * var(--type));
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #5ac53b;
+    }
+    .l2-sub {
+      margin: 20px auto 0;
+      max-width: 44ch;
+      text-align: center;
+      font-size: calc(1.125rem * var(--type));
+      line-height: 1.5;
+      color: var(--w-ink-2, #a6a6a6);
+    }
+    .l2-hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: clamp(24px, 4cqw, 56px) 16px;
+      border-radius: 12px;
+      background: #030205;
+    }
+    .l2-hero-img { display: block; width: min(460px, 100%); height: auto; border-radius: 10px; }
+    .l2-cta,
+    .l2-try {
+      align-self: center;
+      padding: 10px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      color: #f3f1ec;
+      font-size: calc(0.9375rem * var(--type));
+      font-weight: 600;
+      text-decoration: none;
+      transition: background-color 0.14s ease, border-color 0.14s ease;
+    }
+    .l2-try { align-self: flex-start; padding: 8px 14px; font-size: calc(0.875rem * var(--type)); }
+    .l2-cta:hover,
+    .l2-try:hover { background: rgba(255, 255, 255, 0.06); border-color: #5ac53b; }
+    /* Larger reading type than the house study (user, 2026-11-05). */
+    .l2 .cs-body { font-size: calc(clamp(1.1875rem, 1.1rem + 0.45cqw, 1.375rem) * var(--type)); line-height: 1.55; }
+    .l2 .cs-label { font-size: calc(1.0625rem * var(--type)); }
+    .l2 .cs-stats .l { font-size: calc(1.125rem * var(--type)); line-height: 1.45; }
+    .l2 .cs-ba figcaption { font-size: calc(1.0625rem * var(--type)); }
+    .l2 .l2-sub { font-size: calc(1.375rem * var(--type)); }
+    .l2 .l2-cta { font-size: calc(1.0625rem * var(--type)); }
+    .l2 .l2-try { font-size: calc(1rem * var(--type)); }
+    .l2-goals .n { color: #5ac53b; }
+    .l2-problem {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: clamp(2.5rem, 6cqw, 5rem);
+    }
+    .l2-solution { margin-top: clamp(1.25rem, 2.5cqw, 2rem); }
+    .l2-problem .cs-label { color: #5ac53b; }
+    .l2-problem .cs-body { max-width: 68ch; }
+    .l2 .cs-ba.l2-pair { margin-top: clamp(1.25rem, 2.5cqw, 2rem); }
+    /* the screenshots sit whole inside their cards (contain), centred */
+    .l2-pair figure > img,
+    .l2-pair .l2-stack {
+      width: 86%;
+      max-height: 78%;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+    .l2-stack { display: flex; flex-direction: column; gap: 14px; align-items: center; height: 78%; }
+    .l2-stack img { flex: none; width: 100%; height: auto; border-radius: 8px; }
+    /* the hover pill takes what's left of the card and shrinks to fit it */
+    .l2-stack img + img { flex: 1 1 0; min-height: 0; width: auto; max-width: 100%; object-fit: contain; }
+    .l2-intent { margin-bottom: clamp(3rem, 8cqw, 6rem); }
+    .l2-quote {
+      margin: 0;
+      max-width: 30ch;
+      font-size: calc(clamp(1.5rem, 1rem + 2cqw, 2.5rem) * var(--type));
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+    @media (max-width: 760px) {
+      .l2 .cs-ba.l2-pair { grid-template-columns: 1fr; }
+    }
+  </style>
+
+  <script>
+    import { initReveal } from "../../components/website/reveal";
+    initReveal();
+  </script>
+</Website>

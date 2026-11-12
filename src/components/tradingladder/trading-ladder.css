@@ -1,0 +1,1712 @@
+/* ------------------------------------------------------------------
+   Trading ladder — Robinhood's visual language, entirely.
+
+   The user asked for this piece to follow Robinhood's UI end to end
+   (2026-11-04), so it does NOT sit on option-chain.css or the house
+   widget shell. Values are read off their ladder: the screenshot (a 2x
+   capture, halved here) and the DOM they pasted, whose tokens it names —
+   13px type at 1.23 with -0.00625rem tracking and tabular figures, 700
+   for every figure that matters, borderRadius small / large, the
+   negative accent rgb(255 80 0), the entry pill's 12% fill and 30% rim.
+
+   Colours are sampled by eye from the capture (the file itself was not
+   readable from disk). Re-sample against a real export, or against the
+   app's --colors-* custom properties, when one is to hand.
+
+   Their typeface is licensed and cannot ship here; Inter stands in — a
+   neutral grotesk with real tabular figures, which is what the ladder's
+   columns lean on. No Robinhood name or logo is used.
+------------------------------------------------------------------ */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap");
+
+.tl-root {
+  /* neutral ramp */
+  --bg: #171717;        /* ground */
+  --bg1: #1f1f1f;       /* raised: menus, panels */
+  --bg2: #2a2a2a;       /* controls, rules */
+  --bg3: #3d3d3d;       /* control-on-control: the stepper's + */
+  --fg1: #ffffff;
+  --fg2: #a6a6a6;
+  --fg3: #6b6b6b;
+  --line: #2a2a2a;
+
+  /* accents */
+  --pos: #5ac53b;
+  --pos-rgb: 90 197 59;
+  --neg: #ff5000;
+  --neg-rgb: 255 80 0;
+  /* the depth bars are a step deeper than the green ink beside them */
+  --bar-pos: #4aa02c;
+  --bar-neg: #d94a0a;
+
+  --r-s: 4px;           /* borderRadius.small  */
+  --r-l: 12px;
+  /* glass */
+  --glass-bg: rgba(30, 30, 30, 0.72);
+  --glass-blur: blur(32px) saturate(1.8);
+  --glass-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07), 0 12px 32px 9px rgba(0, 0, 0, 0.25);          /* borderRadius.large  */
+
+  position: relative;
+  width: 534px;
+  max-width: 100%;
+  /* Width-aware: the widget resizes, so its own width (not the
+     viewport's) drives the narrow layout below. */
+  container: tl / inline-size;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  color: var(--fg1);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  font-size: 13px;
+  line-height: 1.23;
+  letter-spacing: -0.00625rem;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.tl-root *,
+.tl-root *::before,
+.tl-root *::after { box-sizing: border-box; }
+
+.tl-root button,
+.tl-root input {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.tl-root button { cursor: pointer; }
+.tl-root button:disabled { cursor: default; }
+.tl-root :focus-visible { outline: 2px solid var(--fg1); outline-offset: 1px; }
+
+/* ---------- summary as icons on the symbol (vision) ---------- */
+
+/* Owned badge and orders ring: square buttons beside Flatten, its size
+   and plate, so the three read as one group. Their panels hang from
+   the header like the pills'. */
+.tl-root[data-summary="icons"] .tl-posn { flex-direction: row; align-items: center; gap: 8px; }
+.tl-root .tl-ico-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-s);
+  background: var(--bg2);
+  color: var(--fg1);
+  transition: background-color 0.14s ease;
+}
+.tl-root .tl-ico-btn:hover,
+.tl-root .tl-ico-btn[data-open] { background: var(--bg3); }
+
+
+/* ---------- top bar ---------- */
+
+/* ■ | 🔍 HOOD | price ▼ change ········ ⚡ ⋮ — each of the first three
+   in its own cell, split by full-height rules. */
+.tl-bar-top {
+  display: flex;
+  align-items: stretch;
+  height: 42px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tl-win {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  border-right: 1px solid var(--line) !important;
+}
+.tl-win span {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: #bdbdbd;
+  transition: background-color 0.14s ease;
+}
+.tl-win:hover span { background: var(--fg1); }
+
+.tl-sym {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px 0 10px;
+  border-right: 1px solid var(--line);
+  font-weight: 700;
+  color: var(--fg1);
+}
+.tl-sym svg { color: var(--fg1); }
+.tl-sym-rest { color: var(--fg3); }
+
+.tl-quote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 12px;
+  white-space: nowrap;
+}
+.tl-quote-px { color: var(--fg2); }
+.tl-quote-chg { display: inline-flex; align-items: center; gap: 4px; }
+.tl-quote-chg[data-dir="up"] { color: var(--pos); }
+.tl-quote-chg[data-dir="down"] { color: var(--neg); }
+
+.tl-split { flex: 1; }
+
+.tl-root .oc-menu { position: relative; display: flex; }
+
+.tl-root .tl-icon-btn {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 100%;
+  color: var(--fg1);
+  transition: background-color 0.14s ease, color 0.14s ease;
+}
+.tl-root .tl-icon-btn:hover,
+.tl-root .tl-icon-btn[aria-expanded="true"] { background: var(--bg1); }
+.tl-root .tl-quick[aria-pressed="true"] { color: var(--pos); }
+
+/* Menus: the raised neutral, the reference's small radius, a soft drop. */
+.tl-root .oc-menu-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 6px;
+  z-index: 30;
+  padding: 4px;
+  border-radius: 8px;
+  background: var(--bg1);
+  border: 1px solid var(--line);
+  box-shadow: 0 12px 32px 9px rgba(0, 0, 0, 0.25);
+}
+.tl-root .oc-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--r-s);
+  text-align: left;
+  white-space: nowrap;
+  transition: background-color 0.12s ease;
+}
+.tl-root .oc-menu-item:hover:not(:disabled) { background: var(--bg2); }
+.tl-root .oc-menu-item:disabled { color: var(--fg3); }
+.tl-menu-check { display: inline-grid; place-items: center; width: 10px; color: var(--fg1); }
+
+/* ---------- header ---------- */
+
+.tl-top {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 12px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tl-summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tl-pnl,
+.tl-posn {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  white-space: nowrap;
+}
+.tl-pnl { margin-right: auto; }
+.tl-posn { align-items: flex-end; }
+
+.tl-pnl-line { display: inline-flex; align-items: center; gap: 4px; line-height: 16px; }
+.tl-pnl-l { color: var(--fg2); }
+.tl-pnl-v { display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+.tl-pnl-v[data-dir="up"] { color: var(--pos); }
+.tl-pnl-v[data-dir="down"] { color: var(--neg); }
+
+.tl-posn-v { color: var(--fg1); line-height: 16px; }
+.tl-posn-o { color: var(--fg2); line-height: 16px; }
+
+.tl-root .tl-flatten {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  border-radius: var(--r-s);
+  background: var(--bg2);
+  color: var(--fg1);
+  transition: background-color 0.14s ease;
+}
+.tl-root .tl-flatten svg,
+.tl-root .tlc-flat svg { width: 16px; height: 16px; }
+.tl-root .tl-flatten:hover:not(:disabled) { background: var(--bg3); }
+.tl-root .tl-flatten:disabled,
+.tl-root .tl-flatten[data-off] { color: var(--fg3); cursor: default; }
+.tl-root .tl-flatten[data-off]:hover { background: var(--bg2); }
+
+/* ---------- ladder ---------- */
+
+.tl-body { padding: 4px 0; }
+
+.tl-grid {
+  display: grid;
+  grid-template-columns: 84px 1fr 88px 1fr 84px;
+  align-items: center;
+  width: 100%;
+}
+
+/* Column labels: small, muted, bold, each on its column's working
+   edge — sizes on the edge their bars grow from (flush to the price),
+   mine on the edge their tags sit at. A hairline seats the book. */
+/* Size · Bid | Ask · Size — the user's L2 table head: white, bold,
+   each label on its figures' edge. */
+.tl-head {
+  height: 32px;
+  color: var(--fg1);
+  font-weight: 700;
+  border-bottom: 1px solid var(--line);
+}
+.tl-head-pair { gap: 8px; }
+.tl-head .tl-cell--bid.tl-head-pair { justify-content: space-between; }
+/* Ask side: "Size" alone, so it sits on the size column's outer edge. */
+.tl-head .tl-cell--ask.tl-head-pair { justify-content: flex-end; }
+.tl-head-px { color: var(--fg2); }
+
+.tl-cell {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-width: 0;
+  white-space: nowrap;
+}
+.tl-cell--mine { justify-content: flex-start; padding-left: 4px; }
+.tl-cell--sells { justify-content: flex-end; padding: 0 4px 0 0; }
+.tl-cell--bid { justify-content: flex-end; }
+.tl-cell--ask { justify-content: flex-start; }
+.tl-cell--px { justify-content: center; position: relative; overflow: visible; }
+.tl-head .tl-cell--mine { padding-left: 6px; }
+.tl-head .tl-cell--sells { padding: 0 14px 0 0; }
+
+/* The book scrolls inside the fixed window. The native bar is hidden so
+   the grid keeps its full 534; .tl-sb draws an overlay one instead. */
+.tl-scroll { position: relative; }
+.tl-rows {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+}
+.tl-rows::-webkit-scrollbar { width: 0; height: 0; }
+
+/* Overlay scrollbar: a 10px hit strip on the right edge, a 4px thumb
+   that thickens to 6 under the pointer. Invisible — and click-through —
+   until you hover the ladder or scroll, so it never sits over the sell
+   tags' × at rest. */
+.tl-sb {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  right: 0;
+  width: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 240ms ease;
+}
+.tl-sb[data-active] { opacity: 1; pointer-events: auto; }
+.tl-sb-thumb {
+  position: absolute;
+  top: 0;
+  right: 2px;
+  width: 6px;
+  border-radius: 999px;
+  /* The platform's thumb: see-through — a faint wash with a brighter
+     hairline rim, so it reads as an outline over the ladder, not a
+     solid bar. */
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+  will-change: transform;
+}
+.tl-sb:hover .tl-sb-thumb,
+.tl-sb[data-dragging] .tl-sb-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+}
+
+/* No dividers — the reference's rows are separated by the bars' own 4px
+   gap. */
+.tl-row {
+  position: relative;
+  height: var(--row-h, 28px);
+  transition: background-color 120ms ease, height 200ms cubic-bezier(0.2, 0, 0, 1);
+}
+.tl-row[data-lit] { background: rgba(255, 255, 255, 0.04); z-index: 1; }
+
+.tl-px { color: var(--fg2); }
+.tl-px[data-dir="up"] { color: var(--pos); }
+.tl-px[data-dir="down"] { color: var(--neg); }
+
+/* Last trade: white, bold, on a square plate. */
+.tl-last {
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: var(--bg2);
+  color: var(--fg1);
+  font-weight: 700;
+}
+
+/* The position's price: a solid pill in the P&L colour, dark bold
+   figures — the platform's position marker, sat on its dashed line. */
+.tl-px.tl-avg {
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: var(--fg3);
+  color: #000;
+  font-weight: 700;
+}
+.tl-px.tl-avg[data-dir="up"] { background: var(--pos); }
+.tl-px.tl-avg[data-dir="down"] { background: var(--neg); }
+
+/* Position line: the reference's dashed rule in the P&L colour. */
+.tl-posline {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  border-top: 1px dashed currentColor;
+  color: var(--fg3);
+  pointer-events: none;
+}
+.tl-posline[data-dir="up"] { color: var(--pos); }
+.tl-posline[data-dir="down"] { color: var(--neg); }
+
+/* ---------- size cells ---------- */
+
+/* [size][████] | price | [████][size]. The bar is flush against the
+   price column and the size stands outside its far end. */
+.tl-root .tl-size {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+/* DOM order is [bar][size] on both sides. A buy cell reverses it so
+   the bar packs against the price column on the right and the size
+   stands to its left; a sell cell keeps it, bar on the left. */
+.tl-root .tl-size--buy { flex-direction: row-reverse; justify-content: flex-start; }
+.tl-root .tl-size--sell { flex-direction: row; justify-content: flex-start; }
+.tl-size:focus-visible { outline: none; }
+
+/* The bar's track: the cell less the size column. Bars pack to the
+   price side of it. */
+.tl-track { display: flex; flex: 1; min-width: 0; height: 100%; align-items: center; }
+.tl-size--buy .tl-track { justify-content: flex-end; }
+.tl-size--sell .tl-track { justify-content: flex-start; }
+/* Fixed size column on the outer edge, figures right-aligned. */
+.tl-size-col { flex: none; width: 36px; text-align: right; }
+
+.tl-bar {
+  flex: none;
+  height: calc(var(--row-h, 28px) - 4px);
+  width: calc(100% * var(--f, 0));
+  transition:
+    width 240ms cubic-bezier(0.2, 0, 0, 1),
+    background-color 240ms ease,
+    opacity 240ms ease;
+}
+/* L2 ramp in the platform's own accents: --mix runs 100% at the touch
+   to 19% nine levels out, blended into the ladder ground, so the far
+   book sinks toward --bg the way the swatch columns do. */
+.tl-size--buy .tl-bar { background-color: color-mix(in srgb, var(--pos) var(--mix, 100%), var(--bg)); }
+.tl-size--sell .tl-bar { background-color: color-mix(in srgb, var(--neg) var(--mix, 100%), var(--bg)); }
+
+.tl-size-v { display: inline-flex; justify-content: flex-end; color: var(--fg1); }
+
+/* ---------- trade-entry pill ---------- */
+
+.tl-pill-slot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* The reference's pill, value for value: large radius, a 12% fill of the
+   side's accent on the raised neutral, a 30% rim, 15px blur and its own
+   drop. The price sits in a fixed box (the reference's is 71.56), so the
+   pill keeps its width from row to row. */
+.tl-pill {
+  --rgb: var(--pos-rgb);
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 2px;
+  border-radius: var(--r-l);
+  white-space: nowrap;
+  background:
+    linear-gradient(rgb(var(--rgb) / 0.12), rgb(var(--rgb) / 0.12)),
+    var(--bg1);
+  border: 1px solid rgb(var(--rgb) / 0.3);
+  backdrop-filter: blur(15px);
+  box-shadow: 0 12px 32px 9px rgba(0, 0, 0, 0.25);
+  font-weight: 700;
+}
+.tl-pill[data-side="sell"] { --rgb: var(--neg-rgb); }
+.tl-pill[data-staged] { pointer-events: auto; }
+
+.tl-pill-px {
+  display: inline-flex;
+  justify-content: center;
+  width: 72px;
+  color: var(--fg1);
+}
+
+.tl-pill-label,
+.tl-root .tl-pill-send {
+  display: inline-flex;
+  align-items: center;
+  height: 16px;
+  padding: 0 8px 0 4px;
+  border-radius: var(--r-s);
+  color: rgb(var(--rgb));
+  font-weight: 700;
+}
+.tl-root .tl-pill-send { transition: opacity 0.12s ease, background-color 0.12s ease; }
+.tl-root .tl-pill-send:hover { opacity: 0.8; }
+.tl-root .tl-pill-send:focus-visible { outline: none; background: rgb(var(--rgb) / 0.16); }
+
+.tl-root .tl-pill-x {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 2px;
+  border-radius: var(--r-s);
+  color: var(--fg2);
+}
+.tl-root .tl-pill-x:hover { color: var(--fg1); }
+
+/* One-click: the click sends — the pill fills with its accent. */
+.tl-pill[data-quick] { background: rgb(var(--rgb)); border-color: rgb(var(--rgb)); }
+.tl-pill[data-quick] .tl-pill-px,
+.tl-pill[data-quick] .tl-pill-label { color: #000; }
+
+/* ---------- working-order tags ---------- */
+
+/* "1 LMT ×": the reference's order tag — 5% white glass, a dashed rim
+   that only shows on hover, count white, type in the side's accent. */
+.tl-tag {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 20px;
+  padding-left: 4px;
+  border: 1px dashed transparent;
+  border-radius: var(--r-s);
+  background: linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)), var(--bg);
+  backdrop-filter: blur(18px);
+  /* The reference's 32px drop reads as a halo on a 20px tag over a flat
+     ground; this keeps the lift without the cloud. */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  font-weight: 700;
+  transition: border-color 0.14s ease;
+}
+.tl-tag:hover { border-color: var(--bg3); }
+.tl-tag + .tl-tag { margin-left: 4px; }
+.tl-tag-q { color: var(--fg1); }
+.tl-tag-k { color: var(--pos); }
+.tl-tag[data-side="sell"] .tl-tag-k { color: var(--neg); }
+
+.tl-root .tl-tag-x {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: var(--fg2);
+}
+.tl-root .tl-tag-x:hover { color: var(--fg1); }
+
+/* ---------- fill flash ---------- */
+
+.tl-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: var(--pos);
+  opacity: 0;
+  animation: tl-flash 0.9s cubic-bezier(0.2, 0, 0, 1);
+}
+.tl-flash[data-side="sell"] { background: var(--neg); }
+@keyframes tl-flash {
+  0% { opacity: 0.25; }
+  100% { opacity: 0; }
+}
+
+/* ---------- footer ---------- */
+
+.tl-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line);
+}
+
+.tl-view { display: flex; gap: 8px; }
+.tl-root .tl-view-btn { font-weight: 700; color: var(--fg3); transition: color 0.14s ease; }
+.tl-root .tl-view-btn:hover { color: var(--fg2); }
+.tl-root .tl-view-btn[aria-checked="true"] { color: var(--fg1); }
+
+.tl-zoom { display: flex; }
+.tl-root .tl-zoom button {
+  display: grid;
+  place-items: center;
+  width: 33px;
+  height: 33px;
+  border: 1px solid var(--line);
+  color: var(--fg2);
+  transition: background-color 0.14s ease;
+}
+.tl-root .tl-zoom button svg { width: 16px; height: 16px; }
+.tl-root .tl-zoom button:first-child { border-radius: var(--r-s) 0 0 var(--r-s); }
+.tl-root .tl-zoom button:last-child { border-left: 0; border-radius: 0 var(--r-s) var(--r-s) 0; }
+.tl-root .tl-zoom button:hover:not(:disabled) { background: var(--bg1); }
+.tl-root .tl-zoom button:disabled { color: var(--fg3); }
+
+/* ---------- hover surface ---------- */
+
+/* The reference's hover card (its Flatten hint): a translucent grey over a
+   heavy blur, no rim, 8 radius, its elevated drop. Shared by the hint and
+   the open-orders panel, so every hover surface on the ladder is one
+   material. Sampled by eye off the capture. */
+/* Glass — the platform's ticket material (user, 2026-11-05): a dark,
+   see-through pane that blurs and lifts the colour behind it, a
+   hairline rim, a soft drop. Every hover surface wears it: the
+   open-orders panel, the Flatten hint, the quantity tooltip. */
+.tl-surface {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: 8px;
+  box-shadow: var(--glass-shadow);
+}
+.tl-oo-card.tl-surface { border-radius: 12px; }
+
+.tl-hint-host { position: relative; display: inline-flex; flex: none; }
+
+/* Hangs under the control, right edges aligned, so it reads into the
+   ladder rather than off the card. */
+.tl-hint {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  width: 304px;
+  padding: 12px 12px 14px;
+  pointer-events: none;
+  white-space: normal;
+}
+.tl-hint-text { flex: 1; color: var(--fg1); line-height: 1.23; }
+.tl-hint-keys { flex: none; color: var(--fg2); white-space: nowrap; }
+
+/* ---------- open-orders panel ---------- */
+
+.oc-root .tl-oo-trigger,
+.tl-root .tl-oo-trigger {
+  color: var(--fg2);
+  text-decoration: underline dotted var(--fg3);
+  text-underline-offset: 3px;
+}
+.tl-root .tl-oo-trigger:hover,
+.tl-root .tl-oo-trigger[data-open] { color: var(--fg1); }
+
+.tl-oo-panel {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 40;
+  padding-top: 6px;
+}
+
+/* The reference's Recent orders table, small: raised neutral, bold grey
+   headers, 40px rows, an outlined status, a white Cancel on hover. */
+/* Material from .tl-surface — the reference's hover card. */
+.tl-oo-card {
+  width: 510px;
+  padding: 4px 0;
+}
+.tl-oo-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding-inline: 12px;
+  font-weight: 700;
+}
+.tl-root .tl-oo-all { color: var(--fg2); font-weight: 700; }
+.tl-root .tl-oo-all:hover { color: var(--neg); }
+
+.tl-oo-grid {
+  display: grid;
+  grid-template-columns: 70px 32px 46px 34px 64px 1fr 94px;
+  align-items: center;
+  column-gap: 8px;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+.tl-oo-head {
+  height: 28px;
+  color: var(--fg2);
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.tl-oo-r { text-align: right; }
+.tl-oo-row { color: var(--fg1); overflow: hidden; transition: background-color 120ms ease; }
+/* A lift on the translucent card, not an opaque band. */
+.tl-oo-row:hover,
+.tl-oo-row:focus-within { background: rgba(255, 255, 255, 0.06); }
+
+.tl-oo-status {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding-inline: 5px;
+  border: 1px solid var(--bg3);
+  border-radius: var(--r-s);
+  color: var(--fg2);
+}
+.tl-oo-side { color: var(--pos); }
+.tl-oo-side[data-side="sell"] { color: var(--neg); }
+.tl-oo-time { color: var(--fg1); }
+
+.tl-oo-act { position: relative; display: flex; justify-content: flex-end; gap: 6px; }
+.tl-root .tl-oo-cancel {
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--r-s);
+  background: var(--fg1);
+  color: #000;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.tl-oo-row:hover .tl-oo-cancel,
+.tl-oo-row:focus-within .tl-oo-cancel,
+.tl-oo-row[data-menu] .tl-oo-cancel { opacity: 1; }
+.tl-root .tl-oo-cancel:disabled { background: var(--bg3); color: var(--fg3); cursor: default; }
+
+/* ⋮ — the reference's grey square beside Cancel, shown with it. */
+.tl-root .tl-oo-more {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-s);
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--fg1);
+  opacity: 0;
+  transition: opacity 0.12s ease, background-color 0.12s ease;
+}
+.tl-root .tl-oo-more svg { width: 14px; height: 14px; }
+.tl-root .tl-oo-more:hover,
+.tl-root .tl-oo-more[aria-expanded="true"] { background: rgba(255, 255, 255, 0.26); }
+.tl-oo-row:hover .tl-oo-more,
+.tl-oo-row:focus-within .tl-oo-more,
+.tl-oo-row[data-menu] .tl-oo-more,
+.tl-oo-act--on .tl-oo-cancel,
+.tl-oo-act--on .tl-oo-more { opacity: 1; }
+
+/* The row's own menu hangs under ⋮, right-aligned; the row stops
+   clipping while it is open (rows clip only for their height tween). */
+.tl-oo-row[data-menu] { overflow: visible !important; position: relative; z-index: 2; background: rgba(255, 255, 255, 0.06); }
+.tl-oo-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 5;
+  min-width: 140px;
+  padding: 4px;
+  border-radius: 8px;
+  /* A menu over rows must not let them read through: the same glass,
+     near-opaque. */
+  background: rgba(30, 30, 30, 0.94);
+}
+.tl-root .tl-oo-mi {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--r-s);
+  color: var(--fg1);
+  white-space: nowrap;
+}
+.tl-root .tl-oo-mi:hover,
+.tl-root .tl-oo-mi:focus-visible { background: rgba(255, 255, 255, 0.08); outline: none; }
+
+/* Replace mode: the row holds the lift; size and price are fields. */
+.tl-oo-edit { background: rgba(255, 255, 255, 0.06); }
+.tl-root .tl-oo-in {
+  width: 100%;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: var(--r-s);
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: inset 0 0 0 1px var(--bg3);
+  font-weight: 700;
+  color: var(--fg1);
+  outline: none;
+}
+.tl-root .tl-oo-in:focus { box-shadow: inset 0 0 0 1px var(--fg2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .tl-flash { animation: none; }
+  .tl-row,
+  .tl-bar { transition: none; }
+}
+
+/* ---------- review harness (page, outside the ladder) ---------- */
+
+.tlv { display: flex; flex-direction: column; align-items: center; gap: 16px; max-width: 100%; }
+.tlv-head { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.tlv-switch {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font: 500 13px/1 Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+  max-width: 100%;
+  overflow-x: auto;
+}
+.tlv-opt {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  background: none;
+  color: #a6a6a6;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.14s ease;
+}
+.tlv-opt:hover,
+.tlv-opt[aria-checked="true"] { color: #fff; }
+.tlv-on { position: absolute; inset: 0; border-radius: 7px; background: rgba(255, 255, 255, 0.1); }
+.tlv-opt-k,
+.tlv-opt-n { position: relative; }
+.tlv-opt-k { font-weight: 700; color: #6b6b6b; }
+.tlv-opt[aria-checked="true"] .tlv-opt-k { color: #a6a6a6; }
+.tlv-note { margin: 0; color: #6b6b6b; font: 400 12px/16px Inter, -apple-system, sans-serif; }
+
+/* ---------- chart preview (variant e) ---------- */
+
+.tlv-stage { display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start; gap: 24px; max-width: 100%; }
+.tl-root.tlc { width: 534px; }
+.tlc-plot { position: relative; }
+.tlc-plot svg { display: block; }
+.tlc-axis { fill: var(--fg2); font-size: 12px; }
+.tlc-up line, .tlc-up rect { stroke: var(--pos); fill: var(--pos); }
+.tlc-dn line, .tlc-dn rect { stroke: var(--neg); fill: var(--neg); }
+.tlc-up line, .tlc-dn line { stroke-width: 1; }
+.tlc-up rect, .tlc-dn rect { stroke-width: 0; }
+.tlc-last-line { stroke: var(--pos); stroke-dasharray: 2 3; opacity: 0.6; }
+.tlc-last-tag { fill: var(--pos); }
+.tlc-last-tx { fill: #000; font-weight: 700; font-size: 12px; }
+.tlc-bar { position: absolute; top: 12px; left: 12px; }
+.tl-root .tlc-flat {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-s);
+  background: var(--bg2);
+  color: var(--fg1);
+  transition: background-color 0.14s ease;
+}
+.tl-root .tlc-flat:hover { background: var(--bg3); }
+
+/* ---------- off-screen order tags ---------- */
+
+/* A working order out of view pins here, on its own side, at the edge
+   it went past: ↑ LMT on top, ↓ LMT below. A click centres it. */
+.tl-root .tl-jump {
+  position: absolute;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px 0 8px;
+  border-radius: 6px;
+  background: var(--bg3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  font-weight: 700;
+  transition: background-color 0.14s ease;
+}
+.tl-root .tl-jump:hover { background: #4a4a4a; }
+.tl-root .tl-jump:focus-visible { outline: 2px solid #3b82f6; outline-offset: 1px; }
+.tl-jump[data-edge="top"] { top: 4px; }
+.tl-jump[data-edge="bottom"] { bottom: 4px; }
+.tl-jump[data-side="buy"] { left: 6px; }
+/* Clear of the overlay scrollbar. */
+.tl-jump[data-side="sell"] { right: 14px; }
+.tl-jump-a { color: var(--fg2); }
+.tl-jump-k { color: var(--pos); }
+.tl-jump[data-side="sell"] .tl-jump-k { color: var(--neg); }
+
+/* ---------- session pill (proposed) ---------- */
+
+.tl-session {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: center;
+  height: 22px;
+  margin-left: 10px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--bg2);
+  color: var(--fg2);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tl-session-dot { width: 6px; height: 6px; border-radius: 50%; background: #f5b400; }
+.tlv-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.tlv-switch[data-off] { opacity: 0.4; }
+.tlv-opt:disabled { cursor: default; }
+
+/* ---------- position panel (twin of open orders) ---------- */
+
+.tl-root .tl-pp-trigger { color: var(--fg1); text-decoration: underline dotted var(--fg3); text-underline-offset: 3px; }
+.tl-root .tl-pp-trigger:hover,
+.tl-root .tl-pp-trigger[data-open] { text-decoration-color: var(--fg2); }
+.tl-pp-grid {
+  display: grid;
+  grid-template-columns: 52px 40px 72px 60px 1fr 1fr 62px;
+  align-items: center;
+  column-gap: 8px;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+.tl-pp-row { height: 40px; }
+.tl-pp-sym { font-weight: 700; }
+.tl-pp-pnl[data-dir="up"] { color: var(--pos); }
+.tl-pp-pnl[data-dir="down"] { color: var(--neg); }
+.tl-pp-note { color: var(--fg2); font-weight: 400; font-size: 12px; }
+/* The single row: Close is the panel's one action, so it shows without
+   waiting for the row hover. */
+.tl-pp-row .tl-oo-cancel { opacity: 1; }
+.tl-root .tl-oo-cancel[data-off] { background: var(--bg3); color: var(--fg3); cursor: default; }
+
+/* ---------- position tag (on the dashed line) ---------- */
+
+/* The order tag's material and type, sat on the position line at the
+   row's edge; × closes. */
+.tl-ptag {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 20px;
+  margin-top: -10px;
+  padding-left: 6px;
+  border-radius: var(--r-s);
+  background: linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05)), var(--bg);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  font-weight: 700;
+  white-space: nowrap;
+}
+/* Hidden until the pointer is on the position's row (or focus is in
+   it), so the line stays a quiet marker and the close comes to hand
+   only where it is wanted. */
+/* !important: Motion writes opacity inline on layout-animated nodes. */
+.tl-ptag {
+  opacity: 0 !important;
+  pointer-events: none;
+  transition: opacity 0.14s ease;
+}
+/* Pointer on the row, or KEYBOARD focus in it — not mouse focus, which
+   would leave the tag up after a click while you hover other lines. */
+.tl-row:hover .tl-ptag,
+.tl-row:has(:focus-visible) .tl-ptag { opacity: 1 !important; pointer-events: auto; }
+@media (hover: none) {
+  /* No hover on touch: keep it reachable. */
+  .tl-ptag { opacity: 1 !important; pointer-events: auto; }
+}
+.tl-ptag[data-edge="left"] { left: 6px; }
+.tl-ptag[data-edge="right"] { right: 14px; }
+.tl-ptag-pnl { color: var(--fg2); }
+.tl-ptag-pnl[data-dir="up"] { color: var(--pos); }
+.tl-ptag-pnl[data-dir="down"] { color: var(--neg); }
+.tl-ptag-xhost { position: relative; display: inline-flex; }
+.tl-root .tl-ptag .tl-tag-x[data-off] { color: var(--fg3); cursor: default; }
+.tl-root .tl-ptag .tl-tag-x:hover:not([data-off]) { color: var(--fg1); }
+
+.tl-ptag-tip {
+  position: absolute;
+  top: calc(100% + 8px);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  white-space: nowrap;
+  font-weight: 400;
+  pointer-events: none;
+}
+.tl-ptag-tip[data-edge="left"] { left: -40px; }
+.tl-ptag-tip[data-edge="right"] { right: -6px; }
+.tl-ptag-tip-t { color: var(--fg1); font-weight: 700; }
+.tl-ptag-tip-s { color: var(--fg2); }
+
+/* ---------- header summary as pills ---------- */
+
+/* One pill per thing that exists — the position, the working orders —
+   side by side, each the trigger for its hover panel. Same height as
+   the stepper's plates, the neutral raised fill, bold figures. */
+.tl-root[data-summary="pills"] .tl-posn {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+/* The status chip's treatment (the open-orders "Working" tag): an
+   outline on the ground, small radius, regular grey text — quiet labels
+   that wake on hover, not filled buttons. */
+.tl-root[data-summary="pills"] .tl-pp-trigger,
+.tl-root[data-summary="pills"] .tl-oo-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  /* Flatten's 32, so the pills and the icon button share a row line. */
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--bg3);
+  border-radius: var(--r-s);
+  background: transparent;
+  color: var(--fg2);
+  font-weight: 400;
+  line-height: 1;
+  text-decoration: none;
+  transition: border-color 0.14s ease, color 0.14s ease;
+}
+.tl-root[data-summary="pills"] .tl-pp-trigger:hover,
+.tl-root[data-summary="pills"] .tl-pp-trigger[data-open],
+.tl-root[data-summary="pills"] .tl-oo-trigger:hover,
+.tl-root[data-summary="pills"] .tl-oo-trigger[data-open] { border-color: var(--fg3); color: var(--fg1); }
+/* The size keeps its side's colour, so long/short reads at a glance. */
+.tl-root[data-summary="pills"] .tl-pp-q[data-side="buy"] { color: var(--pos); }
+.tl-root[data-summary="pills"] .tl-pp-q[data-side="sell"] { color: var(--neg); }
+.tl-root[data-summary="pills"] .tl-pill-n { color: inherit; }
+/* Pills are one line, so the P&L block keeps the header's height. */
+.tl-root[data-summary="pills"] .tl-summary { min-height: 32px; }
+
+/* ---------- narrow widget (≤ 440px — the platform's mid width) ---------- */
+
+/* The header holds ONE line at every width (user, 2026-11-05): it
+   sheds words, never wraps. Full: "+50 @ 118.42" "2 orders" "Open P&L".
+   ≤500: the pills keep what a glance needs — size, and ≡ count — the
+   average and the order list live in their panels. ≤440: "Open"/"Day". */
+.tl-l-short,
+.tl-pill-ico { display: none; }
+.tl-summary { flex-wrap: nowrap; }
+.tl-pnl { min-width: 0; }
+@container tl (max-width: 500px) {
+  /* The position pill stays whole (user, 2026-11-05); the orders pill
+     and then the P&L give way. */
+  .tl-root[data-summary="pills"] .tl-pill-word { display: none; }
+  .tl-root[data-summary="pills"] .tl-pill-ico { display: block; color: var(--fg2); }
+  .tl-root[data-summary="pills"] .tl-oo-trigger { gap: 6px; }
+}
+@container tl (max-width: 440px) {
+  .tl-l-full { display: none; }
+  .tl-l-short { display: inline; }
+  /* Labels are the last to go: they ellipsize if the figures need it. */
+  .tl-pnl-line { min-width: 0; max-width: 100%; }
+  .tl-pnl-l { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .tl-pnl-v { flex: none; }
+  .tl-posn, .tl-pp-trigger, .tl-oo-trigger, .tl-hint-host { flex: none; }
+  .tl-root[data-summary="pills"] .tl-pp-trigger,
+  .tl-root[data-summary="pills"] .tl-oo-trigger { padding: 0 8px; }
+}
+
+@container tl (max-width: 440px) {
+  /* Quote bar: the change, not the price — the platform's mid width. */
+  .tl-quote-px { display: none; }
+
+  /* Ladder: tighter tag and price columns so the bars keep a track. */
+  .tl-grid { grid-template-columns: 60px 1fr 72px 1fr 60px; }
+  .tl-root .tl-size { gap: 6px; }
+  .tl-size-col { width: 32px; }
+
+  /* Order tags: 12px, and × only on hover, so "999 LMT" fits its column. */
+  .tl-tag { font-size: 12px; gap: 3px; padding-right: 4px; }
+  .tl-root .tl-tag .tl-tag-x { width: 0; overflow: hidden; transition: width 0.12s ease; }
+  .tl-root .tl-tag:hover .tl-tag-x,
+  .tl-root .tl-tag:focus-within .tl-tag-x { width: 18px; }
+  .tl-grid { grid-template-columns: 64px 1fr 72px 1fr 64px; }
+  .tl-size-col { width: 30px; }
+  .tl-cell--mine { padding-left: 2px; }
+  .tl-cell--sells { padding-right: 0; }
+
+  /* Panels fit the widget: drop the columns a glance can do without. */
+  .tl-oo-card { width: calc(100cqw - 24px); }
+  .tl-oo-grid { grid-template-columns: 34px 44px 36px 1fr 94px; }
+  .tl-oo-c-status,
+  .tl-oo-time { display: none; }
+  .tl-pp-grid { grid-template-columns: 44px 52px 64px 1fr 62px; }
+  .tl-pp-c-last,
+  .tl-pp-c-day { display: none; }
+  .tl-pp-note { display: none; }
+
+  /* The Flatten hint narrows with the widget. */
+  .tl-hint { width: min(304px, calc(100cqw - 24px)); }
+}
+
+/* A three-digit order at any width: the compact tag. */
+.tl-tag[data-wide] { font-size: 12px; gap: 3px; padding-right: 4px; }
+.tl-root .tl-tag[data-wide] .tl-tag-x { width: 0; overflow: hidden; transition: width 0.12s ease; }
+.tl-root .tl-tag[data-wide]:hover .tl-tag-x,
+.tl-root .tl-tag[data-wide]:focus-within .tl-tag-x { width: 18px; }
+
+/* ---------- drag to reprice ---------- */
+
+.tl-tag[data-grab] { cursor: grab; touch-action: none; user-select: none; }
+.tl-tag[data-grab]:active { cursor: grabbing; }
+/* Left behind while dragged: a dashed outline of where it was. */
+.tl-tag[data-lifted] {
+  /* !important: Motion writes opacity inline on its tags. */
+  opacity: 0.35 !important;
+  border-color: var(--fg3);
+}
+/* The row it will land on. */
+.tl-row[data-drop] { background: rgba(255, 255, 255, 0.07); }
+
+/* Ghost: the tag at its new row, lifted, with a readout beside it that
+   floats over the ladder (never pushes the row's layout). */
+/* Absolutely placed on the row (not in the tag column's flow), so it
+   is never clipped by the column and never shifts the row. */
+.tl-ghost {
+  position: absolute;
+  top: 50%;
+  z-index: 7;
+  display: inline-flex;
+  align-items: center;
+  translate: 0 -50%;
+  pointer-events: none;
+}
+.tl-ghost[data-side="buy"] { left: 6px; }
+.tl-ghost[data-side="sell"] { right: 14px; }
+.tl-tag--ghost {
+  /* No × on the ghost, so it carries its own right padding. */
+  padding-right: 6px;
+  border: 1px solid var(--fg2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+  transform: scale(1.04);
+}
+/* Kind will change here: the outline goes dashed, the readout says so. */
+.tl-tag--ghost[data-flip] { border-style: dashed; }
+.tl-ghost-read {
+  position: absolute;
+  top: 50%;
+  z-index: 8;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 22px;
+  padding: 0 8px;
+  translate: 0 -50%;
+  border-radius: var(--r-s);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  color: var(--fg2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.tl-ghost-read b { color: var(--fg1); }
+.tl-ghost[data-side="buy"] .tl-ghost-read { left: calc(100% + 8px); }
+.tl-ghost[data-side="sell"] .tl-ghost-read { right: calc(100% + 8px); }
+.tl-ghost-flip { color: var(--fg1); }
+
+/* ---------- tag → price leader ---------- */
+
+/* Hovering (or dragging) an order: a hairline from the tag across its
+   side's bars to the price, and the price lit like the last trade. */
+.tl-link {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+}
+.tl-px[data-focus] {
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: var(--bg2);
+  color: var(--fg1);
+  font-weight: 700;
+}
+.tl-last[data-focus] { box-shadow: inset 0 0 0 1px var(--fg3); }
+
+/* Buy tags carry × first (outer edge), so their padding flips. */
+.tl-tag[data-side="buy"] { padding-left: 0; padding-right: 6px; }
+/* A compact buy tag with × collapsed still needs a left inset. */
+.tl-tag[data-wide][data-side="buy"] { padding-left: 4px; }
+
+/* The leader passes behind the size figure, not through it: the figure
+   sits above the line on a ground-coloured knockout. */
+.tl-row[data-linked] .tl-size-col .tl-size-v {
+  position: relative;
+  z-index: 3;
+  padding: 0 3px;
+  margin-right: -3px;
+  background: var(--bg);
+}
+
+/* "--": no position, no figure — grey, the triangle muted. */
+.tl-pnl-none { color: var(--fg2); font-weight: 400; }
+.tl-pnl-none svg { color: var(--fg3); }
+
+/* The owned badge's check/minus is cut in the plate's own colour. */
+.tl-knock { stroke: var(--bg2); transition: stroke 0.14s ease; }
+.tl-ico-btn:hover .tl-knock,
+.tl-ico-btn[data-open] .tl-knock { stroke: var(--bg3); }
+
+/* ---------- sizes ride the bar (user, 2026-11-05) ---------- */
+/* Bar and figure side by side, packed to the price column; the bar's
+   share is of the cell less room for a four-character figure. */
+.tl-root .tl-size { gap: 4px; }
+.tl-root .tl-size .tl-size-col { width: auto; flex: none; text-align: left; }
+.tl-root .tl-size .tl-bar { width: calc((100% - 38px) * var(--f, 0)); }
+.tl-size--buy .tl-size-v { color: var(--pos); }
+.tl-size--sell .tl-size-v { color: var(--neg); }
+
+/* A hover/link focus on the position row keeps the pill, not the grey box. */
+.tl-px.tl-avg[data-focus] { color: #000; }
+.tl-px.tl-avg[data-focus][data-dir="up"] { background: var(--pos); }
+.tl-px.tl-avg[data-focus][data-dir="down"] { background: var(--neg); }
+
+/* ---------- bracket ---------- */
+
+/* The staged pill's bracket toggle. */
+.tl-root .tl-pill-br {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  color: var(--fg2);
+  transition: color 0.14s ease, background-color 0.14s ease;
+}
+.tl-root .tl-pill-br:hover { color: var(--fg1); background: rgba(255, 255, 255, 0.08); }
+.tl-root .tl-pill-br[aria-pressed="true"] { color: var(--fg1); background: rgba(255, 255, 255, 0.16); }
+
+/* Legs: TP / SL. Draft legs are dashed and carry their dollar result;
+   held (sent, waiting on the entry) are dashed and quieter. */
+.tl-tag--leg {
+  gap: 6px;
+  padding: 0 6px;
+  border: 1px dashed var(--fg3);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.tl-tag--leg .tl-tag-k,
+.tl-tag[data-leg] .tl-tag-k { color: var(--fg1); }
+.tl-leg-pnl { font-weight: 700; }
+.tl-leg-pnl[data-dir="up"] { color: var(--pos); }
+.tl-leg-pnl[data-dir="down"] { color: var(--neg); }
+.tl-tag[data-held] { border: 1px dashed var(--fg3); opacity: 0.7; }
+
+/* Rail: inside the scroll content, at the inner edge of the legs' tag
+   column, ticks reaching out toward the tags. */
+.tl-rows { position: relative; }
+.tl-rail {
+  position: absolute;
+  z-index: 3;
+  width: 0;
+  border-left: 1px solid var(--fg3);
+  pointer-events: none;
+}
+.tl-rail[data-draft] { border-left-style: dashed; }
+.tl-rail[data-side="sell"] { right: 86px; }
+.tl-rail[data-side="buy"] { left: 86px; }
+.tl-rail-tick { position: absolute; width: 6px; height: 0; border-top: 1px solid var(--fg3); }
+.tl-rail[data-side="sell"] .tl-rail-tick { left: 0; }
+.tl-rail[data-side="buy"] .tl-rail-tick { right: 0; }
+.tl-rail-tick[data-leg="tp"] { border-color: var(--pos); }
+.tl-rail-tick[data-leg="sl"] { border-color: var(--neg); }
+.tl-rail-entry { position: absolute; left: -4px; width: 7px; height: 7px; margin-top: -3.5px; border-radius: 50%; background: var(--fg2); }
+.tl-rail-rr {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--bg2);
+  color: var(--fg1);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tl-rail[data-side="sell"] .tl-rail-rr { right: 12px; }
+.tl-rail[data-side="buy"] .tl-rail-rr { left: 12px; }
+@container tl (max-width: 440px) {
+  .tl-rail[data-side="sell"] { right: 66px; }
+  .tl-rail[data-side="buy"] { left: 66px; }
+}
+
+/* Position bracket: ⊐ on the position tag; while drafting the tag stays
+   up and offers Place. */
+.tl-root .tl-ptag .tl-ptag-br[aria-pressed="true"] { color: var(--fg1); background: rgba(255, 255, 255, 0.16); border-radius: var(--r-s); }
+.tl-root .tl-ptag .tl-ptag-br svg { width: 12px; height: 12px; }
+.tl-ptag[data-active] { opacity: 1 !important; pointer-events: auto; }
+.tl-root .tl-ptag-place {
+  height: 18px;
+  padding: 0 7px;
+  border-radius: var(--r-s);
+  background: var(--fg1);
+  color: #000;
+  font-size: 12px;
+  font-weight: 700;
+}
+.tl-ptag-rr { font-weight: 500; color: #3a3a3a; }
+
+/* Placed bracket, active (hovered / selected): both legs outlined as a
+   pair while the rail shows. */
+.tl-tag[data-leg][data-active] { border: 1px solid var(--fg2); }
+
+/* Leg pills: the staged-order pill, draggable; the dollar result rides
+   the label in its own colour. */
+.tl-pill--leg { cursor: grab; touch-action: none; user-select: none; }
+.tl-pill--leg:active { cursor: grabbing; }
+.tl-pill--leg .tl-leg-pnl { margin-left: 2px; }
+.tl-ptag-ratio { padding: 0 6px; border-radius: 999px; background: var(--bg2); color: var(--fg1); font-size: 12px; line-height: 18px; }
+
+/* Bracket mode: the connector runs in the price column's left margin,
+   between the bid bars and the figures — from the position pill to each
+   leg pill. Ticks reach in toward the pills. */
+/* The price column is centred: its left edge is 50% − half its width. */
+.tl-rail[data-anchor="price"] { right: auto; left: calc(50% - 44px + 6px); }
+.tl-rail[data-anchor="price"] .tl-rail-tick { left: 0; right: auto; width: 10px; }
+.tl-rail[data-anchor="price"] .tl-rail-entry { left: -3.5px; }
+@container tl (max-width: 440px) {
+  .tl-rail[data-anchor="price"] { left: calc(50% - 36px + 5px); }
+}
+/* The hover preview: the leg pill, quieter, not yet set. */
+.tl-pill--leg[data-preview] { opacity: 0.7; pointer-events: none; }
+.tl-ptag-hint { color: var(--fg2); font-weight: 400; font-size: 12px; }
+
+/* ⊐ on a working order tag: shown on hover (pressed while bracketing). */
+.tl-root .tl-tag .tl-tag-br { width: 0; overflow: hidden; transition: width 0.12s ease; }
+.tl-root .tl-tag:hover .tl-tag-br,
+.tl-root .tl-tag:focus-within .tl-tag-br,
+.tl-root .tl-tag .tl-tag-br[aria-pressed="true"] { width: 18px; }
+.tl-root .tl-tag .tl-tag-br svg { width: 11px; height: 11px; }
+.tl-root .tl-tag .tl-tag-br[aria-pressed="true"] { color: var(--fg1); }
+.tl-tag:not([data-leg])[data-active] { border: 1px solid var(--fg2); }
+
+/* ---------- the platform's pill (user ref, 2026-11-05) ---------- */
+/* A rounded rectangle, not a capsule: 8px radius, 26px tall, a warmer
+   glass tint of the side's accent, price and label set freely. */
+.tl-pill {
+  height: 26px;
+  padding: 0 10px;
+  gap: 14px;
+  border-radius: 8px;
+  background:
+    linear-gradient(rgb(var(--rgb) / 0.16), rgb(var(--rgb) / 0.16)),
+    rgba(30, 30, 30, 0.82);
+  backdrop-filter: blur(15px) saturate(1.4);
+  -webkit-backdrop-filter: blur(15px) saturate(1.4);
+  border: 1px solid rgb(var(--rgb) / 0.32);
+  transition: none;
+}
+.tl-pill-px { width: auto; }
+.tl-pill-label,
+.tl-root .tl-pill-send { padding: 0; height: auto; }
+.tl-pill[data-staged] { cursor: pointer; }
+.tl-pill[data-staged]:hover { background: linear-gradient(rgb(var(--rgb) / 0.24), rgb(var(--rgb) / 0.24)), rgba(30, 30, 30, 0.82); }
+.tl-root .tl-pill[data-staged] .tl-pill-send:hover { opacity: 1; }
+.tl-root .tl-pill-x { margin-right: -4px; }
+
+/* ---------- bracket mode bar ---------- */
+/* Pinned over the top of the book while a bracket is being added. */
+.tl-modebar {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  right: 8px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 10px;
+  border-radius: 8px;
+}
+.tl-modebar > svg { flex: none; color: var(--fg1); }
+.tl-modebar-t { display: flex; flex-direction: column; min-width: 0; margin-right: auto; line-height: 16px; }
+.tl-modebar-t b { color: var(--fg1); white-space: nowrap; }
+.tl-modebar-s { color: var(--fg2); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-root .tl-modebar-cancel,
+.tl-root .tl-modebar-place {
+  flex: none;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: var(--r-s);
+  font-weight: 700;
+}
+.tl-root .tl-modebar-cancel { background: var(--bg3); color: var(--fg1); }
+.tl-root .tl-modebar-cancel:hover { background: #4a4a4a; }
+.tl-root .tl-modebar-place { background: var(--fg1); color: #000; }
+.tl-root .tl-modebar-place:hover { background: #e6e6e6; }
+
+/* The hover pill is live: a click on it sends straight away (a click on
+   the row elsewhere still stages). */
+.tl-pill[data-live] { pointer-events: auto; cursor: pointer; }
+.tl-pill[data-live]:hover { background: linear-gradient(rgb(var(--rgb) / 0.24), rgb(var(--rgb) / 0.24)), rgba(30, 30, 30, 0.82); }
+
+/* ---------- position tag → menu ---------- */
+.tl-root .tl-ptag-btn { display: inline-flex; align-items: center; gap: 6px; height: 100%; padding-right: 2px; font-weight: 700; }
+.tl-ptag-more { display: grid; place-items: center; width: 16px; color: var(--fg2); }
+.tl-ptag-more svg { width: 12px; height: 12px; }
+.tl-root .tl-ptag-btn:hover .tl-ptag-more,
+.tl-root .tl-ptag-btn[aria-expanded="true"] .tl-ptag-more { color: var(--fg1); }
+.tl-ptag { padding-right: 4px; }
+.tl-ptag-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 4px;
+  border-radius: 10px;
+  background: rgba(30, 30, 30, 0.94);
+  font-weight: 400;
+}
+.tl-ptag-menu[data-edge="right"] { right: -4px; }
+.tl-ptag-menu[data-edge="left"] { left: -6px; }
+.tl-root .tl-ptag-mi {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  color: var(--fg1);
+  text-align: left;
+  white-space: nowrap;
+}
+.tl-root .tl-ptag-mi:hover,
+.tl-root .tl-ptag-mi:focus-visible { background: rgba(255, 255, 255, 0.08); outline: none; }
+.tl-root .tl-ptag-mi[data-off] { color: var(--fg3); cursor: default; }
+.tl-ptag-mi-s { color: var(--fg2); font-size: 12px; }
+
+/* Live bracket connector: dashed in the tag column; at rest quiet, no
+   ticks or dot. */
+.tl-rail[data-anchor="tags"] { border-left-style: dashed; }
+.tl-rail[data-quiet] { border-left-color: rgba(255, 255, 255, 0.28); }
+/* At rest the ticks stay (dim) so each leg stays joined to its tag;
+   only the dot waits for hover. */
+.tl-rail[data-quiet] .tl-rail-entry { display: none; }
+.tl-rail[data-quiet] .tl-rail-tick { border-top-color: rgba(255, 255, 255, 0.28) !important; }
+.tl-rail:not([data-quiet]):not([data-draft]) { border-left-color: var(--fg2); }
+.tl-ptag-mode { color: var(--fg2); font-weight: 400; font-size: 12px; }
+.tl-modebar-t { flex-direction: row; white-space: nowrap; color: var(--fg1); }
+
+/* The connector's ticks run all the way into their TP / SL tag (tags
+   sit above the rail, so the tick's end tucks under whatever the tag's
+   width). */
+.tl-rail[data-anchor="tags"] .tl-rail-tick { width: 56px; }
+.tl-cell--mine .tl-tag[data-leg] { z-index: 4; }
+
+/* Placed connector: centred over the legs' tag column, so it lands on
+   the tag's top / bottom edge. */
+.tl-rail[data-anchor="tags"][data-side="sell"] { right: 42px; }
+.tl-rail[data-anchor="tags"][data-side="buy"] { left: 42px; }
+@container tl (max-width: 440px) {
+  .tl-rail[data-anchor="tags"][data-side="sell"] { right: 32px; }
+  .tl-rail[data-anchor="tags"][data-side="buy"] { left: 32px; }
+}
+/* The ratio sits beside the dot, toward the book. */
+.tl-rail[data-anchor="tags"][data-side="sell"] .tl-rail-rr { right: 12px; }
+
+/* ⋮ alone is the trigger: a small square target that lights on hover. */
+.tl-root .tl-ptag-btn.tl-ptag-more { display: grid; place-items: center; width: 18px; height: 18px; padding: 0; border-radius: var(--r-s); }
+.tl-root .tl-ptag-btn.tl-ptag-more:hover,
+.tl-root .tl-ptag-btn.tl-ptag-more[aria-expanded="true"] { background: rgba(255, 255, 255, 0.12); color: var(--fg1); }
+
+/* Ghost of the leg tag a click will place: dashed, quieter, same spot. */
+.tl-tag--preview {
+  /* Same box as the real tag (its × slot included), so placing it moves
+     nothing. */
+  border: 1px dashed var(--fg2);
+  opacity: 0.75;
+  pointer-events: none;
+}
+.tl-tag--preview .tl-tag-k { color: var(--fg1); }
+
+/* Setting a leg on a price that can't take it: a neutral note in place
+   of the preview pill, and the not-allowed cursor. */
+.tl-nope {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 8px;
+  color: var(--fg1);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.tl-row[data-nope],
+.tl-row[data-nope] .tl-size { cursor: not-allowed; }
+
+/* ---------- pinned price, mirrored pill (the platform's) ---------- */
+/* The price sits in a fixed 56px slot centred on the price column; the
+   pill grows away from it toward the side you're on — a buy reads
+   "Buy stop  118.40" (label left), a sell "118.50  Sell limit". Moving
+   bid ↔ ask only swaps the label's side: the price never moves. */
+.tl-pill-slot { justify-content: flex-start; }
+.tl-pill {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  gap: 12px;
+}
+.tl-pill-px { width: 56px; justify-content: center; }
+.tl-pill[data-side="sell"] { left: calc(50% - 39px); flex-direction: row; }
+.tl-pill[data-side="buy"] { right: calc(50% - 39px); flex-direction: row-reverse; }
+
+.tl-rows .tl-row .tl-ptag[data-away],
+.tl-rows .tl-row:hover .tl-ptag[data-away] { opacity: 0 !important; pointer-events: none !important; }
+/* The hint centres on the price column like a pill's price. */
+.tl-nope { position: absolute; top: 50%; left: 50%; translate: -50% -50%; }
+
+
+/* ⋮ on an order tag (shown on hover, like ×), and its menu. */
+.tl-root .tl-tag .tl-tag-more svg { width: 11px; height: 11px; }
+.tl-root .tl-tag .tl-tag-more { width: 0; overflow: hidden; transition: width 0.12s ease; }
+.tl-root .tl-tag:hover .tl-tag-more,
+.tl-root .tl-tag:focus-within .tl-tag-more,
+.tl-root .tl-tag .tl-tag-more[aria-expanded="true"] { width: 18px; }
+.tl-omenu { z-index: 26; }
+.tl-cell--mine .tl-tag:has(.tl-omenu) { z-index: 6; }
+/* Tags sit above the neighbouring size cells, so a tag that grows on
+   hover (its ⋮ / ×) stays under the pointer instead of being covered. */
+.tl-row > .tl-cell--mine { position: relative; z-index: 3; }
+
+/* An order's bracket: a dashed link along the order's row, from the
+   price column's edge to the connector — the position line's stand-in. */
+.tl-rail-entryline {
+  position: absolute;
+  width: calc(50cqw - 86px);
+  height: 0;
+  border-top: 1px dashed currentColor;
+  color: rgba(255, 255, 255, 0.28);
+}
+.tl-rail[data-side="sell"] .tl-rail-entryline { right: 0; }
+.tl-rail[data-side="buy"] .tl-rail-entryline { left: 0; }
+.tl-rail:not([data-quiet]) .tl-rail-entryline { color: var(--fg2); }
+@container tl (max-width: 440px) {
+  .tl-rail-entryline { width: calc(50cqw - 68px); }
+}
+
+/* The position's pill on the last-trade row: a white ring says "last". */
+.tl-px.tl-avg[data-last] { box-shadow: 0 0 0 1.5px var(--fg1); }
+
+/* ---------- the position line runs the full row ---------- */
+.tl-row[data-pos] .tl-posline { z-index: 0; }
+/* Bars and the pill sit over it; size figures knock it out. */
+.tl-row[data-pos] .tl-bar,
+.tl-row[data-pos] .tl-avg,
+.tl-row[data-pos] .tl-last { position: relative; z-index: 1; }
+.tl-row[data-pos] .tl-size-col .tl-size-v {
+  position: relative;
+  z-index: 1;
+  padding: 0 4px;
+  margin: 0 -4px;
+  background: var(--bg);
+}
+/* The pill keeps a little air from the line, as the platform's does. */
+.tl-row[data-pos] .tl-avg { box-shadow: 0 0 0 6px var(--bg); }
+.tl-row[data-pos] .tl-avg[data-last] { box-shadow: 0 0 0 1.5px var(--fg1), 0 0 0 6px var(--bg); }
+.tl-row[data-pos][data-lit] .tl-size-col .tl-size-v,
+.tl-row[data-pos][data-lit] .tl-avg { --knock: #1d1d1d; }
+
+/* ---------- the page split: story | live ladder ---------- */
+.tlv--split {
+  display: grid;
+  grid-template-columns: minmax(0, 520px) auto;
+  align-items: start;
+  justify-content: center;
+  gap: 72px;
+  width: 100%;
+  max-width: 1200px;
+}
+.tlv-demo { position: sticky; top: 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.tlv-demo .tlv-row { flex-wrap: wrap; justify-content: center; }
+@media (max-width: 1100px) {
+  .tlv--split { grid-template-columns: 1fr; justify-items: center; }
+  .tlv-demo { position: static; }
+}
+
+.tlv-story {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+  color: #f3f1ec;
+  font: 400 16px/1.55 Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+.tlv-story h1 { margin: 0; font-size: 44px; line-height: 1.05; font-weight: 700; letter-spacing: -0.02em; }
+.tlv-story h2 { margin: 0; font-size: 26px; line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+.tlv-story h3 { margin: 0; font-size: 16px; font-weight: 700; color: #f3f1ec; }
+.tlv-story p { margin: 0; color: #a6a6a6; }
+.tlv-s-hero { display: flex; flex-direction: column; gap: 12px; padding-top: 8px; }
+.tlv-s-block { display: flex; flex-direction: column; gap: 16px; padding-top: 28px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.tlv-eyebrow { font-size: 12px !important; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #e9b949 !important; }
+.tlv-eyebrow--warn { color: #ff6a1f !important; }
+.tlv-eyebrow--go { color: #5ac53b !important; }
+.tlv-jobs, .tlv-list { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 16px; counter-reset: n; }
+.tlv-jobs li { display: flex; flex-direction: column; gap: 2px; padding-left: 36px; position: relative; counter-increment: n; }
+.tlv-jobs li::before, .tlv-list li::before {
+  content: counter(n, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 1px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #6b6b6b;
+  font-variant-numeric: tabular-nums;
+}
+.tlv-jobs b { color: #f3f1ec; }
+.tlv-jobs span { color: #a6a6a6; }
+.tlv-list li { position: relative; padding-left: 36px; display: flex; flex-direction: column; gap: 6px; counter-increment: n; }
+.tlv-try {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: transparent;
+  color: #f3f1ec;
+  font: 600 13px/1 Inter, -apple-system, sans-serif;
+  cursor: pointer;
+  transition: background-color 0.14s ease, border-color 0.14s ease;
+}
+.tlv-try:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.24); }
+.tlv-try[aria-pressed="true"] { border-color: #5ac53b; }
+
+/* the case-study story column (2026-11-05) */
+.tlv-story .tlv-lede { font-size: 18px; line-height: 1.5; }
+.tlv-story .tlv-k { color: #f3f1ec; }
+.tlv-story .tlv-k--go { color: #5ac53b; }
+.tlv-shots { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tlv-shot {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 12px;
+  background: #0b0b0c;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.tlv-shot figcaption { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #5ac53b; }
+.tlv-shot[data-now] figcaption { color: #a6a6a6; }
+.tlv-shot img { display: block; width: 100%; height: auto; border-radius: 6px; }
+
+/* ---------- summary: pill → icon (2026-11-05) ----------
+   One control in two states. Open: the badge and its label in an
+   outlined pill (the pills' treatment). Settled: the label folds to
+   nothing and the pill closes to the icon button's 32px square. The
+   label's grid track animates 1fr → 0fr, so the fold is its real width,
+   not a guessed max-width. */
+.tl-root[data-summary="morph"] .tl-posn { flex-direction: row; align-items: center; gap: 8px; }
+.tl-root[data-summary="morph"] .tl-summary { min-height: 32px; }
+.tl-root .tl-morph {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 7px;
+  border: 1px solid var(--bg3);
+  border-radius: var(--r-s);
+  background: transparent;
+  color: var(--fg1);
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background-color 0.32s ease, border-color 0.32s ease, padding 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.tl-root .tl-morph[data-morph="open"] { padding-right: 10px; }
+.tl-root .tl-morph[data-morph="icon"] { background: var(--bg2); border-color: var(--bg2); }
+.tl-root .tl-morph:hover,
+.tl-root .tl-morph[data-open] { border-color: var(--fg3); }
+.tl-root .tl-morph[data-morph="icon"]:hover,
+.tl-root .tl-morph[data-morph="icon"][data-open] { background: var(--bg3); border-color: var(--bg3); }
+.tl-root .tl-morph > svg { flex: none; }
+.tl-morph-l {
+  display: grid;
+  grid-template-columns: 1fr;
+  transition: grid-template-columns 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.tl-morph[data-morph="icon"] .tl-morph-l { grid-template-columns: 0fr; }
+.tl-morph-t {
+  min-width: 0;
+  overflow: hidden;
+  padding-left: 6px;
+  color: var(--fg2);
+  transition: opacity 0.2s ease, padding-left 0.42s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.tl-morph[data-morph="icon"] .tl-morph-t { opacity: 0; padding-left: 0; }
+.tl-root[data-summary="morph"] .tl-pp-q[data-side="buy"] { color: var(--pos); }
+.tl-root[data-summary="morph"] .tl-pp-q[data-side="sell"] { color: var(--neg); }
+@media (prefers-reduced-motion: reduce) {
+  .tl-root .tl-morph, .tl-morph-l, .tl-morph-t { transition: none; }
+}
+/* the badge's knock-out follows the pill's fill: ground while open,
+   the button's plate once settled */
+.tl-morph .tl-knock { stroke: var(--bg); transition: stroke 0.32s ease; }
+.tl-morph[data-morph="icon"] .tl-knock { stroke: var(--bg2); }
+.tl-morph[data-morph="icon"]:hover .tl-knock,
+.tl-morph[data-morph="icon"][data-open] .tl-knock { stroke: var(--bg3); }
