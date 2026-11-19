@@ -127,7 +127,8 @@ export const pieces: Piece[] = [
   },
   {
     slug: "stock-order-entry",
-    href: "/work/stock-order-entry",
+    /* the final ticket (2026-11-19): the cycling-unit design */
+    href: "/work/stock-order-entry-cycle",
     title: "Stock order entry",
     previewWidth: 860,
     previewHeight: 560,
@@ -298,8 +299,7 @@ export const THUMBS: Record<
   "options-strategy-builder": {
     "fill": 0.72, "ar": 0.86, "focus": ".wshell", "pad": 0, "seconds": 6.5,
     "script": [
-      { "wait": 700 }, { "label": "Increase Quantity" }, { "wait": 450 }, { "label": "Increase Quantity" },
-      { "wait": 1900 }, { "label": "Decrease Quantity" }, { "wait": 450 }, { "label": "Decrease Quantity" }
+      { "wait": 900 }, { "label": "Duration" }, { "wait": 1800 }, { "label": "Duration" }, { "wait": 1500 }
     ]
   },
   /* The bid and ask pills lighting under the pointer and being picked. Only
@@ -318,15 +318,17 @@ export const THUMBS: Record<
       { "wait": 900 }, { "click": "[aria-label^=\"Buy 185 call\"]" }
     ]
   },
-  /* Only the Quantity box — its unit prefix, the count and the arrows —
-     counting 10 up to 13 and back down, so the loop ends where it began. */
+  /* Only the Quantity box on the cycling ticket: its unit plate tapped to
+     dollars and back, the value sliding across each time, so the loop ends
+     where it began. */
   "stock-order-entry": {
-    "focus": ".ob-stepper:has(input[aria-label=\"Quantity\"])", "isolate": "#0f1719",
-    "fill": 0.32, "ar": 0.5, "pad": 0, "seconds": 8,
+    "page": "/work/stock-order-entry-cycle",
+    "focus": ".ob-line:has(input[aria-label=\"Quantity\"])", "isolate": "#0f1719",
+    "fill": 0.6, "ar": 0.5, "pad": 0, "seconds": 6,
     "script": [
-      { "wait": 600 }, { "label": "Increase Quantity" }, { "wait": 550 }, { "label": "Increase Quantity" }, { "wait": 550 }, { "label": "Increase Quantity" },
-      { "wait": 1300 }, { "label": "Decrease Quantity" }, { "wait": 550 }, { "label": "Decrease Quantity" }, { "wait": 550 }, { "label": "Decrease Quantity" },
-      { "wait": 500 }, { "leave": 1 }, { "eval": "document.activeElement && document.activeElement.blur()" }
+      { "wait": 900 }, { "click": "[aria-label^=\"What the order is counted in\"]" },
+      { "wait": 2200 }, { "click": "[aria-label^=\"What the order is counted in\"]" },
+      { "wait": 600 }, { "leave": 1 }, { "eval": "document.activeElement && document.activeElement.blur()" }
     ]
   },
   "beam-ring": { "focus": ".bd-cta", "fill": 0.24, "ar": 0.62, "pad": 0 },

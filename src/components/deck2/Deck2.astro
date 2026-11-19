@@ -1,0 +1,156 @@
+---
+/* The new deck: a 1920 × 1080 canvas scaled to the window, one slide at a
+   time. Arrow keys / space / click to move, #slide-N to deep link.
+   Geometry measured off the user's "problem statement" reference at
+   1920 × 1080: 40px side margins, the footer rule at y 1001, the label's
+   cap line at 348 with its underline at 387, the statement's first cap
+   line at 456 on a 120px line pitch. */
+import { slides, deckTitle } from "../../data/deck2";
+const pad = (n: number) => String(n).padStart(2, "0");
+---
+
+<div class="d2" data-count={slides.length}>
+  <div class="d2-canvas">
+    {
+      slides.map((s, i) => (
+        <section class="d2-slide" data-i={i + 1} hidden={i !== 0}>
+          {s.kind === "statement" && (
+            <div class="d2-statement">
+              <p class="d2-label">{s.label}</p>
+              <h2 class="d2-text">
+                {s.text.split("\n").map((line, j, all) => (
+                  <>
+                    {line}
+                    {j < all.length - 1 && <br />}
+                  </>
+                ))}
+              </h2>
+            </div>
+          )}
+          <footer class="d2-foot">
+            <span>{deckTitle}</span>
+            <span>{pad(i + 1)}</span>
+          </footer>
+        </section>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>(".d2");
+  const canvas = root?.querySelector<HTMLElement>(".d2-canvas");
+  if (root && canvas) {
+    const slides = [...canvas.querySelectorAll<HTMLElement>(".d2-slide")];
+    const fit = () => {
+      const s = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+      canvas.style.transform = `translate(-50%, -50%) scale(${s})`;
+    };
+    let cur = 1;
+    const show = (n: number) => {
+      cur = Math.max(1, Math.min(slides.length, n));
+      slides.forEach((el, i) => (el.hidden = i + 1 !== cur));
+      history.replaceState(null, "", `#slide-${cur}`);
+    };
+    const m = location.hash.match(/^#slide-(\d+)$/);
+    show(m ? parseInt(m[1], 10) : 1);
+    fit();
+    window.addEventListener("resize", fit);
+    window.addEventListener("keydown", (e) => {
+      if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) {
+        e.preventDefault();
+        show(cur + 1);
+      } else if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) {
+        e.preventDefault();
+        show(cur - 1);
+      } else if (e.key === "Home") show(1);
+      else if (e.key === "End") show(slides.length);
+    });
+    // click: right two-thirds forward, left third back
+    root.addEventListener("click", (e) => show(e.clientX < window.innerWidth / 3 ? cur - 1 : cur + 1));
+  }
+</script>
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400&family=DM+Mono:wght@400&display=swap");
+
+  .d2 {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: #0b0b0b;
+    cursor: default;
+  }
+
+  .d2-canvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: 50% 50%;
+  }
+
+  .d2-slide {
+    position: absolute;
+    inset: 0;
+    background: #0b0b0b;
+    color: #fff;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+  }
+
+  .d2-slide[hidden] {
+    display: none;
+  }
+
+  /* ---- statement: label, its rule, the big line ------------------- */
+  .d2-statement {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    top: 0;
+  }
+
+  .d2-label {
+    position: absolute;
+    top: 342px;
+    left: 0;
+    margin: 0;
+    padding-bottom: 19px;
+    border-bottom: 1px solid #d2d2d2;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 26px;
+    letter-spacing: -0.008em;
+    text-transform: uppercase;
+    color: #e6e6e6;
+  }
+
+  .d2-text {
+    position: absolute;
+    top: 431px;
+    left: -1px;
+    margin: 0;
+    font-size: 80px;
+    font-weight: 300;
+    line-height: 96px;
+    letter-spacing: -0.025em;
+  }
+
+  /* ---- footer: the rule, the deck's name, the page ----------------- */
+  .d2-foot {
+    position: absolute;
+    left: 40px;
+    right: 40px;
+    top: 1001px;
+    display: flex;
+    justify-content: space-between;
+    padding-top: 19px;
+    border-top: 1px solid #3b3b3b;
+    font-family: "DM Mono", ui-monospace, monospace;
+    font-size: 19.2px;
+    line-height: 26px;
+    text-transform: uppercase;
+    color: #9f9f9f;
+  }
+</style>

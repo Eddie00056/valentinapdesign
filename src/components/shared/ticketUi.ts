@@ -8,6 +8,23 @@
    Worn by the deck's order entry slides (GustoDeck) and — when the deck
    flags the page it embeds with --ticket-ui — by ChainLoop's copies on
    slide 35's MacBook. The website itself never sees it. */
+/* The fields' state ramp, in neutrals (the user, 2026-11-19: hovering a
+   field has to show it is interactive — their Atlas sheet: the whole field
+   lights where the prefix is a label; a clickable prefix lights alone; the
+   value half lights with its arrows; each arrow takes its own plate).
+   The base sheet already draws all of that off these tokens; the deck had
+   been pinning every field to a flat 8% white with !important, which
+   switched every state off. So: the tokens, not the fill.
+   Opaque, not white-at-n%: the prefix paints its own --chip ground over
+   the field's, and two translucent layers would double up. The Atlas
+   steps kept exactly (default → hover +20, → press +11; the arrow plates
+   +19 / +28 over hover), starting from the 8% white the fields read at on
+   the card (#242424); selected is the chain's picked plate, the new green
+   at 12% on the card. */
+const FIELD_STATES =
+  ".ob-stage{--chip:#242424!important;--chip-hover:#383838!important;--chip-press:#434343!important;" +
+  "--chip-sel:#1e2920!important;--arrow-hover:#4b4b4b!important;--arrow-press:#545454!important}";
+
 const GRAD =
   "linear-gradient(180deg,color-mix(in srgb,var(--rim) 37%,var(--body)),color-mix(in srgb,var(--rim) 22%,var(--body)) 1px,color-mix(in srgb,var(--rim) 14%,var(--body)) 2px,color-mix(in srgb,var(--rim) 10%,var(--body)) 3px,color-mix(in srgb,var(--rim) 7%,var(--body)) 4px,color-mix(in srgb,var(--rim) 4%,var(--body)) 5px,color-mix(in srgb,var(--rim) 2%,var(--body)) 6.5px,var(--body) 8px,var(--body) calc(100% - 3px),color-mix(in srgb,var(--rim) 2%,var(--body)) calc(100% - 2px),color-mix(in srgb,var(--rim) 8%,var(--body)) calc(100% - 1px),color-mix(in srgb,var(--rim) 22%,var(--body))) padding-box";
 
@@ -28,12 +45,15 @@ export const TICKET_UI =
   "outline:1px solid rgba(255,255,255,.06)!important;outline-offset:-1px!important}" +
   "html.is-bare .ob-stage .wshell.wshell.ob-modal,.ob-stage .wshell.wshell.ob-modal{background:#0d0d0d!important}" +
   ".ob-stage .ob-field{border-radius:4px!important}" +
-  /* the fields' neutral 8% white, the deck's own slides' value (GustoDeck
-     sets it on the frames it embeds) — stated here too so slide 35's
-     MacBook copies (ChainLoop) stop falling back to the old teal --chip
-     #2c3334 (the user, 2026-11-19); the prefix shares the field's ground */
-  ".ob-stage .ob-field{background:rgba(255,255,255,.08)!important}" +
-  ".ob-stage .ob-field-k{background:transparent!important}" +
+  FIELD_STATES +
+  /* the order entry study's final ticket (the user, 2026-11-19: "replace
+     the order entry ticket with this one everywhere including on the
+     option chain"): fields 140 × 28 (152 × 30) on both tickets — the
+     longest control, the condition "Immediate or cancel", still clears
+     its chevron by 21 at 140 — and no ±0.01 arrows: a value is typed, or
+     its unit cycled */
+  ".ob-stage{--field-h:28px!important;--line-w:140px!important}" +
+  ".ob-stage .ob-stepper-hit{display:none!important}" +
   /* positive / negative from the user's button reference (dark mode,
      2026-11-12). Text — every green / red reading in the widgets (P&L,
      price change, legs…) rides --up / --down: its fg-positive #7ED68C and
@@ -50,7 +70,11 @@ export const TICKET_UI =
      inset lines (fainter at the bottom), coloured labels (black would
      vanish on the dark tint). The ticket's 4px corner kept */
   '.ob-stage .ob-cta:not([data-side="sell"]){--rim:rgba(100,180,110,.6);--body:rgba(86,146,86,.35);--ink:#7ed68c}' +
-  '.ob-stage .ob-cta[data-side="sell"]{--rim:rgba(255,120,100,.68);--body:rgba(205,62,41,.33);--ink:#ed4f3c}' +
+  '.ob-stage .ob-cta[data-side="sell"]{--rim:rgba(255,120,100,.68);--body:rgba(205,62,41,.33);--ink:#f07161}' +
+  // Sell's label #f07161 (the user, 2026-11-19: "make sure the design always
+  // passes accessibility"): #ed4f3c measured 3.73:1 on its own tinted body,
+  // under AA's 4.5 — the same hue and saturation, lifted just far enough,
+  // is 4.66:1 there (5.02 hovered, 6.51 on the card). Earlier note:
   // Sell's label between the reference's #e22b18 (too dark on its body) and
   // the rim's #ff7864 (too light): #ed4f3c, the reference's own negative
   // in light mode (the user, 2026-11-12)
@@ -81,6 +105,64 @@ export const TICKET_UI =
   // measures: 5% white reads 2 lighter on the ticket's lighter card top
   ".ob-stage .ob-leg[data-linked]:hover,.ob-stage .ob-leg[data-lit]{background:#1c1c1c!important}" +
   ".oc-menu-list{background:#141414!important}" +
+  /* the chain's expiry menu as the tickets' dropdown (the user,
+     2026-11-19: "make sure this is applied to all the dropdowns in order
+     entry"): 4 below its trigger, rows the trigger's height running edge
+     to edge (no inset plates) on the field's 6 inset, the 6 corner, the
+     10% edge and the same depth. Its longest date outruns the 124 trigger,
+     so the trigger's width is its MINIMUM — still right-aligned to it */
+  ".oc-root .oc-menu-list{box-sizing:border-box!important;min-width:100%!important;top:calc(100% + 4px)!important;" +
+  "border-radius:6px!important;border-color:rgba(255,255,255,.1)!important;" +
+  "box-shadow:0 0 0 1px rgba(0,0,0,.5),0 4px 8px rgba(0,0,0,.45),0 12px 28px -4px rgba(0,0,0,.7)!important}" +
+  // the tickets' list margins (see .ob-dd-item below): no top / bottom
+  // padding, the card's 10 of ink at the sides, the panel clipping its rows
+  ".oc-root .oc-menu-list{padding:0!important;overflow:hidden!important}" +
+  ".oc-root .oc-menu-item{box-sizing:border-box!important;height:20px!important;padding:0 8px!important;border-radius:0!important}" +
+  // the check is the menu's one accent, green as on the tickets' lists
+  ".oc-root .oc-menu-item .oc-exp-marks svg{color:#7ed68c!important}" +
+  /* the tickets' dropdown panel and its popover in the same neutrals (the
+     user, 2026-11-19: its #171b1c / #454949 rim was the old teal-grey).
+     Portalled to <body>, so no .ob-stage in these selectors: the chain's
+     menu ground, the cards' 10% edge, the fields' 8% for a hovered row,
+     the check in the new green, a row's glyph at the labels' 60% */
+  ".ob-dd-menu,.ob-tip{background:#141414!important;border-color:rgba(255,255,255,.1)!important}" +
+  /* real depth under the panel (the user, 2026-11-19: "something looks
+     off"): the Shares / Dollars list is 66 tall and ends 2px short of the
+     Duration field it covers, and its 6 corners are rounder than the
+     field's 4 — so a light sliver of that field showed along the bottom
+     and round the corners, under a shadow that began 2px below the panel
+     (0 14 28 −12) and darkened none of it. It read as a second panel. A
+     dark contact ring and a close drop put whatever peeks out in shadow */
+  ".ob-dd-menu{box-shadow:0 0 0 1px rgba(0,0,0,.5),0 4px 8px rgba(0,0,0,.45),0 12px 28px -4px rgba(0,0,0,.7)!important}" +
+  ".ob-dd-item:hover,.ob-dd-item:focus-visible{background:rgba(255,255,255,.08)!important}" +
+  ".ob-dd-item>svg{color:#7ed68c!important}" +
+  ".ob-dd-item .ob-dd-lead{color:rgba(254,255,253,.6)!important}" +
+  /* a row's glyph against its label, measured in ink (the user,
+     2026-11-19: "the padding between the icon and the text is off", then
+     "now the icons aren't aligned" when they were set against the label
+     end of their column). Glyphs stay CENTRED on one axis down the menu —
+     an icon column is read by its centre line — with the share stack at
+     the field's own 11 (it was 13: 9.5 of ink against the "$"'s 5.5, which
+     is what made the gaps so uneven), and the box gap 5 so the widest
+     glyph's painted gap is 8. Measured: stack 8, padlock 9, "$" 10.5 —
+     what's left is only the glyphs' own widths, centred */
+  ".ob-dd-item .ob-dd-lead>svg{width:11px!important;height:11px!important}" +
+  ".ob-dd-item .ob-dd-label{gap:5px!important}" +
+  /* a row the height of the field it drops from (the user, 2026-11-19):
+     30, not the Atlas doc's 27 (its field was 48 tall at that scale) — a
+     hovered row is then exactly a field's size */
+  ".ob-dd-item{height:30px!important}" +
+  /* no padding above the first row or below the last (the user's menu
+     reference, 2026-11-19), and the sides on the CARD's inset: the ticket
+     has two — 6 inside a control (a field's text), 10 inside a surface
+     (the card's labels sit 10.5 from its edge, its fields stop 10 short)
+     — and the list is a surface over the card. 14 (the reference's
+     proportion) read too big for this design, the field's 6 too tight
+     (the user). 8 + the 1px rim + the glyphs' own bearing put the ink 10
+     in on both sides. The panel clips, so a hovered first or last row
+     takes its corner. */
+  ".ob-dd-menu{padding:0!important;overflow:hidden!important}" +
+  ".ob-dd-item{padding:0 8px!important}" +
   /* the light round a quote whose ticket leg is hovered (the user,
      2026-11-19: it "looks bad" since the recolour). The rim it travels is
      made by the chip's fill laid back over the middle (::after,
@@ -123,6 +205,8 @@ export const TICKET_UI =
   ".wsp-avatar{background:#222!important;color:#7ed68c!important}" +
   // the options legs' "Buy / Sell to open" carry the old pair inline
   '.ob-leg-act[style*="72, 213, 151"]{color:#7ed68c!important}.ob-leg-act[style*="255, 85, 125"]{color:#e5837a!important}' +
+  // …and as the server writes them (hex, before React's rgb() re-render)
+  '.ob-leg-act[style*="48d597" i]{color:#7ed68c!important}.ob-leg-act[style*="ff557d" i]{color:#e5837a!important}' +
   // the ticket's own thin chevrons back for the deck theme's solid
   // triangles, which read heavy beside the text (the user, 2026-11-12)
   ".ob-stage .ob-chevron{background:none!important;clip-path:none!important}" +
@@ -132,6 +216,22 @@ export const TICKET_UI =
      a hair taller and nearly twice as wide, so far more area. At 11 it
      sits at the $'s weight */
   ".ob-field-k > svg:not(.ob-chevron){width:11px!important;height:11px!important}" +
+  /* the prefix cell as a small dropdown (the user, 2026-11-19: 46 was "too
+     large… the padding between the icon is too big… the left and right
+     padding doesn't match what's inside the input fields"; 34 at the
+     field's bare 6.5 then read "too narrow"). It takes the dropdown
+     fields' own spacing, measured in ink at 4x: the mark 6.5 in from the
+     field's edge, as their label (5.95 of padding plus a glyph's own
+     bearing; the stack's svg sits 0.5 left to land on the same line);
+     the chevron ~9 short of the divider (it snaps to 8.75 or 9.75 at 4x), as theirs sits 9.25 off the
+     field's edge (5.82 — it sits well inside its own 12px box); 6 — the
+     control inset — between the widest mark, the stack, and its chevron.
+     One width for every prefix (38.5, the stack's own), so the values
+     after them start on one line from row to row; a narrower mark keeps
+     the slack before its chevron ("$" ~8.5). Re-measure if a mark or the
+     chevron changes size. */
+  ".ob-stage .ob-field-k{min-width:38.5px!important;justify-content:space-between!important;gap:2.25px!important;padding-left:7.07px!important;padding-right:4.7px!important}" +
+  ".ob-stage .ob-field-k > svg:not(.ob-chevron){margin-left:-1.25px}" +
   ".ob-stage{--rule:rgba(255,255,255,.08)!important}" +
   // html.is-bare: the page's own bare rule (#1c1e21, blue-grey) outranked a bare .tpill
   // 4 like the fields and actions (the user, 2026-11-12)
@@ -143,6 +243,10 @@ export const TICKET_UI =
   ".ob-stage .ob-line-label,.ob-stage .ob-line-label[data-tone]{color:rgba(254,255,253,.6)!important}" +
   ".ob-stage .ob-stepper-btns{opacity:0;transition:opacity .14s ease}" +
   ".ob-stage .ob-field:hover .ob-stepper-btns,.ob-stage .ob-field:focus-within .ob-stepper-btns{opacity:1}" +
+  /* not while the pointer is on a clickable prefix: that hovers the field
+     too, but what lights is the unit, and the arrows belong to the value
+     (the user's Atlas sheet, "Prefix states", 2026-11-19) */
+  ".ob-stage .ob-field:has(button.ob-field-k:hover):not(:focus-within) .ob-stepper-btns{opacity:0}" +
   '.ob-line:has(.ob-line-label[data-tone="up"]) .ob-sub-v{color:var(--up)!important}' +
   '.ob-line:has(.ob-line-label[data-tone="down"]) .ob-sub-v{color:var(--down)!important}' +
   ".wshell:not(.ob-modal) .ob-foot{flex-direction:column!important;align-items:stretch!important;gap:10px!important}" +
@@ -156,3 +260,55 @@ export const TICKET_UI =
   ".st-stage .wshell:not(.ob-modal) .ob-foot{padding-inline:0!important}" +
   // no estimated total / cost above the actions (user, 2026-11-12)
   ".wshell:not(.ob-modal) .ob-cost{display:none!important}";
+
+/* The deck's "new UI" for every widget it embeds (moved here from
+   GustoDeck, 2026-11-19, verbatim): the widget card from the user's Figma
+   (#010101 at 50% under a 20% black wash, a 10% white edge); the order
+   tickets with no title bar, lighter fields with rounder corners, "Limit
+   price" on its own with a smaller Mid / Ask line, a solid caret. */
+export const DECK_NEW_UI =
+  "html.is-bare .wshell.wshell,.wshell.wshell{background:linear-gradient(0deg,rgba(0,0,0,.2),rgba(0,0,0,.2)),rgba(1,1,1,.5)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:8px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;-webkit-backdrop-filter:blur(100px);backdrop-filter:blur(100px)}" +
+  ".ob-stage .wshell-bar,.wshell-bar{display:none!important}" +
+  ".ob-stage .ob-field{border-radius:6px!important}" +
+  FIELD_STATES +
+  ".ob-stage .ob-line-side{display:none}" +
+  ".ob-stage .ob-line-sub{font-size:10px!important}" +
+  ".ob-stage .ob-x{color:rgba(255,255,255,.55)!important}" +
+  // the stepper arrows and the caret in the X's grey, so the three icons
+  // down the right edge are one colour
+  ".ob-stage .ob-stepper-btns svg *{fill:rgba(255,255,255,.55)!important}" +
+  ".ob-stage .ob-chevron{color:rgba(255,255,255,.55)!important}" +
+  ".ob-stage .ob-payoff{border-color:rgba(255,255,255,.1)!important}" +
+  ".ob-stage .ob-chevron path{display:none}" +
+  ".ob-stage .ob-chevron{background:currentColor;clip-path:polygon(22% 38%,78% 38%,50% 68%)}";
+
+/* …and on the Veda slides on top of it: the card's edge a clear cool grey
+   (the user's chart reference, 2026-11-04), and the order confirmation
+   solid from its first frame (its glass showed the chain through it until
+   the blur was painted). */
+export const DECK_VEDA =
+  "html.is-bare .wshell.wshell,.wshell.wshell{border-color:#5b5f62!important}" +
+  "html.is-bare .ob-stage .wshell.wshell.ob-modal,.ob-stage .wshell.wshell.ob-modal{background:#010101!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}";
+
+/* The prototype pages opened on their own (/prototypes links to them):
+   the order entry study's look exactly as the Veda deck dresses them —
+   the deck's layers in the deck's order, the new ticket UI last. The
+   deck draws the cards' depth outside the frame (.gd-shade.is-ticket);
+   a page has no deck, so the card carries that same layered drop itself,
+   after its hairline and top rim. */
+export const TICKET_PAGE =
+  DECK_NEW_UI +
+  DECK_VEDA +
+  TICKET_UI +
+  ".wshell.wshell:not(.ob-modal){box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 2px 2px -2px rgba(0,0,0,.7),0 12px 12px -12px rgba(0,0,0,.85),0 28px 24px -24px rgba(0,0,0,.95),0 56px 48px -48px rgba(0,0,0,.6)!important}" +
+  /* the stock ticket's top held, as the deck holds it (the user,
+     2026-11-19: switching Market ↔ Limit made the widget "shaky"). Its
+     page centred the card (safe center + a 24dvh lift), so every row the
+     order type added grew it both ways: the card slid up 18.5px while it
+     grew 37, the fields just used moving with it, and every frame landed
+     on a fractional pixel. Pinned instead at exactly where the Market
+     ticket centred — 38dvh less half its 244 — rounded to a whole pixel,
+     it only ever grows down. (The options ticket's base stage already
+     pins its top for this reason.) */
+  ".ob-stage.st-stage{align-items:start!important;padding-top:max(48px,round(calc(38dvh - 122px),1px))!important}" +
+  ".st-stage .ob-deck{margin-bottom:0!important}";

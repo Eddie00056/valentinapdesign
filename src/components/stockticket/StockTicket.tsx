@@ -12,6 +12,7 @@ import { StackIcon } from "../glasslab/icons";
 import { TickerPill } from "../shared/TickerPill";
 import {
   AutoHeight,
+  Unroll,
   Dropdown,
   Lock,
   Plus,
@@ -151,6 +152,29 @@ const BRACKET = [
 const LEG_UNITS = ["Dollar amount", "Percentage"] as const;
 type LegUnit = (typeof LEG_UNITS)[number];
 
+/* The "switch" variant (the user, 2026-11-19, off their inset-switch
+   reference; reviewed at /work/stock-order-entry-switch, the default page
+   untouched): every field that picks its unit names it with a switch
+   docked in the field, the unit set with the figure — instead of the
+   prefix picker. */
+const UNIT_SWITCH_OPTS = [
+  { id: "Dollar amount", glyph: "$", label: "Dollar amount", place: "prefix" },
+  { id: "Percentage", glyph: "%", label: "Percentage", place: "suffix" },
+] as const;
+/* quantity, on a market order: a share count or a dollar amount — the
+   stack and the "$", the marks its picker already used */
+const QTY_SWITCH_OPTS = [
+  { id: "Shares", glyph: <StackIcon size={11} stroke={2.21} />, label: "Shares", place: "prefix" },
+  { id: "Dollars", glyph: "$", label: "Dollars", place: "prefix" },
+] as const;
+/* the limit: a price, or an offset off the bid or the ask — the two
+   follow modes share their "%" so moving between them leaves it put */
+const LIMIT_SWITCH_OPTS = [
+  { id: "Limit price", glyph: "$", label: "Limit price", place: "prefix" },
+  { id: "Follow bid price", glyph: "Bid", label: "Follow bid price", place: "suffix", mark: "%", markKey: "offset" },
+  { id: "Follow ask price", glyph: "Ask", label: "Follow ask price", place: "suffix", mark: "%", markKey: "offset" },
+] as const;
+
 /** A bracket leg holds both, so switching the prefix never loses the
     number you had — see `switchLeg`. */
 type Leg = { unit: LegUnit; price: number; pct: number };
@@ -253,7 +277,11 @@ const pct = (x: number) => `${x < 0 ? "−" : "+"}${Math.abs(x).toFixed(2)}%`;
 export function StockTicket({
   onClose,
   onGrip,
+  variant,
 }: {
+  /** "switch": units picked by a docked switch rather than a prefix
+      picker, on every field that has one (see UNIT_SWITCH_OPTS). */
+  variant?: "switch" | "cycle";
   /** Given, the title bar's X dismisses the ticket. */
   onClose?: () => void;
   /**
@@ -263,6 +291,22 @@ export function StockTicket({
    */
   onGrip?: (e: ReactPointerEvent) => void;
 }) {
+  const UNIT_SWITCH = variant === "switch";
+  /* the third variation (/work/stock-order-entry-cycle): the unit is the
+     prefix again, and a click on it switches to the next one — no menu */
+  const UNIT_CYCLE = variant === "cycle";
+  /* the variants read a percentage as a whole number (the user,
+     2026-11-19: "remove the decimals… only whole numbers") — shown AND
+     kept, so the order is never priced off a fraction the field hides */
+  const WHOLE_PCT = UNIT_SWITCH || UNIT_CYCLE;
+  const wholePct = (v: number) => (WHOLE_PCT ? Math.max(1, Math.round(v)) : v);
+  const wholeLeg = <L extends { pct: number }>(l: L): L => ({ ...l, pct: wholePct(l.pct) });
+  /* set when a click on Quantity's cycling prefix changed the unit: the
+     field that replaces it rolls its new mark in (CycleMark rollIn) */
+  const unitCycled = useRef(false);
+  /* the quantity figure as it read before the cycle — the incoming field
+     plays it out (MorphFigure `from`) */
+  const qtyFrom = useRef<{ text: string; side: "prefix" | "suffix" } | undefined>(undefined);
   const reduce = useReducedMotion();
   const spring: Transition = reduce
     ? { duration: 0 }
@@ -313,12 +357,18 @@ export function StockTicket({
 
   const [type, setType] = useState<OrderType>("Market");
   const [unit, setUnit] = useState<Unit>("Shares");
+  useEffect(() => {
+    unitCycled.current = false;
+  }, [unit]);
   const [limitMode, setLimitMode] = useState<LimitMode>("Limit price");
   /* How far off the followed quote the limit sits, as a percentage. */
   const [offset, setOffset] = useState(1);
   const [qty, setQty] = useState(10);
   const [amount, setAmount] = useState(500);
   const [limitPx, setLimitPx] = useState(+(PX_BASE + 0.01).toFixed(2));
+  /* the switch variant's stop-limit unit and its % off the stop */
+  const [slUnit, setSlUnit] = useState<LegUnit>("Dollar amount");
+  const [slPct, setSlPct] = useState(1);
   const [stop, setStop] = useState<Leg>({
     unit: "Percentage",
     price: +(PX_BASE * 0.99).toFixed(2),
@@ -359,6 +409,20 @@ export function StockTicket({
 
   const wantsLimit = type === "Limit" || type === "Stop limit";
   const wantsStop = type === "Stop" || type === "Stop limit";
+  /* A SWAP: the stop row and the limit row trade places (Limit ↔ Stop) —
+     one leaves as the other arrives, in the same slot. Those two crossfade
+     in place instead of folding one away under the other unrolling (see
+     Unroll `swap`). Held for the length of the change, so a price tick
+     re-rendering mid-way cannot turn it back into a fold. */
+  const prevRows = useRef({ stop: wantsStop, limit: wantsLimit });
+  const swapUntil = useRef(0);
+  if (prevRows.current.stop !== wantsStop || prevRows.current.limit !== wantsLimit) {
+    const p = prevRows.current;
+    const isSwap = p.stop !== wantsStop && p.limit !== wantsLimit && wantsStop !== wantsLimit;
+    swapUntil.current = isSwap ? Date.now() + 450 : 0;
+    prevRows.current = { stop: wantsStop, limit: wantsLimit };
+  }
+  const rowSwap = Date.now() < swapUntil.current;
   /* Dollars only exist on a market order.
 
      A dollar amount buys whatever fraction of a share it buys, and that
@@ -379,9 +443,16 @@ export function StockTicket({
      to, on every tick. A limit that is not following is a price, and it
      tracks the last until somebody types over it — the ticket's old
      behaviour, which is now just one of the three modes. */
-  const following = limitMode !== "Limit price";
+  /* the switch variant's stop limit names its limit in $ or as a % off
+     the stop (below), so a follow mode picked on a plain limit does not
+     carry into it */
+  /* the switch variant names every limit in $ or % (the user,
+     2026-11-19: "the same treatment for the limit price") — no follow
+     modes there */
+  const variantStopLimit = (UNIT_SWITCH || UNIT_CYCLE) && wantsLimit;
+  const following = limitMode !== "Limit price" && !variantStopLimit;
   const followed = limitMode === "Follow ask price" ? ask : bid;
-  const limit = following
+  const limitBase = following
     ? +Math.max(0.01, followed * (1 + offset / 100)).toFixed(2)
     : limitPx;
 
@@ -472,6 +543,21 @@ export function StockTicket({
      stop is ever actually set, and which means it tracks the market
      without needing to be told to. */
   const stopAt = legPrice(stop, false, S);
+  /* The switch variant's stop limit (the user, 2026-11-19: "only $ and
+     %"): its limit is a price, or a distance off the stop in percent —
+     the slippage you will take once the stop fires. Unsigned, because the
+     ticket has no side until Buy or Sell is pressed: the limit sits above
+     the stop for a buy and below it for a sell, resolved for the
+     confirmation (a buy until then). */
+  /* …and a plain limit's % is off the LAST: below it for a buy, above it
+     for a sell — where a limit that waits for a better price sits. */
+  const slPctMode = variantStopLimit && slUnit === "Percentage";
+  const slRef = type === "Stop limit" ? stopAt : S;
+  const slSign =
+    type === "Stop limit" ? (confirming === "sell" ? -1 : 1) : confirming === "sell" ? 1 : -1;
+  const limit = slPctMode
+    ? +Math.max(0.01, slRef * (1 + (slSign * slPct) / 100)).toFixed(2)
+    : limitBase;
 
   /* The price this order is written at. A market order has none of its
      own and takes the market's; a stop has not got a limit, so what it
@@ -533,6 +619,19 @@ export function StockTicket({
     return { ...l, unit, price: legPrice(l, up, ref) };
   }
 
+  /* The variants' limit in $ or % — switching keeps the limit where it
+     is: leaving % hands over the price it resolved to; entering it
+     measures the price's distance off its reference. */
+  function pickSlUnit(v: LegUnit) {
+    if (v === "Percentage" && slUnit !== "Percentage") {
+      setSlPct(wholePct(+Math.max(0.01, Math.abs((limitPx / slRef - 1) * 100)).toFixed(2)));
+    } else if (v === "Dollar amount" && slUnit === "Percentage") {
+      limitEdited.current = true;
+      setLimitPx(limit);
+    }
+    setSlUnit(v);
+  }
+
   /* Switching modes keeps the number meaning what it says: leaving a
      follow mode hands the absolute price it had resolved to over to the
      price field, so the limit on the order does not jump because you
@@ -581,7 +680,7 @@ export function StockTicket({
   const title = `${SYMBOL} Common Stock`;
 
   return (
-    <div className="ob-stage st-stage">
+    <div className="ob-stage st-stage" data-variant={variant}>
       {/* The ticket and its confirmation share one box, so the panel can
           be placed on the WIDGET rather than on the window — see
           .ob-deck. The scrim stays outside it: that one belongs to the
@@ -626,7 +725,7 @@ export function StockTicket({
               left and one control on a shared right edge. Two of them are
               only asked when the order type asks them — the block springs
               open to let them in rather than the card jumping. */}
-          <AutoHeight transition={sizeSpring} enabled={!reduce}>
+          <AutoHeight transition={sizeSpring} enabled={false}>
               <div className="ob-params">
                 {/* How much, first. It is the one thing on the ticket
                     you always have to say — every other line has an
@@ -649,12 +748,33 @@ export function StockTicket({
                   {dollars ? (
                     <PriceField
                       ariaLabel="Amount"
+                      /* the switch variant has no arrows (the user, 2026-11-19) */
+                      steppable={!UNIT_SWITCH && !UNIT_CYCLE}
+                      prefixCycle={UNIT_CYCLE}
+                      unitSwitch={
+                        UNIT_SWITCH
+                          ? {
+                              id: "qty-unit",
+                              options: QTY_SWITCH_OPTS,
+                              value: unit,
+                              onSelect: (v) => setUnit(v as Unit),
+                              ariaLabel: "What the order is counted in",
+                            }
+                          : undefined
+                      }
                       prefix={unit}
                       prefixLabel={UNIT_MARK[unit]}
                       prefixOptions={UNITS}
-                      onPrefixSelect={(v) => setUnit(v as Unit)}
+                      onPrefixSelect={(v) => {
+                        unitCycled.current = true;
+                        qtyFrom.current = { text: amount.toFixed(2), side: "prefix" };
+                        setUnit(v as Unit);
+                      }}
+                      prefixRollIn={UNIT_CYCLE && unitCycled.current}
                       prefixIcon={(v) => UNIT_MARK[v as Unit]}
                       prefixAria="What the order is counted in"
+                      unitMorph={UNIT_CYCLE ? { key: "Dollars", side: "prefix" } : undefined}
+                      morphFrom={UNIT_CYCLE && unitCycled.current ? qtyFrom.current : undefined}
                       value={amount}
                       reduce={reduce}
                       spring={spring}
@@ -664,6 +784,20 @@ export function StockTicket({
                   ) : (
                     <StepperField
                       ariaLabel="Quantity"
+                      /* the switch variant has no arrows (the user, 2026-11-19) */
+                      steppable={!UNIT_SWITCH && !UNIT_CYCLE}
+                      prefixCycle={UNIT_CYCLE}
+                      unitSwitch={
+                        UNIT_SWITCH && sized
+                          ? {
+                              id: "qty-unit",
+                              options: QTY_SWITCH_OPTS,
+                              value: unit,
+                              onSelect: (v) => setUnit(v as Unit),
+                              ariaLabel: "What the order is counted in",
+                            }
+                          : undefined
+                      }
                       /* The prefix IS the unit picker, and there is no
                          unit to pick unless this is a market order — see
                          `dollars` above. Without it the field is what a
@@ -672,9 +806,20 @@ export function StockTicket({
                       prefix={sized ? unit : undefined}
                       prefixLabel={sized ? UNIT_MARK[unit] : undefined}
                       prefixOptions={sized ? UNITS : undefined}
-                      onPrefixSelect={sized ? (v) => setUnit(v as Unit) : undefined}
+                      onPrefixSelect={
+                        sized
+                          ? (v) => {
+                              unitCycled.current = true;
+                              qtyFrom.current = { text: String(qty), side: "suffix" };
+                              setUnit(v as Unit);
+                            }
+                          : undefined
+                      }
+                      prefixRollIn={UNIT_CYCLE && unitCycled.current}
                       prefixIcon={(v) => UNIT_MARK[v as Unit]}
                       prefixAria="What the order is counted in"
+                      unitMorph={UNIT_CYCLE ? { key: "Shares", side: "suffix" } : undefined}
+                      morphFrom={UNIT_CYCLE && unitCycled.current ? qtyFrom.current : undefined}
                       value={String(qty)}
                       reduce={reduce}
                       spring={spring}
@@ -702,40 +847,31 @@ export function StockTicket({
                   />
                 </div>
 
-                {/* popLayout, so a line on its way out is out of the flow
-                    immediately and the block closes underneath it rather
-                    than holding both open for the length of the exit. */}
-                <AnimatePresence initial={false} mode="popLayout">
+                {/* Each line unrolls in and folds out on its own real height
+                    (Unroll), so Duration below slides with it instead of
+                    jumping — popLayout used to drop a leaving line out of
+                    the flow at once and snap everything under it (the
+                    user, 2026-11-19: "a smoother experience"). */}
+                <AnimatePresence initial={false} custom={rowSwap}>
                   {wantsStop && (
-                    <motion.div
-                      key="stop"
-                      className="ob-line"
-                      initial={reduce ? false : { opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={
-                        reduce
-                          ? { opacity: 0 }
-                          : {
-                              opacity: 0,
-                              y: 10,
-                              filter: "blur(4px)",
-                              transition: exitTransition,
-                            }
-                      }
-                      transition={enterTransition}
-                    >
+                    <Unroll key="stop" gap={6} swap={rowSwap}>
+                    <div className="ob-line">
                       <span className="ob-line-k">
                         <span className="ob-line-label">Stop price</span>
                         {/* What the stop is measured from, under the name
                             of the thing it measures — see the limit row
                             below, which is where this arrangement is
                             argued. */}
-                        <span className="ob-line-sub">
-                          <span className="ob-sub">
-                            <span className="ob-sub-k">Last</span>
-                            <span className="ob-sub-v">{money(S)}</span>
+                        {/* not on the variants (the user, 2026-11-19: "remove last
+                            from the stop price") */}
+                        {!WHOLE_PCT && (
+                          <span className="ob-line-sub">
+                            <span className="ob-sub">
+                              <span className="ob-sub-k">Last</span>
+                              <span className="ob-sub-v">{money(S)}</span>
+                            </span>
                           </span>
-                        </span>
+                        )}
                       </span>
                       {/* The same picker the bracket's legs wear, on the
                           same two units: a stop is a price you name or a
@@ -745,26 +881,48 @@ export function StockTicket({
                           rule of its own. */}
                       <PriceField
                         ariaLabel="Stop price"
+                        /* the switch variant has no arrows (the user, 2026-11-19) */
+                        steppable={!UNIT_SWITCH && !UNIT_CYCLE}
+                        prefixCycle={UNIT_CYCLE}
                         prefix={stop.unit}
                         prefixLabel={stop.unit === "Percentage" ? "%" : "$"}
                         prefixOptions={LEG_UNITS}
                         onPrefixSelect={(v) =>
-                          setStop((cur) => switchLeg(cur, v as LegUnit, false, S))
+                          setStop((cur) => {
+                            const n = switchLeg(cur, v as LegUnit, false, S);
+                            return { ...n, pct: wholePct(n.pct) };
+                          })
                         }
                         prefixIcon={(v) => (
                           <span className="ob-dd-mark">
                             {v === "Percentage" ? "%" : "$"}
                           </span>
                         )}
-                        prefixHint={OFFSET_HINT}
+                        prefixHint={UNIT_CYCLE ? undefined : OFFSET_HINT}
                         prefixAria="What the stop price is set in"
+                        unitMorph={UNIT_CYCLE ? { key: stop.unit, side: stop.unit === "Percentage" ? "suffix" : "prefix" } : undefined}
+                        decimals={WHOLE_PCT && stop.unit === "Percentage" ? 0 : 2}
+                        unitSwitch={
+                          UNIT_SWITCH
+                            ? {
+                                options: UNIT_SWITCH_OPTS,
+                                value: stop.unit,
+                                onSelect: (v) =>
+                                  setStop((cur) => {
+                            const n = switchLeg(cur, v as LegUnit, false, S);
+                            return { ...n, pct: wholePct(n.pct) };
+                          }),
+                                ariaLabel: "What the stop price is set in",
+                              }
+                            : undefined
+                        }
                         value={stop.unit === "Percentage" ? stop.pct : stop.price}
                         reduce={reduce}
                         spring={spring}
                         onCommit={(v) =>
                           setStop((cur) =>
                             cur.unit === "Percentage"
-                              ? { ...cur, pct: Math.min(99.99, Math.max(0.01, v)) }
+                              ? { ...cur, pct: wholePct(Math.min(99.99, Math.max(0.01, v))) }
                               : { ...cur, price: Math.min(9999.99, Math.max(0.01, v)) },
                           )
                         }
@@ -788,27 +946,13 @@ export function StockTicket({
                           )
                         }
                       />
-                    </motion.div>
+                    </div>
+                    </Unroll>
                   )}
 
                   {wantsLimit && (
-                    <motion.div
-                      key="limit"
-                      className="ob-line"
-                      initial={reduce ? false : { opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={
-                        reduce
-                          ? { opacity: 0 }
-                          : {
-                              opacity: 0,
-                              y: 10,
-                              filter: "blur(4px)",
-                              transition: exitTransition,
-                            }
-                      }
-                      transition={enterTransition}
-                    >
+                    <Unroll key="limit" gap={6} swap={rowSwap}>
+                    <div className="ob-line">
                       <span className="ob-line-k">
                         <span className="ob-line-label">Limit price</span>
                         {/* The two prices the field is sitting between,
@@ -835,13 +979,37 @@ export function StockTicket({
                       </span>
                       <PriceField
                         ariaLabel="Limit price"
+                        /* the switch variant has no arrows (the user, 2026-11-19) */
+                        steppable={!UNIT_SWITCH && !UNIT_CYCLE}
+                        prefixCycle={UNIT_CYCLE}
                         /* "$" for a price you name, "Offset %" for one
                            locked to a quote — the spec's two prefix
                            labels, for the spec's two kinds of number. */
-                        prefix={limitMode}
-                        prefixLabel={following ? "Offset %" : "$"}
-                        prefixOptions={LIMIT_MODES}
-                        onPrefixSelect={(v) => pickLimitMode(v as LimitMode)}
+                        prefix={UNIT_CYCLE ? slUnit : limitMode}
+                        prefixLabel={UNIT_CYCLE ? (slUnit === "Percentage" ? "%" : "$") : following ? "Offset %" : "$"}
+                        prefixOptions={UNIT_CYCLE ? LEG_UNITS : LIMIT_MODES}
+                        onPrefixSelect={(v) => (UNIT_CYCLE ? pickSlUnit(v as LegUnit) : pickLimitMode(v as LimitMode))}
+                        unitSwitch={
+                          variantStopLimit && UNIT_SWITCH
+                            ? {
+                                /* $ / % on a stop limit — switching keeps the
+                                   limit where it is: leaving % hands over the
+                                   price it resolved to; entering it measures
+                                   the price's distance off the stop */
+                                options: UNIT_SWITCH_OPTS,
+                                value: slUnit,
+                                onSelect: (v) => pickSlUnit(v as LegUnit),
+                                ariaLabel: "What the limit price is set in",
+                              }
+                            : UNIT_SWITCH
+                              ? {
+                                  options: LIMIT_SWITCH_OPTS,
+                                  value: limitMode,
+                                  onSelect: (v) => pickLimitMode(v as LimitMode),
+                                  ariaLabel: "What the limit price is",
+                                }
+                              : undefined
+                        }
                         prefixIcon={(v) =>
                           v === "Limit price" ? (
                             <span className="ob-dd-mark">$</span>
@@ -849,12 +1017,18 @@ export function StockTicket({
                             <Lock size={12} />
                           )
                         }
-                        prefixHint={OFFSET_HINT}
+                        prefixHint={UNIT_CYCLE ? undefined : OFFSET_HINT}
                         prefixAria="What the limit price is"
-                        value={following ? offset : limitPx}
+                        unitMorph={UNIT_CYCLE ? { key: slUnit, side: slUnit === "Percentage" ? "suffix" : "prefix" } : undefined}
+                        decimals={slPctMode ? 0 : 2}
+                        value={slPctMode ? slPct : following ? offset : limitPx}
                         reduce={reduce}
                         spring={spring}
                         onCommit={(v) => {
+                          if (slPctMode) {
+                            setSlPct(wholePct(Math.min(99.99, Math.max(0, v))));
+                            return;
+                          }
                           if (following) {
                             setOffset(Math.min(99.99, Math.max(0, v)));
                             return;
@@ -864,7 +1038,8 @@ export function StockTicket({
                         }}
                         onStep={(d) => bumpLimit(d * 0.01)}
                       />
-                    </motion.div>
+                    </div>
+                    </Unroll>
                   )}
                 </AnimatePresence>
 
@@ -902,30 +1077,22 @@ export function StockTicket({
               add row lives INSIDE it: with nothing attached it is the
               only child and its rule is suppressed, so the panel is a
               single row until it has something to divide. */}
-          <AutoHeight transition={sizeSpring} enabled={!reduce}>
+          <AutoHeight transition={sizeSpring} enabled={false}>
               <div className="st-attach-stack">
-                <AnimatePresence initial={false} mode="popLayout">
-                  {ATTACHMENTS.filter((a) => attached.includes(a.id)).map((a) => (
-                    <motion.div
-                      key={a.id}
+                <AnimatePresence initial={false}>
+                  {ATTACHMENTS.filter((a) => attached.includes(a.id)).map((a, i) => (
+                    /* The first section folds a 1px margin with it: the one
+                       after it gains its 1px rule the moment this one
+                       unmounts (it is no longer first), and the margin is
+                       that pixel taken back in the same motion — without it
+                       the card dropped 1px after everything had settled. */
+                    <Unroll key={a.id} className="st-unroll" gap={i === 0 ? 1 : 0}>
+                    <div
                       className="ob-attach"
                       /* The section's own name, so its heading can be
                          nudged onto the same optical line as the other's
                          — see the padding note in stock-ticket.css. */
                       data-attach={a.id}
-                      initial={reduce ? false : { opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={
-                        reduce
-                          ? { opacity: 0 }
-                          : {
-                              opacity: 0,
-                              y: 10,
-                              filter: "blur(4px)",
-                              transition: exitTransition,
-                            }
-                      }
-                      transition={enterTransition}
                     >
                       <div className="ob-attach-head">
                         {/* Ink. A section heading names a part of the
@@ -1015,12 +1182,15 @@ export function StockTicket({
                                 </span>
                                 <PriceField
                                   ariaLabel={b.aria}
+                                  /* the switch variant has no arrows (the user, 2026-11-19) */
+                                  steppable={!UNIT_SWITCH && !UNIT_CYCLE}
+                                  prefixCycle={UNIT_CYCLE}
                                   prefix={leg.unit}
                                   prefixLabel={pct ? "%" : "$"}
                                   prefixOptions={LEG_UNITS}
                                   onPrefixSelect={(v) =>
                                     setLeg((cur) =>
-                                      switchLeg(cur, v as LegUnit, up, orderPx),
+                                      wholeLeg(switchLeg(cur, v as LegUnit, up, orderPx)),
                                     )
                                   }
                                   prefixIcon={(v) => (
@@ -1028,15 +1198,30 @@ export function StockTicket({
                                       {v === "Percentage" ? "%" : "$"}
                                     </span>
                                   )}
-                                  prefixHint={OFFSET_HINT}
+                                  prefixHint={UNIT_CYCLE ? undefined : OFFSET_HINT}
                                   prefixAria={`What the ${b.label.toLowerCase()} leg is set in`}
+                                  unitMorph={UNIT_CYCLE ? { key: leg.unit, side: leg.unit === "Percentage" ? "suffix" : "prefix" } : undefined}
+                                  decimals={WHOLE_PCT && pct ? 0 : 2}
+                                  unitSwitch={
+                                    UNIT_SWITCH
+                                      ? {
+                                          options: UNIT_SWITCH_OPTS,
+                                          value: leg.unit,
+                                          onSelect: (v) =>
+                                            setLeg((cur) =>
+                                              wholeLeg(switchLeg(cur, v as LegUnit, up, orderPx)),
+                                            ),
+                                          ariaLabel: `What the ${b.label.toLowerCase()} leg is set in`,
+                                        }
+                                      : undefined
+                                  }
                                   value={pct ? leg.pct : leg.price}
                                   reduce={reduce}
                                   spring={spring}
                                   onCommit={(v) =>
                                     setLeg((cur) =>
                                       pct
-                                        ? { ...cur, pct: Math.min(99.99, Math.max(0.01, v)) }
+                                        ? { ...cur, pct: wholePct(Math.min(99.99, Math.max(0.01, v))) }
                                         : { ...cur, price: Math.min(9999.99, Math.max(0.01, v)) },
                                     )
                                   }
@@ -1065,7 +1250,8 @@ export function StockTicket({
                           })
                         )}
                       </div>
-                    </motion.div>
+                    </div>
+                    </Unroll>
                   ))}
                 </AnimatePresence>
 
@@ -1086,16 +1272,10 @@ export function StockTicket({
                     screen directly above it. The row goes with the last
                     one, so a fully attached order ends in its fields and
                     not in an empty band. */}
-                <AnimatePresence initial={false} mode="popLayout">
+                <AnimatePresence initial={false}>
                   {attached.length < ATTACHMENTS.length && (
-                    <motion.div
-                      key="add"
-                      className="ob-add"
-                      initial={reduce ? false : { opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={reduce ? { opacity: 0 } : { opacity: 0, transition: exitTransition }}
-                      transition={enterTransition}
-                    >
+                    <Unroll key="add" className="st-unroll">
+                    <div className="ob-add">
                       <AnimatePresence initial={false} mode="popLayout">
                         {ATTACHMENTS.filter((a) => !attached.includes(a.id)).map(
                           (a) => (
@@ -1128,7 +1308,8 @@ export function StockTicket({
                           ),
                         )}
                       </AnimatePresence>
-                    </motion.div>
+                    </div>
+                    </Unroll>
                   )}
                 </AnimatePresence>
               </div>

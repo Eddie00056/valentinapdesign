@@ -748,7 +748,13 @@
   right: 0;
   z-index: 5;
   min-width: 140px;
-  padding: 4px;
+  /* The dropdown rule shared with the order-entry tickets (user,
+     2026-11-19): no padding above the first row or below the last —
+     rows run edge to edge and the panel clips them to its corner — and
+     the sides on this surface's own inset, the 12 the open-orders card
+     sets its title and rows on. */
+  padding: 0;
+  overflow: hidden;
   border-radius: 8px;
   /* A menu over rows must not let them read through: the same glass,
      near-opaque. */
@@ -760,7 +766,7 @@
   width: 100%;
   height: 32px;
   padding: 0 12px;
-  border-radius: var(--r-s);
+  border-radius: 0;
   color: var(--fg1);
   white-space: nowrap;
 }
@@ -1417,7 +1423,10 @@
   display: flex;
   flex-direction: column;
   min-width: 180px;
-  padding: 4px;
+  /* see .tl-oo-menu: no top / bottom padding, rows edge to edge,
+     clipped to the corner; sides on the surface's 12 */
+  padding: 0;
+  overflow: hidden;
   border-radius: 10px;
   background: rgba(30, 30, 30, 0.94);
   font-weight: 400;
@@ -1431,7 +1440,7 @@
   justify-content: center;
   min-height: 36px;
   padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 0;
   color: var(--fg1);
   text-align: left;
   white-space: nowrap;

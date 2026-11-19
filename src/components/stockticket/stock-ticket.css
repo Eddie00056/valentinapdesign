@@ -335,7 +335,8 @@
    cannot reach here — the row sits inside the measured box rather than
    directly in the panel — so it is restated against the box that is
    actually its parent. */
-.st-attach-stack > .ob-add:first-child {
+.st-attach-stack > .ob-add:first-child,
+.st-attach-stack > .st-unroll:first-child > .ob-add {
   border-top: 0;
 }
 
@@ -390,7 +391,8 @@
    are a list of like things, and the last one's 6 of padding is the
    container's own bottom. options-builder.css never needed it (nothing
    there could hold two at once), so it is stated here. */
-.st-stage .ob-attach + .ob-attach {
+.st-stage .ob-attach + .ob-attach,
+.st-stage .st-unroll + .st-unroll > .ob-attach {
   border-top: 1px solid var(--rule);
 }
 
@@ -438,3 +440,32 @@
   position: relative;
 }
 
+
+/* The bid / ask pairs a little closer on the variant pages (the user,
+   2026-11-19: "the gap slightly smaller… make sure the values aren't
+   moving"). Only the gap BETWEEN the pairs changes, 8 → 5; each figure's
+   fixed 43px box above is untouched, so the readings still never shift.
+   The visible space "$194.15" → "Ask" goes 14.5 → 11.5 — most of it is the
+   box's spare room, held for the widest price the walk reaches. */
+.st-stage[data-variant] .ob-line-sub {
+  gap: 5px;
+}
+
+/* Tighter on the variant pages (the user, 2026-11-19: "decrease the
+   spacing between the labels and fields, make the fields slightly
+   smaller and the widget narrower"). Fields 152 × 30 → 140 × 28; the
+   widest label (Limit price's Bid / Ask caption, 131.9) now sits 12 from
+   its field, as the 324 card set out to hold it before the fields grew;
+   the card is that sum, 10 + 131.9 + 12 + 140 + 10 = 304. The cycling
+   unit plate follows the field: 20 square, the same 4 inset. */
+.st-stage[data-variant] {
+  --field-h: 28px;
+  --line-w: 140px;
+}
+html.is-prop .st-stage[data-variant] .ob-shell {
+  width: 304px !important;
+}
+.st-stage[data-variant] button.ob-field-k.ob-cycle-chip {
+  min-width: 20px !important;
+  height: 20px;
+}

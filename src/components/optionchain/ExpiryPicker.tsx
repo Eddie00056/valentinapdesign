@@ -1,6 +1,7 @@
 import { EXPIRIES } from "./mock";
 import { Menu, MenuItem } from "./ui";
 import { Check, ChevronDown } from "./icons";
+import { Press } from "../shared/TicketControls";
 
 /**
  * Expiry selector.
@@ -25,12 +26,14 @@ export function ExpiryPicker({
       width="max-content"
       direction="right"
       triggerClass="oc-exp-btn"
-      renderTrigger={() => (
+      renderTrigger={({ kick }) => (
         <>
           <span>
             {selected.label} ({selected.dte}D)
           </span>
-          <ChevronDown size={11} />
+          <Press kick={kick}>
+            <ChevronDown size={11} />
+          </Press>
         </>
       )}
     >

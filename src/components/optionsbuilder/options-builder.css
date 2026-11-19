@@ -698,6 +698,16 @@ button.ob-chip--strike {
 
 .ob-stage [data-open] .ob-chevron { opacity: 1; color: #ffffff; }
 
+/* Open holds over hover and press. An open field is in its Selected state
+   until the list closes; pointing at it changes nothing (the user,
+   2026-11-19 — a page-wide scrim used to hide this by swallowing the
+   hover; with the scrim gone, button.ob-field:hover at (0,2,1) outranked
+   [data-open] at (0,2,0)). The prefix cell has its own rule below. */
+.ob-stage button.ob-field[data-open]:hover,
+.ob-stage button.ob-field[data-open]:active {
+  background: var(--chip-sel);
+}
+
 /* Covers the page so the next click anywhere closes the menu. Transparent:
    the doc shows no scrim behind an open dropdown. */
 .ob-dd-scrim {
@@ -717,6 +727,11 @@ button.ob-chip--strike {
 .ob-dd-menu {
   position: fixed;
   z-index: 41;
+  /* border-box, so the trigger's width (minWidth, from its rect) is the
+     panel's OUTER width. The bare pages don't load global.css, so this was
+     content-box and the 1px rim landed outside: 154 against a 152 field,
+     flush on the left, 2px proud on the right (user, 2026-11-19). */
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   padding: 5px 0;
@@ -2311,7 +2326,8 @@ button.ob-chip--strike:focus-visible::after,
    is the right outcome — a field with nothing in it is not an answer. */
 .ob-stage button.ob-field,
 .ob-stage .ob-stepper-num,
-.ob-stage .ob-field input {
+.ob-stage .ob-field input,
+.ob-stage .ob-roll-over {
   color: #ffffff;
 }
 
@@ -2531,6 +2547,15 @@ button.ob-chip--strike:focus-visible::after,
 
 .ob-stage .ob-stepper:has(button.ob-field-k:focus)::after {
   content: none;
+}
+
+/* …but standing down is not the same as going dead. With the prefix's
+   list open (the prefix holds focus), pointing at the value half must
+   still light it — the rule above pinned the whole field to its default
+   and swallowed the hover (user, 2026-11-19). Only while the pointer is
+   on the field and not on the prefix itself. */
+.ob-stage .ob-stepper:has(button.ob-field-k:focus):hover:not(:has(button.ob-field-k:hover)) {
+  background: var(--chip-hover);
 }
 
 /* Open, and holding the Selected state — `.ob-stage [data-open]` supplies
@@ -3170,3 +3195,299 @@ button.ob-chip--strike:focus-visible::after,
    rule now sits 9.27 above (8, plus the 1.27 the p leaves under it) and
    12 below, and nothing in the stack is a different height from its
    neighbours. */
+
+
+/* ---------- a stepped value rolls (RollText, user 2026-11-19) ---------- */
+
+/* One slot per character, as wide as the character itself: an invisible
+   copy sizes it, the visible one rides on top, absolutely placed, so the
+   figure at rest sets exactly as plain text would. The slot clips the
+   vertical travel. `vertical-align: top` because an inline-block that
+   clips takes its baseline from its bottom edge, which would drop the
+   digits below the "$" beside them. */
+.ob-roll {
+  display: inline-flex;
+  white-space: pre;
+}
+.ob-roll-slot {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+.ob-roll-ghost {
+  visibility: hidden;
+}
+.ob-roll-ch {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* The count field is an <input>, whose text cannot animate — so at rest
+   its own text is hidden under the same figure drawn as RollText, on the
+   input's own 6px inset. Being typed in (focus), disabled, or empty (the
+   placeholder shows), the input is itself again. */
+.ob-roll-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  align-self: stretch;
+}
+.ob-roll-over {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  pointer-events: none;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 400;
+}
+.ob-field .ob-roll-wrap:not(:focus-within):not(:has(input:disabled)):not(:has(input:placeholder-shown)) input {
+  color: transparent;
+}
+.ob-roll-wrap:focus-within .ob-roll-over,
+.ob-roll-wrap:has(input:disabled) .ob-roll-over,
+.ob-roll-wrap:has(input:placeholder-shown) .ob-roll-over {
+  display: none;
+}
+
+/* The prefix's own slot (StepperField): a flex box the cell fills, so the
+   cell keeps the field's full height — and something AnimatePresence can
+   hold while the cell slides and fades out. */
+.ob-field-k-slot {
+  display: flex;
+  align-self: stretch;
+  flex: none;
+}
+
+/* ---------- the unit switch (PriceField `unitSwitch`, user 2026-11-19) ----------
+
+   The inset-switch reference in this ticket's parts: two segments the
+   field's 30 less a 4 inset each side (22), docked on the field's right
+   edge with the field's own 4 to spare; idle glyphs at the labels' 60%
+   ink, the active one white on a raised plate — the field's hover step
+   (--chip-hover), a lit top edge, a short drop — corners 4 less the inset
+   (2), concentric with the field's. */
+.ob-uswitch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: none;
+  margin-right: 4px;
+}
+.ob-uswitch-seg {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: none;
+  color: rgba(254, 255, 253, 0.6);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+.ob-stage .ob-uswitch-seg { background: none; }
+.ob-uswitch-seg[aria-checked="true"] { color: #ffffff; }
+.ob-uswitch-seg:not([aria-checked="true"]):hover { color: rgba(254, 255, 253, 0.85); }
+.ob-uswitch-seg:focus-visible { outline: none; box-shadow: 0 0 0 1px var(--up); }
+.ob-uswitch-pill {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background: var(--chip-hover);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.45);
+}
+.ob-uswitch-label {
+  position: relative;
+  z-index: 1;
+  transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ob-uswitch-seg:active .ob-uswitch-label { transform: scale(0.85); }
+
+/* The unit set with the figure: a "%" after it keeps the hair the "$"
+   keeps before it (.ob-unit's margin), on the other side. */
+.ob-unit--suffix { margin-right: 0; margin-left: 1px; }
+.ob-unit-figure { display: inline-flex; }
+
+/* The switch variant's other parts. A segment holding a word ("Bid",
+   "Ask") takes the room it needs; one glyph keeps the 22 square. The
+   count field's leading mark sits on the field's 6 and a hair off the
+   figure, as the "$" in a price field does: its 6 of margin, then −5 into
+   the input's own 6 of padding, so the figure starts 1 after it — and with
+   the mark gone (popLayout) the input's padding is the field's 6 again,
+   nothing to reflow. The shares mark at the 11 its picker used. */
+.ob-uswitch-seg { width: auto; min-width: 22px; padding: 0 5px; box-sizing: border-box; }
+.ob-uswitch-slot { display: flex; flex: none; }
+.ob-unit--lead { display: inline-flex; align-items: center; margin-left: 6px; margin-right: -5px; flex: none; }
+.ob-unit svg, .ob-uswitch-seg svg { width: 11px; height: 11px; }
+/* The shares icon onto the figures' line (measured at 4x, the user:
+   "align the icons properly"). It centres by its BOX, and type centres by
+   its line — a figure's ink sits low in its line box — so in a segment
+   the stack rode 2.25 above the digits (and 0.5 right of centre), and as
+   the mark before a count 0.75 below them. Nudged onto the same centre
+   line the "$", "%", "Bid" and "Ask" already share. */
+.ob-uswitch-seg svg { transform: translate(-0.5px, 1.5px); }
+.ob-unit--lead svg { transform: translateY(-0.75px); }
+
+/* Flat, with a hover (the user, 2026-11-19: "the design is currently
+   elevated and I need it to be flat… add a hover for the toggle
+   buttons"). The active plate loses its lit edge and drop and becomes a
+   flat fill — white at 12%, not a solid grey, because a solid at the
+   field's hover step would vanish into the field the moment the field
+   itself is hovered; translucent, it stays one step above whatever the
+   field is showing. An idle segment under the pointer takes half that
+   step, so it reads as pickable without looking picked. */
+.ob-uswitch-pill {
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+.ob-uswitch-seg { transition: color 0.2s ease, background-color 0.15s ease; }
+.ob-stage .ob-uswitch-seg:not([aria-checked="true"]):hover { background: rgba(255, 255, 255, 0.06); }
+.ob-stage .ob-uswitch-seg:not([aria-checked="true"]):active { background: rgba(255, 255, 255, 0.09); }
+
+/* The selected plate stays the flat 12% (the user, 2026-11-19, choosing
+   it over an inset edge and over a light plate with a dark glyph). Note:
+   flat at 12% it is 1.46:1 off the field — under WCAG 1.4.11's 3:1 for a
+   state indicator; the glyphs on it pass AA as text. A known, accepted
+   trade-off for this variant. */
+/* The idle segment's 60% ink, at a weight that holds: `.ob-stage button
+   { color: inherit }` (0,1,1) outranked `.ob-uswitch-seg` (0,1,0), so an
+   idle glyph rendered in the field's full white. 60% is 6.47:1 off the
+   field, 5.36:1 off it hovered; 85% under the pointer. */
+.ob-stage .ob-uswitch-seg:not([aria-checked="true"]) { color: rgba(254, 255, 253, 0.6); }
+.ob-stage .ob-uswitch-seg:not([aria-checked="true"]):hover { color: rgba(254, 255, 253, 0.85); }
+
+/* Every glyph centred in its segment by its INK (the user, 2026-11-19:
+   "the icons aren't aligned"). With the marks beside the figure gone the
+   switch only has to agree with itself: type sat ~1px above the
+   segment's centre (−0.4 to −1.4, measured at 4x — its ink rides high in
+   its line box), the stack 0.25 above it, so "$" stood a pixel over the
+   stack beside it. The label comes down 1px (`translate`, so the press's
+   `transform: scale` still applies on top), and the stack's own nudge
+   (above) is set against it to land on the same centre. */
+.ob-uswitch-label { translate: 0 1px; }
+/* On the chevrons' column (the user, 2026-11-19: "does the toggle look
+   weird compared to the placement of the chevron"). Measured: a dropdown's
+   chevron centres 13 in from the field's right edge; the switch's last
+   glyph centred at 18.1, and its plate sat 7 off the right (the field's 3
+   of padding + 4 of margin) against 4 off the top and bottom. Now 4 all
+   round — 1 of margin on the field's 3 — and 18-wide segments, so the
+   last glyph centres at 4 + 9 = 13, under the chevrons. A word ("Bid",
+   "Ask") still takes its own width. */
+.ob-uswitch { margin-right: 1px; }
+.ob-uswitch-seg { min-width: 18px; width: auto; padding: 0 3px; }
+
+/* ---------- the cycling prefix (the third variation, user 2026-11-19) ----------
+   The mark's slot clips its roll: the outgoing unit leaves upward and the
+   next rises in, inside the cell. The slot is one grid cell both share, so
+   it keeps the mark's own size; the up/down pair takes the chevron's ink. */
+.ob-cycle-mark {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: middle;
+}
+.ob-cycle-mark-in {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* The cycling prefix as one toggle plate (the user, 2026-11-19: "I want
+   it to look like the toggle, but when you click it switches"). The
+   switch's own segment, alone at the field's head: 18 × 22, inset 4 from
+   the field's left, top and bottom, flat white at 12% with a white glyph,
+   corners 2 — no divider, no chevron. Under the pointer one step lighter;
+   pressed, the glyph gives to 85%. The theme pins the prefix cell's width
+   and padding with !important, so these restate theirs. */
+.ob-stage button.ob-field-k.ob-cycle-chip {
+  min-width: 18px !important;
+  height: 22px;
+  margin: 0 0 0 4px;
+  padding: 0 3px !important;
+  align-self: center;
+  justify-content: center !important;
+  border: 0 !important;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff;
+  transition: background-color 0.15s ease;
+}
+.ob-stage button.ob-field-k.ob-cycle-chip:hover { background: rgba(255, 255, 255, 0.18) !important; }
+.ob-stage button.ob-field-k.ob-cycle-chip:active .ob-cycle-mark { transform: scale(0.85); }
+.ob-cycle-chip .ob-cycle-mark { transition: transform 0.12s cubic-bezier(0.4, 0, 0.2, 1); }
+.ob-cycle-chip .ob-cycle-mark-in { translate: 0 1px; }
+.ob-cycle-chip .ob-cycle-mark-in svg { width: 11px; height: 11px; transform: translate(-0.5px, -1.6px); }
+/* Wider (the user, 2026-11-19: 18 "looks too skinny and doesn't look
+   balanced"): square, 22 × 22 — its own height, the toggle's first
+   segment size — so a lone glyph sits in a balanced plate. */
+.ob-stage button.ob-field-k.ob-cycle-chip { min-width: 22px !important; }
+/* The morphing-input reference's motion (the user, 2026-11-19: "I don't
+   like the way the icon changes"): the glyph crossfades through a 5px
+   blur in place (TicketControls' CycleMark), so the slot no longer clips —
+   a clip would cut the blur at the plate's edge — and the press is the
+   whole plate giving to 90%, not the glyph alone. */
+.ob-cycle-chip .ob-cycle-mark { overflow: visible; transition: none; }
+.ob-stage button.ob-field-k.ob-cycle-chip:active .ob-cycle-mark { transform: none; }
+.ob-stage button.ob-field-k.ob-cycle-chip { transition: background-color 0.15s ease, transform 0.15s cubic-bezier(0.4, 0, 0.2, 1); }
+.ob-stage button.ob-field-k.ob-cycle-chip:active { transform: scale(0.9); }
+/* The Toggle reference's only motion (the user, 2026-11-19): colours, 150ms
+   on its ease (cubic-bezier(0.4, 0, 0.2, 1)). No press scale — the new unit
+   is the feedback, and it lands in the frame of the click. */
+.ob-stage button.ob-field-k.ob-cycle-chip { transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), color 0.15s cubic-bezier(0.4, 0, 0.2, 1); }
+.ob-stage button.ob-field-k.ob-cycle-chip:active { transform: none; }
+
+/* The figure's unit crossover (MorphFigure): the outgoing number is
+   lifted out (popLayout) against this box while the incoming one takes its
+   place, so neither shifts the field. */
+.ob-morph { position: relative; display: inline-flex; }
+.ob-morph-in { display: inline-flex; }
+/* the replaced quantity figure, played out over the new one's slot */
+.ob-morph-ghost { position: absolute; left: 0; top: 0; display: inline-flex; white-space: pre; pointer-events: none; }
+/* Half the 1px, not all of it (the user, 2026-11-19: Quantity's "$" "doesn't
+   look center aligned"). Measured here the "$" sat 0.25 high with the full
+   1px; off the user's own screen it sat ~0.65 LOW — their display puts this
+   glyph ~0.9px lower than the test browser. 0.5 lands within ~0.25 of
+   centre on both. The stack's own nudge moves with it (it is inside the
+   label), so it keeps its 0.00. */
+.ob-cycle-chip .ob-cycle-mark-in { translate: 0 0.5px; }
+.ob-cycle-chip .ob-cycle-mark-in svg { transform: translate(-0.5px, -1.1px); }
+
+/* The cycling plate at the field's RIGHT end (the user, 2026-11-19: "put
+   these toggles on the other side of the input fields"). Moved by `order`
+   (the markup keeps it first, where a prefix belongs), inset 4 from the
+   right as it was from the left — the field's own 3 of padding + 1 — so
+   the figure starts on the field's ordinary 6 like every other value. */
+.ob-stepper > button.ob-field-k.ob-cycle-chip,
+.ob-stepper > .ob-field-k-slot:has(> .ob-cycle-chip) { order: 2; }
+.ob-stage .ob-stepper > button.ob-field-k.ob-cycle-chip,
+.ob-stage .ob-stepper > .ob-field-k-slot > button.ob-field-k.ob-cycle-chip { margin: 0 1px 0 0; }
+/* The stack's centring on ONE offset, its own (the user, 2026-11-19: "does
+   the icon look aligned… center aligned"): the label's text nudge no longer
+   carries it, so nothing stacked — the svg alone sits 0.6 above the plate's
+   centre by its box, which puts its ink on the centre (its drawing sits
+   0.6 low inside its own 11px box). */
+.ob-cycle-chip .ob-cycle-mark-in:has(> svg) { translate: none; }
+.ob-cycle-chip .ob-cycle-mark-in svg { transform: translate(-0.5px, -0.6px); }
+
+/* A swapped row (Unroll `swap`) is lifted out at its own offsetTop while it
+   fades, so the box it is measured from must be the rows' own column. */
+.ob-params { position: relative; }
+/* The rows that trade places (Stop ↔ Limit) one height, so a swap moves
+   nothing below them (the user, 2026-11-19: "bracket order and special
+   instructions shouldn't move as I am switching order types"). The limit
+   row's label carries its Bid / Ask caption — 30.59 tall — and the stop
+   row, captionless on the variants, was 30: every swap nudged the
+   sections under it by 0.6. */
+.ob-stage .ob-params > div > .ob-line { min-height: 30.6px; }

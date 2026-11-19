@@ -41,13 +41,13 @@
   },
   "option-chain": {
     "w": 1200,
-    "h": 694,
+    "h": 696,
     "seconds": 8.5
   },
   "stock-order-entry": {
     "w": 1200,
     "h": 602,
-    "seconds": 8
+    "seconds": 6
   },
   "beam-ring": {
     "w": 1200,
@@ -61,7 +61,7 @@
   },
   "chain-to-order": {
     "w": 1200,
-    "h": 598,
+    "h": 600,
     "seconds": 6.4
   },
   "holdings-empty-state": {

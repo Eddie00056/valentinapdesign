@@ -147,6 +147,10 @@ const VEDA_SAME: Record<number, number> = { 30: 26, 59: 32 };
    HOOD at $87.41 — passed to each embedded page as ?sym=&px= (see
    shared/quoteOverride); the website's own pages keep DASH / PLTR */
 const VEDA_QUOTE = "sym=HOOD&px=87.41";
+/* veda: the stock ticket is the cycling-unit design (the user, 2026-11-19:
+   "replace the order entry ticket with this one everywhere") — the same
+   page under /work/stock-order-entry-cycle; the other decks keep theirs */
+const vedaPage = (page: string) => page.replace(/^stock-order-entry(?=\?|$)/, "stock-order-entry-cycle");
 // the user's Figma (2026-11-04): the Problem #1 run carries its solution
 const P1 = "Problem #1: Optimizing information hierarchy for faster scanning and quicker trade reactions.";
 const P2 = "Problem #2: Improving trade ergonomics";
@@ -164,8 +168,12 @@ const TICKET32 = {
      preferred size after trying 27.3, 28.5 and 31.5; the original top */
   /* then 20% smaller (the user, 2026-11-12): 26.15 × 0.8 = 20.92 — then
      10% back up: 20.92 × 1.1 = 23.01, centred, its top held */
-  x: (100 - 23.01) / 2,
-  w: 23.01,
+  /* …then the cycling ticket (2026-11-19) is a 304 card, not 324: the
+     frame narrows by the same 304/324 so the ticket keeps its scale (the
+     slide fits the card to this width — kept at 23.01 the narrower card
+     came out 6.6% larger). Centred, its top held. */
+  x: (100 - (23.01 * 304) / 324) / 2,
+  w: (23.01 * 304) / 324,
   h: 44.8 * 0.88,
   css: ".ob-stage{background:none!important;align-items:flex-start!important}.ob-cost{display:none!important}",
 };
@@ -219,7 +227,10 @@ const VEDA_PATCH: Record<number, Slide> = {
     live: [{ ...TICKET32, step: undefined, unstep: undefined, init: "openBracket" }],
     // re-measured at 23.01, no title bar (2026-11-12)
     // re-measured at 23.01 (card left 739, so the rule at 715)
-    eye: { line: "#E03E1A", x: 715, ys: [332, 440, 609, 757] },
+    // re-measured for the cycling ticket (2026-11-19): the frame at
+    // 23.01 × 304/324, card left 752.7 → the rule at 729; section centres
+    // 331.9 / 435.5 / 586.3 / 747.9 (28px fields, so shorter)
+    eye: { line: "#E03E1A", x: 729, ys: [332, 436, 586, 748] },
   },
   /* 38: placing an option order in IQ Edge (the user's "placing an option
      order iq edge.mp4", 2026-11-04), in slide 16's box: the same top and
@@ -1054,7 +1065,7 @@ const nt = (
                     >
                       <iframe
                         title={l.page}
-                        data-src={`/work/${l.page}${isV(s) ? (l.page.includes("?") ? "&" : "?") + VEDA_QUOTE : ""}`}
+                        data-src={`/work/${isV(s) ? vedaPage(l.page) : l.page}${isV(s) ? (l.page.includes("?") ? "&" : "?") + VEDA_QUOTE : ""}`}
                         data-css={l.css || ""}
                         data-css-last={l.cssLast || ""}
                         data-fit={l.fit || ""}
@@ -1121,7 +1132,7 @@ const nt = (
   import { applyOverrides } from "./deckOverrides";
   import type { Overrides } from "./deckOverrides";
   import { mountNotes } from "./deckNotes";
-  import { TICKET_UI } from "../../shared/ticketUi";
+  import { TICKET_UI, DECK_NEW_UI, DECK_VEDA } from "../../shared/ticketUi";
 
   const stage = document.querySelector<HTMLElement>(".gd-stage");
   if (stage) {
@@ -1432,36 +1443,7 @@ const nt = (
               /* new UI: the widget card from the user's Figma — #010101 at
                  50% under a 20% black wash, a 10% white edge. After the
                  slide's own css, so it wins over its #010101. */
-              (f.closest(".gd-n")
-                ? "html.is-bare .wshell.wshell,.wshell.wshell{background:linear-gradient(0deg,rgba(0,0,0,.2),rgba(0,0,0,.2)),rgba(1,1,1,.5)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:8px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;-webkit-backdrop-filter:blur(100px);backdrop-filter:blur(100px)}" +
-                  /* the order tickets in the user's updated design: no title
-                     bar, lighter fields with rounder corners, "Limit price"
-                     on its own with a smaller Mid / Ask line, a solid caret */
-                  ".ob-stage .wshell-bar,.wshell-bar{display:none!important}" +
-                  ".ob-stage .ob-field{background:rgba(255,255,255,.08)!important;border-radius:6px!important}" +
-                  // the field's prefix (the quantity unit) shares its ground
-                  ".ob-stage .ob-field-k{background:transparent!important}" +
-                  ".ob-stage .ob-line-side{display:none}" +
-                  ".ob-stage .ob-line-sub{font-size:10px!important}" +
-                  ".ob-stage .ob-x{color:rgba(255,255,255,.55)!important}" +
-                  // the stepper arrows and the caret in the X's grey, so the
-                  // three icons down the right edge are one colour
-                  ".ob-stage .ob-stepper-btns svg *{fill:rgba(255,255,255,.55)!important}" +
-                  ".ob-stage .ob-chevron{color:rgba(255,255,255,.55)!important}" +
-                  ".ob-stage .ob-payoff{border-color:rgba(255,255,255,.1)!important}" +
-                  ".ob-stage .ob-chevron path{display:none}" +
-                  ".ob-stage .ob-chevron{background:currentColor;clip-path:polygon(22% 38%,78% 38%,50% 68%)}" +
-                  /* veda: the card's edge a clear cool grey (the user's
-                     chart reference, 2026-11-04), so it holds on the ground */
-                  (f.closest(".gd-v")
-                    ? "html.is-bare .wshell.wshell,.wshell.wshell{border-color:#5b5f62!important}" +
-                      /* the order confirmation solid from its first frame
-                         (the user, 2026-11-04): its glass (50% + a 100px
-                         backdrop blur) showed the chain through it until
-                         the blur was painted */
-                      "html.is-bare .ob-stage .wshell.wshell.ob-modal,.ob-stage .wshell.wshell.ob-modal{background:#010101!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}"
-                    : "")
-                : "") +
+              (f.closest(".gd-n") ? DECK_NEW_UI + (f.closest(".gd-v") ? DECK_VEDA : "") : "") +
               /* the new ticket UI (user, 2026-11-12) on every order ticket
                  in the order entry study — Veda slides only, so the
                  fractional study is untouched */

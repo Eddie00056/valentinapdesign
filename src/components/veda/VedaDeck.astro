@@ -1,0 +1,801 @@
+---
+/* Exploration: the deck in the Veda direction (behance.net/gallery/250754359)
+   — one black ground, one accent, Elza Text set large and plain, the product
+   shown alone like an object, and the hero's dot field as the visual
+   system: every chart is drawn in its dots. 1920×1080 canvas,
+   arrow keys / click to move, #slide-N to deep link. */
+import { DotField } from "../website/DotField";
+import { LiveFit } from "../website/LiveFit";
+
+/* the hero's dot field as the chart language: every chart is dots on one
+   pitch — faint where empty, grey where filled, a green hairline joining
+   the tops (DotField's cursor lines), one red dot where it ends up */
+const P = 28;
+const CH_COLS = 28;
+const CH_ROWS = 15;
+const ease = (t: number) => t * t * (3 - 2 * t);
+// illustrative: a plateau, then the slide
+const CH_TOP = Array.from({ length: CH_COLS }, (_, i) => {
+  const t = i / (CH_COLS - 1);
+  return Math.round((CH_ROWS - 1) * (0.86 + 0.03 * Math.sin(t * 9) - 0.62 * ease(Math.min(1, Math.max(0, (t - 0.18) / 0.82)))));
+});
+const CH_W = (CH_COLS - 1) * P;
+const CH_H = (CH_ROWS - 1) * P;
+const chY = (r: number) => CH_H - r * P;
+const CH_LINE = CH_TOP.map((r, i) => `${i * P},${chY(r)}`).join(" ");
+// time to submit, as rows of dots (illustrative)
+const BAR_COLS = 54;
+const BAR_ROWS = 3;
+const BARS = [
+  { label: "Stock order", lit: 25 },
+  { label: "Option order", lit: 50, hot: true },
+];
+
+const TICKET =
+  ".ob-stage{background:none!important}.wshell-actions,.ob-cost,.wshell-bar{display:none!important}.ob-foot{justify-content:flex-end!important}html.is-bare .wshell.wshell{background:#0d0d0d!important;border-color:rgba(255,255,255,.12)!important;border-radius:10px!important}";
+---
+
+<div class="vd">
+  <div class="vd-canvas">
+    <!-- 1 · opener -->
+    <section class="vd-slide vd-dark" data-i="1">
+      <p class="vd-mark">Valentina Padure</p>
+      <div class="vd-orb" aria-hidden="true">
+        <DotField
+          client:visible
+          spacing={18}
+          dotRadius={1.6}
+          dotColor={[120, 128, 130]}
+          lineOpacity={0.35}
+          radius={140}
+          falloff={{ cx: 0.5, cy: 0.5, rx: 0.42, ry: 0.42, inner: 0.55 }}
+        />
+      </div>
+      <h1 class="vd-hero">Designing trading<br />products people trust.</h1>
+    </section>
+
+    <!-- 2 · chapter -->
+    <section class="vd-slide vd-dark vd-chapter" data-i="2" hidden>
+      <p class="vd-kicker">Case study 01</p>
+      <h2 class="vd-giant">Order entry<br />modernization</h2>
+      <p class="vd-num" aria-hidden="true">01</p>
+    </section>
+
+    <!-- 3 · problem + a falling chart -->
+    <section class="vd-slide vd-dark" data-i="3" hidden>
+      <p class="vd-kicker">Background — Problem</p>
+      <h2 class="vd-statement vd-statement--md">Active-trader<br />growth was<br />slowing.</h2>
+      <figure class="vd-chart">
+        <svg viewBox={`-8 -8 ${CH_W + 16} ${CH_H + 16}`} aria-hidden="true">
+          {CH_TOP.map((top, i) =>
+            Array.from({ length: CH_ROWS }, (_, r) => (
+              <circle
+                class={r > top ? "g" : r === top ? (i === CH_COLS - 1 ? "e" : "t") : "u"}
+                cx={i * P}
+                cy={chY(r)}
+                r={r === top ? (i === CH_COLS - 1 ? 7 : 3.2) : 2.4}
+                style={`--c:${i}`}
+              />
+            )),
+          )}
+          <polyline class="vd-tline" pathLength="1" points={CH_LINE} />
+        </svg>
+        <figcaption><span>New active traders, YoY</span>Illustrative — replace with the real series</figcaption>
+      </figure>
+    </section>
+
+    <!-- 4 · solution -->
+    <section class="vd-slide vd-dark" data-i="4" hidden>
+      <p class="vd-kicker">Background — Solution</p>
+      <h2 class="vd-statement">Launch a new,<br />modernized<br />trading platform.</h2>
+    </section>
+
+    <!-- 5 · the quote -->
+    <section class="vd-slide vd-dark" data-i="5" hidden>
+      <p class="vd-kicker">Existing client sentiment</p>
+      <blockquote class="vd-quote">
+        <span class="vd-qmark" aria-hidden="true">“</span>Don’t change order entry. It’s the only feature no one complains about.<span aria-hidden="true">”</span>
+      </blockquote>
+    </section>
+
+    <!-- 6 · the journey -->
+    <section class="vd-slide vd-dark" data-i="6" hidden>
+      <p class="vd-kicker">Pivoting the research</p>
+      <h2 class="vd-statement vd-statement--sm">We stepped back and studied the whole trading journey.</h2>
+      <ol class="vd-journey">
+        <li><i></i><b>Discover</b><span>Find an idea</span></li>
+        <li><i></i><b>Research</b><span>Read the chart</span></li>
+        <li><i></i><b>Decide</b><span>Pick the trade</span></li>
+        <li class="is-hot"><i></i><b>Place</b><span>The slow step</span></li>
+        <li><i></i><b>Manage</b><span>Watch the position</span></li>
+      </ol>
+    </section>
+
+    <!-- 7 · the problem, as time -->
+    <section class="vd-slide vd-dark" data-i="7" hidden>
+      <p class="vd-kicker">Problem</p>
+      <h2 class="vd-statement vd-statement--md">Placing an order<br />took too long.</h2>
+      <div class="vd-bars">
+        {BARS.map((b) => (
+          <div class={b.hot ? "vd-bar is-hot" : "vd-bar"}>
+            <span>{b.label}</span>
+            <svg viewBox={`-6 -6 ${(BAR_COLS - 1) * P + 12} ${(BAR_ROWS - 1) * P + 12}`} aria-hidden="true">
+              {Array.from({ length: BAR_COLS }, (_, i) =>
+                Array.from({ length: BAR_ROWS }, (_, r) => (
+                  <circle class={i < b.lit ? "on" : "g"} cx={i * P} cy={r * P} r={i < b.lit ? 3.2 : 2.4} style={`--c:${i}`} />
+                )),
+              )}
+            </svg>
+          </div>
+        ))}
+        <p class="vd-bars-note">Relative time to submit · illustrative</p>
+      </div>
+    </section>
+
+    <!-- from the old deck: the plain statements, left-aligned -->
+    <section class="vd-slide vd-dark" data-i="8" hidden>
+      <p class="vd-kicker">Solution</p>
+      <h2 class="vd-plain">Make trade submission fast and frictionless.</h2>
+    </section>
+
+    <section class="vd-slide vd-dark" data-i="9" hidden>
+      <p class="vd-kicker">Reducing time to trade</p>
+      <h2 class="vd-plain">How do we make the option trade experience faster?</h2>
+    </section>
+
+    <!-- 8 · revenue share as dots -->
+    <section class="vd-slide vd-dark" data-i="10" hidden>
+      <p class="vd-kicker">The problem</p>
+      <div class="vd-split">
+        <h2 class="vd-statement vd-statement--sm">80% of revenue came from the most complex experience in the industry.</h2>
+        <div class="vd-dots" aria-label="80 of 100">
+          {Array.from({ length: 100 }, (_, k) => <i class={k < 80 ? "on" : ""} style={`--k:${k}`} />)}
+        </div>
+      </div>
+    </section>
+
+    <section class="vd-slide vd-dark" data-i="11" hidden>
+      <p class="vd-kicker">The solution</p>
+      <h2 class="vd-plain">Tailor the order placement experience to a security type.</h2>
+    </section>
+
+    <!-- 9 · product as object -->
+    <section class="vd-slide vd-dark" data-i="12" hidden>
+      <p class="vd-kicker">Then / Now</p>
+      <figure class="vd-obj vd-obj--then">
+        <img src="/website/case/gusto/v2/049c-body.webp" alt="The legacy order ticket" />
+        <figcaption><span>Then</span>The legacy ticket</figcaption>
+      </figure>
+      <figure class="vd-obj vd-obj--now">
+        <div class="vd-live">
+          <LiveFit
+            client:visible
+            src="/work/options-strategy-builder?bare&static"
+            fit=".wshell"
+            css={TICKET}
+            vw={1280}
+            vh={1000}
+            pad={2}
+            freeze
+            title="Options ticket"
+          />
+        </div>
+        <figcaption><span>Now</span>Tailored to the security</figcaption>
+      </figure>
+    </section>
+
+    <!-- 10 · impact -->
+    <section class="vd-slide vd-dark" data-i="13" hidden>
+      <div class="vd-field" aria-hidden="true"></div>
+      <p class="vd-kicker">Impact</p>
+      <div class="vd-figs">
+        <div class="vd-fig"><b>60%</b><span>faster to place a trade</span></div>
+        <div class="vd-fig vd-fig--accent"><b>85%</b><span>satisfaction in the closed beta</span></div>
+      </div>
+    </section>
+
+    <!-- 11 · chapter two -->
+    <section class="vd-slide vd-dark vd-chapter" data-i="14" hidden>
+      <p class="vd-kicker">Case study 02</p>
+      <h2 class="vd-giant">Fractional<br />shares</h2>
+      <p class="vd-num" aria-hidden="true">02</p>
+    </section>
+
+    <!-- 12 · the build-up: 1 · 2 · 2 -->
+    <section class="vd-slide vd-dark" data-i="15" hidden>
+      <p class="vd-kicker">Design challenge</p>
+      <div class="vd-stack">
+        <p><b>1</b> Feature.</p>
+        <p><b>2</b> Personas.</p>
+        <p><b>2</b> Design languages.</p>
+      </div>
+    </section>
+
+    <!-- 13 · the challenge -->
+    <section class="vd-slide vd-dark" data-i="16" hidden>
+      <p class="vd-kicker">The challenge</p>
+      <h2 class="vd-statement vd-statement--sm">How might we make investing accessible to new investors without slowing down advanced traders?</h2>
+    </section>
+
+    <!-- 14 · impact two -->
+    <section class="vd-slide vd-dark" data-i="17" hidden>
+      <div class="vd-field" aria-hidden="true"></div>
+      <p class="vd-kicker">Impact</p>
+      <div class="vd-figs">
+        <div class="vd-fig vd-fig--line"><b>60K</b><span>increase in trading volume</span></div>
+        <div class="vd-fig vd-fig--accent"><b>$33M</b><span>total value traded</span></div>
+      </div>
+      <p class="vd-award">UX Design Awards — Fall 2025 nominee</p>
+    </section>
+  </div>
+  <p class="vd-count"><span class="vd-n">1</span> / 17</p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>(".vd");
+  const canvas = root?.querySelector<HTMLElement>(".vd-canvas");
+  if (root && canvas) {
+    const slides = [...canvas.querySelectorAll<HTMLElement>(".vd-slide")];
+    const n = root.querySelector<HTMLElement>(".vd-n")!;
+    const fit = () => {
+      const s = Math.min(innerWidth / 1920, innerHeight / 1080);
+      canvas.style.transform = `translate(-50%, -50%) scale(${s})`;
+    };
+    let cur = 1;
+    let leaving: HTMLElement | null = null;
+    const show = (i: number) => {
+      const next = Math.max(1, Math.min(slides.length, i));
+      if (next === cur && slides[cur - 1].classList.contains("is-on")) return;
+      const dir = next > cur ? 1 : -1;
+      const from = slides[cur - 1];
+      cur = next;
+      const to = slides[cur - 1];
+      // the outgoing slide eases back and dims under the incoming one
+      if (leaving) leaving.hidden = true, leaving.classList.remove("is-out");
+      if (from !== to && !from.hidden) {
+        from.classList.remove("is-on");
+        from.classList.add("is-out");
+        from.style.setProperty("--dir", String(dir));
+        leaving = from;
+        setTimeout(() => {
+          from.classList.remove("is-out");
+          if (from !== slides[cur - 1]) from.hidden = true;
+        }, 300);
+      }
+      slides.forEach((el) => el !== from && el !== to && (el.hidden = true));
+      to.hidden = false;
+      to.style.setProperty("--dir", String(dir));
+      to.classList.remove("is-on");
+      void to.offsetWidth;
+      to.classList.add("is-on");
+      n.textContent = String(cur);
+      history.replaceState(null, "", `#slide-${cur}`);
+    };
+    const m = location.hash.match(/^#slide-(\d+)$/);
+    show(m ? +m[1] : 1);
+    fit();
+    addEventListener("resize", fit);
+    addEventListener("keydown", (e) => {
+      if (["ArrowRight", "ArrowDown", "PageDown", " "].includes(e.key)) (e.preventDefault(), show(cur + 1));
+      else if (["ArrowLeft", "ArrowUp", "PageUp"].includes(e.key)) (e.preventDefault(), show(cur - 1));
+    });
+    root.addEventListener("click", (e) => show(e.clientX < innerWidth / 3 ? cur - 1 : cur + 1));
+  }
+</script>
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&display=swap");
+
+  .vd {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    background: #000;
+    --ink: #0a0a0a;
+    --accent: #00e88f;
+  }
+  .vd-canvas {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1920px;
+    height: 1080px;
+  }
+  .vd-slide {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    font-family: "Elza Text", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .vd-slide[hidden] {
+    display: none;
+  }
+  .vd-dark {
+    background: #000;
+    color: #fff;
+  }
+
+  /* between slides: the old one fades out under the new one, whose
+     parts rise in one after another */
+  .vd-slide.is-on { z-index: 2; }
+  .vd-slide.is-out {
+    z-index: 1;
+    animation: vd-out 0.3s ease both;
+  }
+  @keyframes vd-out {
+    to { opacity: 0; }
+  }
+
+  /* arrival: everything rises a touch, the hero last */
+  .vd-slide.is-on > * {
+    animation: vd-rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+  .vd-slide.is-on > :nth-child(2) { animation-delay: 0.22s; }
+  .vd-slide.is-on > :nth-child(3) { animation-delay: 0.3s; }
+  .vd-slide.is-on > :nth-child(4) { animation-delay: 0.38s; }
+  @keyframes vd-rise {
+    from { opacity: 0; translate: 0 18px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .vd-slide.is-out,
+    .vd-slide.is-on > *,
+    .vd-slide.is-on * { animation: none !important; }
+    .vd-chart circle, .vd-bar circle { opacity: 1; }
+    .vd-tline { stroke-dashoffset: 0; }
+    .vd-dots i.on { background: var(--accent); }
+  }
+
+  /* ---- the small voice: metadata, kickers, the mark --------------- */
+  .vd-mark,
+  .vd-kicker {
+    position: absolute;
+    left: 56px;
+    top: 48px;
+    margin: 0;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+  .vd-kicker {
+    font-family: "DM Mono", monospace;
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .vd-kicker--dark {
+    color: #fff;
+  }
+
+  /* ---- 1 · opener: the dot sphere as the hero object -------------- */
+  .vd-orb {
+    position: absolute;
+    left: 50%;
+    top: 46%;
+    width: 760px;
+    height: 760px;
+    transform: translate(-50%, -50%);
+  }
+  .vd-hero {
+    position: absolute;
+    left: 56px;
+    bottom: 120px;
+    margin: 0;
+    font-size: 80px;
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+  }
+
+  /* ---- 2 · statement: huge, blunt, left ----------------------------- */
+  .vd-statement {
+    position: absolute;
+    left: 50px;
+    top: 210px;
+    margin: 0;
+    font-size: 124px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.035em;
+  }
+
+  /* the quiet system behind light slides: dashed circles on a loose grid */
+  .vd-field {
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle, rgba(150, 158, 160, 0.5) 1.6px, transparent 2.2px);
+    background-size: 28px 28px;
+    background-position: 14px 14px;
+    -webkit-mask-image: radial-gradient(ellipse 46% 60% at 50% 48%, #000 25%, transparent 100%);
+    mask-image: radial-gradient(ellipse 46% 60% at 50% 48%, #000 25%, transparent 100%);
+  }
+
+  /* ---- 3 · product as object ---------------------------------------- */
+  .vd-obj {
+    position: absolute;
+    margin: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .vd-obj--then {
+    left: 120px;
+    width: 640px;
+  }
+  .vd-obj--then img {
+    display: block;
+    width: 100%;
+    border-radius: 8px;
+    opacity: 0.85;
+    filter: grayscale(0.4);
+  }
+  .vd-obj--now {
+    right: 160px;
+    width: 560px;
+  }
+  .vd-live {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 60px 120px -30px rgba(0, 232, 143, 0.18),
+      0 30px 60px -20px rgba(0, 0, 0, 0.9);
+  }
+  .vd-obj figcaption {
+    margin-top: 28px;
+    font-size: 16px;
+    letter-spacing: -0.005em;
+    color: rgba(255, 255, 255, 0.8);
+  }
+  /* the label in mono caps, then the line */
+  .vd-obj figcaption span,
+  .vd-chart figcaption span {
+    margin-right: 14px;
+    font: 13px "DM Mono", monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .vd-obj--now figcaption span {
+    color: var(--accent);
+    opacity: 1;
+  }
+
+  /* ---- 4 · impact: figures as pills ---------------------------------- */
+  .vd-figs {
+    position: absolute;
+    left: 50%;
+    top: 47%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+  .vd-fig {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+  }
+  .vd-fig b {
+    display: block;
+    padding: 34px 72px 40px;
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.7), 0 0 0 28px #000;
+    font-size: 120px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+  .vd-fig--accent b {
+    background: var(--accent);
+    color: var(--ink);
+    box-shadow: none;
+  }
+  .vd-fig span {
+    font-size: 20px;
+    letter-spacing: -0.01em;
+    opacity: 0.7;
+  }
+
+  .vd-count {
+    position: fixed;
+    right: 20px;
+    bottom: 14px;
+    margin: 0;
+    font: 12px "DM Mono", monospace;
+    color: rgba(255, 255, 255, 0.35);
+    mix-blend-mode: difference;
+    pointer-events: none;
+  }
+
+
+  /* ---- chapter openers: one giant word block and its number -------- */
+  .vd-giant {
+    position: absolute;
+    left: 50px;
+    bottom: 70px;
+    margin: 0;
+    font-size: 176px;
+    font-weight: 400;
+    line-height: 0.96;
+    letter-spacing: -0.04em;
+  }
+  .vd-chapter .vd-num {
+    color: var(--accent);
+    opacity: 1;
+  }
+  .vd-num {
+    position: absolute;
+    right: 56px;
+    top: 40px;
+    margin: 0;
+    font-family: "DM Mono", monospace;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    opacity: 0.6;
+  }
+
+  /* the old deck's statement: one sentence, set calm, left, mid-slide */
+  .vd-plain {
+    position: absolute;
+    left: 56px;
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 1500px;
+    margin: 0;
+    font-size: 88px;
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  .vd-statement--md {
+    font-size: 104px;
+  }
+  .vd-statement--sm {
+    font-size: 76px;
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    max-width: 1440px;
+  }
+
+  /* ---- a chart that draws itself on arrival -------------------------- */
+  .vd-chart {
+    position: absolute;
+    right: 90px;
+    bottom: 120px;
+    width: 760px;
+    margin: 0;
+  }
+  .vd-chart svg {
+    display: block;
+    width: 100%;
+    overflow: visible;
+  }
+  .vd-chart circle,
+  .vd-bar circle {
+    opacity: 0;
+  }
+  .vd-chart .g,
+  .vd-bar .g { fill: rgba(255, 255, 255, 0.1); }
+  .vd-chart .u { fill: rgba(150, 158, 160, 0.55); }
+  .vd-chart .t { fill: #fff; }
+  .vd-chart .e { fill: #e5484d; }
+  .vd-tline {
+    fill: none;
+    stroke: rgba(72, 213, 151, 0.7);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  /* columns light left to right, the line follows them */
+  .vd-slide.is-on .vd-chart circle,
+  .vd-slide.is-on .vd-bar circle {
+    animation: vd-dot 0.45s ease forwards;
+    animation-delay: calc(0.35s + var(--c) * 45ms);
+  }
+  .vd-slide.is-on .vd-tline {
+    animation: vd-draw 1.3s linear 0.45s forwards;
+  }
+  @keyframes vd-dot {
+    to { opacity: 1; }
+  }
+  @keyframes vd-draw {
+    to { stroke-dashoffset: 0; }
+  }
+  .vd-chart figcaption {
+    margin-top: 28px;
+    font-size: 15px;
+    opacity: 0.7;
+  }
+
+  /* ---- the quote: one huge sentence --------------------------------- */
+  .vd-quote {
+    position: absolute;
+    left: 104px;
+    right: 140px;
+    top: 220px;
+    margin: 0;
+    font-size: 88px;
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+  }
+  .vd-qmark {
+    color: var(--accent);
+    margin-left: -0.42em;
+  }
+
+  /* ---- the journey: five stops, one lit ------------------------------ */
+  .vd-journey {
+    position: absolute;
+    left: 56px;
+    right: 56px;
+    bottom: 120px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: radial-gradient(circle, rgba(150, 158, 160, 0.55) 1.6px, transparent 2.2px) 0 -14px / 28px 28px repeat-x;
+  }
+  .vd-journey li {
+    position: relative;
+    padding-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .vd-journey i {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+  }
+  .vd-journey b {
+    font-size: 34px;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+  .vd-journey span {
+    font-size: 17px;
+    opacity: 0.55;
+  }
+  .vd-journey .is-hot i {
+    background: var(--accent);
+    box-shadow: 0 0 0 7px #000, 0 0 0 8px rgba(72, 213, 151, 0.7);
+  }
+  .vd-journey .is-hot b {
+    color: var(--accent);
+  }
+  .vd-slide.is-on .vd-journey li {
+    animation: vd-rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .vd-slide.is-on .vd-journey li:nth-child(2) { animation-delay: 0.1s; }
+  .vd-slide.is-on .vd-journey li:nth-child(3) { animation-delay: 0.2s; }
+  .vd-slide.is-on .vd-journey li:nth-child(4) { animation-delay: 0.3s; }
+  .vd-slide.is-on .vd-journey li:nth-child(5) { animation-delay: 0.4s; }
+
+  /* ---- time as bars --------------------------------------------------- */
+  .vd-bars {
+    position: absolute;
+    left: 56px;
+    right: 56px;
+    bottom: 110px;
+    display: grid;
+    gap: 48px;
+  }
+  .vd-bar {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    align-items: center;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+  }
+  .vd-bar svg {
+    display: block;
+    width: 100%;
+    overflow: visible;
+  }
+  .vd-bar .on { fill: #fff; }
+  .vd-bar.is-hot .on { fill: #e5484d; }  .vd-bars-note {
+    margin: 4px 0 0 240px;
+    font-family: "DM Mono", monospace;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.45;
+  }
+
+  /* ---- 80 of 100: a dot matrix that lights up ------------------------- */
+  .vd-split {
+    position: absolute;
+    left: 56px;
+    right: 90px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: grid;
+    grid-template-columns: 1fr 444px;
+    gap: 100px;
+    align-items: center;
+  }
+  .vd-split .vd-statement {
+    position: static;
+    font-size: 68px;
+  }
+  .vd-dots {
+    display: grid;
+    grid-template-columns: repeat(10, 12px);
+    gap: 36px;
+  }
+  .vd-dots i {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .vd-slide.is-on .vd-dots i.on {
+    animation: vd-light 0.4s ease forwards;
+    animation-delay: calc(0.3s + var(--k) * 12ms);
+  }
+  @keyframes vd-light {
+    to { background: var(--accent); }
+  }
+
+  /* ---- the 1 · 2 · 2 build ------------------------------------------ */
+  .vd-stack {
+    position: absolute;
+    left: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .vd-stack p {
+    margin: 0;
+    font-size: 120px;
+    font-weight: 400;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+  }
+  .vd-stack b {
+    display: inline-block;
+    min-width: 1.1em;
+    color: var(--accent);
+    font-weight: 400;
+  }
+  .vd-slide.is-on .vd-stack p {
+    animation: vd-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .vd-slide.is-on .vd-stack p:nth-child(2) { animation-delay: 0.5s; }
+  .vd-slide.is-on .vd-stack p:nth-child(3) { animation-delay: 1s; }
+
+  /* ---- impact two ---------------------------------------------------- */
+  .vd-fig--line b {
+    background: transparent;
+    color: #fff;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.85);
+  }
+  .vd-dark .vd-fig span {
+    color: #fff;
+  }
+  .vd-award {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 90px;
+    margin: 0;
+    text-align: center;
+    font-family: "DM Mono", monospace;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+</style>

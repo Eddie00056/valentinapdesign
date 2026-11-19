@@ -1,5 +1,6 @@
 ---
 import Bare from "../../layouts/Bare.astro";
+import { TICKET_PAGE } from "../../components/shared/ticketUi";
 import { ChainToTicket } from "../../components/chaintoticket/ChainToTicket";
 ---
 
@@ -82,5 +83,17 @@ import { ChainToTicket } from "../../components/chaintoticket/ChainToTicket";
 </style>
   <script is:inline>
     if (new URLSearchParams(location.search).has("bare")) document.documentElement.classList.add("is-bare");
+  </script>
+  <!-- the order entry study's ticket look (the Veda deck's), when the page
+       is opened on its own — /prototypes links here — in the mode the deck
+       embeds it in (?bare, and the stock ticket's ?proposed). Embedded (the
+       deck, the case study, ChainLoop) the host dresses it, so nothing here. -->
+  <script is:inline define:vars={{ css: TICKET_PAGE, cls: ["is-bare"] }}>
+    if (window.top === window) {
+      document.documentElement.classList.add(...cls);
+      const s = document.createElement("style");
+      s.textContent = css;
+      document.head.appendChild(s);
+    }
   </script>
 </Bare>

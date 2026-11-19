@@ -357,9 +357,13 @@ export function OptionsBuilder({
      editing directly; wrong when the leg arrives because you clicked a
      price in the widget next door, where the bounce reads as the ticket
      reacting rather than the row arriving. */
+  /* the stock ticket's shared spring (Unroll's, 2026-11-19): 560 / 0.5
+     at critical damping — every row on both tickets grows and shrinks on
+     one curve (the user: the same motion "everywhere including on the
+     option chain") */
   const sizeSpring: Transition = reduce
     ? { duration: 0 }
-    : { type: "spring", stiffness: 500, damping: 45 };
+    : { type: "spring", stiffness: 560, damping: 34, mass: 0.5 };
 
   /* Arriving content does not move. It is revealed by the height above it
      opening, the way one iOS sheet grows into another — so all a new row
