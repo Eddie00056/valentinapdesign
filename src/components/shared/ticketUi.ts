@@ -28,6 +28,12 @@ export const TICKET_UI =
   "outline:1px solid rgba(255,255,255,.06)!important;outline-offset:-1px!important}" +
   "html.is-bare .ob-stage .wshell.wshell.ob-modal,.ob-stage .wshell.wshell.ob-modal{background:#0d0d0d!important}" +
   ".ob-stage .ob-field{border-radius:4px!important}" +
+  /* the fields' neutral 8% white, the deck's own slides' value (GustoDeck
+     sets it on the frames it embeds) — stated here too so slide 35's
+     MacBook copies (ChainLoop) stop falling back to the old teal --chip
+     #2c3334 (the user, 2026-11-19); the prefix shares the field's ground */
+  ".ob-stage .ob-field{background:rgba(255,255,255,.08)!important}" +
+  ".ob-stage .ob-field-k{background:transparent!important}" +
   /* positive / negative from the user's button reference (dark mode,
      2026-11-12). Text — every green / red reading in the widgets (P&L,
      price change, legs…) rides --up / --down: its fg-positive #7ED68C and
