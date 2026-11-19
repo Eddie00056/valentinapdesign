@@ -20,7 +20,12 @@ export const TICKET_UI =
      brought back and removed again, 2026-11-12) */
   "html.is-bare .wshell.wshell,.wshell.wshell{background:linear-gradient(180deg,#141414 0%,#0d0d0d 100%)!important;border:0!important;" +
   "border-radius:6px!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;" +
-  "box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 0 0 1px rgba(255,255,255,.06)!important}" +
+  /* the 6% hairline drawn 1px INSIDE the edge (an outline over the card),
+     not as a ring outside it: a slide that fits the card by width (17's
+     "My role") clips exactly at the card's sides, which cut the ring away
+     there (the user, 2026-11-19: the widget "cut off at the sides") */
+  "box-shadow:inset 0 1px 0 rgba(255,255,255,.09)!important;" +
+  "outline:1px solid rgba(255,255,255,.06)!important;outline-offset:-1px!important}" +
   "html.is-bare .ob-stage .wshell.wshell.ob-modal,.ob-stage .wshell.wshell.ob-modal{background:#0d0d0d!important}" +
   ".ob-stage .ob-field{border-radius:4px!important}" +
   /* positive / negative from the user's button reference (dark mode,
@@ -45,7 +50,11 @@ export const TICKET_UI =
   // in light mode (the user, 2026-11-12)
   ".ob-stage .ob-cta{border:0!important;background:" + GRAD + "!important;" +
   "box-shadow:inset 0 .34px 0 var(--rim),inset 0 1.01px 0 color-mix(in srgb,var(--rim) 50%,transparent)," +
-  "inset 0 -.34px 0 color-mix(in srgb,var(--rim) 65%,transparent),inset 0 -1.01px 0 color-mix(in srgb,var(--rim) 33%,transparent)!important;" +
+  "inset 0 -.34px 0 color-mix(in srgb,var(--rim) 65%,transparent),inset 0 -1.01px 0 color-mix(in srgb,var(--rim) 33%,transparent)," +
+  /* the rim down the sides too, at the bottom's strength: drawn only top
+     and bottom, the button's ends read as sliced off (the user,
+     2026-11-19: the CTA "cut off at the sides") */
+  "inset .5px 0 0 color-mix(in srgb,var(--rim) 65%,transparent),inset -.5px 0 0 color-mix(in srgb,var(--rim) 65%,transparent)!important;" +
   "color:var(--ink)!important;-webkit-font-smoothing:antialiased!important}" +
   ".ob-stage .ob-cta .ob-cta-label,.ob-stage .ob-cta .ob-cta-label>span{color:var(--ink)!important}" +
   ".ob-stage .ob-cta:hover{filter:brightness(1.15)}" +
@@ -59,8 +68,25 @@ export const TICKET_UI =
   "--line-itm:rgba(255,255,255,.06)!important}" +
   ".oc-pill--bid,.oc-pill--ask{--pill-bg:rgba(255,255,255,.08)!important}" +
   ".oc-pill--bid{--pill-ring:rgba(229,131,122,.5)!important}.oc-pill--ask{--pill-ring:rgba(126,214,140,.5)!important}" +
-  ".oc-row:hover,.oc-row[data-lit]{background:rgba(255,255,255,.05)!important}" +
+  ".oc-row:hover,.oc-row[data-lit],.oc-root .oc-row[data-hov]{background:rgba(255,255,255,.05)!important}" +
+  // the ticket's end of the same link (a leg hovered, or lit from the
+  // chain) in the chain row's grey, not the old teal #272e30 (the user,
+  // 2026-11-19: "match on both widgets") — solid, as the lit chain row
+  // measures: 5% white reads 2 lighter on the ticket's lighter card top
+  ".ob-stage .ob-leg[data-linked]:hover,.ob-stage .ob-leg[data-lit]{background:#1c1c1c!important}" +
   ".oc-menu-list{background:#141414!important}" +
+  /* the light round a quote whose ticket leg is hovered (the user,
+     2026-11-19: it "looks bad" since the recolour). The rim it travels is
+     made by the chip's fill laid back over the middle (::after,
+     `background: inherit`) — opaque #0e231e before, translucent now, so
+     the whole arc showed through the chip. The same plate made opaque
+     again: its tint over the lit row's grey (measured #1c1c1c).
+     And the arc's hot core re-tinted to the new pair (#e8f7ef / #ffe4ea
+     were the old mint and pink) */
+  ".oc-root .oc-pill[data-beam][data-picked]::after{background:linear-gradient(var(--primary-900),var(--primary-900)),#1c1c1c!important}" +
+  ".oc-root .oc-pill[data-beam]:not([data-picked])::after{background:linear-gradient(var(--pill-bg),var(--pill-bg)),#1c1c1c!important}" +
+  ".oc-root .oc-beam{background:conic-gradient(from 0deg,transparent 0 72%,var(--up) 84%,#eaf8ec 90%,transparent 96%)!important}" +
+  ".oc-root .oc-beam--bid{background:conic-gradient(from 0deg,transparent 0 72%,var(--down) 84%,#fdeae7 90%,transparent 96%)!important}" +
   ".oc-spot::before{border-top-color:rgba(255,255,255,.2)!important}" +
   /* the order confirmation (the user, 2026-11-12: slide 35): its inner
      panel and the scrim off the teal */
