@@ -54,6 +54,63 @@ export const TICKET_UI =
      its unit cycled */
   ".ob-stage{--field-h:28px!important;--line-w:140px!important}" +
   ".ob-stage .ob-stepper-hit{display:none!important}" +
+  /* the confirmation without its inner panel (the user, 2026-11-19:
+     "remove the container inside the order confirmation"): the sections
+     sit straight on the card, divided by their rules as before */
+  ".ob-stage .ob-conf-body{background:none!important;border-radius:0!important}" +
+  /* the options ticket as narrow as the stock one (the user, 2026-11-19:
+     "make this as narrow as the stocks only widget"): 304, its modal too */
+  /* then roomier (the user, 2026-11-19: "slightly bigger … more padding
+     on the left and right"): the leg rows, the fields and the footer 10 in
+     from their panels instead of 6, the card 8 wider (312) so the content
+     keeps its 284 */
+  ".ob-stage:not(.st-stage) .ob-shell,.ob-stage:not(.st-stage) .ob-modal{width:312px!important}" +
+  /* legs as full-width bands (the user, 2026-11-19): a leg is a row, like
+     the chain's rows and the dropdown items, so its highlight runs edge to
+     edge, square, clipped to the card's corners and under its edge —
+     controls stay inset boxes. The card's 4 side/top inset moves into each
+     section, so the content line holds at 14 from the card: */
+  ".ob-stage:not(.st-stage) .ob-card{padding-left:0!important;padding-right:0!important;padding-top:0!important}" +
+  ".ob-stage:not(.st-stage) .ob-params-panel,.ob-stage:not(.st-stage) .ob-foot{padding-left:14px!important;padding-right:14px!important}" +
+  ".ob-stage:not(.st-stage) .ob-leg{padding-left:14px!important;padding-right:14px!important;border-radius:0!important}" +
+  // the first leg keeps its text where it was: the card's 4 top inset, inside
+  ".ob-stage:not(.st-stage) .ob-leg-u:first-child>.ob-leg,.ob-stage:not(.st-stage) .ob-leg-u[data-leaving]:first-child+.ob-leg-u>.ob-leg{padding-top:12px!important}" +
+  // …handed to the next leg as the first one folds, over about the fold's length
+  ".ob-stage:not(.st-stage) .ob-leg{transition:background .16s ease,padding-top .3s cubic-bezier(.2,0,0,1)!important}" +
+  /* the card's stroke over its bands, not under (the user: "the box should
+     not go on top of the stroke … but below it"): the outline and the top
+     highlight move from the card to a layer above its contents, at the
+     same values — 6% on its own page, 10% on the workspace */
+  "html .ob-stage:not(.st-stage) .wshell.wshell.wshell{outline-color:transparent!important;box-shadow:none!important}" +
+  ".ob-stage:not(.st-stage) .wshell::after{content:\"\";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.09)}" +
+  ".wsp .ob-stage:not(.st-stage) .wshell::after{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),inset 0 1px 0 rgba(255,255,255,.09)}" +
+  /* the option chain gets the same (the user, 2026-11-19): its rows run
+     edge to edge — the table out to the card's sides, each row and the
+     header 4 in, so the columns stay put — under the stroke, moved to a
+     layer above the content as on the ticket */
+  "html .wshell.wshell.wshell.oc-root.oc-root{outline-color:transparent!important;box-shadow:none!important}" +
+  ".wshell.oc-root::after{content:\"\";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:5;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 1px 0 rgba(255,255,255,.09)}" +
+  ".wsp .wshell.oc-root::after{box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),inset 0 1px 0 rgba(255,255,255,.09)}" +
+  ".oc-root .oc-table{margin-left:-4px!important;margin-right:-4px!important;border-radius:0!important}" +
+  // (the right keeps the grid's 8 for the scrollbar: 8 + 4)
+  ".oc-root .oc-head,.oc-root .oc-row{padding-left:4px!important;padding-right:12px!important}" +
+  /* the ticket's column the width of its card (312, not the 357 it was
+     sized for), so the chain and the ticket sit the layout's 4 apart */
+  ".ctt-ticket{flex-basis:312px!important}" +
+  // dividers on the content line, and none either side of a lit row
+  ".ob-stage:not(.st-stage) .ob-leg-u+.ob-leg-u>.ob-leg::before{left:14px!important;right:14px!important}" +
+  ".ob-stage:not(.st-stage) .ob-leg:is([data-linked]:hover,[data-lit])::before,.ob-stage:not(.st-stage) .ob-leg-u:has(>.ob-leg:is([data-linked]:hover,[data-lit]))+.ob-leg-u>.ob-leg::before{opacity:0}" +
+  ".ob-stage:not(.st-stage) .ob-legs-panel:has(.ob-leg-u:last-child>.ob-leg:is([data-linked]:hover,[data-lit]))+.ob-params-panel .ob-params{border-top-color:transparent!important}" +
+  // the payoff box's edges on the same line as the fields' (its 6 margin → 10)
+  ".ob-stage:not(.st-stage) .ob-payoff{margin-left:14px!important;margin-right:14px!important}" +
+  /* …and its leg line still whole at 304: a price is right-aligned, so its
+     44 minimum only held space — at its own width ("$3.07" 30) the
+     description gets the rest */
+  ".ob-stage:not(.st-stage) .ob-leg-px{min-width:0!important}" +
+  /* the leg's two insets equal (the user, 2026-11-19): the text starts 6
+     in; the X's 8px glyph, centred in its 16 hit box behind a 5 margin,
+     ended 15 in. −4 puts its ink 6 from the edge, the box still 16 */
+  ".ob-stage:not(.st-stage) .ob-leg .ob-x{margin-right:-4px!important}" +
   /* positive / negative from the user's button reference (dark mode,
      2026-11-12). Text — every green / red reading in the widgets (P&L,
      price change, legs…) rides --up / --down: its fg-positive #7ED68C and
@@ -98,7 +155,11 @@ export const TICKET_UI =
   "--line-itm:rgba(255,255,255,.06)!important}" +
   ".oc-pill--bid,.oc-pill--ask{--pill-bg:rgba(255,255,255,.08)!important}" +
   ".oc-pill--bid{--pill-ring:rgba(229,131,122,.5)!important}.oc-pill--ask{--pill-ring:rgba(126,214,140,.5)!important}" +
-  ".oc-row:hover,.oc-row[data-lit],.oc-root .oc-row[data-hov]{background:rgba(255,255,255,.05)!important}" +
+  /* a chain row lights only from its leg on the ticket (the user,
+     2026-11-19: "dont hover the entire row unless i am hovering over the
+     leg in order entry") — not under the pointer, real or the loop's */
+  ".oc-row[data-lit]{background:rgba(255,255,255,.05)!important}" +
+  ".oc-root .oc-row:not([data-lit]):is(:hover,[data-hov]){background:transparent!important}" +
   // the ticket's end of the same link (a leg hovered, or lit from the
   // chain) in the chain row's grey, not the old teal #272e30 (the user,
   // 2026-11-19: "match on both widgets") — solid, as the lit chain row
@@ -151,7 +212,8 @@ export const TICKET_UI =
   /* a row the height of the field it drops from (the user, 2026-11-19):
      30, not the Atlas doc's 27 (its field was 48 tall at that scale) — a
      hovered row is then exactly a field's size */
-  ".ob-dd-item{height:30px!important}" +
+  // …the field is 28 since the tighter ticket, so the row follows it
+  ".ob-dd-item{height:var(--field-h,28px)!important}" +
   /* no padding above the first row or below the last (the user's menu
      reference, 2026-11-19), and the sides on the CARD's inset: the ticket
      has two — 6 inside a control (a field's text), 10 inside a surface
@@ -267,6 +329,10 @@ export const TICKET_UI =
    tickets with no title bar, lighter fields with rounder corners, "Limit
    price" on its own with a smaller Mid / Ask line, a solid caret. */
 export const DECK_NEW_UI =
+  /* no confirmation scrim on a slide (the user, 2026-11-19: "remove the
+     weird box"): it fills the page, and a slide's frame crops the page to
+     a rectangle — a dim box around the ticket. The panel stands alone. */
+  "html .ob-stage .ob-scrim.ob-scrim.ob-scrim{background:transparent!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}" +
   "html.is-bare .wshell.wshell,.wshell.wshell{background:linear-gradient(0deg,rgba(0,0,0,.2),rgba(0,0,0,.2)),rgba(1,1,1,.5)!important;border:1px solid rgba(255,255,255,.1)!important;border-radius:8px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important;-webkit-backdrop-filter:blur(100px);backdrop-filter:blur(100px)}" +
   ".ob-stage .wshell-bar,.wshell-bar{display:none!important}" +
   ".ob-stage .ob-field{border-radius:6px!important}" +
@@ -300,7 +366,10 @@ export const TICKET_PAGE =
   DECK_NEW_UI +
   DECK_VEDA +
   TICKET_UI +
-  ".wshell.wshell:not(.ob-modal){box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 2px 2px -2px rgba(0,0,0,.7),0 12px 12px -12px rgba(0,0,0,.85),0 28px 24px -24px rgba(0,0,0,.95),0 56px 48px -48px rgba(0,0,0,.6)!important}" +
+  "html .wshell.wshell.wshell.wshell:not(.ob-modal){box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 2px 2px -2px rgba(0,0,0,.5),0 12px 12px -12px rgba(0,0,0,.6),0 28px 24px -24px rgba(0,0,0,.65),0 56px 48px -48px rgba(0,0,0,.4)!important}" +
+  /* (the bare page's own "none" and the options card's stroke layer both
+     outranked the depth; the options card's top highlight is its ::after) */
+  "html .ob-stage:not(.st-stage) .wshell.wshell.wshell.wshell:not(.ob-modal){box-shadow:0 2px 2px -2px rgba(0,0,0,.5),0 12px 12px -12px rgba(0,0,0,.6),0 28px 24px -24px rgba(0,0,0,.65),0 56px 48px -48px rgba(0,0,0,.4)!important}" +
   /* the stock ticket's top held, as the deck holds it (the user,
      2026-11-19: switching Market ↔ Limit made the widget "shaky"). Its
      page centred the card (safe center + a 24dvh lift), so every row the

@@ -425,7 +425,7 @@
 /* Drawn inset 6 each side, the length of the rule under the last leg
    (.ob-params' border-top): a border on the row ran 6 further out at both
    ends, so the card had two lengths of divider. */
-.ob-leg + .ob-leg::before {
+.ob-leg-u + .ob-leg-u > .ob-leg::before {
   content: "";
   position: absolute;
   top: 0;
@@ -3103,11 +3103,11 @@ button.ob-chip--strike:focus-visible::after,
 /* Which leaves the divider, because it would now run to the container's
    edge — the one line on these cards that never does. Drawn as a
    pseudo-element inset by the same 6 instead. */
-.ob-leg[data-linked] + .ob-leg[data-linked] {
+.ob-leg-u + .ob-leg-u > .ob-leg[data-linked] {
   border-top: 0;
 }
 
-.ob-leg[data-linked] + .ob-leg[data-linked]::before {
+.ob-leg-u + .ob-leg-u > .ob-leg[data-linked]::before {
   content: "";
   position: absolute;
   top: 0;

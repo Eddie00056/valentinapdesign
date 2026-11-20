@@ -1509,8 +1509,9 @@ export function StockTicket({
             </div>
         )}
       </AnimatePresence>
-      </div>
-
+      {/* (inside the ticket's box since 2026-11-19, so it can sit under the
+          card — the user: "the same order confirmation banner as in option
+          chain"; at the page's foot it fell outside a slide's frame) */}
       {/* ---- the order has been placed ----
 
           Bottom of the page, not attached to the ticket: what it reports
@@ -1629,6 +1630,7 @@ export function StockTicket({
             </motion.div>
           )}
         </AnimatePresence>
+      </div>
       </div>
 
       {/* The scrim is the page's, not the widget's: it covers everything

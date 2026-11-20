@@ -15,15 +15,21 @@ import "./input-field-spec.css";
    it doesn't have yet (error, disabled, read only) are the spec's own
    proposal, drawn on the same field. */
 
+/* Updated to the final ticket (the user, 2026-11-19: "update the
+   component design system page with the updated behaviour and design"):
+   140 × 28, no ±0.01 arrows, the unit a one-tap toggle plate on the right,
+   the value crossing over when it changes unit, the deck's colours. */
 const SPRING = { type: "spring", stiffness: 500, damping: 34 } as const;
 const UNITS = ["Shares", "Dollars"] as const;
+const PX_UNITS = ["Dollar amount", "Percentage"] as const;
+const LAST = 87.41;
 const MARK: Record<string, ReactNode> = {
   Shares: <StackIcon size={13} stroke={2.21} />,
   Dollars: <span className="ob-dd-mark">$</span>,
 };
 const noop = () => {};
 
-type Kind = "value" | "stepper" | "price" | "prefix" | "select";
+type Kind = "value" | "unit" | "price" | "select";
 type State = "default" | "hover" | "selected" | "error" | "error-hover" | "error-selected" | "disabled" | "readonly";
 
 const STATES: { k: State; name: string }[] = [
@@ -36,21 +42,20 @@ const STATES: { k: State; name: string }[] = [
   { k: "readonly", name: "Read only" },
 ];
 
-/* the bare field, every kind × every state — one width (the ticket's 168),
+/* the bare field, every kind × every state — one width (the ticket's 140),
    one left edge per column */
 const ROWS: { k: Kind; name: string }[] = [
   { k: "value", name: "Value" },
-  { k: "stepper", name: "Stepper" },
-  { k: "price", name: "Currency" },
-  { k: "prefix", name: "Clickable prefix" },
+  { k: "unit", name: "Unit toggle" },
+  { k: "price", name: "Price toggle" },
   { k: "select", name: "Select" },
 ];
 
-/* the field in a ticket line: label left, the same 168 field on the line's
+/* the field in a ticket line: label left, the same 140 field on the line's
    right edge (its own board, so the label never squeezes the field) */
 const LINES: { k: Kind; name: string; label: string; sub?: string }[] = [
-  { k: "stepper", name: "Side label", label: "Quantity" },
-  { k: "price", name: "Side label + caption", label: "Limit price", sub: "Mid $19.84" },
+  { k: "unit", name: "Side label", label: "Quantity" },
+  { k: "price", name: "Side label + caption", label: "Limit price", sub: "Bid $87.40  Ask $87.42" },
 ];
 const LINE_STATES: State[] = ["default", "selected", "error", "error-selected"];
 
@@ -60,51 +65,74 @@ function Field({ kind, live = false, bad = false }: { kind: Kind; live?: boolean
   // `bad`: an error example holds a value that breaks its rule
   const [qty, setQty] = useState(bad ? 0 : 10);
   const [unit, setUnit] = useState<string>("Shares");
-  const [price, setPrice] = useState(bad ? 0 : 19.84);
+  const [pxUnit, setPxUnit] = useState<string>("Dollar amount");
+  const [price, setPrice] = useState(bad ? 0 : 87.41);
   const [dur, setDur] = useState("Good for day");
   if (kind === "value")
     return (
       <StepperField ariaLabel="Value" value={String(qty)} onChange={noop} onStep={noop} reduce={reduce} spring={SPRING} steppable={false} />
     );
-  if (kind === "stepper")
-    return (
+  if (kind === "unit")
+    return unit === "Dollars" ? (
+      <PriceField
+        ariaLabel="Amount"
+        steppable={false}
+        prefixCycle
+        prefix={unit}
+        prefixLabel={MARK[unit]}
+        prefixOptions={UNITS}
+        onPrefixSelect={live ? setUnit : noop}
+        prefixIcon={(v) => MARK[v]}
+        prefixAria="What the order is counted in"
+        unitMorph={{ key: "Dollars", side: "prefix" }}
+        value={qty * LAST}
+        onCommit={noop}
+        onStep={noop}
+        reduce={reduce}
+        spring={SPRING}
+      />
+    ) : (
       <StepperField
         ariaLabel="Quantity"
+        steppable={false}
+        prefixCycle
+        prefix={unit}
+        prefixLabel={MARK[unit]}
+        prefixOptions={UNITS}
+        onPrefixSelect={live ? setUnit : noop}
+        prefixIcon={(v) => MARK[v]}
+        prefixAria="What the order is counted in"
+        unitMorph={{ key: "Shares", side: "suffix" }}
         value={String(qty)}
         onChange={(r) => live && setQty(Math.max(1, parseInt(r.replace(/\D/g, ""), 10) || 1))}
-        onStep={(d) => live && setQty((q) => Math.max(1, q + d))}
+        onStep={noop}
         reduce={reduce}
         spring={SPRING}
       />
     );
-  if (kind === "price")
+  if (kind === "price") {
+    const pct = pxUnit === "Percentage";
     return (
       <PriceField
         ariaLabel="Limit price"
-        value={price}
+        steppable={false}
+        prefixCycle
+        prefix={pxUnit}
+        prefixLabel={pct ? "%" : "$"}
+        prefixOptions={PX_UNITS}
+        onPrefixSelect={live ? setPxUnit : noop}
+        prefixIcon={(v) => <span className="ob-dd-mark">{v === "Percentage" ? "%" : "$"}</span>}
+        prefixAria="What the limit price is set in"
+        unitMorph={{ key: pxUnit, side: pct ? "suffix" : "prefix" }}
+        decimals={pct ? 0 : 2}
+        value={pct ? (bad ? 0 : 2) : price}
         onCommit={(v) => live && setPrice(v)}
-        onStep={(d) => live && setPrice((p) => +(p + d * 0.01).toFixed(2))}
+        onStep={noop}
         reduce={reduce}
         spring={SPRING}
       />
     );
-  if (kind === "prefix")
-    return (
-      <StepperField
-        ariaLabel="Quantity"
-        prefix={unit}
-        prefixLabel={MARK[unit]}
-        prefixOptions={live ? UNITS : undefined}
-        onPrefixSelect={live ? setUnit : undefined}
-        prefixIcon={(v) => MARK[v]}
-        prefixAria="What the order is counted in"
-        value={String(qty)}
-        onChange={(r) => live && setQty(Math.max(1, parseInt(r.replace(/\D/g, ""), 10) || 1))}
-        onStep={(d) => live && setQty((q) => Math.max(1, q + d))}
-        reduce={reduce}
-        spring={SPRING}
-      />
-    );
+  }
   return (
     <Dropdown
       className="ob-field ob-field--switch"
@@ -118,8 +146,7 @@ function Field({ kind, live = false, bad = false }: { kind: Kind; live?: boolean
 
 const ERR: Record<Kind, string> = {
   value: "Enter a quantity of at least 1",
-  stepper: "Enter a quantity of at least 1",
-  prefix: "Enter a quantity of at least 1",
+  unit: "Enter a quantity of at least 1",
   price: "Enter a price above $0.00",
   select: "Choose a duration",
 };
@@ -140,7 +167,9 @@ function Msg({ children }: { children: ReactNode }) {
 function Cell({ kind, state, label, sub }: { kind: Kind; state: State; label?: string; sub?: string }) {
   const err = state === "error" || state === "error-selected" || state === "error-hover";
   return (
-    <div className={`ifs-cell is-${state}`} inert>
+    /* a unit toggle's hover is the plate's alone (the user, 2026-11-19:
+       "the hover treatment for the icon only") — the field keeps its fill */
+    <div className={`ifs-cell ${state === "hover" && (kind === "unit" || kind === "price") ? "is-default is-plate-hover" : `is-${state}`}`} inert>
       <div className={label ? "ob-line ifs-line" : "ifs-solo"}>
         {label && (
           <span className="ob-line-k">
@@ -173,21 +202,19 @@ function Breakdown() {
       const at = (sel: string) => b.querySelector(sel)?.getBoundingClientRect();
       const label = at(".ob-line-label");
       const sub = at(".ob-line-sub");
-      const k = at(".ob-field-k");
+      const plate = at(".ob-cycle-chip");
       const num = at(".ob-field input");
-      const step = at(".ob-stepper-btns");
       const field = at(".ob-field");
-      if (!label || !sub || !k || !num || !step || !field) return;
+      if (!label || !sub || !plate || !num || !field) return;
       const X = (v: number) => (v - o.left) / z;
       const Y = (v: number) => (v - o.top) / z;
       const cx = (r: DOMRect) => X(r.left + r.width / 2);
       setPins([
         { n: 1, x: cx(label), y: Y(label.top), side: "top" },
         { n: 2, x: cx(sub), y: Y(sub.bottom), side: "bottom" },
-        { n: 3, x: cx(k), y: Y(field.top), side: "top" },
-        { n: 4, x: X(num.left + 14 * z), y: Y(field.top), side: "top" },
-        { n: 5, x: cx(step), y: Y(field.top), side: "top" },
-        { n: 6, x: X(field.left + field.width * 0.62), y: Y(field.bottom), side: "bottom" },
+        { n: 3, x: X(num.left + 12 * z), y: Y(field.top), side: "top" },
+        { n: 4, x: cx(plate), y: Y(field.top), side: "top" },
+        { n: 5, x: X(field.left + field.width * 0.55), y: Y(field.bottom), side: "bottom" },
       ]);
     };
     measure();
@@ -205,9 +232,9 @@ function Breakdown() {
           <div className="ob-line ifs-line">
             <span className="ob-line-k">
               <span className="ob-line-label">Quantity</span>
-              <span className="ob-line-sub">≈ $1,940.80</span>
+              <span className="ob-line-sub">≈ $874.10</span>
             </span>
-            <Field kind="prefix" />
+            <Field kind="unit" />
           </div>
         </div>
         {pins.map((p) => (
@@ -219,9 +246,8 @@ function Breakdown() {
       <ol className="ifs-legend">
         <li>Label</li>
         <li>Caption (optional) — a reading about the value; an error replaces it</li>
-        <li>Prefix (optional) — the unit; clickable when there is a choice</li>
-        <li>Value</li>
-        <li>Stepper (optional) — ±1 step; shown on hover and while editing</li>
+        <li>Value — typed; no arrows</li>
+        <li>Unit toggle (optional) — the unit, on the right; one tap switches it</li>
         <li>Field fill</li>
       </ol>
     </div>
@@ -231,13 +257,10 @@ function Breakdown() {
 function Menu() {
   return (
     <div className="ob-dd-menu ifs-menu" role="listbox">
-      {UNITS.map((u) => (
-        <div key={u} className="ob-dd-item" aria-selected={u === "Shares"}>
-          <span className="ob-dd-label">
-            <span className="ob-dd-lead">{MARK[u]}</span>
-            {u}
-          </span>
-          {u === "Shares" && <Check />}
+      {["Good for day", "Good till cancelled", "Extended hours"].map((u) => (
+        <div key={u} className="ob-dd-item" aria-selected={u === "Good for day"}>
+          <span className="ob-dd-label">{u}</span>
+          {u === "Good for day" && <Check />}
         </div>
       ))}
     </div>
@@ -252,17 +275,36 @@ function Menu() {
 function LiveExample() {
   const reduce = useReducedMotion();
   const [unit, setUnit] = useState<string>("Shares");
+  const [pxUnit, setPxUnit] = useState<string>("Dollar amount");
   const [qty, setQty] = useState("10");
-  const [price, setPrice] = useState("19.84");
+  const [price, setPrice] = useState("87.41");
   const [dur, setDur] = useState("Good for day");
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [active, setActive] = useState<string | null>(null);
+  /* the figure a unit switch replaced — the shares field and the dollars
+     field are different fields, so the old one plays its exit here */
+  const from = useRef<{ text: string; side: "prefix" | "suffix" } | undefined>(undefined);
   const touch = (k: string) => setTouched((t) => (t[k] ? t : { ...t, [k]: true }));
 
-  const qtyErr = touched.qty && qty.trim() !== "" && !(parseInt(qty, 10) >= 1) ? ERR.prefix : null;
+  const qtyN = parseInt(qty, 10);
+  const qtyErr = unit === "Shares" && touched.qty && qty.trim() !== "" && !(qtyN >= 1) ? ERR.unit : null;
+  const pct = pxUnit === "Percentage";
   const pxNum = parseFloat(price.replace(/[^0-9.]/g, ""));
   const pxErr = touched.px && price.trim() !== "" && !(pxNum > 0) ? ERR.price : null;
   const errs: Record<string, string | null> = { qty: qtyErr, px: pxErr };
+  const pickUnit = (v: string) => {
+    from.current = unit === "Shares" ? { text: qty, side: "suffix" } : { text: ((qtyN || 0) * LAST).toFixed(2), side: "prefix" };
+    setUnit(v);
+  };
+  /* each unit keeps its own value, so a round trip lands where it began
+     (a whole-number % converted back would drift the price) */
+  const other = useRef("2");
+  const pickPx = (v: string) => {
+    const was = price;
+    setPrice(other.current);
+    other.current = was;
+    setPxUnit(v);
+  };
 
   const wrap = (k: string, child: ReactNode) => (
     <div
@@ -283,48 +325,77 @@ function LiveExample() {
     </div>
   );
 
+  const common = {
+    steppable: false,
+    prefixCycle: true,
+    prefixOptions: UNITS,
+    onPrefixSelect: pickUnit,
+    prefixIcon: (v: string) => MARK[v],
+    prefixAria: "What the order is counted in",
+    reduce,
+    spring: SPRING,
+  };
   return (
     <div className="ifs-example">
       <div className="ob-line ifs-line">
         <span className="ob-line-k">
-          <span className="ob-line-label">Quantity</span>
+          <span className="ob-line-label">{unit === "Dollars" ? "Amount" : "Quantity"}</span>
         </span>
         {wrap(
           "qty",
-          <StepperField
-            ariaLabel="Quantity"
-            prefix={unit}
-            prefixLabel={MARK[unit]}
-            prefixOptions={UNITS}
-            onPrefixSelect={setUnit}
-            prefixIcon={(v) => MARK[v]}
-            prefixAria="What the order is counted in"
-            value={qty}
-            onChange={(r) => setQty(r.replace(/\D/g, ""))}
-            onStep={(d) => {
-              touch("qty");
-              setQty((q) => String(Math.max(0, (parseInt(q, 10) || 0) + d)));
-            }}
-            reduce={reduce}
-            spring={SPRING}
-          />,
+          unit === "Dollars" ? (
+            <PriceField
+              key="amount"
+              {...common}
+              ariaLabel="Amount"
+              prefix={unit}
+              prefixLabel={MARK[unit]}
+              prefixRollIn
+              unitMorph={{ key: "Dollars", side: "prefix" }}
+              morphFrom={from.current}
+              value={(qtyN || 0) * LAST}
+              onCommit={(v) => setQty(String(Math.max(1, Math.round(v / LAST))))}
+              onStep={noop}
+            />
+          ) : (
+            <StepperField
+              key="qty"
+              {...common}
+              ariaLabel="Quantity"
+              prefix={unit}
+              prefixLabel={MARK[unit]}
+              prefixRollIn={!!from.current}
+              unitMorph={{ key: "Shares", side: "suffix" }}
+              morphFrom={from.current}
+              value={qty}
+              onChange={(r) => setQty(r.replace(/\D/g, ""))}
+              onStep={noop}
+            />
+          ),
         )}
       </div>
       <div className="ob-line ifs-line">
         <span className="ob-line-k">
           <span className="ob-line-label">Limit price</span>
-          <span className="ob-line-sub">Mid $19.84 · Ask $19.94</span>
+          <span className="ob-line-sub">Bid $87.40  Ask $87.42</span>
         </span>
         {wrap(
           "px",
           <PriceField
             ariaLabel="Limit price"
+            steppable={false}
+            prefixCycle
+            prefix={pxUnit}
+            prefixLabel={pct ? "%" : "$"}
+            prefixOptions={PX_UNITS}
+            onPrefixSelect={pickPx}
+            prefixIcon={(v) => <span className="ob-dd-mark">{v === "Percentage" ? "%" : "$"}</span>}
+            prefixAria="What the limit price is set in"
+            unitMorph={{ key: pxUnit, side: pct ? "suffix" : "prefix" }}
+            decimals={pct ? 0 : 2}
             value={pxNum > 0 ? pxNum : 0}
-            onCommit={(v) => setPrice(v.toFixed(2))}
-            onStep={(d) => {
-              touch("px");
-              setPrice((p) => Math.max(0, (parseFloat(p) || 0) + d * 0.01).toFixed(2));
-            }}
+            onCommit={(v) => setPrice(pct ? String(Math.round(v)) : v.toFixed(2))}
+            onStep={noop}
             reduce={reduce}
             spring={SPRING}
           />,
@@ -360,7 +431,7 @@ function Section({ title, children, note }: { title: string; children: ReactNode
 
 export function InputFieldSpec() {
   return (
-    <div className="ifs ob-stage st-stage">
+    <div className="ifs ob-stage st-stage" data-variant="cycle">
       <header className="ifs-head">
         <h1>Input field</h1>
         <div className="ifs-badges">
@@ -373,7 +444,7 @@ export function InputFieldSpec() {
 
       <Section
         title="Example"
-        note="Live, with the error rules — enter 0 in Quantity or Limit price, leave the field, then correct it."
+        note="Live, with the error rules — enter 0 in Quantity or Limit price, leave the field, then correct it. Tap a unit plate to switch the unit."
       >
         <LiveExample />
       </Section>
@@ -404,7 +475,7 @@ export function InputFieldSpec() {
         </div>
       </Section>
 
-      <Section title="In a ticket line" note="The label takes the left; the field keeps its 168 on the line's right edge, as in the tickets.">
+      <Section title="In a ticket line" note="The label takes the left; the field keeps its 140 on the line's right edge, as in the tickets.">
         <div className="ifs-lines">
           <span />
           {LINE_STATES.map((k) => (
@@ -427,26 +498,56 @@ export function InputFieldSpec() {
         <div className="ifs-dims">
           <figure>
             <div className="ifs-cell is-default ifs-measure" inert>
-              <Field kind="prefix" />
+              <Field kind="unit" />
               <span className="ifs-h" />
             </div>
-            <figcaption>Fixed height 30 · corner radius 6</figcaption>
+            <figcaption>140 × 28 · corner radius 4</figcaption>
           </figure>
           <dl className="ifs-specs">
-            <div><dt>Height</dt><dd>30px</dd></div>
-            <div><dt>Radius</dt><dd>6px</dd></div>
+            <div><dt>Size</dt><dd>140 × 28 — every control on both tickets, one width</dd></div>
+            <div><dt>Radius</dt><dd>4px</dd></div>
             <div><dt>Value inset</dt><dd>6px left</dd></div>
-            <div><dt>Prefix cell</dt><dd>6px padding · 1px divider (white 10%)</dd></div>
-            <div><dt>Stepper</dt><dd>20 × 20, 3px from the right edge · carets 10 × 5</dd></div>
-            <div><dt>Label → field</dt><dd>label column, field on a shared right edge</dd></div>
-            <div><dt>Caption</dt><dd>2px under the label · 10px</dd></div>
-            <div><dt>Type</dt><dd>DM Sans 12 / 400, tabular figures</dd></div>
-            <div><dt>Fill</dt><dd>white 8%</dd></div>
-            <div><dt>Selected</dt><dd>1px mint rim #48D597</dd></div>
+            <div><dt>Unit toggle</dt><dd>20 × 20 plate, 4px in from the top, right and bottom · radius 2 · white 12%, 18% on hover · glyph centred</dd></div>
+            <div><dt>Label → field</dt><dd>label column, fields on one right edge · 304 card, 10px sides · widest label row 12 clear of its field</dd></div>
+            <div><dt>Label</dt><dd>DM Sans 12 / 400, white 60%</dd></div>
+            <div><dt>Caption</dt><dd>under the label · Bid / Ask 5px apart, fixed-width figures so ticks never shift it</dd></div>
+            <div><dt>Type</dt><dd>DM Sans 12 / 400</dd></div>
+            <div><dt>Fill</dt><dd>#242424 · hover #383838 · pressed #434343</dd></div>
+            <div><dt>Selected</dt><dd>fill #1E2920 · 1px rim #7ED68C</dd></div>
+            <div><dt>Menu</dt><dd>4px under the field, its width · #141414, 1px white 10%, radius 6 · rows the field's height, 0 8 padding · check #7ED68C</dd></div>
             <div><dt>Error</dt><dd>red value #FF557D · fill #2C1921 · rim #F55278 (55% when inactive)</dd></div>
             <div><dt>Error message</dt><dd>6px under the field, on its left edge · 11px #FF557D</dd></div>
           </dl>
         </div>
+      </Section>
+
+      <Section title="Motion" note="One spring for every row, a short crossover for every value — nothing overshoots, and what shouldn't move holds still.">
+        <dl className="ifs-rulelist">
+          <div>
+            <dt>Rows appear and leave</dt>
+            <dd>A field an order type brings (or a bracket, or a leg) unrolls from 0 on one critically damped spring — 560 / 34 / 0.5 — fading in over 0.15s; leaving, it folds in place on the same spring, out in 0.14s with a 3px blur.</dd>
+          </div>
+          <div>
+            <dt>One row replaces another</dt>
+            <dd>Limit ↔ Stop: a crossfade in place — out in 0.12s, in over 0.16s. Nothing below moves.</dd>
+          </div>
+          <div>
+            <dt>Unit toggle</dt>
+            <dd>The plate changes at once. The value crosses over: out toward its old unit's side, in from the new one's — 3px over 0.18s, fading out in 0.1s (2px blur) and in over 0.16s, overlapping so the field never empties.</dd>
+          </div>
+          <div>
+            <dt>Menu</dt>
+            <dd>Unfolds from the field: from 96%, 4px up, tipped back 4°, settling in 0.2s on cubic-bezier(.22, 1.6, .36, 1), fading in 0.1s; closes in 0.08–0.1s. The chevron dips 1.5px on each click.</dd>
+          </div>
+          <div>
+            <dt>Hover</dt>
+            <dd>Fills ease in 0.15s; the unit plate 12% → 18%.</dd>
+          </div>
+          <div>
+            <dt>Holds still</dt>
+            <dd>The ticket's top stays put — it only grows downward; live figures sit in fixed-width boxes so a tick never shifts the layout.</dd>
+          </div>
+        </dl>
       </Section>
 
       <Section title="Error rules" note="From the Atlas component library's text-field errors, applied to this field.">
@@ -480,20 +581,20 @@ export function InputFieldSpec() {
           <div className="ifs-errs">
             <div>
               <h3>While typing</h3>
-              <Cell kind="stepper" state="error-selected" label="Quantity" />
+              <Cell kind="unit" state="error-selected" label="Quantity" />
             </div>
             <div>
               <h3>After leaving the field</h3>
-              <Cell kind="stepper" state="error" label="Quantity" />
+              <Cell kind="unit" state="error" label="Quantity" />
             </div>
             <div>
               <h3>Two fields in error</h3>
-              <Cell kind="stepper" state="error" label="Quantity" />
+              <Cell kind="unit" state="error" label="Quantity" />
               <Cell kind="price" state="error-selected" label="Limit price" />
             </div>
             <div>
               <h3>One corrected</h3>
-              <Cell kind="stepper" state="default" label="Quantity" />
+              <Cell kind="unit" state="default" label="Quantity" />
               <Cell kind="price" state="error" label="Limit price" />
             </div>
           </div>
@@ -503,32 +604,32 @@ export function InputFieldSpec() {
       <Section title="Additional notes">
         <div className="ifs-notes">
           <div>
-            <h3>Incremental</h3>
-            <p>The stepper and ↑ / ↓ change the value by one step — a share, or a cent on a price.</p>
-            <div className="ifs-cell is-selected" inert>
-              <Field kind="stepper" />
+            <h3>Unit toggle</h3>
+            <p>The unit sits in a plate on the right. One tap switches it — shares ⇄ dollars, $ ⇄ % — and the value converts.</p>
+            <div className="ifs-cell is-default is-plate-hover" inert>
+              <Field kind="unit" />
             </div>
           </div>
           <div>
             <h3>Masking</h3>
-            <p>A price always shows two decimals; typing strips anything that isn't a digit or a point.</p>
+            <p>A dollar value always shows two decimals; a percentage is a whole number. Typing strips anything that isn't a digit or a point.</p>
             <div className="ifs-cell is-default" inert>
-              <PriceField ariaLabel="Amount" value={1940.8} onCommit={noop} onStep={noop} reduce spring={SPRING} />
+              <Field kind="price" />
             </div>
           </div>
           <div>
-            <h3>Clickable prefix</h3>
-            <p>The prefix holds the unit. With a choice it opens a menu; the chosen row takes the check.</p>
-            <div className="ifs-cell is-prefix-open" inert>
-              <Field kind="prefix" />
-              <Menu />
+            <h3>No arrows</h3>
+            <p>Values are typed or converted, not nudged: the ±0.01 arrows are gone, so the field is the value and its unit.</p>
+            <div className="ifs-cell is-selected" inert>
+              <Field kind="value" />
             </div>
           </div>
           <div>
             <h3>Select</h3>
-            <p>A field that holds a choice from a list. The caret shows on hover and while open.</p>
-            <div className="ifs-cell is-hover" inert>
+            <p>A choice from a list. The menu drops 4px below, the field's width; its rows are the field's height, the chosen one checked.</p>
+            <div className="ifs-cell is-select-open" inert>
               <Field kind="select" />
+              <Menu />
             </div>
           </div>
         </div>

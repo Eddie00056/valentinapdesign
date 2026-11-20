@@ -16,6 +16,7 @@ import { WidgetShell } from "../shared/WidgetShell";
    same card asking a different set of questions. See TicketControls. */
 import {
   AutoHeight,
+  Unroll,
   Dropdown,
   PriceField,
   StepperField,
@@ -802,7 +803,7 @@ export function OptionsBuilder({
               back off. Everything that WAS editable here is decided in
               the chain, by which price you click. */}
           <div className="ob-legs-panel">
-          <AutoHeight className="ob-legs" transition={sizeSpring} enabled={!reduce}>
+          <AutoHeight className="ob-legs" transition={sizeSpring} enabled={false}>
             {/* popLayout, not the default.
 
                 On a replace — a quote picked off a chain swapping the leg
@@ -811,10 +812,13 @@ export function OptionsBuilder({
                 rows and shrank back. popLayout takes the leaver out of the
                 layout the moment it starts to go, so the height only ever
                 holds one row's worth. */}
-            <AnimatePresence initial={false} mode="popLayout">
+            <AnimatePresence initial={false}>
               {legs.map((l) => (
-                <motion.div
-                  key={l.id}
+                /* each leg opens and folds in place on the stock ticket's
+                   row motion (Unroll — the user, 2026-11-19: the same as
+                   adding or removing a bracket) */
+                <Unroll key={l.id} className="ob-leg-u">
+                <div
                   className="ob-leg"
                   /* Pointer, not mouse: the same event either way here,
                      and it is the one a pen or a trackpad also sends. */
@@ -843,23 +847,6 @@ export function OptionsBuilder({
                      told twice. It is also what kept re-measuring rows
                      mid-flight and putting a small bounce in the leg
                      line. */
-                  initial={reduce ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  /* The exit carries its own transition rather than
-                     taking the element's: entering is a reveal and
-                     leaving is a retreat, and they are not the same
-                     length. */
-                  exit={
-                    reduce
-                      ? { opacity: 0 }
-                      : {
-                          opacity: 0,
-                          y: 10,
-                          filter: "blur(4px)",
-                          transition: exitTransition,
-                        }
-                  }
-                  transition={enterTransition}
                 >
                   <span className="ob-leg-main">
                     {/* The action leads.
@@ -927,7 +914,8 @@ export function OptionsBuilder({
                       />
                     </svg>
                   </motion.button>
-                </motion.div>
+                </div>
+                </Unroll>
               ))}
             </AnimatePresence>
           </AutoHeight>

@@ -147,6 +147,9 @@ const VEDA_SAME: Record<number, number> = { 30: 26, 59: 32 };
    HOOD at $87.41 — passed to each embedded page as ?sym=&px= (see
    shared/quoteOverride); the website's own pages keep DASH / PLTR */
 const VEDA_QUOTE = "sym=HOOD&px=87.41";
+// slide 50's two ticket frames: 25.68 held the 357 card; the card inside
+// the frame's 6px pad (12 of 1920) shrinks by 304/357, the zoom kept
+const PAIR_W = ((25.68 * 19.2 - 12) * (304 / 357) + 12) / 19.2;
 /* veda: the stock ticket is the cycling-unit design (the user, 2026-11-19:
    "replace the order entry ticket with this one everywhere") — the same
    page under /work/stock-order-entry-cycle; the other decks keep theirs */
@@ -175,7 +178,16 @@ const TICKET32 = {
   x: (100 - (23.01 * 304) / 324) / 2,
   w: (23.01 * 304) / 324,
   h: 44.8 * 0.88,
-  css: ".ob-stage{background:none!important;align-items:flex-start!important}.ob-cost{display:none!important}",
+  /* the "order placed" snackbar at the slide's foot (935–980 canvas, just
+     above the frame's end and the toolbar), centred under the ticket:
+     (935 − the card's 307.4) / its 1.3635 zoom = 460 below the card's top */
+  css: ".ob-stage{background:none!important;align-items:flex-start!important}.ob-cost{display:none!important}.st-stage .ob-toast-wrap{position:absolute!important;top:460px!important;bottom:auto!important}",
+  /* the frame runs from the card's top (fitted by width, as 32 always
+     was) down to 1000 — short of the deck's toolbar — so the ticket can
+     grow, its confirmation open downward from its top, and the "order
+     placed" banner show under it (the user, 2026-11-19) */
+  y: 28.46,
+  h: (1000 - 307.4) / 10.8,
 };
 /* 26 / 30 / 31's legacy TSLA widget — one place for all three, so the
    steps between them stay pixel-identical. 20% smaller (the user,
@@ -273,7 +285,10 @@ const VEDA_PATCH: Record<number, Slide> = {
           ".site-header,header{display:none!important}" +
           /* the new ticket UI on the MacBook's screen too (the user,
              2026-11-12): ChainLoop reads this and dresses its copies */
-          "html{--ticket-ui:1}",
+          "html{--ticket-ui:1}" +
+          /* …and yours to drive (the user, 2026-11-19): the loop stops and
+             the chain and ticket take the real pointer — same placement */
+          "html{--chain-live:1}",
       },
     ],
   },
@@ -344,30 +359,32 @@ const VEDA_PATCH: Record<number, Slide> = {
   50: {
     shots: [],
     boxes: [],
-    /* a label over each card (the user, 2026-11-12), the deck's caption
-       style, at the "Updated widget design" distance (gap 17) */
-    labels: [
-      /* the snap measures to each live frame's box, not its card: the
-         stock card sits 26.7 under its box, the options card 21 — so the
-         gaps are 17 less those, which lands both 17 above their cards */
-      { text: "Stocks widget", x: 35.91, y: 31, size: "lg", gap: 17 - 26.7 },
-      { text: "Options widget", x: 64.09, y: 31, size: "lg", gap: 17 - 21 },
-    ],
+    /* the stocks ticket alone (the user, 2026-11-19: "remove the options
+       only widget and keep stocks only. center it and remove the label"):
+       its own height, at the pair's scale, centred on the slide */
+    labels: [],
     live: [
       {
         ...slides[49].live[0],
-        x: (100 - (25.68 * 2 + 2.5)) / 2,
-        /* the two cards top-aligned (the user, 2026-11-12): the stock
-           page lays its card 5.7 canvas px lower than the options page */
-        y: (100 - 35.28) / 2 - (5.7 / 1080) * 100,
-        h: 35.28,
-        /* same height as the option ticket (243.07 native px), Sell/Buy
-           pinned to the bottom so it sits level with Submit */
-        css:
-          slides[49].live[0].css +
-          "html.is-bare .wshell.wshell{min-height:243.07px!important;display:flex!important;flex-direction:column!important}.ob-card{flex:1 1 auto!important;display:flex!important;flex-direction:column!important}.ob-foot{margin-top:auto!important;transform:translateY(3.71px)}",
+        /* 10% of the slide higher (the user, 2026-11-19), and its top held
+           as the order type changes — it grows downward only, as on 32.
+           Fitted by width from the card's top (mode "width"): the frame
+           runs down the slide, so a taller order type (Stop limit, a
+           bracket) has room to grow instead of being cut by the frame
+           ("why is it getting cut off at the bottom"). 409.6 canvas px
+           wide — the card at the pair's 1.347 — its top at 272.7. */
+        /* fitted by width from the card's top, the frame down to 1000
+           (short of the toolbar): room for the tallest order type, the
+           confirmation opening downward from the card's top, and the
+           "order placed" banner under it */
+        mode: "width",
+        w: 409.6 / 19.2,
+        x: (100 - 409.6 / 19.2) / 2,
+        y: 272.7 / 10.8,
+        h: (1000 - 272.7) / 10.8,
+        /* the snackbar at the slide's foot: (935 − 272.7) / 1.3474 = 491.5 */
+        css: slides[49].live[0].css + ".ob-stage{align-items:flex-start!important}.st-stage .ob-toast-wrap{position:absolute!important;top:491.5px!important;bottom:auto!important}",
       },
-      { ...slides[49].live[1], x: (100 - (25.68 * 2 + 2.5)) / 2 + 25.68 + 2.5, y: (100 - 35.28) / 2 },
     ],
   },
   /* 16: the widget-based system, re-recorded (the user's "iq edge widget
@@ -397,8 +414,8 @@ const VEDA_PATCH: Record<number, Slide> = {
     // the set 1600 wide, centred (the user: "slightly smaller" than 1808)
     shots: [
       { src: "ifs-states", x: 160 / 19.2, y: 120 / 10.8, w: 1600 / 19.2 },
-      { src: "ifs-rules", x: 160 / 19.2, y: (120 + (1600 * 1039) / 2944 + 24) / 10.8, w: 788 / 19.2 },
-      { src: "ifs-notes", x: (160 + 788 + 24) / 19.2, y: (120 + (1600 * 1039) / 2944 + 24) / 10.8, w: 788 / 19.2 },
+      { src: "ifs-rules", x: 160 / 19.2, y: (120 + (1600 * 879) / 2944 + 24) / 10.8, w: 788 / 19.2 },
+      { src: "ifs-notes", x: (160 + 788 + 24) / 19.2, y: (120 + (1600 * 879) / 2944 + 24) / 10.8, w: 788 / 19.2 },
     ],
     labels: [],
     boxes: [],
@@ -3815,10 +3832,12 @@ const nt = (
        the layers alone read too weak: "less premium"), the softer layers
        around it */
     box-shadow:
-      0 2px 2px -2px rgba(0, 0, 0, 0.7),
-      0 12px 12px -12px rgba(0, 0, 0, 0.85),
-      0 28px 24px -24px rgba(0, 0, 0, 0.95),
-      0 56px 48px -48px rgba(0, 0, 0, 0.6);
+      /* lighter (the user, 2026-11-19: "slightly lower opacity"): every
+         layer at about 70% of what it was */
+      0 2px 2px -2px rgba(0, 0, 0, 0.5),
+      0 12px 12px -12px rgba(0, 0, 0, 0.6),
+      0 28px 24px -24px rgba(0, 0, 0, 0.65),
+      0 56px 48px -48px rgba(0, 0, 0, 0.4);
   }
   /* the final vision picture on 41 wears the same depth as the live cards */
   /* its stroke the live cards' own (the user: "match the widget stroke"):
@@ -3832,10 +3851,12 @@ const nt = (
     border-radius: 8px;
     box-shadow:
       0 0 0 1px rgba(255, 255, 255, 0.06),
-      0 2px 2px -2px rgba(0, 0, 0, 0.7),
-      0 12px 12px -12px rgba(0, 0, 0, 0.85),
-      0 28px 24px -24px rgba(0, 0, 0, 0.95),
-      0 56px 48px -48px rgba(0, 0, 0, 0.6);
+      /* lighter (the user, 2026-11-19: "slightly lower opacity"): every
+         layer at about 70% of what it was */
+      0 2px 2px -2px rgba(0, 0, 0, 0.5),
+      0 12px 12px -12px rgba(0, 0, 0, 0.6),
+      0 28px 24px -24px rgba(0, 0, 0, 0.65),
+      0 56px 48px -48px rgba(0, 0, 0, 0.4);
   }
   /* the re-cut COIN ticket wears the same depth as the live ones */
   .gd-n :global(img[src$="049c-body.webp"]) {
@@ -3891,9 +3912,10 @@ const nt = (
        blur reaches its full radius past the shape), so nothing reaches
        past the card's sides or top — the depth falls only below it,
        ~28px, darkest at the edge */
+    /* lighter with the live cards' (the user, 2026-11-19): ~70% */
     --veda-card-shadow:
-      0 28px 24px -24px rgba(0, 0, 0, 0.95),
-      0 6px 6px -6px rgba(0, 0, 0, 0.8);
+      0 28px 24px -24px rgba(0, 0, 0, 0.65),
+      0 6px 6px -6px rgba(0, 0, 0, 0.55);
   }
   .gd-slide.gd-v,
   .gd-slide--black.gd-v,

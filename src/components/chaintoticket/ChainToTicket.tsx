@@ -191,7 +191,18 @@ export function ChainToTicket({ plain = false }: { plain?: boolean }) {
      nobody asked for. */
   const chosen = useRef(false);
 
+  /* The pill just clicked doesn't light the leg it adds (the user,
+     2026-11-19: "when the leg is being added there should be no hover"):
+     the pointer is still on that pill, so its highlight is held off until
+     the pointer leaves it — any other pill, or the leg itself, lights as
+     before. */
+  const quiet = useRef<string | null>(null);
+  const hoverId = (q: { strike: number; kind: string; action: string; expiry: string }) =>
+    `${q.strike}|${q.kind}|${q.action}|${q.expiry}`;
+
   function pick(p: QuotePick) {
+    quiet.current = hoverId(p);
+    setLitLeg(null);
     setEverOpen(true);
     const key = keyOf(p);
     const held = pickedKeys.has(key);
@@ -235,7 +246,9 @@ export function ChainToTicket({ plain = false }: { plain?: boolean }) {
           onPick={pick}
           pickedKeys={pickedKeys}
           beamKey={beamKey}
-          onHoverQuote={(q) =>
+          onHoverQuote={(q) => {
+            if (q && quiet.current === hoverId(q)) return;
+            quiet.current = null;
             setLitLeg(
               q
                 ? {
@@ -245,8 +258,8 @@ export function ChainToTicket({ plain = false }: { plain?: boolean }) {
                     expiry: q.expiry,
                   }
                 : null,
-            )
-          }
+            );
+          }}
           onSpotChange={setUnderlying}
           onGrip={plain ? undefined : chainDrag.start}
         />

@@ -279,6 +279,15 @@ export function ChainLoop({
   const visible = useRef(true);
   const reduce =
     typeof window !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  /* --chain-live on the host page (the deck's MacBook slide, the user
+     2026-11-19: "stop the auto animation and let me interact with the
+     prototype and place the trade"): one copy, no script, no pointer of
+     its own — the real pointer and keyboard drive it, same placement */
+  const [live, setLive] = useState(false);
+  useEffect(
+    () => setLive(!!getComputedStyle(document.documentElement).getPropertyValue("--chain-live").trim()),
+    [],
+  );
 
   useLayoutEffect(() => {
     const el = box.current;
@@ -303,7 +312,7 @@ export function ChainLoop({
     style.textContent =
       `html, body, html.is-bare, html.is-bare body { background: ${ground} !important; }` +
       geo.css +
-      POINTER_CSS +
+      (live ? "" : POINTER_CSS) +
       /* the deck's slide 35 flags this page with --ticket-ui: its copies
          wear the new ticket UI there, and only there */
       (getComputedStyle(document.documentElement).getPropertyValue("--ticket-ui").trim() ? TICKET_UI : "");
@@ -314,7 +323,16 @@ export function ChainLoop({
        homepage jumped every time the toast came up, and the page lost the
        keyboard. The run clicks; it never needs focus. */
     const fw = f.contentWindow as (Window & typeof globalThis) | null;
-    if (fw) fw.HTMLElement.prototype.focus = function () {};
+    if (fw && !live) fw.HTMLElement.prototype.focus = function () {};
+    /* live: the deck's arrows still turn the slide after a click in here —
+       a key pressed outside a field is handed up to this page's window,
+       where the deck listens */
+    if (fw && live)
+      fw.addEventListener("keydown", (e) => {
+        const el = e.target as HTMLElement | null;
+        if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
+        window.dispatchEvent(new KeyboardEvent("keydown", { key: e.key, code: e.code, shiftKey: e.shiftKey, metaKey: e.metaKey, ctrlKey: e.ctrlKey, altKey: e.altKey, bubbles: true }));
+      });
 
     const timers: number[] = [];
     timersOf.current.set(key, timers);
@@ -324,7 +342,7 @@ export function ChainLoop({
       timers.push(
         window.setTimeout(() => setCopies((cs) => cs.filter((c) => c.key >= key)), FADE + 50),
       );
-      if (reduce) return;
+      if (reduce || live) return;
       void play(d, timers, geo);
       const next = () => {
         /* off screen: hold here rather than load copies nobody sees */
@@ -361,7 +379,7 @@ export function ChainLoop({
     <div
       ref={box}
       className="chain-loop"
-      aria-hidden="true"
+      aria-hidden={live ? undefined : true}
       style={{
         position: "relative",
         width: "100%",
@@ -376,9 +394,11 @@ export function ChainLoop({
           ref={(el) => {
             if (el) frames.current.set(c.key, el);
           }}
-          src={SRC}
+          /* live: the ticket waits for your first pick (?closed, as the
+             deck's chain slide opens it) */
+          src={live ? SRC + (SRC.includes("?") ? "&" : "?") + "closed" : SRC}
           title="Option chain to order ticket"
-          tabIndex={-1}
+          tabIndex={live ? 0 : -1}
           loading="eager"
           onLoad={() => onLoad(c.key)}
           style={{
@@ -392,7 +412,7 @@ export function ChainLoop({
             transform: `scale(${scale}) translate(${-geo.x}px, ${-geo.y}px)`,
             opacity: c.shown && scale ? 1 : 0,
             transition: `opacity ${FADE}ms ease`,
-            pointerEvents: "none",
+            pointerEvents: live ? "auto" : "none",
           }}
         />
       ))}

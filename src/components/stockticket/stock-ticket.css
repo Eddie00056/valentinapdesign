@@ -462,10 +462,39 @@
   --field-h: 28px;
   --line-w: 140px;
 }
-html.is-prop .st-stage[data-variant] .ob-shell {
+.st-stage[data-variant] .ob-shell {
   width: 304px !important;
 }
 .st-stage[data-variant] button.ob-field-k.ob-cycle-chip {
   min-width: 20px !important;
   height: 20px;
 }
+
+/* The order confirmation centred on the ticket itself (the user,
+   2026-11-19: "center the order confirmation on top of the new widget"):
+   the ticket now sits pinned near the top and grows downward, so a panel
+   centred on the page landed off it. Anchored to the deck (the card's own
+   box), centred both ways — a panel taller than the card overhangs it
+   equally above and below. The scrim stays fixed over the whole page. */
+.st-stage .ob-modal-wrap {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  align-items: center;
+  overflow: visible;
+}
+
+/* Placing a stock order the way an option order is placed (the user,
+   2026-11-19: "follow the same interaction as with placing an option
+   trade"): the confirmation ALIGNED to the ticket — its top on the card's
+   top, the same width, opening downward over it — and on Send order it
+   closes into the same "Your order has been placed" banner, here just
+   under the ticket rather than at the page's foot, where a slide's frame
+   never showed it. */
+.st-stage .ob-modal-wrap {
+  align-items: flex-start;
+}
+/* (the banner itself is a bottom snackbar — the user, 2026-11-19: "move
+   the banner lower… more like a bottom snackbar": on its own page the
+   window's foot, as ever; a slide sets its own place near the frame's
+   foot, the window there being taller than the slide shows) */

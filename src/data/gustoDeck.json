@@ -192,10 +192,10 @@
     "live": [
       {
         "page": "options-strategy-builder?bare&auto",
-        "x": 55.7,
+        "x": 57.528,
         "y": 22.0,
-        "w": 29.0,
-        "h": 62,
+        "w": 25.345,
+        "h": 52.796,
         "vw": 1280,
         "vh": 960,
         "fit": ".wshell",
@@ -762,9 +762,9 @@
     "live": [
       {
         "page": "stock-order-entry?bare",
-        "x": 67.12,
+        "x": 68.928,
         "y": 9.07,
-        "w": 24.99,
+        "w": 21.373,
         "h": 27.5,
         "vw": 1280,
         "vh": 960,
@@ -775,9 +775,9 @@
       },
       {
         "page": "options-strategy-builder?bare",
-        "x": 67.14,
+        "x": 68.673,
         "y": 49.51,
-        "w": 24.95,
+        "w": 21.884,
         "h": 34.04,
         "vw": 1280,
         "vh": 960,
@@ -844,7 +844,8 @@
         "fit": ".ctt",
         "css": ".wsp-rail{visibility:hidden!important}.wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}.ctt{min-height:0!important;padding:0!important;width:max-content!important}html.is-bare .wshell.wshell{background:#010101!important}",
         "clip": true,
-        "init": "pairOverlays"
+        "init": "pairOverlays",
+        "cssLast": ".wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}"
       }
     ],
     "corner": "Reducing time to trade"
@@ -864,9 +865,9 @@
     "live": [
       {
         "page": "options-strategy-builder?bare",
-        "x": 11.13,
+        "x": 12.796,
         "y": 25.05,
-        "w": 27.05,
+        "w": 23.719,
         "h": 36.91,
         "vw": 1280,
         "vh": 960,
@@ -899,9 +900,9 @@
     "live": [
       {
         "page": "options-strategy-builder?bare",
-        "x": 11.13,
+        "x": 12.796,
         "y": 25.05,
-        "w": 27.05,
+        "w": 23.719,
         "h": 36.91,
         "vw": 1280,
         "vh": 960,
@@ -1046,9 +1047,9 @@
     "live": [
       {
         "page": "stock-order-entry?bare",
-        "x": 40.91,
+        "x": 42.77,
         "y": 24.07,
-        "w": 25.68,
+        "w": 21.96,
         "h": 33.89,
         "vw": 1280,
         "vh": 1000,
@@ -1059,9 +1060,9 @@
       },
       {
         "page": "options-strategy-builder?bare",
-        "x": 69.09,
+        "x": 70.669,
         "y": 24.07,
-        "w": 25.68,
+        "w": 22.522,
         "h": 35.28,
         "vw": 1280,
         "vh": 1000,
@@ -1098,7 +1099,8 @@
         "fit": ".ctt",
         "css": ".wsp-rail{visibility:hidden!important}.wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}.ctt{min-height:0!important;padding:0!important;width:max-content!important}html.is-bare .wshell.wshell{background:#010101!important}",
         "clip": true,
-        "init": "pairOverlays"
+        "init": "pairOverlays",
+        "cssLast": ".wsp,.wsp-stage,.wsp-screen,.wsp-canvas{background:none!important;box-shadow:none!important;border:none!important}"
       }
     ],
     "corner": "Reducing time to trade"

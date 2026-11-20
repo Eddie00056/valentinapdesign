@@ -3,10 +3,13 @@
    real ticket fields — see components/inputspec/InputFieldSpec.tsx. */
 import Bare from "../../layouts/Bare.astro";
 import { InputFieldSpec } from "../../components/inputspec/InputFieldSpec";
+import { TICKET_UI } from "../../components/shared/ticketUi";
 ---
 
 <Bare title="Input field — spec" bg="#000">
   <InputFieldSpec client:load />
+  <!-- the tickets' own theme, so every cell is the final field (2026-11-19) -->
+  <Fragment set:html={`<style>${TICKET_UI}</style>`} />
 
   <style is:global>
     html,

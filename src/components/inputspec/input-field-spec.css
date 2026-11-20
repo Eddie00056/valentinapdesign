@@ -8,9 +8,8 @@
   --ifs-rule: #262626;
   --ifs-text: #fefffd;
   --ifs-muted: #9b9f9f;
-  /* the deck's field look (GustoDeck's injected ticket css, theme new) */
-  --chip: rgba(255, 255, 255, 0.08);
-  --sunk: rgba(255, 255, 255, 0.1);
+  /* the field's colours come from the tickets' own theme (TICKET_UI,
+     loaded by the page) — nothing restated here */
   width: 100%;
   max-width: 1760px;
   margin: 0 auto;
@@ -133,7 +132,7 @@
 .ifs-line > .ob-field,
 .ifs-line > label.ob-field,
 .ifs-line > button.ob-field {
-  width: 168px;
+  width: 140px;
 }
 .ifs-solo > * {
   width: 100%;
@@ -143,41 +142,55 @@
   gap: 16px;
   align-items: center;
   justify-content: space-between;
-  width: 280px;
+  width: 284px;
 }
 
 /* ---- held states --------------------------------------------------- */
-/* hover: the fill is the deck's (it doesn't change), the stepper shows,
-   the select's caret shows */
-.ifs-cell.is-hover .ob-stepper-hit,
-.ifs-cell.is-selected .ob-stepper-hit,
-.ifs-cell.is-error-selected .ob-stepper-hit,
-.ifs-cell.is-prefix-open .ob-stepper-hit {
-  opacity: 1;
+/* the ticket's own field states (2026-11-19): hover lifts the fill,
+   selected tints it green under a 1px #7ED68C rim; the select's caret and
+   the unit plate show as they do on the ticket */
+.ifs-cell.is-hover {
+  --chip: #383838 !important;
+}
+.ifs .ifs-cell.is-plate-hover button.ob-field-k.ob-cycle-chip.ob-cycle-chip {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+.ifs-cell.is-selected,
+.ifs-cell.is-select-open {
+  --chip: #1e2920 !important;
 }
 .ifs-cell.is-hover .ob-chevron,
 .ifs-cell.is-selected .ob-chevron,
+.ifs-cell.is-select-open .ob-chevron,
 .ifs-cell.is-error-selected .ob-chevron {
   opacity: 1;
 }
-/* selected: the mint rim, closed over the prefix divider */
 .ifs-cell.is-selected .ob-field::after,
+.ifs-cell.is-select-open .ob-field::after,
 .ifs-cell.is-error .ob-field::after,
 .ifs-cell.is-error-hover .ob-field::after,
-.ifs-cell.is-error-selected .ob-field::after,
-.ifs-cell.is-prefix-open .ob-field-k::after {
+.ifs-cell.is-error-selected .ob-field::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 2;
-  border: 1px solid #48d597;
+  border: 1px solid #7ed68c;
   border-radius: inherit;
   pointer-events: none;
 }
-.ifs-cell.is-prefix-open .ob-field-k {
+.ifs-cell.is-selected .ob-field,
+.ifs-cell.is-select-open .ob-field {
   position: relative;
-  border-radius: 6px 0 0 6px;
-  background: #112d25;
+}
+/* the select, open: its menu 4 under the field, the field's width */
+.ifs-cell.is-select-open {
+  position: relative;
+}
+.ifs-cell.is-select-open .ifs-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 140px;
 }
 /* error (proposed): the ticket's own error tokens */
 .ifs-cell.is-error .ob-field,
@@ -201,7 +214,7 @@
 .ifs-fieldwrap {
   position: relative;
   flex: none;
-  width: 168px;
+  width: 140px;
 }
 .ifs-fieldwrap > .ob-field,
 .ifs-fieldwrap > label.ob-field,
@@ -272,7 +285,7 @@
   gap: 14px;
 }
 /* the example's caption ("Mid $19.84 · Ask $19.94", ~125px) needs a wider
-   label column than the board's: 136 + the 16 gap + the 168 field */
+   label column than the board's: 136 + the 16 gap + the 140 field */
 .ifs-example .ifs-line {
   width: 320px;
 }
@@ -322,11 +335,11 @@
 }
 
 /* ---- states grid --------------------------------------------------- */
-/* every column is one field wide (168), spread across the panel, so the
+/* every column is one field wide (140), spread across the panel, so the
    seven states fit and every field in a column shares its left edge */
 .ifs-grid {
   display: grid;
-  grid-template-columns: 112px repeat(var(--cols), 168px);
+  grid-template-columns: 112px repeat(var(--cols), 140px);
   justify-content: space-between;
   column-gap: 16px;
   row-gap: 0;
@@ -371,7 +384,7 @@
 /* ---- in a ticket line ---------------------------------------------- */
 .ifs-lines {
   display: grid;
-  grid-template-columns: 160px repeat(3, 280px);
+  grid-template-columns: 160px repeat(3, 284px);
   column-gap: 72px;
   justify-content: start;
 }
@@ -380,7 +393,7 @@
   min-height: 84px;
 }
 .ifs-lines {
-  grid-template-columns: 136px repeat(4, 280px) !important;
+  grid-template-columns: 136px repeat(4, 284px) !important;
   column-gap: 24px !important;
 }
 
@@ -397,13 +410,13 @@
 }
 .ifs-measure {
   position: relative;
-  width: 168px;
+  width: 140px;
 }
 .ifs-h {
   position: absolute;
   right: -14px;
   top: 0;
-  height: 30px;
+  height: 28px;
   border-left: 1px solid #b07cf0;
 }
 .ifs-h::before,
@@ -476,7 +489,7 @@
 .ifs-notes .ifs-cell > .ob-field,
 .ifs-notes .ifs-cell > label.ob-field,
 .ifs-notes .ifs-cell > button.ob-field {
-  width: 168px;
+  width: 140px;
 }
 /* the open prefix's menu, set in place under the field (it's a portal in
    the ticket) */
@@ -484,7 +497,7 @@
   position: absolute !important;
   top: calc(100% + 4px);
   left: 0;
-  width: 168px;
+  width: 140px;
 }
 /* the four notes' fields on one line: each note's text takes the slack,
    so a description that wraps longer doesn't push its field down; the

@@ -1,7 +1,7 @@
 import { forwardRef, useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { ReactNode } from "react";
-import { AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
+import { useIsPresent, AnimatePresence, LayoutGroup, motion, useReducedMotion } from "motion/react";
 import type { Transition } from "motion/react";
 
 /**
@@ -156,6 +156,9 @@ export const Unroll = forwardRef<HTMLDivElement, UnrollProps>(function Unroll({
   swap = false,
 }: UnrollProps, ref) {
   const reduce = useReducedMotion();
+  /* marked while it folds, so the rows around it can already take the
+     place it is giving up (the options ticket's first-leg inset) */
+  const present = useIsPresent();
   const own = useRef<HTMLDivElement | null>(null);
   const top = useRef(0);
   useLayoutEffect(() => {
@@ -229,6 +232,7 @@ export const Unroll = forwardRef<HTMLDivElement, UnrollProps>(function Unroll({
       initial="enter"
       animate="rest"
       exit="leave"
+      data-leaving={present ? undefined : ""}
       style={{ overflow: "hidden" }}
     >
       {children}
@@ -343,9 +347,14 @@ export type UnitMorph = { key: string; side: "prefix" | "suffix" };
    user, 2026-11-19: "make it faster a bit"): the slide on a 0.22s spring
    (0.32), the fade and blur in 0.08s (0.1). Same shape, same distances. */
 const MORPH_T = {
-  x: { type: "spring" as const, duration: 0.22, bounce: 0 },
-  opacity: { duration: 0.08, ease: [0.4, 0, 1, 1] as [number, number, number, number] },
-  filter: { duration: 0.08, ease: [0.4, 0, 1, 1] as [number, number, number, number] },
+  /* calmer (the user, 2026-11-19: "the value flies… not smooth enough"):
+     the slide was a 0.22s spring with a long tail, so the new number sat
+     fully visible while still drifting 8–10px — a moving object, not a
+     value changing. Now 3px on a short ease-out that ends with the fade:
+     a nudge that says which way, read as a crossfade. */
+  x: { duration: 0.18, ease: [0.2, 0, 0, 1] as [number, number, number, number] },
+  opacity: { duration: 0.1, ease: [0.4, 0, 1, 1] as [number, number, number, number] },
+  filter: { duration: 0.1, ease: [0.4, 0, 1, 1] as [number, number, number, number] },
 };
 /* …and the incoming figure on an EASE-OUT (the user, 2026-11-19: "a small
    flicker"). Measured frame by frame, with both numbers on the ease-in the
@@ -354,9 +363,9 @@ const MORPH_T = {
    Coming in fast and settling soft, the two overlap instead of leaving a
    gap: the outgoing keeps its quick ease-in, the incoming takes the out. */
 const MORPH_IN_T = {
-  x: { type: "spring" as const, duration: 0.22, bounce: 0 },
-  opacity: { duration: 0.12, ease: [0, 0, 0.2, 1] as [number, number, number, number] },
-  filter: { duration: 0.12, ease: [0, 0, 0.2, 1] as [number, number, number, number] },
+  x: { duration: 0.18, ease: [0.2, 0, 0, 1] as [number, number, number, number] },
+  opacity: { duration: 0.16, ease: [0, 0, 0.2, 1] as [number, number, number, number] },
+  filter: { duration: 0.16, ease: [0, 0, 0.2, 1] as [number, number, number, number] },
 };
 
 /**
@@ -388,7 +397,7 @@ function MorphFigure({
      so it is held here until its exit has played, then dropped */
   const [ghost, setGhost] = useState(() => (enter ? from : undefined));
   if (!morph || reduce) return <>{children}</>;
-  const off = (side: "prefix" | "suffix") => (side === "prefix" ? -8 : 10);
+  const off = (side: "prefix" | "suffix") => (side === "prefix" ? -3 : 3);
   return (
     <span className="ob-morph">
       {ghost && (
@@ -396,7 +405,7 @@ function MorphFigure({
           className="ob-morph-ghost"
           aria-hidden="true"
           initial={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-          animate={{ opacity: 0, x: off(ghost.side), filter: "blur(4px)" }}
+          animate={{ opacity: 0, x: off(ghost.side), filter: "blur(2px)" }}
           transition={MORPH_T}
           onAnimationComplete={() => setGhost(undefined)}
         >
@@ -420,7 +429,7 @@ function MorphFigure({
             out: (side: "prefix" | "suffix") => ({
               opacity: 0,
               x: off(side === "prefix" ? "suffix" : "prefix"),
-              filter: "blur(4px)",
+              filter: "blur(2px)",
               transition: MORPH_T,
             }),
           }}
